@@ -355,8 +355,8 @@ This project is for educational and academic purposes.
 
 If you have any questions or suggestions:
 
-* Email: [your-email@example.com](mailto:your-email@example.com)
-* GitHub: your-github-profile
+* Email: [nguyenkhanhson03@gmail.com](mailto:nguyenkhanhson03@gmail.com)
+* GitHub: SonwNguyen
 
 ---
 
