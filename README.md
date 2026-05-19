@@ -1,23 +1,23 @@
 # Sales Process Digitalization System
 
-## 📚 Mục Lục
+## 📚 Table of Contents
 
-- [📖 Giới Thiệu](#-giới-thiệu)
-- [🎯 Mục Tiêu](#-mục-tiêu)
-- [🏗️ Các Chức Năng Chính](#️-các-chức-năng-chính)
-- [🔄 Quy Trình Hệ Thống](#-quy-trình-hệ-thống)
-- [👥 Vai Trò Hệ Thống](#-vai-trò-hệ-thống)
-- [🧩 Công Nghệ Sử Dụng](#-công-nghệ-sử-dụng)
-- [🗂️ Cấu Trúc Dự Án](#️-cấu-trúc-dự-án)
+- [📖 Introduction](#-introduction)
+- [🎯 Main Objectives](#-main-objectives)
+- [🏗️ System Modules](#️-system-modules)
+- [🔄 System Workflow](#-system-workflow)
+- [👥 System Roles](#-system-roles)
+- [🧩 Technologies Used](#-technologies-used)
+- [🗂️ Project Structure](#️-project-structure)
 - [🗃️ Database Entities](#️-database-entities)
 - [🔐 Authentication & Authorization](#-authentication--authorization)
 - [📊 Dashboard](#-dashboard)
-- [🚀 Hướng Phát Triển](#-hướng-phát-triển)
-- [⚙️ Cài Đặt Dự Án](#️-cài-đặt-dự-án)
-- [🧪 Database](#-database)
-- [📄 Tài Liệu](#-tài-liệu)
+- [🚀 Future Improvements](#-future-improvements)
+- [⚙️ Installation](#️-installation)
+- [🧪 Database Setup](#-database-setup)
+- [📄 Documents](#-documents)
 - [📜 License](#-license)
-- [📬 Liên Hệ](#-liên-hệ)
+- [📬 Contact](#-contact)
 
 ## 📌 Introduction
 
