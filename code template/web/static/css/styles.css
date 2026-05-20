@@ -1,0 +1,142 @@
+/* ===== Layout cơ bản ===== */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: #fafafa;
+  color: #333;
+}
+
+.header, .footer {
+  background-color: #F1F1F1;
+  text-align: center;
+  padding: 16px;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #FF6600; /* FPT Orange */
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  color: #fff;
+  text-align: center;
+  padding: 14px 18px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.topnav a:hover {
+  background-color: #0078D4; /* FPT Blue */
+}
+
+/* ===== Form Styling ===== */
+form {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 16px 0;
+  width: fit-content;
+}
+
+form input[type="text"],
+form input[type="password"],
+form select {
+  padding: 8px;
+  margin: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 180px;
+}
+
+form button {
+  padding: 8px 16px;
+  background-color: #0078D4; /* FPT Blue */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+form button:hover {
+  background-color: #005ea6;
+}
+
+/* ===== Table Styling ===== */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background-color: #fff;
+  margin-top: 16px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #FF6600; /* FPT Orange */
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* ===== CRUD Button Classes ===== */
+a, button {
+  text-decoration: none;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 4px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  margin: 2px;
+}
+
+/* Create */
+.btnCreate {
+  background-color: #00A859; /* FPT Green */
+}
+.btnCreate:hover {
+  background-color: #008947;
+}
+
+/* Edit */
+.btnEdit {
+  background-color: #0078D4; /* FPT Blue */
+}
+.btnEdit:hover {
+  background-color: #005ea6;
+}
+
+/* Delete */
+.btnDelete {
+  background-color: #C62828; /* Red tone */
+}
+.btnDelete:hover {
+  background-color: #a31d1d;
+}
+
+/* Details */
+.btnDetails {
+  background-color: #FF6600; /* FPT Orange */
+}
+.btnDetails:hover {
+  background-color: #e55a00;
+}
+
+/* Search */
+.btnSearch {
+  background-color: #0078D4;
+}
+.btnSearch:hover {
+  background-color: #005ea6;
+}
