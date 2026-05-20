@@ -1,6 +1,6 @@
 -- ============================================================================
--- Sales Process Digitalization System - SQL Server Schema (3NF)
--- Database: SWP_Sales_Process
+-- Sales Process Digitalization System - SQL Server Schema (Exact 17 Entities)
+-- Based on Context.drawio.xml ERD
 -- Created: 2026-05-20
 -- ============================================================================
 
@@ -13,466 +13,225 @@ GO
 USE SWP_Sales_Process;
 GO
 
--- 1. AUTHENTICATION & RBAC
--- ============================================================================
-
-CREATE TABLE roles (
+-- 1. role
+CREATE TABLE role (
     role_id INT IDENTITY(1,1) PRIMARY KEY,
-    role_name VARCHAR(50) UNIQUE NOT NULL,
-    description TEXT NULL
+    role_name VARCHAR(100) NOT NULL,
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE()
 );
 
-CREATE TABLE permissions (
+-- 2. permission
+CREATE TABLE permission (
     permission_id INT IDENTITY(1,1) PRIMARY KEY,
-    permission_code VARCHAR(100) UNIQUE NOT NULL, -- e.g., 'A01', 'SUBMIT_ORDER'
-    permission_name VARCHAR(255) NOT NULL
+    permission_name VARCHAR(255) NOT NULL,
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE()
 );
 
-CREATE TABLE role_permissions (
+-- 3. role_permission
+CREATE TABLE role_permission (
     role_id INT NOT NULL,
     permission_id INT NOT NULL,
     PRIMARY KEY (role_id, permission_id),
-    FOREIGN KEY (role_id) REFERENCES roles(role_id),
-    FOREIGN KEY (permission_id) REFERENCES permissions(permission_id)
+    FOREIGN KEY (role_id) REFERENCES role(role_id),
+    FOREIGN KEY (permission_id) REFERENCES permission(permission_id)
 );
 
-CREATE TABLE users (
+-- 4. user
+CREATE TABLE [user] (
     user_id INT IDENTITY(1,1) PRIMARY KEY,
-    username VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    user_name VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    full_name VARCHAR(255) NULL,
-    role_id INT NULL,
-    is_active BIT DEFAULT 1,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (role_id) REFERENCES roles(role_id)
+    full_name VARCHAR(255),
+    phone VARCHAR(20),
+    status VARCHAR(50),
+    role_id INT, -- FK from Role
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (role_id) REFERENCES role(role_id)
 );
 
--- 2. CORE MASTER DATA
--- ============================================================================
-
-CREATE TABLE customers (
-    customer_id INT IDENTITY(1,1) PRIMARY KEY,
-    user_id INT UNIQUE NULL,
-    company_name VARCHAR(255) NULL,
-    address TEXT NULL,
-    phone VARCHAR(20) NULL,
-    tax_code VARCHAR(50) NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-
-CREATE TABLE providers (
-    provider_id INT IDENTITY(1,1) PRIMARY KEY,
-    user_id INT UNIQUE NULL,
-    provider_name VARCHAR(255) NOT NULL,
-    address TEXT NULL,
-    phone VARCHAR(20) NULL,
-    rating DECIMAL(3,2) DEFAULT 0.0,
-    production_capacity TEXT NULL,
-    lead_time_avg INT NULL, -- in days
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-
-CREATE TABLE product_categories (
+-- 5. category
+CREATE TABLE category (
     category_id INT IDENTITY(1,1) PRIMARY KEY,
-    category_name VARCHAR(255) NOT NULL,
-    description TEXT NULL
+    category_name VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE provider_categories (
-    provider_id INT NOT NULL,
-    category_id INT NOT NULL,
-    PRIMARY KEY (provider_id, category_id),
-    FOREIGN KEY (provider_id) REFERENCES providers(provider_id),
-    FOREIGN KEY (category_id) REFERENCES product_categories(category_id)
-);
-
-CREATE TABLE products_services (
+-- 6. product
+CREATE TABLE product (
     product_id INT IDENTITY(1,1) PRIMARY KEY,
-    category_id INT NOT NULL,
     product_name VARCHAR(255) NOT NULL,
-    base_price DECIMAL(15,2) NULL,
-    description TEXT NULL,
-    FOREIGN KEY (category_id) REFERENCES product_categories(category_id)
+    description TEXT,
+    unit VARCHAR(50),
+    status VARCHAR(50),
+    selling_price DECIMAL(15,2),
+    category_id INT, -- FK from Category
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (category_id) REFERENCES category(category_id)
 );
 
--- 3. ORDERING & SOURCING
--- ============================================================================
+-- 7. customer
+CREATE TABLE customer (
+    customer_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT UNIQUE NULL, -- FK from User
+    tax_code VARCHAR(50),
+    type VARCHAR(50),
+    create_by INT NULL,
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES [user](user_id)
+);
 
-CREATE TABLE customer_orders (
-    order_id INT IDENTITY(1,1) PRIMARY KEY,
+-- 8. provider
+CREATE TABLE provider (
+    provider_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT UNIQUE NULL, -- FK from User
+    tax_code VARCHAR(50),
+    provider_name VARCHAR(255) NOT NULL,
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES [user](user_id)
+);
+
+-- 9. provider_product
+CREATE TABLE provider_product (
+    provider_id INT NOT NULL,
+    product_id INT NOT NULL,
+    cost_price DECIMAL(15,2),
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE(),
+    PRIMARY KEY (provider_id, product_id),
+    FOREIGN KEY (provider_id) REFERENCES provider(provider_id),
+    FOREIGN KEY (product_id) REFERENCES product(product_id)
+);
+
+-- 10. customer_order
+CREATE TABLE customer_order (
+    customer_order_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_id INT NOT NULL,
-    sale_id INT NULL, -- Manager/Sale who handles
-    order_date DATETIME DEFAULT GETDATE(),
-    status VARCHAR(50) NOT NULL, -- Draft, Pending Approval, Approved, Negotiating, Accepted, Rejected, Cancelled, Expired
-    total_estimated_amount DECIMAL(15,2) NULL,
-    requirement_details TEXT NULL,
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
-    FOREIGN KEY (sale_id) REFERENCES users(user_id)
+    status VARCHAR(50),
+    create_by INT,
+    create_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
 );
 
-CREATE TABLE quotations (
+-- 11. customer_order_detail
+CREATE TABLE customer_order_detail (
+    customer_order_detail_id INT IDENTITY(1,1) PRIMARY KEY,
+    customer_order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id),
+    FOREIGN KEY (product_id) REFERENCES product(product_id)
+);
+
+-- 12. quotation
+CREATE TABLE quotation (
     quotation_id INT IDENTITY(1,1) PRIMARY KEY,
-    order_id INT NOT NULL,
-    created_by INT NOT NULL,
-    quoted_amount DECIMAL(15,2) NOT NULL,
-    valid_until DATETIME NULL,
-    is_final BIT DEFAULT 0,
+    customer_order_id INT NULL,
+    quotation_date DATETIME DEFAULT GETDATE(),
+    status VARCHAR(50),
+    total_amount DECIMAL(15,2),
+    created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (order_id) REFERENCES customer_orders(order_id),
-    FOREIGN KEY (created_by) REFERENCES users(user_id)
+    FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id)
 );
 
-CREATE TABLE negotiation_history (
-    negotiation_id INT IDENTITY(1,1) PRIMARY KEY,
+-- 13. quotation_detail
+CREATE TABLE quotation_detail (
+    quotation_detail_id INT IDENTITY(1,1) PRIMARY KEY,
     quotation_id INT NOT NULL,
-    user_id INT NOT NULL, -- Who made the note/offer
-    note TEXT NOT NULL,
-    offered_amount DECIMAL(15,2) NULL,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (quotation_id) REFERENCES quotations(quotation_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    quantity INT,
+    selling_price DECIMAL(15,2),
+    discount_percent DECIMAL(5,2),
+    tax_percent DECIMAL(5,2),
+    amount DECIMAL(15,2),
+    FOREIGN KEY (quotation_id) REFERENCES quotation(quotation_id)
 );
 
--- 4. CONTRACTS (CUSTOMER & PROVIDER)
--- ============================================================================
+-- 14. provider_order
+CREATE TABLE provider_order (
+    provider_order_id INT IDENTITY(1,1) PRIMARY KEY,
+    customer_order_id INT NULL,
+    asigned_by INT,
+    assigned_at DATETIME DEFAULT GETDATE(),
+    status VARCHAR(50),
+    FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id)
+);
 
-CREATE TABLE customer_contracts (
+-- 15. provider_order_detail
+CREATE TABLE provider_order_detail (
+    provider_order_detail_id INT IDENTITY(1,1) PRIMARY KEY,
+    provider_order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    FOREIGN KEY (provider_order_id) REFERENCES provider_order(provider_order_id),
+    FOREIGN KEY (product_id) REFERENCES product(product_id)
+);
+
+-- 16. customer_contract
+CREATE TABLE customer_contract (
     contract_id INT IDENTITY(1,1) PRIMARY KEY,
-    order_id INT UNIQUE NOT NULL,
-    customer_id INT NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    status VARCHAR(50) NOT NULL, -- Draft, Pending Approval, Waiting Signature, Approved, In Execution, Completed, Cancelled
-    total_value DECIMAL(15,2) NOT NULL,
-    start_date DATE NULL,
-    end_date DATE NULL,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (order_id) REFERENCES customer_orders(order_id),
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+    customer_order_id INT NULL,
+    contract_number VARCHAR(100) UNIQUE NOT NULL,
+    total_amount DECIMAL(15,2),
+    status VARCHAR(50),
+    contract_version INT,
+    signed_at DATETIME NULL,
+    FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id)
 );
 
-CREATE TABLE customer_contract_versions (
-    version_id INT IDENTITY(1,1) PRIMARY KEY,
-    contract_id INT NOT NULL,
-    version_number INT NOT NULL,
-    content_snapshot NVARCHAR(MAX) NOT NULL, -- JSON format
-    modified_by INT NULL,
-    reason_for_change TEXT NULL,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (contract_id) REFERENCES customer_contracts(contract_id),
-    FOREIGN KEY (modified_by) REFERENCES users(user_id)
-);
-
-CREATE TABLE provider_orders (
-    p_order_id INT IDENTITY(1,1) PRIMARY KEY,
-    c_contract_id INT NOT NULL,
-    provider_id INT NOT NULL,
-    manager_id INT NULL,
-    status VARCHAR(50) NOT NULL, -- Sent To Provider, Negotiating, Accepted, Rejected, Cancelled
-    estimated_cost DECIMAL(15,2) NULL,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (c_contract_id) REFERENCES customer_contracts(contract_id),
-    FOREIGN KEY (provider_id) REFERENCES providers(provider_id),
-    FOREIGN KEY (manager_id) REFERENCES users(user_id)
-);
-
-CREATE TABLE provider_contracts (
-    p_contract_id INT IDENTITY(1,1) PRIMARY KEY,
-    p_order_id INT UNIQUE NOT NULL,
-    c_contract_id INT NOT NULL, -- Link to source customer contract
-    provider_id INT NOT NULL,
-    status VARCHAR(50) NOT NULL, -- Waiting Provider Signature, Approved, In Progress, Completed, Cancelled
-    contract_value DECIMAL(15,2) NOT NULL,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (p_order_id) REFERENCES provider_orders(p_order_id),
-    FOREIGN KEY (c_contract_id) REFERENCES customer_contracts(contract_id),
-    FOREIGN KEY (provider_id) REFERENCES providers(provider_id)
-);
-
-CREATE TABLE provider_contract_versions (
-    version_id INT IDENTITY(1,1) PRIMARY KEY,
-    p_contract_id INT NOT NULL,
-    version_number INT NOT NULL,
-    content_snapshot NVARCHAR(MAX) NOT NULL, -- JSON format
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (p_contract_id) REFERENCES provider_contracts(p_contract_id)
-);
-
--- 5. EXECUTION & QUALITY
--- ============================================================================
-
-CREATE TABLE provider_tasks (
-    task_id INT IDENTITY(1,1) PRIMARY KEY,
-    p_contract_id INT NOT NULL,
-    task_name VARCHAR(255) NOT NULL,
-    description TEXT NULL,
-    status VARCHAR(50) NOT NULL, -- Assigned, In Progress, Completed, Locked
-    delivery_status VARCHAR(50) NULL, -- Not Started, Packing, Delivering, Delivered, Received
-    due_date DATETIME NULL,
-    assigned_to INT NULL, -- User from Provider entity
-    FOREIGN KEY (p_contract_id) REFERENCES provider_contracts(p_contract_id),
-    FOREIGN KEY (assigned_to) REFERENCES users(user_id)
-);
-
-CREATE TABLE task_history (
-    history_id INT IDENTITY(1,1) PRIMARY KEY,
-    task_id INT NOT NULL,
-    old_status VARCHAR(50) NULL,
-    new_status VARCHAR(50) NOT NULL,
-    changed_by INT NULL,
-    reason TEXT NULL,
-    changed_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (task_id) REFERENCES provider_tasks(task_id),
-    FOREIGN KEY (changed_by) REFERENCES users(user_id)
-);
-
-CREATE TABLE quality_checks (
-    qc_id INT IDENTITY(1,1) PRIMARY KEY,
-    task_id INT NOT NULL,
-    checker_id INT NOT NULL, -- Manager
-    check_date DATETIME DEFAULT GETDATE(),
-    result VARCHAR(50) NOT NULL, -- Approved, Rejected, Request Rework
-    feedback TEXT NULL,
-    FOREIGN KEY (task_id) REFERENCES provider_tasks(task_id),
-    FOREIGN KEY (checker_id) REFERENCES users(user_id)
-);
-
--- 6. FINANCE
--- ============================================================================
-
-CREATE TABLE payments (
-    payment_id INT IDENTITY(1,1) PRIMARY KEY,
-    c_contract_id INT NULL, -- Inflow (from customer)
-    p_contract_id INT NULL, -- Outflow (to provider)
-    amount DECIMAL(15,2) NOT NULL,
-    payment_type VARCHAR(20) NOT NULL, -- 'INFLOW' or 'OUTFLOW'
-    status VARCHAR(50) NOT NULL, -- Pending, Confirmed, Rejected, Paid
-    payment_date DATETIME NULL,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (c_contract_id) REFERENCES customer_contracts(contract_id),
-    FOREIGN KEY (p_contract_id) REFERENCES provider_contracts(p_contract_id)
-);
-
-CREATE TABLE invoices (
-    invoice_id INT IDENTITY(1,1) PRIMARY KEY,
-    payment_id INT NOT NULL,
-    invoice_number VARCHAR(100) UNIQUE NOT NULL,
-    invoice_url TEXT NULL,
-    issue_date DATE DEFAULT CAST(GETDATE() AS DATE),
-    status VARCHAR(50) NOT NULL, -- Generated, Exported, Cancelled
-    FOREIGN KEY (payment_id) REFERENCES payments(payment_id)
-);
-
--- 7. COMMONS & AUDIT
--- ============================================================================
-
-CREATE TABLE attachments (
-    attachment_id INT IDENTITY(1,1) PRIMARY KEY,
-    entity_type VARCHAR(50) NULL, -- 'CONTRACT', 'ORDER', 'TASK'
-    entity_id INT NULL,
-    file_name VARCHAR(255) NULL,
-    file_url TEXT NULL,
-    uploaded_by INT NULL,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (uploaded_by) REFERENCES users(user_id)
-);
-
-CREATE TABLE status_history (
-    history_id INT IDENTITY(1,1) PRIMARY KEY,
-    entity_type VARCHAR(50) NOT NULL, -- 'CUSTOMER_ORDER', 'CUSTOMER_CONTRACT', etc.
-    entity_id INT NOT NULL,
-    old_status VARCHAR(50) NULL,
-    new_status VARCHAR(50) NOT NULL,
-    changed_by INT NULL,
-    reason TEXT NULL,
-    changed_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (changed_by) REFERENCES users(user_id)
+-- 17. provider_contract
+CREATE TABLE provider_contract (
+    contract_id INT IDENTITY(1,1) PRIMARY KEY,
+    provider_order_id INT NULL,
+    start_date DATE,
+    end_date DATE,
+    status VARCHAR(50),
+    FOREIGN KEY (provider_order_id) REFERENCES provider_order(provider_order_id)
 );
 
 -- ============================================================================
--- INDEXES (Performance Optimization)
+-- SEED SAMPLE DATA (Expanded)
 -- ============================================================================
 
-CREATE INDEX idx_customer_order_status ON customer_orders(status);
-CREATE INDEX idx_customer_order_customer_id ON customer_orders(customer_id);
-CREATE INDEX idx_customer_contract_status ON customer_contracts(status);
-CREATE INDEX idx_customer_contract_customer_id ON customer_contracts(customer_id);
-CREATE INDEX idx_provider_task_p_contract ON provider_tasks(p_contract_id);
-CREATE INDEX idx_provider_task_status ON provider_tasks(status);
-CREATE INDEX idx_payment_c_contract ON payments(c_contract_id);
-CREATE INDEX idx_payment_p_contract ON payments(p_contract_id);
-CREATE INDEX idx_payment_status ON payments(status);
-CREATE INDEX idx_provider_order_provider_id ON provider_orders(provider_id);
-CREATE INDEX idx_provider_contract_provider_id ON provider_contracts(provider_id);
-CREATE INDEX idx_status_history_entity ON status_history(entity_type, entity_id);
-CREATE INDEX idx_quotation_order_id ON quotations(order_id);
-CREATE INDEX idx_negotiation_quotation_id ON negotiation_history(quotation_id);
+-- Role & Permission
+INSERT INTO role (role_name) VALUES ('Admin'), ('Manager'), ('Sale'), ('Provider'), ('Customer');
+INSERT INTO permission (permission_name) VALUES ('Manage Users'), ('Manage Orders'), ('Manage Contracts'), ('View Reports');
+INSERT INTO role_permission (role_id, permission_id) SELECT r.role_id, p.permission_id FROM role r, permission p;
 
--- ============================================================================
--- SAMPLE DATA (Optional - for testing)
--- ============================================================================
+-- Users
+INSERT INTO [user] (user_name, password, email, full_name, status, role_id) VALUES
+('admin', '123', 'admin@mail.com', 'System Admin', 'Active', 1),
+('manager_a', '123', 'manager@mail.com', 'Nguyen Manager', 'Active', 2),
+('sale_x', '123', 'sale@mail.com', 'Tran Sale', 'Active', 3),
+('bakery_abc', '123', 'bakery@mail.com', 'ABC Bakery', 'Active', 4),
+('customer_j', '123', 'john@mail.com', 'John Doe', 'Active', 5);
 
--- Insert Roles
-INSERT INTO roles (role_name, description) VALUES
-('Admin', 'System Administrator'),
-('Manager', 'Business Manager'),
-('Sale', 'Sales Representative'),
-('Provider', 'Service Provider'),
-('Customer', 'Customer');
+-- Categories & Products
+INSERT INTO category (category_name) VALUES ('Bánh Mì'), ('Bánh Kem'), ('Bánh Quy');
+INSERT INTO product (product_name, selling_price, category_id, status) VALUES
+('Bánh Mì Sừng Bò', 25000, 1, 'Active'),
+('Bánh Kem Dâu', 350000, 2, 'Active'),
+('Cookies Socola', 50000, 3, 'Active');
 
--- Insert Permissions (Sample - A01 to A80 from requirements)
-INSERT INTO permissions (permission_code, permission_name) VALUES
-('A01', 'Submit Customer Order for Approval'),
-('A02', 'Approve Customer Order'),
-('A03', 'Reject Customer Order'),
-('A04', 'Send Customer Order Quotation'),
-('A05', 'Mark Customer Order as Negotiating'),
-('A06', 'Accept Customer Order'),
-('A07', 'Cancel Customer Order'),
-('A08', 'Expire Customer Order'),
-('A09', 'Create Customer Contract from Customer Order'),
-('A10', 'Submit Provider Order for Approval'),
-('A11', 'Approve Provider Order'),
-('A12', 'Reject Provider Order'),
-('A13', 'Send Provider Order to Provider'),
-('A14', 'Mark Provider Order as Negotiating'),
-('A15', 'Accept Provider Order'),
-('A16', 'Reject Provider Order by Provider'),
-('A17', 'Cancel Provider Order'),
-('A18', 'Expire Provider Order'),
-('A19', 'Create Provider Contract from Provider Order'),
-('A20', 'Send Quotation'),
-('A21', 'Revise Quotation'),
-('A22', 'Accept Quotation'),
-('A23', 'Reject Quotation'),
-('A24', 'Add Negotiation Note'),
-('A25', 'Submit Customer Contract for Approval'),
-('A26', 'Approve Customer Contract'),
-('A27', 'Reject Customer Contract'),
-('A28', 'Send Customer Contract for Signature'),
-('A29', 'Sign Customer Contract'),
-('A30', 'Decline Customer Contract'),
-('A31', 'Cancel Customer Contract'),
-('A32', 'Create Customer Contract Version'),
-('A33', 'Add Customer Contract Reject Note'),
-('A34', 'Move Customer Contract to In Execution'),
-('A35', 'Complete Customer Contract'),
-('A36', 'Submit Provider Contract for Approval'),
-('A37', 'Approve Provider Contract'),
-('A38', 'Reject Provider Contract'),
-('A39', 'Send Provider Contract for Signature'),
-('A40', 'Sign / Accept Provider Contract'),
-('A41', 'Decline Provider Contract'),
-('A42', 'Cancel Provider Contract'),
-('A43', 'Create Provider Contract Version'),
-('A44', 'Add Provider Contract Reject Note'),
-('A45', 'Assign Provider Contract'),
-('A46', 'Move Provider Contract to In Progress'),
-('A47', 'Complete Provider Contract'),
-('A48', 'Assign Provider Task'),
-('A49', 'Edit Provider Task'),
-('A50', 'Accept Provider Task'),
-('A51', 'Reject Provider Task'),
-('A52', 'Update Provider Task Progress'),
-('A53', 'Mark Provider Task as Completed'),
-('A54', 'Update Delivery Status'),
-('A55', 'Mark as Delivered'),
-('A56', 'Confirm Customer Received Order'),
-('A57', 'Lock Provider Task'),
-('A58', 'Submit Quality Check Result'),
-('A59', 'Approve Quality Check'),
-('A60', 'Reject Quality Check'),
-('A61', 'Request Provider Rework'),
-('A62', 'Create Customer Payment Request'),
-('A63', 'Confirm Customer Payment'),
-('A64', 'Reject Customer Payment'),
-('A65', 'Create Provider Payment Request'),
-('A66', 'Approve Provider Payment'),
-('A67', 'Reject Provider Payment'),
-('A68', 'Mark Provider Payment as Paid'),
-('A69', 'Generate Customer Invoice'),
-('A70', 'Export Customer Invoice'),
-('A71', 'Cancel Customer Invoice'),
-('A72', 'Generate Provider Invoice'),
-('A73', 'Export Provider Invoice'),
-('A74', 'Cancel Provider Invoice'),
-('A75', 'Export Report'),
-('A76', 'Export Excel'),
-('A77', 'Export PDF'),
-('A78', 'View History'),
-('A79', 'Upload Attachment'),
-('A80', 'Download Attachment');
+-- Customer & Provider Profiles
+INSERT INTO customer (user_id, tax_code, type) VALUES (5, '123456', 'Personal');
+INSERT INTO provider (user_id, tax_code, provider_name) VALUES (4, '789012', 'ABC Bakery Corp');
 
--- Insert Product Categories
-INSERT INTO product_categories (category_name, description) VALUES
-('Bánh Sinh Nhật', 'Birthday cakes'),
-('Bánh Cưới', 'Wedding cakes'),
-('Bánh Kem Custom', 'Custom cream cakes'),
-('Bánh Fondant', 'Fondant cakes'),
-('Bánh Sự Kiện', 'Event cakes'),
-('Bánh Doanh Nghiệp', 'Corporate cakes'),
-('Cupcake', 'Cupcakes'),
-('Bánh Lạnh', 'Cold cakes'),
-('Bánh Trung Thu', 'Mid-autumn cakes'),
-('Sản Xuất Bánh', 'Cake production service'),
-('In Hộp Bánh', 'Cake box printing'),
-('Trang Trí Bánh', 'Cake decoration'),
-('Giao Hàng Lạnh', 'Cold delivery service'),
-('Cung Cấp Nguyên Liệu', 'Raw material supply');
+-- Quotation & Orders
+INSERT INTO customer_order (customer_id, status) VALUES (1, 'Pending');
+INSERT INTO customer_order_detail (customer_order_id, product_id, quantity) VALUES (1, 1, 10), (1, 2, 1);
+INSERT INTO quotation (customer_order_id, status, total_amount) VALUES (1, 'Accepted', 600000);
+INSERT INTO quotation_detail (quotation_id, quantity, selling_price, amount) VALUES (1, 10, 25000, 250000), (1, 1, 350000, 350000);
 
--- ============================================================================
--- BUSINESS RULES & CONSTRAINTS NOTES
--- ============================================================================
-/*
-BR01: Customer Order phải Accepted trước khi tạo Customer Contract
-  -> Enforce: App layer checks customer_orders.status = 'Accepted' before INSERT into customer_contracts
+-- Contracts
+INSERT INTO customer_contract (customer_order_id, contract_number, total_amount, status) VALUES (1, 'CTR-2026-001', 600000, 'Signed');
+INSERT INTO provider_order (customer_order_id, status) VALUES (1, 'In Progress');
+INSERT INTO provider_contract (provider_order_id, start_date, end_date, status) VALUES (1, '2026-05-20', '2026-06-20', 'Active');
 
-BR02: Customer Contract phải Approved trước khi tạo Provider Order
-  -> Enforce: App layer checks customer_contracts.status = 'Approved' before INSERT into provider_orders
-
-BR03: Provider Order phải Accepted trước khi tạo Provider Contract
-  -> Enforce: App layer checks provider_orders.status = 'Accepted' before INSERT into provider_contracts
-
-BR04: Một Customer Contract có thể có nhiều Provider Contract
-  -> Enforce: FK c_contract_id in provider_contracts allows multiple rows per contract
-
-BR05: Provider chỉ thấy contract/task của chính mình
-  -> Enforce: App layer filters by provider_id in WHERE clause
-
-BR06: Completed contract không được sửa giá trị tiền
-  -> Enforce: App layer checks status != 'Completed' before UPDATE total_value
-
-BR07: Mọi thay đổi workflow phải lưu history
-  -> Enforce: Trigger on customer_contracts, provider_contracts, provider_tasks INSERT/UPDATE -> status_history
-
-BR08: Provider Contract phải gắn với Customer Contract
-  -> Enforce: FK c_contract_id NOT NULL in provider_contracts
-
-BR09: Không được thanh toán provider nếu task chưa completed
-  -> Enforce: App layer checks provider_tasks.status = 'Completed' before INSERT payments with payment_type='OUTFLOW'
-
-BR10: Nếu Customer Contract chưa được ký thì không được triển khai provider workflow
-  -> Enforce: App layer checks status = 'Approved' before allowing provider_tasks creation
-
-BR11: Nếu Provider từ chối contract thì task phải bị khóa
-  -> Enforce: Trigger on provider_contracts UPDATE status='Provider Declined' -> UPDATE provider_tasks SET status='Locked'
-
-BR12: Hệ thống phải lưu lý do từ chối của customer/provider
-  -> Enforce: reason column in status_history captures rejection reason
-
-BR13: Mỗi lần sửa contract phải tạo version mới
-  -> Enforce: Trigger on customer_contracts UPDATE -> INSERT into customer_contract_versions
-
-BR14: Provider phải cập nhật trạng thái delivery của đơn hàng lên hệ thống
-  -> Enforce: App layer allows provider to UPDATE provider_tasks.delivery_status
-
-BR15: Manager phải kiểm tra chất lượng sản phẩm trước khi provider giao hàng cho customer
-  -> Enforce: App layer checks quality_checks.result = 'Approved' before allowing delivery_status='Delivered'
-
-BR16: Provider chỉ được chuyển trạng thái Delivered khi customer đã xác nhận nhận hàng
-  -> Enforce: App layer checks delivery_status='Received' before marking task as completed
-*/
-
--- ============================================================================
--- END OF SCHEMA
--- ============================================================================
+GO
