@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import models.Customer;
+import models.User;
 
 /**
  *
@@ -72,6 +73,10 @@ public class EditCustomerController extends HttpServlet {
                 request.setAttribute("errorDetail", "Customer not found");
             } else {
                 request.setAttribute("customer", customer);
+                if (customer.getUserId() != null) {
+                    User user = dao.getUserById(customer.getUserId());
+                    if (user != null) request.setAttribute("user", user);
+                }
             }
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Edit failed");
@@ -95,6 +100,11 @@ public class EditCustomerController extends HttpServlet {
         String customerIdStr = request.getParameter("customerId");
         String taxCode = request.getParameter("taxCode");
         String type = request.getParameter("type");
+        String userName = request.getParameter("username");
+        String password = request.getParameter("password");
+        String email = request.getParameter("email");
+        String fullName = request.getParameter("fullname");
+        String status = request.getParameter("status");
 
         if (customerIdStr == null || customerIdStr.isBlank() || taxCode == null || taxCode.isBlank() || type == null || type.isBlank()) {
             request.setAttribute("error", "Edit failed");
@@ -111,13 +121,46 @@ public class EditCustomerController extends HttpServlet {
                 request.setAttribute("error", "Edit failed");
                 request.setAttribute("errorDetail", "Customer not found");
             } else {
+                // update customer fields
                 customer.setTaxCode(taxCode);
                 customer.setType(type);
-                boolean success = dao.updateCustomer(customer);
-                
-                if (success) {
+
+                // load and update user fields
+                User user = null;
+                if (customer.getUserId() != null) {
+                    user = dao.getUserById(customer.getUserId());
+                }
+
+                boolean userOk = true;
+                if (user != null) {
+                    // check email uniqueness if changed
+                    if (email != null && !email.isBlank() && !email.equals(user.getEmail())) {
+                        User other = dao.getUserByEmail(email);
+                        if (other != null && other.getUserId() != user.getUserId()) {
+                            request.setAttribute("error", "Edit failed");
+                            request.setAttribute("errorDetail", "Email already exists.");
+                            request.setAttribute("customer", customer);
+                            request.setAttribute("user", user);
+                            request.getRequestDispatcher("views/EditCustomer.jsp").forward(request, response);
+                            return;
+                        }
+                    }
+
+                    if (userName != null && !userName.isBlank()) user.setUserName(userName);
+                    if (password != null && !password.isBlank()) user.setPassword(password);
+                    if (email != null && !email.isBlank()) user.setEmail(email);
+                    if (fullName != null) user.setFullName(fullName);
+                    if (status != null && !status.isBlank()) user.setStatus(status);
+
+                    userOk = dao.updateUser(user);
+                }
+
+                boolean custOk = dao.updateCustomer(customer);
+
+                if (userOk && custOk) {
                     request.setAttribute("success", "Edit successful");
                     request.setAttribute("customer", customer);
+                    if (user != null) request.setAttribute("user", user);
                 } else {
                     request.setAttribute("error", "Edit failed");
                     String detail = dao.getLastError();
@@ -125,6 +168,7 @@ public class EditCustomerController extends HttpServlet {
                         request.setAttribute("errorDetail", detail);
                     }
                     request.setAttribute("customer", customer);
+                    if (user != null) request.setAttribute("user", user);
                 }
             }
         } catch (NumberFormatException ex) {
