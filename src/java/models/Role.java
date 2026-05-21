@@ -1,12 +1,13 @@
 package models;
 
 import java.time.LocalDateTime;
-
+import java.util.*;
 public class Role {
     private int roleId;
     private String roleName;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
+    private List<Permission> permissions; // Danh sách các quyền thuộc Role này
 
     public Role() {}
 
@@ -22,7 +23,23 @@ public class Role {
         this.createAt = createAt;
         this.updateAt = updateAt;
     }
+    
+    public Role(int roleId, String roleName,LocalDateTime createAt, LocalDateTime updateAt, List<Permission> permissions) {
+        this.roleId = roleId;
+        this.roleName = roleName;
+        this.permissions = permissions;
+        this.createAt = createAt;
+        this.updateAt = updateAt;
+    }
 
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
+    }
+    
     public int getRoleId() {
         return roleId;
     }

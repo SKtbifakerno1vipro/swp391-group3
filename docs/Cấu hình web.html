@@ -1,0 +1,2883 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cấu hình web.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> or <div class="page"></div> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="screen--action-permission-matrix--final-version">Screen &amp; Action Permission Matrix — Final Version</h1>
+<blockquote>
+<p>Dự án: <strong>Pơ Bread Sales Process Digitalization System</strong><br>
+Mục tiêu: tổng hợp danh sách màn hình, action permission và bảng phân quyền theo các vai trò:
+<strong>Admin, Manager, Sale, Provider, Customer</strong>.</p>
+</blockquote>
+<hr>
+<h2 id="1-danh-sách-màn-hình-final">1. Danh sách màn hình final</h2>
+<h3 id="11-dashboard--report-manager">1.1 Dashboard &amp; Report (Manager)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">1</td>
+<td>Dashboard</td>
+</tr>
+<tr>
+<td style="text-align:right">2</td>
+<td>Business Report</td>
+</tr>
+<tr>
+<td style="text-align:right">3</td>
+<td>Revenue Report</td>
+</tr>
+<tr>
+<td style="text-align:right">4</td>
+<td>Cost Report</td>
+</tr>
+<tr>
+<td style="text-align:right">5</td>
+<td>Profit Report</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="12-user--role-management-admin">1.2 User &amp; Role Management (Admin)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">8</td>
+<td>User List</td>
+</tr>
+<tr>
+<td style="text-align:right">9</td>
+<td>User Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">10</td>
+<td>Create User</td>
+</tr>
+<tr>
+<td style="text-align:right">11</td>
+<td>Edit User</td>
+</tr>
+<tr>
+<td style="text-align:right">12</td>
+<td>Role List</td>
+</tr>
+<tr>
+<td style="text-align:right">13</td>
+<td>Role Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">14</td>
+<td>Create Role</td>
+</tr>
+<tr>
+<td style="text-align:right">15</td>
+<td>Edit Role</td>
+</tr>
+<tr>
+<td style="text-align:right">16</td>
+<td>Edit Role Permissions</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="13-customer-managementsale">1.3 Customer Management(Sale)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">17</td>
+<td>Customer List</td>
+</tr>
+<tr>
+<td style="text-align:right">18</td>
+<td>Customer Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">19</td>
+<td>Create Customer</td>
+</tr>
+<tr>
+<td style="text-align:right">20</td>
+<td>Edit Customer</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="14-provider-managementmanager">1.4 Provider Management(Manager)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">21</td>
+<td>Provider List</td>
+</tr>
+<tr>
+<td style="text-align:right">22</td>
+<td>Provider Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">23</td>
+<td>Create Provider</td>
+</tr>
+<tr>
+<td style="text-align:right">24</td>
+<td>Edit Provider</td>
+</tr>
+<tr>
+<td style="text-align:right">25</td>
+<td>Provider Category Management</td>
+</tr>
+<tr>
+<td style="text-align:right">26</td>
+<td>Provider Review List</td>
+</tr>
+<tr>
+<td style="text-align:right">27</td>
+<td>Provider Review Detail</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="15-product-service--category-managementmanager">1.5 Product/ Service &amp; Category Management(Manager)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">28</td>
+<td>Product / Service List</td>
+</tr>
+<tr>
+<td style="text-align:right">29</td>
+<td>Product / Service Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">30</td>
+<td>Create Product / Service</td>
+</tr>
+<tr>
+<td style="text-align:right">31</td>
+<td>Edit Product / Service</td>
+</tr>
+<tr>
+<td style="text-align:right">32</td>
+<td>Category List</td>
+</tr>
+<tr>
+<td style="text-align:right">33</td>
+<td>Category Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">34</td>
+<td>Create Category</td>
+</tr>
+<tr>
+<td style="text-align:right">35</td>
+<td>Edit Category</td>
+</tr>
+<tr>
+<td style="text-align:right">36</td>
+<td>Product Price History</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="16-customer-order-managementsale--manager">1.6 Customer Order Management(Sale + Manager)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">37</td>
+<td>Customer Order List</td>
+</tr>
+<tr>
+<td style="text-align:right">38</td>
+<td>Customer Order Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">39</td>
+<td>Create Customer Order</td>
+</tr>
+<tr>
+<td style="text-align:right">40</td>
+<td>Edit Customer Order</td>
+</tr>
+<tr>
+<td style="text-align:right">41</td>
+<td>Customer Order Status History</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="17-provider-order-managementmanager">1.7 Provider Order Management(Manager)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">42</td>
+<td>Provider Order List</td>
+</tr>
+<tr>
+<td style="text-align:right">43</td>
+<td>Provider Order Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">44</td>
+<td>Create Provider Order</td>
+</tr>
+<tr>
+<td style="text-align:right">45</td>
+<td>Edit Provider Order</td>
+</tr>
+<tr>
+<td style="text-align:right">46</td>
+<td>Provider Order Status History</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="18-quotation--negotiationmanager">1.8 Quotation / Negotiation(Manager)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">47</td>
+<td>Quotation List</td>
+</tr>
+<tr>
+<td style="text-align:right">48</td>
+<td>Quotation Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">49</td>
+<td>Create Quotation</td>
+</tr>
+<tr>
+<td style="text-align:right">50</td>
+<td>Edit Quotation</td>
+</tr>
+<tr>
+<td style="text-align:right">51</td>
+<td>Negotiation History</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="19-customer-contract-managementsale--manager">1.9 Customer Contract Management(Sale + Manager)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">52</td>
+<td>Customer Contract List</td>
+</tr>
+<tr>
+<td style="text-align:right">53</td>
+<td>Customer Contract Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">54</td>
+<td>Create Customer Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">55</td>
+<td>Edit Customer Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">56</td>
+<td>Customer Contract Template</td>
+</tr>
+<tr>
+<td style="text-align:right">5x</td>
+<td>Create Contract Template</td>
+</tr>
+<tr>
+<td style="text-align:right">5x</td>
+<td>Edit Contract Template</td>
+</tr>
+<tr>
+<td style="text-align:right">57</td>
+<td>Customer Contract Version History</td>
+</tr>
+<tr>
+<td style="text-align:right">58</td>
+<td>Customer Contract Status History</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="110-provider-contract-managementprovider--manager">1.10 Provider Contract Management(Provider + Manager)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">59</td>
+<td>Provider Contract List</td>
+</tr>
+<tr>
+<td style="text-align:right">60</td>
+<td>Provider Contract Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">61</td>
+<td>Create Provider Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">62</td>
+<td>Edit Provider Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">63</td>
+<td>Provider Contract Template</td>
+</tr>
+<tr>
+<td style="text-align:right">6x</td>
+<td>Create Contract Template</td>
+</tr>
+<tr>
+<td style="text-align:right">6x</td>
+<td>Edit Contract Template</td>
+</tr>
+<tr>
+<td style="text-align:right">64</td>
+<td>Provider Contract Version History</td>
+</tr>
+<tr>
+<td style="text-align:right">65</td>
+<td>Provider Contract Status History</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="113-payment-managementcostumer--manager--provider">1.13 Payment Management(Costumer + Manager + Provider)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">74</td>
+<td>Customer Payment List</td>
+</tr>
+<tr>
+<td style="text-align:right">75</td>
+<td>Customer Payment Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">76</td>
+<td>Create Customer Payment Request</td>
+</tr>
+<tr>
+<td style="text-align:right">77</td>
+<td>Customer Payment History</td>
+</tr>
+<tr>
+<td style="text-align:right">78</td>
+<td>Provider Payment List</td>
+</tr>
+<tr>
+<td style="text-align:right">79</td>
+<td>Provider Payment Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">80</td>
+<td>Create Provider Payment Request</td>
+</tr>
+<tr>
+<td style="text-align:right">81</td>
+<td>Provider Payment History</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="114-invoice-management-customer--manager--provider">1.14 Invoice Management (Customer + Manager + Provider)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Screen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">82</td>
+<td>Customer Invoice List</td>
+</tr>
+<tr>
+<td style="text-align:right">83</td>
+<td>Customer Invoice Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">84</td>
+<td>Create Customer Invoice</td>
+</tr>
+<tr>
+<td style="text-align:right">85</td>
+<td>Provider Invoice List</td>
+</tr>
+<tr>
+<td style="text-align:right">86</td>
+<td>Provider Invoice Detail</td>
+</tr>
+<tr>
+<td style="text-align:right">87</td>
+<td>Create Provider Invoice</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="2-danh-sách-action-permission-final">2. Danh sách Action Permission final</h2>
+<blockquote>
+<p>Các mục dưới đây <strong>không nên tách thành màn hình riêng</strong>.<br>
+Đây là các nút bấm, thao tác trong List / Detail / Modal / Form.</p>
+</blockquote>
+<h3 id="21-customer-order-actions">2.1 Customer Order Actions</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Action Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">A01</td>
+<td>Submit Customer Order for Approval</td>
+</tr>
+<tr>
+<td style="text-align:right">A02</td>
+<td>Approve Customer Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A03</td>
+<td>Reject Customer Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A04</td>
+<td>Send Customer Order Quotation</td>
+</tr>
+<tr>
+<td style="text-align:right">A05</td>
+<td>Mark Customer Order as Negotiating</td>
+</tr>
+<tr>
+<td style="text-align:right">A06</td>
+<td>Accept Customer Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A07</td>
+<td>Cancel Customer Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A08</td>
+<td>Expire Customer Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A09</td>
+<td>Create Customer Contract from Customer Order</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="22-provider-order-actions">2.2 Provider Order Actions</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Action Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">A10</td>
+<td>Submit Provider Order for Approval</td>
+</tr>
+<tr>
+<td style="text-align:right">A11</td>
+<td>Approve Provider Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A12</td>
+<td>Reject Provider Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A13</td>
+<td>Send Provider Order to Provider</td>
+</tr>
+<tr>
+<td style="text-align:right">A14</td>
+<td>Mark Provider Order as Negotiating</td>
+</tr>
+<tr>
+<td style="text-align:right">A15</td>
+<td>Accept Provider Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A16</td>
+<td>Reject Provider Order by Provider</td>
+</tr>
+<tr>
+<td style="text-align:right">A17</td>
+<td>Cancel Provider Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A18</td>
+<td>Expire Provider Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A19</td>
+<td>Create Provider Contract from Provider Order</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="23-quotation--negotiation-actions">2.3 Quotation / Negotiation Actions</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Action Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">A20</td>
+<td>Send Quotation</td>
+</tr>
+<tr>
+<td style="text-align:right">A21</td>
+<td>Revise Quotation</td>
+</tr>
+<tr>
+<td style="text-align:right">A22</td>
+<td>Accept Quotation</td>
+</tr>
+<tr>
+<td style="text-align:right">A23</td>
+<td>Reject Quotation</td>
+</tr>
+<tr>
+<td style="text-align:right">A24</td>
+<td>Add Negotiation Note</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="24-customer-contract-actions">2.4 Customer Contract Actions</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Action Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">A25</td>
+<td>Submit Customer Contract for Approval</td>
+</tr>
+<tr>
+<td style="text-align:right">A26</td>
+<td>Approve Customer Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A27</td>
+<td>Reject Customer Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A28</td>
+<td>Send Customer Contract for Signature</td>
+</tr>
+<tr>
+<td style="text-align:right">A29</td>
+<td>Sign Customer Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A30</td>
+<td>Decline Customer Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A31</td>
+<td>Cancel Customer Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A32</td>
+<td>Create Customer Contract Version</td>
+</tr>
+<tr>
+<td style="text-align:right">A33</td>
+<td>Add Customer Contract Reject Note</td>
+</tr>
+<tr>
+<td style="text-align:right">A34</td>
+<td>Move Customer Contract to In Execution</td>
+</tr>
+<tr>
+<td style="text-align:right">A35</td>
+<td>Complete Customer Contract</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="25-provider-contract-actions">2.5 Provider Contract Actions</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Action Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">A36</td>
+<td>Submit Provider Contract for Approval</td>
+</tr>
+<tr>
+<td style="text-align:right">A37</td>
+<td>Approve Provider Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A38</td>
+<td>Reject Provider Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A39</td>
+<td>Send Provider Contract for Signature</td>
+</tr>
+<tr>
+<td style="text-align:right">A40</td>
+<td>Sign / Accept Provider Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A41</td>
+<td>Decline Provider Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A42</td>
+<td>Cancel Provider Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A43</td>
+<td>Create Provider Contract Version</td>
+</tr>
+<tr>
+<td style="text-align:right">A44</td>
+<td>Add Provider Contract Reject Note</td>
+</tr>
+<tr>
+<td style="text-align:right">A45</td>
+<td>Assign Provider Contract</td>
+</tr>
+<tr>
+<td style="text-align:right">A46</td>
+<td>Move Provider Contract to In Progress</td>
+</tr>
+<tr>
+<td style="text-align:right">A47</td>
+<td>Complete Provider Contract</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="26-provider-task--delivery-actions">2.6 Provider Task / Delivery Actions</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Action Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">A48</td>
+<td>Assign Provider Task</td>
+</tr>
+<tr>
+<td style="text-align:right">A49</td>
+<td>Edit Provider Task</td>
+</tr>
+<tr>
+<td style="text-align:right">A50</td>
+<td>Accept Provider Task</td>
+</tr>
+<tr>
+<td style="text-align:right">A51</td>
+<td>Reject Provider Task</td>
+</tr>
+<tr>
+<td style="text-align:right">A52</td>
+<td>Update Provider Task Progress</td>
+</tr>
+<tr>
+<td style="text-align:right">A53</td>
+<td>Mark Provider Task as Completed</td>
+</tr>
+<tr>
+<td style="text-align:right">A54</td>
+<td>Update Delivery Status</td>
+</tr>
+<tr>
+<td style="text-align:right">A55</td>
+<td>Mark as Delivered</td>
+</tr>
+<tr>
+<td style="text-align:right">A56</td>
+<td>Confirm Customer Received Order</td>
+</tr>
+<tr>
+<td style="text-align:right">A57</td>
+<td>Lock Provider Task</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="27-quality-check-actions">2.7 Quality Check Actions</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Action Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">A58</td>
+<td>Submit Quality Check Result</td>
+</tr>
+<tr>
+<td style="text-align:right">A59</td>
+<td>Approve Quality Check</td>
+</tr>
+<tr>
+<td style="text-align:right">A60</td>
+<td>Reject Quality Check</td>
+</tr>
+<tr>
+<td style="text-align:right">A61</td>
+<td>Request Provider Rework</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="28-payment-actions">2.8 Payment Actions</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Action Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">A62</td>
+<td>Create Customer Payment Request</td>
+</tr>
+<tr>
+<td style="text-align:right">A63</td>
+<td>Confirm Customer Payment</td>
+</tr>
+<tr>
+<td style="text-align:right">A64</td>
+<td>Reject Customer Payment</td>
+</tr>
+<tr>
+<td style="text-align:right">A65</td>
+<td>Create Provider Payment Request</td>
+</tr>
+<tr>
+<td style="text-align:right">A66</td>
+<td>Approve Provider Payment</td>
+</tr>
+<tr>
+<td style="text-align:right">A67</td>
+<td>Reject Provider Payment</td>
+</tr>
+<tr>
+<td style="text-align:right">A68</td>
+<td>Mark Provider Payment as Paid</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="29-invoice-actions">2.9 Invoice Actions</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Action Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">A69</td>
+<td>Generate Customer Invoice</td>
+</tr>
+<tr>
+<td style="text-align:right">A70</td>
+<td>Export Customer Invoice</td>
+</tr>
+<tr>
+<td style="text-align:right">A71</td>
+<td>Cancel Customer Invoice</td>
+</tr>
+<tr>
+<td style="text-align:right">A72</td>
+<td>Generate Provider Invoice</td>
+</tr>
+<tr>
+<td style="text-align:right">A73</td>
+<td>Export Provider Invoice</td>
+</tr>
+<tr>
+<td style="text-align:right">A74</td>
+<td>Cancel Provider Invoice</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="210-system--common-actions">2.10 System / Common Actions</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">STT</th>
+<th>Action Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">A75</td>
+<td>Export Report</td>
+</tr>
+<tr>
+<td style="text-align:right">A76</td>
+<td>Export Excel</td>
+</tr>
+<tr>
+<td style="text-align:right">A77</td>
+<td>Export PDF</td>
+</tr>
+<tr>
+<td style="text-align:right">A78</td>
+<td>View History</td>
+</tr>
+<tr>
+<td style="text-align:right">A79</td>
+<td>Upload Attachment</td>
+</tr>
+<tr>
+<td style="text-align:right">A80</td>
+<td>Download Attachment</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="3-bảng-screen-permission">3. Bảng Screen Permission</h2>
+<blockquote>
+<p>Ký hiệu:</p>
+<ul>
+<li><code>✓</code>: Có quyền truy cập màn hình</li>
+<li><code>-</code>: Không có quyền truy cập</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Screen</th>
+<th style="text-align:center">Admin</th>
+<th style="text-align:center">Manager</th>
+<th style="text-align:center">Sale</th>
+<th style="text-align:center">Provider</th>
+<th style="text-align:center">Customer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dashboard</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Business Report</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Revenue Report</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Cost Report</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Profit Report</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Sales Performance Report</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Performance Report</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>User List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>User Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create User</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit User</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Role List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Role Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Role</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Role</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Role Permissions</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Customer List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Customer Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Create Customer</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Customer</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Provider List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Provider</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Provider</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Category Management</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Review List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Review Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Product / Service List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Product / Service Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Create Product / Service</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Product / Service</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Category List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Category Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Create Category</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Category</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Product Price History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Customer Order List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Customer Order Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Create Customer Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Edit Customer Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Customer Order Status History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Provider Order List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Order Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Provider Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Provider Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Order Status History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Quotation List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Quotation Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Create Quotation</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Quotation</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Negotiation History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Customer Contract List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Customer Contract Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Create Customer Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Customer Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Customer Contract Template</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Customer Contract Version History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Customer Contract Status History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Provider Contract List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Contract Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Provider Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Provider Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Contract Template</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Contract Version History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Contract Status History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Task List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Task Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Task Progress History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Delivery Status Tracking</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Quality Check List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Quality Check Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Quality Check</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Quality Check</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Customer Payment List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Customer Payment Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Create Customer Payment Request</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Customer Payment History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Provider Payment List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Payment Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Provider Payment Request</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Payment History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Customer Invoice List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Customer Invoice Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Create Customer Invoice</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Invoice List</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Provider Invoice Detail</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Provider Invoice</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="4-bảng-action-permission">4. Bảng Action Permission</h2>
+<blockquote>
+<p>Ký hiệu:</p>
+<ul>
+<li><code>✓</code>: Có quyền thực hiện action</li>
+<li><code>-</code>: Không có quyền thực hiện action</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Action Permission</th>
+<th style="text-align:center">Admin</th>
+<th style="text-align:center">Manager</th>
+<th style="text-align:center">Sale</th>
+<th style="text-align:center">Provider</th>
+<th style="text-align:center">Customer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Submit Customer Order for Approval</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Approve Customer Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Reject Customer Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Send Customer Order Quotation</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Mark Customer Order as Negotiating</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Accept Customer Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Cancel Customer Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Expire Customer Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Customer Contract from Customer Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Submit Provider Order for Approval</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Approve Provider Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Reject Provider Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Send Provider Order to Provider</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Mark Provider Order as Negotiating</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Accept Provider Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Reject Provider Order by Provider</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Cancel Provider Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Expire Provider Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Provider Contract from Provider Order</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Send Quotation</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Revise Quotation</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Accept Quotation</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Reject Quotation</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Add Negotiation Note</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Submit Customer Contract for Approval</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Approve Customer Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Reject Customer Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Send Customer Contract for Signature</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Sign Customer Contract</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Decline Customer Contract</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Cancel Customer Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Customer Contract Version</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Add Customer Contract Reject Note</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Move Customer Contract to In Execution</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Complete Customer Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Submit Provider Contract for Approval</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Approve Provider Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Reject Provider Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Send Provider Contract for Signature</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Sign / Accept Provider Contract</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Decline Provider Contract</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Cancel Provider Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Provider Contract Version</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Add Provider Contract Reject Note</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Assign Provider Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Move Provider Contract to In Progress</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Complete Provider Contract</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Assign Provider Task</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Edit Provider Task</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Accept Provider Task</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Reject Provider Task</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Update Provider Task Progress</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Mark Provider Task as Completed</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Update Delivery Status</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Mark as Delivered</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Confirm Customer Received Order</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Lock Provider Task</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Submit Quality Check Result</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Approve Quality Check</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Reject Quality Check</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Request Provider Rework</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Customer Payment Request</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Confirm Customer Payment</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Reject Customer Payment</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Create Provider Payment Request</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Approve Provider Payment</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Reject Provider Payment</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Mark Provider Payment as Paid</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Generate Customer Invoice</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Export Customer Invoice</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Cancel Customer Invoice</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Generate Provider Invoice</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Export Provider Invoice</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Cancel Provider Invoice</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Export Report</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Export Excel</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>Export PDF</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td>View History</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Upload Attachment</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td>Download Attachment</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="5-ghi-chú-thiết-kế">5. Ghi chú thiết kế</h2>
+<h3 id="51-không-tách-action-thành-screen-riêng">5.1 Không tách action thành screen riêng</h3>
+<p>Các thao tác như:</p>
+<ul>
+<li>Approve / Reject</li>
+<li>Cancel</li>
+<li>Export</li>
+<li>Confirm Payment</li>
+<li>Accept / Reject Task</li>
+<li>Update Progress</li>
+<li>Mark as Completed</li>
+</ul>
+<p>nên là <strong>button/action</strong> trong màn hình List hoặc Detail, không nên đưa vào danh sách screen.</p>
+<p>Ví dụ:</p>
+<pre class="hljs"><code><div>Customer Invoice Detail
+├── Export Invoice
+└── Cancel Invoice
+</div></code></pre>
+<pre class="hljs"><code><div>Provider Task Detail
+├── Accept Task
+├── Reject Task
+├── Update Progress
+└── Mark as Completed
+</div></code></pre>
+<hr>
+<h3 id="52-các-màn-hình-cần-ưu-tiên-cho-iteration-1">5.2 Các màn hình cần ưu tiên cho Iteration 1</h3>
+<p>Nếu cần làm trước MVP, nên ưu tiên:</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Screen cần làm trước</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User &amp; Role</td>
+<td>User List, User Detail, Create User, Edit User, Role List</td>
+</tr>
+<tr>
+<td>Customer</td>
+<td>Customer List, Customer Detail, Create Customer, Edit Customer</td>
+</tr>
+<tr>
+<td>Provider</td>
+<td>Provider List, Provider Detail, Create Provider, Edit Provider</td>
+</tr>
+<tr>
+<td>Product / Service</td>
+<td>Product List, Product Detail, Create Product, Edit Product</td>
+</tr>
+<tr>
+<td>Customer Order</td>
+<td>Customer Order List, Customer Order Detail, Create Customer Order</td>
+</tr>
+<tr>
+<td>Provider Order</td>
+<td>Provider Order List, Provider Order Detail, Create Provider Order</td>
+</tr>
+<tr>
+<td>Customer Contract</td>
+<td>Customer Contract List, Customer Contract Detail</td>
+</tr>
+<tr>
+<td>Provider Contract</td>
+<td>Provider Contract List, Provider Contract Detail</td>
+</tr>
+<tr>
+<td>Payment</td>
+<td>Customer Payment List, Provider Payment List</td>
+</tr>
+<tr>
+<td>Report</td>
+<td>Dashboard, Revenue Report, Profit Report</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="53-business-rule-quan-trọng-cần-nhớ-khi-code-permission">5.3 Business rule quan trọng cần nhớ khi code permission</h3>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Ý nghĩa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BR01</td>
+<td>Customer Order phải Accepted trước khi tạo Customer Contract</td>
+</tr>
+<tr>
+<td>BR02</td>
+<td>Customer Contract phải Approved trước khi tạo Provider Order</td>
+</tr>
+<tr>
+<td>BR03</td>
+<td>Provider Order phải Accepted trước khi tạo Provider Contract</td>
+</tr>
+<tr>
+<td>BR04</td>
+<td>Một Customer Contract có thể có nhiều Provider Contract</td>
+</tr>
+<tr>
+<td>BR05</td>
+<td>Provider chỉ thấy contract/task của chính mình</td>
+</tr>
+<tr>
+<td>BR06</td>
+<td>Completed contract không được sửa giá trị tiền</td>
+</tr>
+<tr>
+<td>BR07</td>
+<td>Mọi thay đổi workflow phải lưu history</td>
+</tr>
+<tr>
+<td>BR08</td>
+<td>Provider Contract phải gắn với Customer Contract</td>
+</tr>
+<tr>
+<td>BR09</td>
+<td>Không được thanh toán provider nếu task chưa completed</td>
+</tr>
+<tr>
+<td>BR10</td>
+<td>Nếu Customer Contract chưa được ký thì không được triển khai provider workflow</td>
+</tr>
+<tr>
+<td>BR11</td>
+<td>Nếu Provider từ chối contract thì task phải bị khóa</td>
+</tr>
+<tr>
+<td>BR12</td>
+<td>Hệ thống phải lưu lý do từ chối của customer/provider</td>
+</tr>
+<tr>
+<td>BR13</td>
+<td>Mỗi lần sửa contract phải tạo version mới</td>
+</tr>
+<tr>
+<td>BR14</td>
+<td>Provider phải cập nhật trạng thái delivery của đơn hàng lên hệ thống</td>
+</tr>
+<tr>
+<td>BR15</td>
+<td>Manager phải kiểm tra chất lượng sản phẩm trước khi provider giao hàng cho customer</td>
+</tr>
+<tr>
+<td>BR16</td>
+<td>Provider chỉ được chuyển trạng thái Delivered khi customer đã xác nhận nhận hàng</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="6-sidebar-đề-xuất">6. Sidebar đề xuất</h2>
+<pre class="hljs"><code><div>Dashboard
+├── Dashboard
+├── Business Report
+├── Revenue Report
+├── Cost Report
+├── Profit Report
+├── Sales Performance Report
+└── Provider Performance Report
+
+System Management
+├── Users
+├── Roles
+└── Role Permissions
+
+Customer Management
+└── Customers
+
+Provider Management
+├── Providers
+├── Provider Categories
+└── Provider Reviews
+
+Product Management
+├── Products / Services
+├── Categories
+└── Product Price History
+
+Sales Management
+├── Customer Orders
+├── Quotations
+└── Negotiation History
+
+Provider Coordination
+├── Provider Orders
+├── Provider Tasks
+└── Delivery Status Tracking
+
+Contract Management
+├── Customer Contracts
+├── Provider Contracts
+├── Contract Templates
+├── Contract Version History
+└── Contract Status History
+
+Quality Management
+└── Quality Checks
+
+Payment Management
+├── Customer Payments
+└── Provider Payments
+
+Invoice Management
+├── Customer Invoices
+└── Provider Invoices
+</div></code></pre>
+
+</body>
+</html>

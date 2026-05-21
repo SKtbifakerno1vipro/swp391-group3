@@ -2,29 +2,41 @@ package models;
 
 import java.time.LocalDateTime;
 
-public class Customer {
+public class Customer extends User{
     private int customerId;
     private Integer userId;
     private String taxCode;
     private String type;
-    private Integer createBy;
+    private String createBy;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
 
     public Customer() {}
-
     public int getCustomerId() { return customerId; }
     public void setCustomerId(int customerId) { this.customerId = customerId; }
-    public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
     public String getTaxCode() { return taxCode; }
     public void setTaxCode(String taxCode) { this.taxCode = taxCode; }
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
-    public Integer getCreateBy() { return createBy; }
-    public void setCreateBy(Integer createBy) { this.createBy = createBy; }
-    public LocalDateTime getCreateAt() { return createAt; }
-    public void setCreateAt(LocalDateTime createAt) { this.createAt = createAt; }
-    public LocalDateTime getUpdateAt() { return updateAt; }
-    public void setUpdateAt(LocalDateTime updateAt) { this.updateAt = updateAt; }
+    public String getCreateBy() { return createBy; }
+    public void setCreateBy(String createBy) { this.createBy = createBy; }
+    @Override
+    public LocalDateTime getCreateAt() {
+        return createAt;
+    }
+    @Override
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
+    }
+
+    @Override
+    public LocalDateTime getUpdateAt() {
+        return updateAt;
+    }
+    @Override
+    public void setUpdateAt(LocalDateTime updateAt) {
+        this.updateAt = updateAt;
+    }
+    
 }

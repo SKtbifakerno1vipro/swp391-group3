@@ -235,3 +235,5 @@ INSERT INTO provider_order (customer_order_id, status) VALUES (1, 'In Progress')
 INSERT INTO provider_contract (provider_order_id, start_date, end_date, status) VALUES (1, '2026-05-20', '2026-06-20', 'Active');
 
 GO
+
+select * from role
