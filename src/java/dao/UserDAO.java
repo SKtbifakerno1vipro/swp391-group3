@@ -1,16 +1,16 @@
 package dao;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 import models.User;
 import service.DBContext;
 
 public class UserDAO extends DBContext {
 
-    // 8. User List & Filter: Lọc danh sách user theo Role và Status
     public List<User> searchUsers(String roleId, String status) {
         List<User> list = new ArrayList<>();
-        // Base SQL
         String sql = "SELECT * FROM [user] WHERE 1=1";
         if (roleId != null && !roleId.isEmpty()) {
             sql += " AND role_id = " + roleId;
@@ -38,15 +38,13 @@ public class UserDAO extends DBContext {
         return list;
     }
 
-    // 8. User List: Lấy danh sách tất cả user từ database
     public List<User> getAllUsers() {
-        return searchUsers(null, null); // Gọi lại hàm search với tham số null để lấy hết
+        return searchUsers(null, null);
     }
 
-    // 9. User Detail: Lấy thông tin chi tiết 1 user theo ID
     public User getUserById(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
-        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -67,7 +65,6 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-    // 10. Create User: Thêm user mới vào database
     public void createUser(User u) {
         String sql = "INSERT INTO [user] (user_name, password, email, full_name, phone, status, role_id) VALUES (?,?,?,?,?,?,?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -84,10 +81,9 @@ public class UserDAO extends DBContext {
         }
     }
 
-    // 11. Edit User: Cập nhật thông tin user
     public void updateUser(User u) {
         String sql = "UPDATE [user] SET full_name=?, phone=?, status=?, role_id=? WHERE user_id=?";
-        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, u.getFullName());
             ps.setString(2, u.getPhone());
             ps.setString(3, u.getStatus());
@@ -97,5 +93,29 @@ public class UserDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public User login(String username, String password) {
+        String sql = "SELECT * FROM [user] WHERE user_name = ? AND password = ? AND status = 'Active'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUserName(rs.getString("user_name"));
+                user.setPassword(rs.getString("password"));
+                user.setEmail(rs.getString("email"));
+                user.setFullName(rs.getString("full_name"));
+                user.setPhone(rs.getString("phone"));
+                user.setStatus(rs.getString("status"));
+                user.setRoleId(rs.getInt("role_id"));
+                return user;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

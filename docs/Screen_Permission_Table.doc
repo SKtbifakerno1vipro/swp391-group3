@@ -1,0 +1,104 @@
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; }
+  th, td { border: 1px solid black; padding: 6px; text-align: center; }
+  th { background: #f2f2f2; }
+  td:first-child { text-align: left; }
+</style>
+</head>
+<body>
+<h2>Screen Permission</h2>
+<table>
+<tr><th>Screen</th><th>Admin</th><th>Manager</th><th>Sale</th><th>Provider</th><th>Customer</th></tr>
+<tr><td>Dashboard</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>Business Report</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Revenue Report</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Cost Report</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Profit Report</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Sales Performance Report</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>-</td></tr>
+<tr><td>Provider Performance Report</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>User List</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>User Detail</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Create User</td><td>✓</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Edit User</td><td>✓</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Role List</td><td>✓</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Role Detail</td><td>✓</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Create Role</td><td>✓</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Role</td><td>✓</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Role Permissions</td><td>✓</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Customer List</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>-</td></tr>
+<tr><td>Customer Detail</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Create Customer</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Customer</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Provider List</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>-</td></tr>
+<tr><td>Provider Detail</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>-</td></tr>
+<tr><td>Create Provider</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Provider</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Provider Category Management</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Provider Review List</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Provider Review Detail</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Product / Service List</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Product / Service Detail</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Create Product / Service</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Product / Service</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Category List</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Category Detail</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Create Category</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Category</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Product Price History</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>-</td></tr>
+<tr><td>Customer Order List</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Customer Order Detail</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Create Customer Order</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Edit Customer Order</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Customer Order Status History</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Provider Order List</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Provider Order Detail</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Create Provider Order</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Provider Order</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Provider Order Status History</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Quotation List</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Quotation Detail</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Create Quotation</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Quotation</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>-</td></tr>
+<tr><td>Negotiation History</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Customer Contract List</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Customer Contract Detail</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Create Customer Contract</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Customer Contract</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>-</td></tr>
+<tr><td>Customer Contract Template</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Customer Contract Version History</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Customer Contract Status History</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Provider Contract List</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Provider Contract Detail</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Create Provider Contract</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Provider Contract</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Provider Contract Template</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Provider Contract Version History</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Provider Contract Status History</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Provider Task List</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Provider Task Detail</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Provider Task Progress History</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Delivery Status Tracking</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>✓</td></tr>
+<tr><td>Quality Check List</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Quality Check Detail</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Create Quality Check</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Edit Quality Check</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Customer Payment List</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Customer Payment Detail</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Create Customer Payment Request</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>-</td></tr>
+<tr><td>Customer Payment History</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Provider Payment List</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Provider Payment Detail</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Create Provider Payment Request</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Provider Payment History</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Customer Invoice List</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Customer Invoice Detail</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>✓</td></tr>
+<tr><td>Create Customer Invoice</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Provider Invoice List</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Provider Invoice Detail</td><td>✓</td><td>✓</td><td>-</td><td>✓</td><td>-</td></tr>
+<tr><td>Create Provider Invoice</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>-</td></tr>
+</table>
+</body>
+</html>

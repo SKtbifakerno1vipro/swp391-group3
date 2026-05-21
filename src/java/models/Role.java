@@ -1,22 +1,18 @@
 package models;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 public class Role {
+
     private int roleId;
     private String roleName;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private Timestamp createAt;
+    private Timestamp updateAt;
 
-    public Role() {}
-
-    public Role(String roleName) {
-        this.roleName = roleName;
-        this.createAt = LocalDateTime.now();
-        this.updateAt = LocalDateTime.now();
+    public Role() {
     }
 
-    public Role(int roleId, String roleName, LocalDateTime createAt, LocalDateTime updateAt) {
+    public Role(int roleId, String roleName, Timestamp createAt, Timestamp updateAt) {
         this.roleId = roleId;
         this.roleName = roleName;
         this.createAt = createAt;
@@ -39,29 +35,19 @@ public class Role {
         this.roleName = roleName;
     }
 
-    public LocalDateTime getCreateAt() {
+    public Timestamp getCreateAt() {
         return createAt;
     }
 
-    public void setCreateAt(LocalDateTime createAt) {
+    public void setCreateAt(Timestamp createAt) {
         this.createAt = createAt;
     }
 
-    public LocalDateTime getUpdateAt() {
+    public Timestamp getUpdateAt() {
         return updateAt;
     }
 
-    public void setUpdateAt(LocalDateTime updateAt) {
+    public void setUpdateAt(Timestamp updateAt) {
         this.updateAt = updateAt;
-    }
-
-    @Override
-    public String toString() {
-        return "Role{" +
-                "roleId=" + roleId +
-                ", roleName='" + roleName + '\'' +
-                ", createAt=" + createAt +
-                ", updateAt=" + updateAt +
-                '}';
     }
 }

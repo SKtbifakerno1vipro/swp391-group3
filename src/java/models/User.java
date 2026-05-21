@@ -1,7 +1,5 @@
 package models;
 
-import java.time.LocalDateTime;
-
 public class User {
 
     private int userId;
@@ -11,9 +9,7 @@ public class User {
     private String fullName;
     private String phone;
     private String status;
-    private Integer roleId;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private int roleId;
 
     public User() {
     }
@@ -30,8 +26,6 @@ public class User {
         this.createAt = createAt;
         this.updateAt = updateAt;
     }
-
-    
     public int getUserId() {
         return userId;
     }

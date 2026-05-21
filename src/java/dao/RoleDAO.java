@@ -2,15 +2,16 @@ package dao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import models.Role;
 
 public class RoleDAO extends service.DBContext {
+
     PreparedStatement stm;
     ResultSet rs;
-    
-    public List<Role> getAllRoles(){
+
+    public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {
             String sql = "select role_id, role_name from role";
