@@ -103,7 +103,7 @@
                         Remember me
                     </label>
 
-                    <a href="#" class="text-primary font-semibold hover:underline">
+                    <a href="javascript:void(0)" class="text-primary font-semibold hover:underline">
                         Forgot password?
                     </a>
                 </div>

@@ -59,7 +59,7 @@ public class EditCustomerController extends HttpServlet {
         String customerIdStr = request.getParameter("id");
         if (customerIdStr == null || customerIdStr.isBlank()) {
             request.setAttribute("error", "Edit failed");
-            request.getRequestDispatcher("views/EditCustomer.jsp").forward(request, response);
+            request.getRequestDispatcher("views/customer/edit.jsp").forward(request, response);
             return;
         }
 
@@ -83,7 +83,7 @@ public class EditCustomerController extends HttpServlet {
             request.setAttribute("errorDetail", ex.getMessage());
         }
 
-        request.getRequestDispatcher("views/EditCustomer.jsp").forward(request, response);
+        request.getRequestDispatcher("views/customer/edit.jsp").forward(request, response);
     }
 
     /** 
@@ -108,7 +108,7 @@ public class EditCustomerController extends HttpServlet {
 
         if (customerIdStr == null || customerIdStr.isBlank() || taxCode == null || taxCode.isBlank() || type == null || type.isBlank()) {
             request.setAttribute("error", "Edit failed");
-            request.getRequestDispatcher("views/EditCustomer.jsp").forward(request, response);
+            request.getRequestDispatcher("views/customer/edit.jsp").forward(request, response);
             return;
         }
 
@@ -141,7 +141,7 @@ public class EditCustomerController extends HttpServlet {
                             request.setAttribute("errorDetail", "Email already exists.");
                             request.setAttribute("customer", customer);
                             request.setAttribute("user", user);
-                            request.getRequestDispatcher("views/EditCustomer.jsp").forward(request, response);
+                            request.getRequestDispatcher("views/customer/edit.jsp").forward(request, response);
                             return;
                         }
                     }
@@ -176,7 +176,7 @@ public class EditCustomerController extends HttpServlet {
             request.setAttribute("errorDetail", ex.getMessage());
         }
 
-        request.getRequestDispatcher("views/EditCustomer.jsp").forward(request, response);
+        request.getRequestDispatcher("views/customer/edit.jsp").forward(request, response);
     }
 
     /** 

@@ -59,7 +59,7 @@ public class CustomerDetailController extends HttpServlet {
         CustomerDAO dao = new CustomerDAO();
         CustomerDetail cus = dao.getCustomerDetailByCustomerId(cusId);
         request.setAttribute("customer", cus);
-        request.getRequestDispatcher("views/CustomerDetail.jsp").forward(request, response);
+        request.getRequestDispatcher("views/customer/detail.jsp").forward(request, response);
     } 
 
     /** 

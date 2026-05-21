@@ -69,7 +69,7 @@
                 </c:if>
             </c:if>
             <div class="mt-6">
-                <a href="#" class="text-primary hover:underline">Back</a>
+                <a href="javascript:void(0)" class="text-primary hover:underline">Back</a>
             </div>
         </div>
     </main>
