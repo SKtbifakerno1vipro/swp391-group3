@@ -1,7 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
-<%@page import="models.Role"%>
-<%@page import="models.User"%>
+<%@page import="model.Role"%>
+<%@page import="model.User"%>
 
 <%
     List<Role> roleList = (List<Role>) request.getAttribute("roleList");
@@ -79,13 +79,13 @@
         <!-- Navigation -->
         <nav class="space-y-2 flex-1">
 
-            <a href="#"
+            <a href="javascript:void(0)"
                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#EAE6DE] transition">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="font-semibold text-sm">Dashboard</span>
             </a>
 
-            <a href="#"
+            <a href="${pageContext.request.contextPath}/user?action=list"
                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#EAE6DE] transition">
                 <span class="material-symbols-outlined">group</span>
                 <span class="font-semibold text-sm">Users</span>
@@ -98,37 +98,37 @@
                 <span class="font-bold text-sm">Roles</span>
             </a>
 
-            <a href="#"
+            <a href="${pageContext.request.contextPath}/CustomerDetail?id=1"
                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#EAE6DE] transition">
                 <span class="material-symbols-outlined">person</span>
                 <span class="font-semibold text-sm">Customers</span>
             </a>
 
-            <a href="#"
+            <a href="javascript:void(0)"
                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#EAE6DE] transition">
                 <span class="material-symbols-outlined">description</span>
                 <span class="font-semibold text-sm">Contracts</span>
             </a>
 
-            <a href="#"
+            <a href="javascript:void(0)"
                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#EAE6DE] transition">
                 <span class="material-symbols-outlined">payments</span>
                 <span class="font-semibold text-sm">Payments</span>
             </a>
 
-            <a href="#"
+            <a href="javascript:void(0)"
                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#EAE6DE] transition">
                 <span class="material-symbols-outlined">store</span>
                 <span class="font-semibold text-sm">Providers</span>
             </a>
 
-            <a href="#"
+            <a href="javascript:void(0)"
                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#EAE6DE] transition">
                 <span class="material-symbols-outlined">account_tree</span>
                 <span class="font-semibold text-sm">Workflow</span>
             </a>
 
-            <a href="#"
+            <a href="javascript:void(0)"
                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#EAE6DE] transition">
                 <span class="material-symbols-outlined">assessment</span>
                 <span class="font-semibold text-sm">Reports</span>
@@ -443,7 +443,7 @@
 
                                 <div class="flex justify-end gap-2">
 
-                                    <a href="#"
+                                    <a href="javascript:void(0)"
                                        class="p-2 rounded-xl hover:bg-[#D8F0DE] text-[#4A7C59] transition">
 
                                         <span class="material-symbols-outlined">
@@ -452,7 +452,7 @@
 
                                     </a>
 
-                                    <a href="#"
+                                    <a href="javascript:void(0)"
                                        class="p-2 rounded-xl hover:bg-[#D8F0DE] text-[#4A7C59] transition">
 
                                         <span class="material-symbols-outlined">
@@ -461,7 +461,7 @@
 
                                     </a>
 
-                                    <a href="#"
+                                    <a href="javascript:void(0)"
                                        class="p-2 rounded-xl hover:bg-[#D8F0DE] text-[#4A7C59] transition">
 
                                         <span class="material-symbols-outlined">
