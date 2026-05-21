@@ -2,23 +2,23 @@
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <servlet>
         <servlet-name>NewServlet</servlet-name>
-        <servlet-class>controllers.NewServlet</servlet-class>
+        <servlet-class>controller.NewServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UserController</servlet-name>
-        <servlet-class>controllers.UserController</servlet-class>
+        <servlet-class>controller.UserController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CustomerDetailController</servlet-name>
-        <servlet-class>controllers.CustomerDetailController</servlet-class>
+        <servlet-class>controller.CustomeduorDetailController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CreateCustomerController</servlet-name>
-        <servlet-class>controllers.CreateCustomerController</servlet-class>
+        <servlet-class>controller.CreateCustomerController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EditCustomerController</servlet-name>
-        <servlet-class>controllers.EditCustomerController</servlet-class>
+        <servlet-class>controller.EditCustomerController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LoginServlet</servlet-name>

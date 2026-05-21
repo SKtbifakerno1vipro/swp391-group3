@@ -1,13 +1,13 @@
 package controller;
 
-import dao.RoleDAO;
+import dal.RoleDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import models.Role;
+import model.Role;
 
 public class RoleListServlet extends HttpServlet {
 
