@@ -202,8 +202,16 @@ CREATE TABLE provider_contract (
 -- Role & Permission
 INSERT INTO role (role_name) VALUES ('Admin'), ('Manager'), ('Sale'), ('Provider'), ('Customer');
 INSERT INTO permission (permission_name) VALUES ('Manage Users'), ('Manage Orders'), ('Manage Contracts'), ('View Reports');
-INSERT INTO role_permission (role_id, permission_id) SELECT r.role_id, p.permission_id FROM role r, permission p;
-
+INSERT INTO role_permission (role_id, permission_id) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(2, 2),
+(2, 3),
+(2, 4),
+(3, 2);
+GO
 -- Users
 INSERT INTO [user] (user_name, password, email, full_name, status, role_id) VALUES
 ('admin', '123', 'admin@mail.com', 'System Admin', 'Active', 1),

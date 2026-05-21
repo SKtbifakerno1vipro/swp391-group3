@@ -444,35 +444,32 @@
                                 <div class="flex justify-end gap-2">
 
                                     <a href="#"
-                                       class="p-2 rounded-xl hover:bg-[#D8F0DE] text-[#4A7C59] transition">
+                                        title="View Role"
+                                        class="p-2 rounded-xl hover:bg-[#D8F0DE] text-[#4A7C59] transition">
+                                   <span class="material-symbols-outlined">
+                                        visibility
+                                   </span>
+                                </a>
 
-                                        <span class="material-symbols-outlined">
-                                            visibility
-                                        </span>
+                                <a href="${pageContext.request.contextPath}/edit-role?id=<%= role.getRoleId()%>"
+                                    title="Edit Role"
+                                    class="p-2 rounded-xl hover:bg-[#D8F0DE] text-[#4A7C59] transition">
+                                    <span class="material-symbols-outlined">
+                                        edit
+                                    </span>
+                                </a>
 
-                                    </a>
+                                <a href="${pageContext.request.contextPath}/edit-role-permissions?roleId=<%= role.getRoleId()%>"
+                                    title="Edit Permissions"
+                                    class="p-2 rounded-xl hover:bg-[#D8F0DE] text-[#4A7C59] transition">
+                                    <span class="material-symbols-outlined">
+                                        admin_panel_settings
+                                    </span>
+                                </a>
 
-                                    <a href="#"
-                                       class="p-2 rounded-xl hover:bg-[#D8F0DE] text-[#4A7C59] transition">
+                            </div>
 
-                                        <span class="material-symbols-outlined">
-                                            edit
-                                        </span>
-
-                                    </a>
-
-                                    <a href="#"
-                                       class="p-2 rounded-xl hover:bg-[#D8F0DE] text-[#4A7C59] transition">
-
-                                        <span class="material-symbols-outlined">
-                                            more_vert
-                                        </span>
-
-                                    </a>
-
-                                </div>
-
-                            </td>
+                        </td>
 
                         </tr>
 
