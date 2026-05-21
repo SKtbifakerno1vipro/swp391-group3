@@ -16,7 +16,7 @@ public class LoginServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("views/login.jsp")
+        request.getRequestDispatcher("views/auth/login.jsp")
                 .forward(request, response);
     }
 
@@ -46,7 +46,7 @@ public class LoginServlet extends HttpServlet {
             request.setAttribute("error",
                     "Invalid username or password");
 
-            request.getRequestDispatcher("views/login.jsp")
+            request.getRequestDispatcher("views/auth/login.jsp")
                     .forward(request, response);
         }
     }

@@ -62,7 +62,7 @@ public class CreateCustomerController extends HttpServlet {
         Integer customerRoleId = dao.getRoleIdByName("Customer");
         request.setAttribute("users", users);
         request.setAttribute("customerRoleId", customerRoleId);
-        request.getRequestDispatcher("views/CreateCustomer.jsp").forward(request, response);
+        request.getRequestDispatcher("views/customer/create.jsp").forward(request, response);
     } 
 
     /** 
@@ -95,7 +95,7 @@ public class CreateCustomerController extends HttpServlet {
 
         if (userName == null || userName.isBlank() || password == null || password.isBlank() || email == null || email.isBlank() || createByValue == null || createByValue.isBlank() || taxCode == null || taxCode.isBlank() || type == null || type.isBlank()) {
             request.setAttribute("error", "Create failed");
-            request.getRequestDispatcher("views/CreateCustomer.jsp").forward(request, response);
+            request.getRequestDispatcher("views/customer/create.jsp").forward(request, response);
             return;
         }
 
@@ -132,7 +132,7 @@ public class CreateCustomerController extends HttpServlet {
             request.setAttribute("errorDetail", ex.getMessage());
         }
 
-        request.getRequestDispatcher("views/CreateCustomer.jsp").forward(request, response);
+        request.getRequestDispatcher("views/customer/create.jsp").forward(request, response);
     }
 
     /** 

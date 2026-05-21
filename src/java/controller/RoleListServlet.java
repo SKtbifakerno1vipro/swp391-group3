@@ -22,7 +22,7 @@ public class RoleListServlet extends HttpServlet {
 
         request.setAttribute("roleList", roleList);
 
-        request.getRequestDispatcher("views/role-list.jsp")
+        request.getRequestDispatcher("views/role/list.jsp")
                 .forward(request, response);
     }
 }
