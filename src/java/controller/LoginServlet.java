@@ -26,22 +26,42 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String username = request.getParameter("username");
-
         String password = request.getParameter("password");
 
         UserDAO dao = new UserDAO();
-
         User user = dao.login(username, password);
 
         if (user != null) {
 
             HttpSession session = request.getSession();
-
             session.setAttribute("user", user);
 
-            response.sendRedirect("role-list");
+            int roleId = user.getRoleId();
 
-        } else {
+        switch (roleId) {
+            case 1:
+                    response.sendRedirect(request.getContextPath() + "/role-list");
+                break;
+            case 2:
+                response.sendRedirect(request.getContextPath() + "/manager-dashboard");
+                break;
+            case 3:
+                response.sendRedirect(request.getContextPath() + "/sale-dashboard");
+                break;
+            case 4:
+                response.sendRedirect(request.getContextPath() + "/provider-dashboard");
+                break;
+        case 5:
+                response.sendRedirect(request.getContextPath() + "/customer-dashboard");
+                break;
+        default:
+                response.sendRedirect(request.getContextPath() + "/login");
+                break;
+        }
+
+    }
+
+        else {
 
             request.setAttribute("error",
                     "Invalid username or password");
