@@ -477,3 +477,5 @@ INSERT INTO provider_contract (provider_order_id, start_date, end_date, status) 
 (8, '2026-05-20', '2026-06-10', 'Pending');
 
 GO
+
+select * from role
