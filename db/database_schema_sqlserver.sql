@@ -199,26 +199,26 @@ CREATE TABLE provider_contract (
 -- SEED SAMPLE DATA (Expanded - ~10 records per entity with logical relationships)
 -- ============================================================================
 
--- 1. Role (5 roles)
-INSERT INTO role (role_name) VALUES
-('Admin'),
-('Manager'),
-('Sale'),
-('Provider'),
-('Customer');
-
--- 2. Permission (10 permissions)
-INSERT INTO permission (permission_name) VALUES
-('Manage Users'),
-('Manage Orders'),
-('Manage Contracts'),
-('View Reports'),
-('Create Quotation'),
-('Approve Contract'),
-('Manage Products'),
-('Manage Providers'),
-('View Dashboard'),
-('Export Data');
+-- Role & Permission
+INSERT INTO role (role_name) VALUES ('Admin'), ('Manager'), ('Sale'), ('Provider'), ('Customer');
+INSERT INTO permission (permission_name) VALUES ('Manage Users'), ('Manage Orders'), ('Manage Contracts'), ('View Reports');
+INSERT INTO role_permission (role_id, permission_id) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(2, 2),
+(2, 3),
+(2, 4),
+(3, 2);
+GO
+-- Users
+INSERT INTO [user] (user_name, password, email, full_name, status, role_id) VALUES
+('admin', '123', 'admin@mail.com', 'System Admin', 'Active', 1),
+('manager_a', '123', 'manager@mail.com', 'Nguyen Manager', 'Active', 2),
+('sale_x', '123', 'sale@mail.com', 'Tran Sale', 'Active', 3),
+('bakery_abc', '123', 'bakery@mail.com', 'ABC Bakery', 'Active', 4),
+('customer_j', '123', 'john@mail.com', 'John Doe', 'Active', 5);
 
 -- 3. Role_Permission (Assign permissions to roles logically)
 -- Admin: all permissions

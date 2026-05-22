@@ -36,6 +36,14 @@
         <servlet-name>AddRoleController</servlet-name>
         <servlet-class>controller.AddRoleController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>EditRoleServlet</servlet-name>
+        <servlet-class>controller.EditRoleServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditRolePermissionsServlet</servlet-name>
+        <servlet-class>controller.EditRolePermissionsServlet</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>UserController</servlet-name>
@@ -69,4 +77,15 @@
         <servlet-name>AddRoleController</servlet-name>
         <url-pattern>/add-role</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditRoleServlet</servlet-name>
+        <url-pattern>/edit-role</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditRolePermissionsServlet</servlet-name>
+        <url-pattern>/edit-role-permissions</url-pattern>
+    </servlet-mapping>
+    <welcome-file-list>
+        <welcome-file>views/login.jsp</welcome-file>
+    </welcome-file-list>
 </web-app>
