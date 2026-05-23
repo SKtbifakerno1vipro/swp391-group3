@@ -11,7 +11,7 @@ import model.User;
 /**
  * DAO for provider details and list
  */
-public class ProviderDAO extends service.DBContext {
+public class ProviderDAO extends DBContext {
     PreparedStatement stm;
     ResultSet rs;
 
@@ -60,7 +60,11 @@ public class ProviderDAO extends service.DBContext {
     public List<Provider> getAllProviders() {
         List<Provider> list = new ArrayList<>();
         try {
-            String sql = "select provider_id, user_id, tax_code, provider_name, create_at, update_at from provider order by provider_id";
+            String sql = "select p.provider_id, p.user_id, p.tax_code, p.provider_name, p.create_at, p.update_at, "
+                       + "u.user_name, u.email, u.full_name, u.phone, u.status, u.role_id "
+                       + "from provider p "
+                       + "left join [user] u on p.user_id = u.user_id "
+                       + "order by p.provider_id";
             stm = connection.prepareStatement(sql);
             rs = stm.executeQuery();
             while (rs.next()) {
@@ -75,6 +79,14 @@ public class ProviderDAO extends service.DBContext {
                 if (rs.getTimestamp("update_at") != null) {
                     p.setUpdateAt(rs.getTimestamp("update_at").toLocalDateTime());
                 }
+                if (rs.getObject("user_id") != null) {
+                    p.setUserName(rs.getString("user_name"));
+                    p.setEmail(rs.getString("email"));
+                    p.setFullName(rs.getString("full_name"));
+                    p.setPhone(rs.getString("phone"));
+                    p.setStatus(rs.getString("status"));
+                    p.setRoleId((Integer) rs.getObject("role_id"));
+                }
                 list.add(p);
             }
         } catch (Exception e) {
@@ -87,7 +99,7 @@ public class ProviderDAO extends service.DBContext {
         try {
             String sql = "insert into provider(user_id, tax_code, provider_name) output inserted.provider_id values (?, ?, ?)";
             stm = connection.prepareStatement(sql);
-            if (provider.getUserId() != null) {
+            if (provider.getUserId() >0) {
                 stm.setInt(1, provider.getUserId());
             } else {
                 stm.setNull(1, java.sql.Types.INTEGER);
@@ -105,10 +117,10 @@ public class ProviderDAO extends service.DBContext {
         return null;
     }
 
-    public Provider createUserAndProvider(models.User user, Provider provider) {
+    public Provider createUserAndProvider(model.User user, Provider provider) {
         try {
-            dao.CustomerDAO cdao = new dao.CustomerDAO();
-            models.User existingUser = cdao.getUserByEmail(user.getEmail());
+            dal.CustomerDAO cdao = new dal.CustomerDAO();
+            model.User existingUser = cdao.getUserByEmail(user.getEmail());
             if (existingUser != null) {
                 return null; // email exists
             }
