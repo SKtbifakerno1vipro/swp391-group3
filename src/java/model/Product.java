@@ -35,3 +35,4 @@ public class Product {
     public LocalDateTime getUpdateAt() { return updateAt; }
     public void setUpdateAt(LocalDateTime updateAt) { this.updateAt = updateAt; }
 }
+

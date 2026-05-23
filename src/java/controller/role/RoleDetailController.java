@@ -1,5 +1,7 @@
 package controller.role;
 
+
+
 import model.Permission;
 import model.Role;
 import service.RoleService;
@@ -7,10 +9,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@WebServlet(name = "RoleDetailController", urlPatterns = {"/role-detail"})
 public class RoleDetailController extends HttpServlet {
 
     private final RoleService roleService = new RoleService();
@@ -37,7 +41,7 @@ public class RoleDetailController extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID của vai trò không hợp lệ!");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID cÃ¡Â»Â§a vai trÃƒÂ² khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡!");
         }
     }
 
@@ -60,7 +64,11 @@ public class RoleDetailController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Đã xảy ra lỗi trong quá trình lưu quyền!");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ã„ÂÃƒÂ£ xÃ¡ÂºÂ£y ra lÃ¡Â»â€”i trong quÃƒÂ¡ trÃƒÂ¬nh lÃ†Â°u quyÃ¡Â»Ân!");
         }
     }
 }
+
+
+
+

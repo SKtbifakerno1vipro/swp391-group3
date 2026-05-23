@@ -1,14 +1,18 @@
 package controller.customer;
 
+
+
 import service.CustomerService;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
 import model.Customer;
 import model.User;
 
+@WebServlet(name = "EditCustomerController", urlPatterns = {"/EditCustomer"})
 public class EditCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
@@ -32,7 +36,7 @@ public class EditCustomerController extends HttpServlet {
                 request.setAttribute("errorDetail", "Customer not found");
             } else {
                 request.setAttribute("customer", customer);
-                if (customer.getUserId() != 0) {
+                if (customer.getUserId() >= 0) {
                     User user = customerService.getUserById(customer.getUserId());
                     if (user != null) request.setAttribute("user", user);
                 }
@@ -107,3 +111,7 @@ public class EditCustomerController extends HttpServlet {
         }
     }
 }
+
+
+
+
