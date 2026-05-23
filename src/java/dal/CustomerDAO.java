@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package dal;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -12,21 +13,26 @@ import java.util.List;
 import model.Customer;
 import model.CustomerDetail;
 import model.User;
+
 /**
  *
  * @author ADMIN
  */
-public class CustomerDAO extends DBContext{
+public class CustomerDAO extends DBContext {
+
     PreparedStatement stm;
     ResultSet rs;
     private String lastError;
+
     public String getLastError() {
         return lastError;
     }
+
     private void setLastError(Exception e) {
         this.lastError = e.getMessage();
     }
-    public Customer getCustomerByCustomerId(int id){
+
+    public Customer getCustomerByCustomerId(int id) {
         try {
             String sql = "select * from customer where customer_id = ?";
             stm = connection.prepareStatement(sql);
@@ -110,7 +116,7 @@ public class CustomerDAO extends DBContext{
         return null;
     }
 
-    public CustomerDetail getCustomerDetailByCustomerId(int id){
+    public CustomerDetail getCustomerDetailByCustomerId(int id) {
         try {
             String sql = "select c.customer_id, c.user_id as customer_user_id, c.tax_code, c.type, c.create_by, c.create_at, c.update_at, "
                     + "u.user_id as user_user_id, u.email, u.full_name, u.phone, u.role_id, r.role_name "
@@ -206,7 +212,7 @@ public class CustomerDAO extends DBContext{
         try {
             String sql = "insert into customer(user_id, tax_code, type, create_by) output inserted.customer_id values (?, ?, ?, ?)";
             stm = connection.prepareStatement(sql);
-            if (customer.getUserId() != null) {
+            if (customer.getUserId() >0) {
                 stm.setInt(1, customer.getUserId());
             } else {
                 stm.setNull(1, java.sql.Types.INTEGER);
@@ -366,5 +372,61 @@ public class CustomerDAO extends DBContext{
             e.printStackTrace();
         }
         return false;
+    }
+
+    public java.util.List<model.Customer> getAllCustomers() {
+        java.util.List<model.Customer> list = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM customer";
+        try {
+            java.sql.PreparedStatement st = connection.prepareStatement(sql);
+            java.sql.ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                model.Customer c = new model.Customer();
+                c.setCustomerId(rs.getInt("customer_id"));
+                c.setUserId(rs.getInt("user_id"));
+                c.setTaxCode(rs.getString("tax_code"));
+                c.setType(rs.getString("type"));
+                list.add(c);
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("CustomerDAO getAllCustomers error: " + e.getMessage());
+        }
+
+        return list;
+    }
+
+    public java.util.List<model.CustomerDetail> getAllCustomerDetails() {
+        java.util.List<model.CustomerDetail> list = new java.util.ArrayList<>();
+        String sql = "select c.customer_id, c.user_id as customer_user_id, c.tax_code, c.type, c.create_by, c.create_at, c.update_at, "
+                + "u.user_id as user_user_id, u.email, u.full_name, u.phone, u.status, u.role_id, u.user_name "
+                + "from customer c "
+                + "left join [user] u on c.user_id = u.user_id";
+        try {
+            java.sql.PreparedStatement st = connection.prepareStatement(sql);
+            java.sql.ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                model.CustomerDetail detail = new model.CustomerDetail();
+                detail.setCustomerId(rs.getInt("customer_id"));
+                detail.setUserId((Integer) rs.getObject("customer_user_id"));
+                detail.setTaxCode(rs.getString("tax_code"));
+                detail.setType(rs.getString("type"));
+
+                if (rs.getObject("user_user_id") != null) {
+                    model.User user = new model.User();
+                    user.setUserId(rs.getInt("user_user_id"));
+                    user.setUserName(rs.getString("user_name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setStatus(rs.getString("status"));
+                    user.setRoleId((Integer) rs.getObject("role_id"));
+                    detail.setUser(user);
+                }
+                list.add(detail);
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("CustomerDAO getAllCustomerDetails error: " + e.getMessage());
+        }
+        return list;
     }
 }

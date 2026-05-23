@@ -1,8 +1,8 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Set"%>
-<%@page import="models.Role"%>
-<%@page import="models.Permission"%>
+<%@page import="model.Role"%>
+<%@page import="model.Permission"%>
 
 <%
     Role role = (Role) request.getAttribute("role");
@@ -28,43 +28,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit Role Permissions</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
 </head>
 
-<body class="bg-[#FAF6F0] text-[#2E3230] min-h-screen">
+<body>
 
-<main class="max-w-5xl mx-auto p-10 pb-28">
+<main>
 
-    <a href="${pageContext.request.contextPath}/role-list"
-       class="text-[#4A7C59] font-bold">
-        ← Back to Role List
+    <a href="${pageContext.request.contextPath}/role-list">
+        &larr; Back to Role List
     </a>
 
-    <h1 class="text-4xl font-bold mt-6 mb-2">Edit Role Permissions</h1>
-    <p class="text-[#74796E] mb-8">
+    <h1>Edit Role Permissions</h1>
+    <p>
         Manage permissions for role:
         <strong><%= role.getRoleName() %></strong>
     </p>
 
-    <div class="bg-[#F5F1EA] border border-[#E4E0D8] rounded-3xl p-8 mb-8">
-        <div class="grid grid-cols-4 gap-6">
+    <div>
+        <div>
             <div>
-                <p class="text-xs uppercase text-[#74796E] font-bold">Role ID</p>
-                <p class="font-bold text-[#4A7C59]">R-<%= role.getRoleId() %></p>
+                <p>Role ID</p>
+                <p>R-<%= role.getRoleId() %></p>
             </div>
 
             <div>
-                <p class="text-xs uppercase text-[#74796E] font-bold">Role Name</p>
-                <p class="font-bold"><%= role.getRoleName() %></p>
+                <p>Role Name</p>
+                <p><%= role.getRoleName() %></p>
             </div>
 
             <div>
-                <p class="text-xs uppercase text-[#74796E] font-bold">Created At</p>
+                <p>Created At</p>
                 <p><%= role.getCreateAt() != null ? role.getCreateAt() : "-" %></p>
             </div>
 
             <div>
-                <p class="text-xs uppercase text-[#74796E] font-bold">Updated At</p>
+                <p>Updated At</p>
                 <p><%= role.getUpdateAt() != null ? role.getUpdateAt() : "-" %></p>
             </div>
         </div>
@@ -74,35 +73,35 @@
 
         <input type="hidden" name="roleId" value="<%= role.getRoleId() %>">
 
-        <div class="flex justify-between items-center mb-6">
-            <span class="px-4 py-2 bg-[#D8F0DE] text-[#2A6038] rounded-full text-sm font-bold">
+        <div>
+            <span>
                 <%= selectedPermissionIds.size() %> permissions enabled
             </span>
 
-            <label class="font-bold text-sm">
-                <input type="checkbox" id="selectAll" class="mr-2 accent-[#4A7C59]">
+            <label>
+                <input type="checkbox" id="selectAll">
                 Select All Permissions
             </label>
         </div>
 
-        <div class="bg-white border border-[#E4E0D8] rounded-3xl overflow-hidden">
+        <div>
 
-            <div class="bg-[#EAE6DE] px-6 py-4 font-bold">
+            <div>
                 System Permissions
             </div>
 
-            <div class="divide-y divide-[#E4E0D8]">
+            <div>
 
                 <%
                     for (Permission permission : permissionList) {
                         boolean checked = selectedPermissionIds.contains(permission.getPermissionId());
                 %>
 
-                <div class="flex justify-between items-center px-6 py-5 hover:bg-[#F5F1EA]">
+                <div>
 
                     <div>
-                        <p class="font-bold"><%= permission.getPermissionName() %></p>
-                        <p class="text-sm text-[#74796E]">
+                        <p><%= permission.getPermissionName() %></p>
+                        <p>
                             Allow this role to access <%= permission.getPermissionName() %>.
                         </p>
                     </div>
@@ -110,8 +109,7 @@
                     <input type="checkbox"
                            name="permissionIds"
                            value="<%= permission.getPermissionId() %>"
-                           <%= checked ? "checked" : "" %>
-                           class="permission-checkbox w-5 h-5 accent-[#4A7C59]">
+                           <%= checked ? "checked" : "" %>>
 
                 </div>
 
@@ -122,15 +120,13 @@
             </div>
         </div>
 
-        <div class="fixed bottom-0 left-0 right-0 bg-[#FAF6F0]/90 border-t border-[#E4E0D8] px-10 py-5 flex justify-end gap-4">
+        <div>
 
-            <a href="${pageContext.request.contextPath}/role-list"
-               class="px-8 py-3 bg-[#F0E8DB] rounded-xl font-bold">
+            <a href="${pageContext.request.contextPath}/role-list">
                 Cancel
             </a>
 
-            <button type="submit"
-                    class="px-8 py-3 bg-[#4A7C59] text-white rounded-xl font-bold">
+            <button type="submit">
                 Save Permission Changes
             </button>
 
@@ -151,3 +147,4 @@
 
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : CreateCustomer
     Created on : May 21, 2026
     Author     : ADMIN
@@ -14,66 +14,66 @@
     <title>Create Customer</title>
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    
 </head>
-<body class="antialiased text-body-md min-h-screen bg-surface text-on-surface">
-    <main class="p-8">
-        <div class="max-w-4xl mx-auto bg-surface-container-low rounded-lg shadow-md p-6">
-            <h1 class="text-2xl font-bold text-primary mb-4">Create Customer</h1>
+<body>
+    <main>
+        <div>
+            <h1>Create Customer</h1>
             <c:if test="${not empty success}">
-                <div class="text-green-600">Create successful</div>
+                <div>Create successful</div>
             </c:if>
             <c:if test="${not empty error}">
-                <div class="text-red-600">Create failed</div>
+                <div>Create failed</div>
                 <c:if test="${not empty errorDetail}">
-                    <div class="text-red-500">${errorDetail}</div>
+                    <div>${errorDetail}</div>
                 </c:if>
             </c:if>
-            <form action="CreateCustomer" method="post" class="space-y-4">
+            <form action="CreateCustomer" method="post">
                 <div>
-                    <label for="username" class="block text-sm font-medium">Username</label>
-                    <input type="text" id="username" name="username" class="w-full p-2 border rounded" required>
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
                 </div>
                 <div>
-                    <label for="password" class="block text-sm font-medium">Password</label>
-                    <input type="password" id="password" name="password" class="w-full p-2 border rounded" required>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
                 </div>
                 <div>
-                    <label for="email" class="block text-sm font-medium">Email</label>
-                    <input type="email" id="email" name="email" class="w-full p-2 border rounded" required>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
                 </div>
                 <div>
-                    <label for="fullname" class="block text-sm font-medium">Full Name</label>
-                    <input type="text" id="fullname" name="fullname" class="w-full p-2 border rounded">
+                    <label for="fullname">Full Name</label>
+                    <input type="text" id="fullname" name="fullname">
                 </div>
                 <div>
-                    <label for="phone" class="block text-sm font-medium">Phone</label>
-                    <input type="text" id="phone" name="phone" class="w-full p-2 border rounded">
+                    <label for="phone">Phone</label>
+                    <input type="text" id="phone" name="phone">
                 </div>
                 <div>
-                    <label for="status" class="block text-sm font-medium">Status</label>
-                    <select id="status" name="status" class="w-full p-2 border rounded">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                     </select>
                 </div>
                 <div>
-                    <label for="role" class="block text-sm font-medium">Role</label>
+                    <label for="role">Role</label>
                     <input type="hidden" name="roleId" value="${customerRoleId}">
                     <span>Customer</span>
                 </div>
                 <div>
-                    <label for="taxCode" class="block text-sm font-medium">Tax Code</label>
-                    <input type="text" id="taxCode" name="taxCode" class="w-full p-2 border rounded" required>
+                    <label for="taxCode">Tax Code</label>
+                    <input type="text" id="taxCode" name="taxCode" required>
                 </div>
                 <div>
-                    <label for="type" class="block text-sm font-medium">Type</label>
-                    <input type="text" id="type" name="type" class="w-full p-2 border rounded" required>
+                    <label for="type">Type</label>
+                    <input type="text" id="type" name="type" required>
                 </div>
                 <div>
-                    <label for="createBy" class="block text-sm font-medium">Created By</label>
-                    <select id="createBy" name="createBy" class="w-full p-2 border rounded" required>
+                    <label for="createBy">Created By</label>
+                    <select id="createBy" name="createBy" required>
                         <option value="">Choose staff</option>
                         <c:forEach var="user" items="${users}">
                             <option value="${user.userId}">${user.fullName != null && !user.fullName.isEmpty() ? user.fullName : user.userName}</option>
@@ -81,10 +81,12 @@
                     </select>
                 </div>
                 <div>
-                    <button type="submit" class="bg-primary text-on-primary px-4 py-2 rounded">Create</button>
+                    <button type="submit">Create</button>
                 </div>
             </form>
         </div>
     </main>
 </body>
 </html>
+
+
