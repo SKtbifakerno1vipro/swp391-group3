@@ -27,16 +27,16 @@
             <c:if test="${not empty customer}">
                 <div>
                     <div>
-                        <span>Customer ID:</span> ${customer.customerId}
+                        <span>Customer ID:</span> ${customerDTO.customer.customerId}
                     </div>
                     <div>
                         <span>User ID:</span> ${customer.userId}
                     </div>
                     <div>
-                        <span>Tax Code:</span> ${customer.taxCode}
+                        <span>Tax Code:</span> ${customerDTO.customer.taxCode}
                     </div>
                     <div>
-                        <span>Type:</span> ${customer.type}
+                        <span>Type:</span> ${customerDTO.customer.type}
                     </div>
                     <div>
                         <span>Created By:</span> ${customer.createBy}
@@ -75,5 +75,6 @@
     </main>
 </body>
 </html>
+
 
 

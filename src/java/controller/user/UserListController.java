@@ -1,16 +1,16 @@
 package controller.user;
-
 import service.UserService;
+import model.User;
 import java.io.IOException;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.annotation.WebServlet;
+@WebServlet(name = "UserListController", urlPatterns = {"/user-list"})
 public class UserListController extends HttpServlet {
-
     private final UserService userService = new UserService();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String roleId = request.getParameter("roleId");
