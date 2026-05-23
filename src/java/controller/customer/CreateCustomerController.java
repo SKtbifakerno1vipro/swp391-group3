@@ -1,5 +1,6 @@
 package controller.customer;
 
+
 import service.CustomerService;
 import java.io.IOException;
 import java.util.List;
@@ -7,8 +8,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
 import model.User;
 
+@WebServlet(name = "CreateCustomerController", urlPatterns = {"/CreateCustomer"})
 public class CreateCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
@@ -86,3 +89,7 @@ public class CreateCustomerController extends HttpServlet {
         }
     }
 }
+
+
+
+
