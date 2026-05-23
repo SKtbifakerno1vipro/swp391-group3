@@ -37,6 +37,8 @@ public class UserDAO extends DBContext {
         }
         return list;
     }
+    
+ 
 
     public List<User> getAllUsers() {
         return searchUsers(null, null);
@@ -118,4 +120,6 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
+    
+
 }

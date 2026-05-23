@@ -1,7 +1,7 @@
 package controller.provider;
 
-import dal.ProviderDAO;
-import dal.CustomerDAO;
+import service.ProviderService;
+import service.CustomerService;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -13,15 +13,17 @@ import model.Provider;
 
 public class CreateProviderController extends HttpServlet {
 
+    private final ProviderService providerService = new ProviderService();
+    private final CustomerService customerService = new CustomerService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        CustomerDAO dao = new CustomerDAO();
-        List<User> users = dao.getAllUsers();
-        Integer providerRoleId = dao.getRoleIdByName("Provider");
+        List<User> users = customerService.getAllUsers();
+        Integer providerRoleId = customerService.getRoleIdByName("Provider");
         request.setAttribute("users", users);
         request.setAttribute("providerRoleId", providerRoleId);
-        request.getRequestDispatcher("views/provider/create.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/provider/create.jsp").forward(request, response);
     }
 
     @Override
@@ -38,15 +40,14 @@ public class CreateProviderController extends HttpServlet {
         String taxCode = request.getParameter("taxCode");
         String roleIdValue = request.getParameter("roleId");
 
-        CustomerDAO cdao = new CustomerDAO();
-        List<User> users = cdao.getAllUsers();
-        Integer providerRoleId = cdao.getRoleIdByName("Provider");
+        List<User> users = customerService.getAllUsers();
+        Integer providerRoleId = customerService.getRoleIdByName("Provider");
         request.setAttribute("users", users);
         request.setAttribute("providerRoleId", providerRoleId);
 
         if (userName == null || userName.isBlank() || password == null || password.isBlank() || email == null || email.isBlank() || providerName == null || providerName.isBlank()) {
             request.setAttribute("error", "Create failed");
-            request.getRequestDispatcher("views/provider/create.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/provider/create.jsp").forward(request, response);
             return;
         }
 
@@ -66,8 +67,7 @@ public class CreateProviderController extends HttpServlet {
             provider.setProviderName(providerName);
             provider.setTaxCode(taxCode);
 
-            ProviderDAO pdao = new ProviderDAO();
-            Provider created = pdao.createUserAndProvider(user, provider);
+            Provider created = providerService.createUserAndProvider(user, provider);
             if (created == null || created.getProviderId() <= 0) {
                 request.setAttribute("error", "Create failed");
             } else {
@@ -78,6 +78,6 @@ public class CreateProviderController extends HttpServlet {
             request.setAttribute("errorDetail", ex.getMessage());
         }
 
-        request.getRequestDispatcher("views/provider/create.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/provider/create.jsp").forward(request, response);
     }
 }
