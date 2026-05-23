@@ -1,4 +1,4 @@
-<%--
+﻿<%--
     Document   : ProviderList
     Created on : 2026-05-21
 --%>
@@ -12,57 +12,45 @@
         <title>Providers</title>
         <link href="https://fonts.googleapis.com" rel="preconnect">
         <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-        <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
-        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        
+        
     </head>
-    <body class="antialiased text-body-md min-h-screen bg-surface text-on-surface">
-        <main class="p-8">
-            <div class="max-w-5xl mx-auto bg-surface-container-low rounded-lg shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h1 class="text-2xl font-bold text-primary">Providers</h1>
-                    <a href="${pageContext.request.contextPath}/CreateProvider"
-                       style="
-                       display: inline-block;
-                       padding: 10px 20px;
-                       background-color: #2563eb;
-                       color: white;
-                       text-decoration: none;
-                       border-radius: 6px;
-                       font-size: 14px;
-                       font-weight: 500;
-                       border: none;
-                       cursor: pointer;
-                       ">
+    <body>
+        <main>
+            <div>
+                <div>
+                    <h1>Providers</h1>
+                    <a href="${pageContext.request.contextPath}/CreateProvider">
                         Create Provider
                     </a>
                 </div>
 
                 <c:if test="${empty providers}">
-                    <p class="text-on-surface-variant">No providers found.</p>
+                    <p>No providers found.</p>
                 </c:if>
 
                 <c:if test="${not empty providers}">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                    <div>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Code</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
-                                    <th class="px-6 py-3"></th>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Tax Code</th>
+                                    <th>User ID</th>
+                                    <th></th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody>
                                 <c:forEach var="p" items="${providers}">
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">${p.providerId}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">${p.providerName}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">${p.taxCode}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">${p.userId}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right space-x-2">
-                                            <a href="${pageContext.request.contextPath}/ProviderDetail?id=${p.providerId}" class="inline-block px-3 py-1 bg-blue-600 text-white rounded">Detail</a>
-                                            <a href="${pageContext.request.contextPath}/EditProvider?id=${p.providerId}" class="inline-block px-3 py-1 bg-yellow-500 text-white rounded">Edit</a>
+                                        <td>${p.providerId}</td>
+                                        <td>${p.providerName}</td>
+                                        <td>${p.taxCode}</td>
+                                        <td>${p.userId}</td>
+                                        <td>
+                                            <a href="${pageContext.request.contextPath}/ProviderDetail?id=${p.providerId}">Detail</a>
+                                            <a href="#" onclick="alert('Chức năng Edit Provider chưa được code'); return false;">Edit</a>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -75,3 +63,5 @@
         </main>
     </body>
 </html>
+
+
