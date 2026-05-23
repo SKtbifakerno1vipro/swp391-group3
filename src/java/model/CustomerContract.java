@@ -29,3 +29,4 @@ public class CustomerContract {
     public LocalDateTime getSignedAt() { return signedAt; }
     public void setSignedAt(LocalDateTime signedAt) { this.signedAt = signedAt; }
 }
+

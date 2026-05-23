@@ -1,5 +1,7 @@
 package controller.provider;
 
+
+
 import service.ProviderService;
 import service.CustomerService;
 import java.io.IOException;
@@ -8,9 +10,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
 import model.User;
 import model.Provider;
 
+@WebServlet(name = "CreateProviderController", urlPatterns = {"/CreateProvider"})
 public class CreateProviderController extends HttpServlet {
 
     private final ProviderService providerService = new ProviderService();
@@ -81,3 +85,7 @@ public class CreateProviderController extends HttpServlet {
         request.getRequestDispatcher("/views/provider/create.jsp").forward(request, response);
     }
 }
+
+
+
+

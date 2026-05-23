@@ -1,13 +1,17 @@
 package controller.role;
 
+
+
 import service.RoleService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import model.Role;
 
+@WebServlet(name = "EditRoleController", urlPatterns = {"/edit-role"})
 public class EditRoleController extends HttpServlet {
 
     private final RoleService roleService = new RoleService();
@@ -35,3 +39,7 @@ public class EditRoleController extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/role-list");
     }
 }
+
+
+
+

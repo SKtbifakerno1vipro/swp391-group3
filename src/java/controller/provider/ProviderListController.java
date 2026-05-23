@@ -1,12 +1,16 @@
 package controller.provider;
 
+
+
 import service.ProviderService;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
 
+@WebServlet(name = "ProviderListController", urlPatterns = {"/provider-list"})
 public class ProviderListController extends HttpServlet {
 
     private final ProviderService providerService = new ProviderService();
@@ -24,3 +28,7 @@ public class ProviderListController extends HttpServlet {
         doGet(request, response);
     }
 }
+
+
+
+
