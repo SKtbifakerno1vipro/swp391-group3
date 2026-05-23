@@ -1,6 +1,8 @@
 package model;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Role {
 
@@ -8,6 +10,7 @@ public class Role {
     private String roleName;
     private Timestamp createAt;
     private Timestamp updateAt;
+    private List<Permission> permissions = new ArrayList<>();
 
     public Role() {
     }
@@ -49,5 +52,13 @@ public class Role {
 
     public void setUpdateAt(Timestamp updateAt) {
         this.updateAt = updateAt;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 }
