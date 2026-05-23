@@ -29,3 +29,4 @@ public class ProviderProduct {
     public LocalDateTime getUpdateAt() { return updateAt; }
     public void setUpdateAt(LocalDateTime updateAt) { this.updateAt = updateAt; }
 }
+
