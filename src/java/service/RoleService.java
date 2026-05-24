@@ -36,3 +36,4 @@ public class RoleService {
         roleDAO.updateRolePermissions(roleId, permissionIds);
     }
 }
+

@@ -3,18 +3,18 @@ package service;
 import dal.CustomerDAO;
 import java.util.List;
 import model.Customer;
-import model.CustomerDetail;
+import dto.CustomerDTO;
 import model.User;
 
 public class CustomerService {
     private final CustomerDAO customerDAO = new CustomerDAO();
 
-    public List<CustomerDetail> getAllCustomerDetails() {
-        return customerDAO.getAllCustomerDetails();
+    public List<CustomerDTO> getAllCustomerDTOs() {
+        return customerDAO.getAllCustomerDTOs();
     }
 
-    public CustomerDetail getCustomerDetailByCustomerId(int id) {
-        return customerDAO.getCustomerDetailByCustomerId(id);
+    public CustomerDTO getCustomerDTOByCustomerId(int id) {
+        return customerDAO.getCustomerDTOByCustomerId(id);
     }
 
     public List<User> getAllUsers() {

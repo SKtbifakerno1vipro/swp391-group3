@@ -1,5 +1,4 @@
 package controller.user;
-
 import service.UserService;
 import model.User;
 import java.io.IOException;
@@ -7,16 +6,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.annotation.WebServlet;
+@WebServlet(name = "CreateUserController", urlPatterns = {"/create-user"})
 public class CreateUserController extends HttpServlet {
-
     private final UserService userService = new UserService();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/views/user/form.jsp").forward(request, response);
     }
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User u = new User();
@@ -27,7 +24,6 @@ public class CreateUserController extends HttpServlet {
         u.setPhone(request.getParameter("phone"));
         u.setStatus(request.getParameter("status"));
         u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
-
         userService.createUser(u);
         response.sendRedirect(request.getContextPath() + "/user-list");
     }
