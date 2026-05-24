@@ -1,14 +1,20 @@
 package controller.auth;
 
+
+
 import service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import model.User;
 
+import jakarta.servlet.annotation.WebServlet;
+
+@WebServlet(name = "LoginController", urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
 
     private final UserService userService = new UserService();
@@ -38,3 +44,7 @@ public class LoginController extends HttpServlet {
         }
     }
 }
+
+
+
+

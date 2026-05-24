@@ -1,31 +1,31 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
-        <title>Danh sách khách hàng</title>
+        <title>Danh sÃ¡ch khÃ¡ch hÃ ng</title>
     </head>
     <body>
 
-        <h2>Quản lý danh sách khách hàng (Hệ thống thành viên)</h2>
+        <h2>Quáº£n lÃ½ danh sÃ¡ch khÃ¡ch hÃ ng (Há»‡ thá»‘ng thÃ nh viÃªn)</h2>
 
         <table>
             <thead>
                 <tr>
-                    <th>Mã KH (User ID)</th>
-                    <th>Tài khoản</th>
-                    <th>Tên hiển thị</th>
+                    <th>MÃ£ KH (User ID)</th>
+                    <th>TÃ i khoáº£n</th>
+                    <th>TÃªn hiá»ƒn thá»‹</th>
                     <th>Email</th>
-                    <th>Số điện thoại</th>
-                    <th>Địa chỉ riêng</th>
-                    <th>Trạng thái</th>
+                    <th>Sá»‘ Ä‘iá»‡n thoáº¡i</th>
+                    <th>Äá»‹a chá»‰ riÃªng</th>
+                    <th>Tráº¡ng thÃ¡i</th>
                 </tr>
             </thead>
             <tbody>
                 <c:if test="${empty customerList}">
                     <tr>
-                        <td colspan="7">Không có dữ liệu khách hàng.</td>
+                        <td colspan="7">KhÃ´ng cÃ³ dá»¯ liá»‡u khÃ¡ch hÃ ng.</td>
                     </tr>
                 </c:if>
 
@@ -45,3 +45,4 @@
 
     </body>
 </html>
+

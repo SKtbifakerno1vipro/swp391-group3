@@ -1,5 +1,7 @@
 package controller.role;
 
+
+
 import service.RoleService;
 import model.Permission;
 import model.Role;
@@ -7,12 +9,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@WebServlet(name = "EditRolePermissionsController", urlPatterns = {"/edit-role-permissions"})
 public class EditRolePermissionsController extends HttpServlet {
 
     private final RoleService roleService = new RoleService();
@@ -60,3 +64,7 @@ public class EditRolePermissionsController extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
     }
 }
+
+
+
+

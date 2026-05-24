@@ -97,13 +97,13 @@ public class RoleDAO extends DBContext {
     public void updateRolePermissions(int roleId, java.util.List<Integer> permissionIds) {
         try {
             connection.setAutoCommit(false);
-            // Xóa permissions cũ
+            // XÃ³a permissions cÅ©
             String sqlDelete = "DELETE FROM role_permission WHERE role_id = ?";
             java.sql.PreparedStatement stDel = connection.prepareStatement(sqlDelete);
             stDel.setInt(1, roleId);
             stDel.executeUpdate();
             
-            // Thêm permissions mới
+            // ThÃªm permissions má»›i
             if (permissionIds != null && !permissionIds.isEmpty()) {
                 String sqlInsert = "INSERT INTO role_permission (role_id, permission_id) VALUES (?, ?)";
                 java.sql.PreparedStatement stIns = connection.prepareStatement(sqlInsert);
@@ -121,3 +121,4 @@ public class RoleDAO extends DBContext {
         }
     }
 }
+
