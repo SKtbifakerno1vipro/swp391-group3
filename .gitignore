@@ -1,38 +1,26 @@
-# NetBeans
+# NetBeans specific
 nbproject/private/
 build/
 dist/
 nbbuild/
 nbdist/
 
-# Java build artifacts
+# Compiled class file
 *.class
-*.jar
-!web/WEB-INF/lib/*.jar
+
+# Log file
+*.log
+
+# Package Files (Ignore globally but allow in WEB-INF/lib)
 *.war
 *.nar
 *.ear
 *.zip
 *.tar.gz
 *.rar
+!web/WEB-INF/lib/*.jar
 
-# Logs
-*.log
-server.log
-
-# Environment / local config
-.env
-.env.*
-
-# Word temporary files
-~$*.doc
-~$*.docx
-
-# OS files
+# OS generated files
 .DS_Store
 Thumbs.db
-
-# Legacy local path artifact
 /code template/nbproject/private/
-# Claude local metadata
-.claude/
