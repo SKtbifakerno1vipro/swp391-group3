@@ -8,7 +8,7 @@
     </head>
     <body>
 
-        <h2>Quáº£n lÃ½ danh sÃ¡ch khÃ¡ch hÃ ng (Há»‡ thá»‘ng thÃ nh viÃªn)</h2>
+        <h2>Quá quản lý danh sách khách hàng (Hệ thống thành viên)</h2>
 
         <table>
             <thead>
