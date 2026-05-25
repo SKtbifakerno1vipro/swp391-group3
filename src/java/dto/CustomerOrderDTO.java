@@ -7,9 +7,19 @@ import model.User;
 public class CustomerOrderDTO {
     private CustomerOrder customerOrder;
     private Customer customer;
-    private User customerUser;
 
     public CustomerOrderDTO() {}
+
+
+    private User customerUser; // The user linked to the customer
+
+ 
+    public CustomerOrderDTO(CustomerOrder customerOrder, Customer customer, User customerUser) {
+        this.customerOrder = customerOrder;
+        this.customer = customer;
+        this.customerUser = customerUser;
+    }
+
 
     public CustomerOrder getCustomerOrder() {
         return customerOrder;
