@@ -29,7 +29,7 @@ public class AddRoleController extends HttpServlet {
             String roleName = request.getParameter("roleName");
 
             if (roleName == null || roleName.trim().isEmpty()) {
-                request.setAttribute("error", "TÃƒÂªn nhÃƒÂ³m quyÃ¡Â»Ân khÃƒÂ´ng Ã„â€˜Ã†Â°Ã¡Â»Â£c Ã„â€˜Ã¡Â»Æ’ trÃ¡Â»â€˜ng!");
+                request.setAttribute("error", "Vui long nhap ten Role name!");
                 request.getRequestDispatcher("/views/role/add-role.jsp").forward(request, response);
                 return;
             }
@@ -39,12 +39,12 @@ public class AddRoleController extends HttpServlet {
             if (isSuccess) {
                 response.sendRedirect(request.getContextPath() + "/role-list?status=add_success");
             } else {
-                request.setAttribute("error", "ThÃƒÂªm mÃ¡Â»â€ºi thÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i! Vui lÃƒÂ²ng thÃ¡Â»Â­ lÃ¡ÂºÂ¡i.");
+                request.setAttribute("error", "Loi trong khi add tai database");
                 request.getRequestDispatcher("/views/role/add-role.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "LÃ¡Â»â€”i hÃ¡Â»â€¡ thÃ¡Â»â€˜ng khi thÃƒÂªm Role!");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Loi khong xac dinh khi them Role!");
         }
     }
 }
