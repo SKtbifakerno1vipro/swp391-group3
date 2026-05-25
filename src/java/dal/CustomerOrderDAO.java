@@ -70,7 +70,10 @@ public class CustomerOrderDAO extends DBContext {
                 p.setSellingPrice(rs.getBigDecimal("selling_price"));
                 p.setUnit(rs.getString("unit"));
 
-                details.add(new dto.CustomerOrderDetailDTO(cod, p));
+                dto.CustomerOrderDetailDTO detailDto = new dto.CustomerOrderDetailDTO();
+                detailDto.setDetail(cod);
+                detailDto.setProduct(p);
+                details.add(detailDto);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,6 +98,10 @@ public class CustomerOrderDAO extends DBContext {
         User u = new User();
         u.setFullName(rs.getString("full_name"));
         
-        return new CustomerOrderDTO(co, c, u);
+        CustomerOrderDTO dto = new CustomerOrderDTO();
+        dto.setCustomerOrder(co);
+        dto.setCustomer(c);
+        dto.setCustomerUser(u);
+        return dto;
     }
 }
