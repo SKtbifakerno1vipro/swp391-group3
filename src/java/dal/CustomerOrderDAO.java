@@ -22,13 +22,30 @@ public class CustomerOrderDAO extends DBContext {
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                list.add(mapResultSetToDTO(rs));
+                CustomerOrder co = new CustomerOrder();
+                co.setCustomerOrderId(rs.getInt("customer_order_id"));
+                co.setCustomerId(rs.getInt("customer_id"));
+                co.setStatus(rs.getString("status"));
+                co.setCreateBy((Integer) rs.getObject("create_by"));
+                if (rs.getTimestamp("create_at") != null) {
+                    co.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
+                }
+                
+                Customer c = new Customer();
+                c.setCustomerId(rs.getInt("customer_id"));
+                c.setTaxCode(rs.getString("tax_code"));
+                
+                User u = new User();
+                u.setFullName(rs.getString("full_name"));
+                
+                list.add(new CustomerOrderDTO(co, c, u));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
     }
+
 
     public CustomerOrderDTO getCustomerOrderDTOById(int id) {
         String sql = "SELECT co.*, c.tax_code, u.full_name " +
@@ -104,4 +121,5 @@ public class CustomerOrderDAO extends DBContext {
         dto.setCustomerUser(u);
         return dto;
     }
+
 }

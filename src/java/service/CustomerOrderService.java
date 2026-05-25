@@ -11,6 +11,7 @@ public class CustomerOrderService {
         return customerOrderDAO.getAllCustomerOrders();
     }
 
+
     public CustomerOrderDTO getCustomerOrderById(int id) {
         return customerOrderDAO.getCustomerOrderDTOById(id);
     }
@@ -18,4 +19,5 @@ public class CustomerOrderService {
     public List<dto.CustomerOrderDetailDTO> getOrderDetails(int orderId) {
         return customerOrderDAO.getDetailsByOrderId(orderId);
     }
+
 }

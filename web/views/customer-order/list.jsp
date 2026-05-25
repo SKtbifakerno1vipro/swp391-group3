@@ -36,7 +36,11 @@
                         <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
                     </td>
                     <td>
+
                         <a href="${pageContext.request.contextPath}/customer-order-detail?id=${item.customerOrder.customerOrderId}">View Details</a>
+
+                        <a href="#">View Details</a>
+
                     </td>
                 </tr>
             </c:forEach>
