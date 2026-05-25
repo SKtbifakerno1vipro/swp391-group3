@@ -31,13 +31,14 @@ public class CustomerDAO extends DBContext {
     public List<CustomerDTO> getAllCustomerDTOs() {
         List<CustomerDTO> list = new ArrayList<>();
         try {
-            String sql = "select c.*, u.full_name, u.email from customer c left join [user] u on c.user_id = u.user_id";
+            String sql = "select c.*, u.full_name, u.email, u.* from customer c left join [user] u on c.user_id = u.user_id";
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                Customer c = new Customer(); c.setCustomerId(rs.getInt("customer_id")); c.setUserId((Integer) rs.getObject("user_id"));
+                Customer c = new Customer(); c.setCustomerId(rs.getInt("customer_id")); c.setUserId((Integer) rs.getObject("user_id")); c.setTaxCode(rs.getString("tax_code"));
                 c.setTaxCode(rs.getString("tax_code")); c.setType(rs.getString("type"));
-                User u = new User(); u.setFullName(rs.getString("full_name")); u.setEmail(rs.getString("email"));
+                User u = new User(); u.setFullName(rs.getString("full_name")); u.setEmail(rs.getString("email")); u.setStatus(rs.getString("status"));
+                u.setPhone(rs.getString("phone"));
                 list.add(new CustomerDTO(c, u, null));
             }
         } catch (Exception e) { e.printStackTrace(); }
