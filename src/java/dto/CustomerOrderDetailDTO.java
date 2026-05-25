@@ -9,11 +9,6 @@ public class CustomerOrderDetailDTO {
 
     public CustomerOrderDetailDTO() {}
 
-    public CustomerOrderDetailDTO(CustomerOrderDetail detail, Product product) {
-        this.detail = detail;
-        this.product = product;
-    }
-
     public CustomerOrderDetail getDetail() {
         return detail;
     }
