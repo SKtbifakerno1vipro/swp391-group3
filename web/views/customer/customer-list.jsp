@@ -4,39 +4,37 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
-        <title>Danh sÃ¡ch khÃ¡ch hÃ ng</title>
+        <title>Danh sach khach hang</title>
     </head>
     <body>
 
-        <h2>Quáº£n lÃ½ danh sÃ¡ch khÃ¡ch hÃ ng (Há»‡ thá»‘ng thÃ nh viÃªn)</h2>
+        <h2>Danh sach khach hang</h2>
 
         <table>
             <thead>
                 <tr>
-                    <th>MÃ£ KH (User ID)</th>
-                    <th>TÃ i khoáº£n</th>
-                    <th>TÃªn hiá»ƒn thá»‹</th>
+                    <th>Ma customer (ID) </th>
+                    <th>Ten khach hang‹</th>
                     <th>Email</th>
-                    <th>Sá»‘ Ä‘iá»‡n thoáº¡i</th>
-                    <th>Äá»‹a chá»‰ riÃªng</th>
-                    <th>Tráº¡ng thÃ¡i</th>
+                    <th>So dien thoai</th>
+                    <th>Ma so thue</th>
+                    <th>Trang thai</th>
                 </tr>
             </thead>
             <tbody>
                 <c:if test="${empty customerList}">
                     <tr>
-                        <td colspan="7">KhÃ´ng cÃ³ dá»¯ liá»‡u khÃ¡ch hÃ ng.</td>
+                        <td colspan="7">Khong co du lieu khach hang</td>
                     </tr>
                 </c:if>
 
                 <c:forEach var="cust" items="${customerList}">
                     <tr>
-                        <td>${cust.userId}</td>
-                        <td>${cust.user.userName}</td>
+                        <td>${cust.customer.customerId}</td>
                         <td><strong>${cust.user.fullName}</strong></td>
                         <td>${cust.user.email}</td>
                         <td>${cust.user.phone}</td>
-                        <td></td>
+                        <td>${cust.customer.taxCode}</td>
                         <td><span>${cust.user.status}</span></td>
                     </tr>
                 </c:forEach>
