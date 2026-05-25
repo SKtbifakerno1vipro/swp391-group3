@@ -31,7 +31,7 @@ public class CustomerDAO extends DBContext {
     public List<CustomerDTO> getAllCustomerDTOs() {
         List<CustomerDTO> list = new ArrayList<>();
         try {
-            String sql = "select c.*, u.full_name, u.email, u.* from customer c left join [user] u on c.user_id = u.user_id";
+            String sql = "select * from customer c left join [user] u on c.user_id = u.user_id";
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
