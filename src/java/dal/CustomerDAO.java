@@ -65,7 +65,7 @@ public class CustomerDAO extends DBContext {
         }
         return list;
     }
-<<<<<<< HEAD
+
     public Customer getCustomerByUserId(int userId) {
         String sql = "SELECT * FROM customer WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
