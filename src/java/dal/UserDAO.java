@@ -28,7 +28,7 @@ public class UserDAO extends DBContext {
                 u.setEmail(rs.getString("email"));
                 u.setFullName(rs.getString("full_name"));
                 u.setPhone(rs.getString("phone"));
-                u.setStatus(rs.getString("status"));
+//                u.setStatus(rs.getString("status"));
                 u.setRoleId(rs.getInt("role_id"));
                 list.add(u);
             }
