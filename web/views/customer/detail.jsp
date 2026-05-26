@@ -82,7 +82,7 @@
             </c:if>
             <br>
             <div>
-                <a href="dashboard">Back</a>
+                <a href="customer-list">Back</a>
             </div>
         </div>
     </main>
