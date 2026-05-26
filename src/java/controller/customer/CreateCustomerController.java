@@ -15,7 +15,7 @@ import model.User;
 public class CreateCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
-
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -75,13 +75,12 @@ public class CreateCustomerController extends HttpServlet {
 
             model.Customer createdCustomer = customerService.createUserAndCustomer(u, c);
 
-            if (createdCustomer == null || createdCustomer.getCustomerId() <= 0) {
+            if (createdCustomer != null && createdCustomer.getUserId() > 0) {
+                request.setAttribute("success", true);
+            } else {
                 request.setAttribute("error", "Create failed. " + (customerService.getLastError() != null ? customerService.getLastError() : "Unknown error"));
-                request.getRequestDispatcher("/views/customer/create.jsp").forward(request, response);
-                return;
             }
-
-            response.sendRedirect(request.getContextPath() + "/customer-list");
+            request.getRequestDispatcher("/views/customer/create.jsp").forward(request, response);
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Create failed");
             request.setAttribute("errorDetail", ex.getMessage());

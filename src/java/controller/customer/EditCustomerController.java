@@ -17,6 +17,8 @@ public class EditCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
 
+    private final service.RoleService roleService = new service.RoleService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -36,10 +38,14 @@ public class EditCustomerController extends HttpServlet {
                 request.setAttribute("errorDetail", "Customer not found");
             } else {
                 request.setAttribute("customer", customer);
-                if (customer.getUserId() >= 0) {
+                if (customer.getUserId() != null) {
                     User user = customerService.getUserById(customer.getUserId());
-                    if (user != null) request.setAttribute("user", user);
+                    if (user != null) {
+                        request.setAttribute("user", user);
+                    }
                 }
+                java.util.List<model.Role> roles = roleService.getAllRoles();
+                request.setAttribute("roles", roles);
             }
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Edit failed");
@@ -72,16 +78,23 @@ public class EditCustomerController extends HttpServlet {
             String fullName = request.getParameter("fullname");
             String phone = request.getParameter("phone");
             String status = request.getParameter("status");
+            String roleIdStr = request.getParameter("roleId");
             String taxCode = request.getParameter("taxCode");
             String type = request.getParameter("type");
 
             User u = new User();
             u.setUserId(userId);
             u.setUserName(userName);
-            u.setPassword(password);
+            if (password != null && !password.isBlank()) {
+                u.setPassword(password);
+            }
             u.setEmail(email);
             u.setFullName(fullName);
+            u.setPhone(phone);
             u.setStatus(status);
+            if (roleIdStr != null && !roleIdStr.isBlank()) {
+                u.setRoleId(Integer.parseInt(roleIdStr));
+            }
 
             Customer c = new Customer();
             c.setCustomerId(customerId);
@@ -92,12 +105,9 @@ public class EditCustomerController extends HttpServlet {
             boolean custUpdated = customerService.updateCustomer(c);
 
             if (!userUpdated || !custUpdated) {
-                Customer customer = customerService.getCustomerByCustomerId(customerId);
-                request.setAttribute("customer", customer);
-                if (customer != null && customer.getUserId() > 0) {
-                    User user = customerService.getUserById(customer.getUserId());
-                    if (user != null) request.setAttribute("user", user);
-                }
+                request.setAttribute("customer", customerService.getCustomerByCustomerId(customerId));
+                request.setAttribute("user", customerService.getUserById(userId));
+                request.setAttribute("roles", roleService.getAllRoles());
                 request.setAttribute("error", "Update failed");
                 request.getRequestDispatcher("/views/customer/edit.jsp").forward(request, response);
                 return;
