@@ -21,55 +21,68 @@
     <main>
         <div>
             <h1>Customer Detail</h1>
-            <c:if test="${empty customer}">
+            <c:if test="${empty customerDTO}">
                 <p>No customer data available.</p>
             </c:if>
-            <c:if test="${not empty customer}">
-                <div>
-                    <div>
-                        <span>Customer ID:</span> ${customerDTO.customer.customerId}
-                    </div>
-                    <div>
-                        <span>User ID:</span> ${customer.userId}
-                    </div>
-                    <div>
-                        <span>Tax Code:</span> ${customerDTO.customer.taxCode}
-                    </div>
-                    <div>
-                        <span>Type:</span> ${customerDTO.customer.type}
-                    </div>
-                    <div>
-                        <span>Created By:</span> ${customer.createBy}
-                    </div>
-                    <div>
-                        <span>Created At:</span> ${customer.createAt}
-                    </div>
-                    <div>
-                        <span>Updated At:</span> ${customer.updateAt}
-                    </div>
-                </div>
-                <c:if test="${not empty customer.user}">
-                    <h2>Associated User</h2>
-                    <div>
-                        <div>
-                            <span>Full Name:</span> ${customer.user.fullName}
-                        </div>
-                        <div>
-                            <span>Email:</span> ${customer.user.email}
-                        </div>
-                        <div>
-                            <span>Phone:</span> ${customer.user.phone}
-                        </div>
-                        <c:if test="${not empty customer.userRoleName}">
-                            <div>
-                                <span>Role:</span> ${customer.userRoleName}
-                            </div>
+            <c:if test="${not empty customerDTO}">
+                <table border="1" cellpadding="5" style="border-collapse: collapse; width: 50%;">
+                    <tr>
+                        <td><b>Customer ID:</b></td>
+                        <td>${customerDTO.customer.customerId}</td>
+                    </tr>
+                    <tr>
+                        <td><b>User ID:</b></td>
+                        <td>${customerDTO.customer.userId}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Tax Code:</b></td>
+                        <td>${customerDTO.customer.taxCode}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Type:</b></td>
+                        <td>${customerDTO.customer.type}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Created By:</b></td>
+                        <td>${customerDTO.customer.createBy}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Created At:</b></td>
+                        <td>${customerDTO.customer.createAt}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Updated At:</b></td>
+                        <td>${customerDTO.customer.updateAt}</td>
+                    </tr>
+                </table>
+
+                <c:if test="${not empty customerDTO.user}">
+                    <h3>Associated User</h3>
+                    <table border="1" cellpadding="5" style="border-collapse: collapse; width: 50%;">
+                        <tr>
+                            <td><b>Full Name:</b></td>
+                            <td>${customerDTO.user.fullName}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Email:</b></td>
+                            <td>${customerDTO.user.email}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Phone:</b></td>
+                            <td>${customerDTO.user.phone}</td>
+                        </tr>
+                        <c:if test="${not empty customerDTO.userRoleName}">
+                            <tr>
+                                <td><b>Role:</b></td>
+                                <td>${customerDTO.userRoleName}</td>
+                            </tr>
                         </c:if>
-                    </div>
+                    </table>
                 </c:if>
             </c:if>
+            <br>
             <div>
-                <a href="javascript:void(0)">Back</a>
+                <a href="customer-list">Back</a>
             </div>
         </div>
     </main>

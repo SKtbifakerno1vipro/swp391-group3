@@ -82,6 +82,7 @@
                 </div>
                 <div>
                     <button type="submit">Create</button>
+                    <a href="dashboard">Cancel</a>
                 </div>
             </form>
         </div>
