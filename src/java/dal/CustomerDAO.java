@@ -65,32 +65,6 @@ public class CustomerDAO extends DBContext {
         }
         return list;
     }
-    public Customer getCustomerByCustomerId(int id) {
-        try {
-            String sql = "select * from [customer] where customer_id = ?";
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setInt(1, id);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                Customer c = new Customer();
-                c.setCustomerId(rs.getInt("customer_id"));
-                c.setUserId((Integer) rs.getObject("user_id"));
-                c.setTaxCode(rs.getString("tax_code"));
-                c.setType(rs.getString("type"));
-                c.setCreateBy((Integer) rs.getObject("create_by"));
-                if (rs.getTimestamp("create_at") != null) {
-                    c.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
-                }
-                if (rs.getTimestamp("update_at") != null) {
-                    c.setUpdateAt(rs.getTimestamp("update_at").toLocalDateTime());
-                }
-                return c;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     public List<User> getAllUsers() {
         UserDAO uDAO = new UserDAO();
@@ -116,7 +90,6 @@ public class CustomerDAO extends DBContext {
                 if (rs.getTimestamp("update_at") != null) {
                     c.setUpdateAt(rs.getTimestamp("update_at").toLocalDateTime());
                 }
->>>>>>> 7466f51a851cacac6c18b45b37023e44ff871477
                 return c;
             }
         } catch (Exception e) {
@@ -125,18 +98,6 @@ public class CustomerDAO extends DBContext {
         return null;
     }
 
-<<<<<<< HEAD
-    public List<User> getAllUsers() { return new ArrayList<>(); }
-    public Customer getCustomerByCustomerId(int id) { return null; }
-    public User getUserByEmail(String email) { return null; }
-    public User getUserById(int userId) { return null; }
-    public Integer getRoleIdByName(String roleName) { return 0; }
-    public Customer createUserAndCustomer(User user, Customer customer) { return null; }
-    public boolean updateUser(User user) { return false; }
-    public boolean updateCustomer(Customer customer) { return false; }
-    public String getLastError() { return ""; }
-}
-=======
     public User getUserByEmail(String email) {
         return null;
     }
@@ -226,4 +187,3 @@ public class CustomerDAO extends DBContext {
         return "";
     }
 }
->>>>>>> 7466f51a851cacac6c18b45b37023e44ff871477
