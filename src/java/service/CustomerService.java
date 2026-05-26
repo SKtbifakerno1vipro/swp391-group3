@@ -17,6 +17,10 @@ public class CustomerService {
         return customerDAO.getCustomerDTOByCustomerId(id);
     }
 
+    public Customer getCustomerByUserId(int userId) {
+        return customerDAO.getCustomerByUserId(userId);
+    }
+
     public List<User> getAllUsers() {
         return customerDAO.getAllUsers();
     }
@@ -38,7 +42,7 @@ public class CustomerService {
     }
 
     public Customer createUserAndCustomer(User user, Customer customer) {
-        return customerDAO.createUserAndCustomer(user, customer);
+        return customerDAO.createCustomer(user, customer);
     }
 
     public boolean updateUser(User user) {
