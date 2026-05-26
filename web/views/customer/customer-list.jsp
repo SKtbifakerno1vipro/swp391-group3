@@ -8,11 +8,8 @@
     </head>
     <body>
 
-<<<<<<< HEAD
         <h2>Danh sach khach hang</h2>
-=======
         <h2>Quá quản lý danh sách khách hàng (Hệ thống thành viên)</h2>
->>>>>>> e7a031de8c312359c8375751cc986f2923303867
 
         <table>
             <thead>
@@ -40,6 +37,10 @@
                         <td>${cust.user.phone}</td>
                         <td>${cust.customer.taxCode}</td>
                         <td><span>${cust.user.status}</span></td>
+                        <td>
+                        <a href="${pageContext.request.contextPath}/CustomerDetail?id=${cust.customer.customerId}">View</a>
+                        <a href="${pageContext.request.contextPath}/EditCustomer?id=${cust.customer.customerId}">Edit</a>
+                    </td>
                     </tr>
                 </c:forEach>
             </tbody>
