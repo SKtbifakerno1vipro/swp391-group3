@@ -41,7 +41,7 @@ public class RoleDetailController extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID cÃ¡Â»Â§a vai trÃƒÂ² khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡!");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error!");
         }
     }
 
@@ -64,7 +64,7 @@ public class RoleDetailController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ã„ÂÃƒÂ£ xÃ¡ÂºÂ£y ra lÃ¡Â»â€”i trong quÃƒÂ¡ trÃƒÂ¬nh lÃ†Â°u quyÃ¡Â»Ân!");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "error!");
         }
     }
 }

@@ -18,22 +18,7 @@
     
 </head>
 <body>
-    <!-- Top nav + side simplified to reuse template look -->
-    <header>
-        <div>
-            <div>
-                <input placeholder="Search..." type="text"/>
-            </div>
-        </div>
-        <div>
-            <h1>Terra</h1>
-        </div>
-        <div>Admin</div>
-    </header>
-
-    <nav>
-        <div><h1>Terra</h1></div>
-    </nav>
+  
 
     <main>
         <div>
@@ -52,52 +37,82 @@
             <c:if test="${not empty customer}">
                 <form action="EditCustomer" method="post">
                     <input type="hidden" name="customerId" value="${customer.customerId}" />
-                    <div>
-                        <div>
-                            <label>Customer ID</label>
-                            <input value="${customer.customerId}" readonly />
-                        </div>
-                        <div>
-                            <label>User ID</label>
-                            <input value="${customer.userId}" readonly />
-                        </div>
-                        <div>
-                            <label>Username</label>
-                            <input name="username" value="${user.userName}" />
-                        </div>
-                        <div>
-                            <label>Password</label>
-                            <input name="password" type="password" placeholder="Leave blank to keep current" />
-                        </div>
-                        <div>
-                            <label>Email</label>
-                            <input name="email" value="${user.email}" />
-                        </div>
-                        <div>
-                            <label>Full name</label>
-                            <input name="fullname" value="${user.fullName}" />
-                        </div>
-                        <div>
-                            <label>Status</label>
-                            <select name="status">
-                                <option value="Active" ${user.status == 'Active' ? 'selected' : ''}>Active</option>
-                                <option value="Inactive" ${user.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Tax Code</label>
-                            <input name="taxCode" value="${customer.taxCode}" required />
-                        </div>
-                        <div>
-                            <label>Type</label>
-                            <input name="type" value="${customer.type}" required />
-                        </div>
-                    </div>
-
-                    <div>
-                        <a href="CustomerDetail?id=${customer.customerId}">Cancel</a>
-                        <button type="submit">Save changes</button>
-                    </div>
+                    <input type="hidden" name="userId" value="${customer.userId}" />
+                    
+                    <table>
+                        <tr>
+                            <td>Customer ID:</td>
+                            <td><input type="text" value="${customer.customerId}" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>User ID:</td>
+                            <td><input type="text" value="${customer.userId}" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Username:</td>
+                            <td><input type="text" name="username" value="${user.userName}" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Password:</td>
+                            <td><input type="password" name="password" value="${user.password}"></td>
+                        </tr>
+                        <tr>
+                            <td>Role:</td>
+                            <td>
+                                <c:forEach var="role" items="${roles}">
+                                    <c:if test="${role.roleId == user.roleId}">
+                                        <input type="text" value="${role.roleName}" readonly>
+                                        <input type="hidden" name="roleId" value="${role.roleId}">
+                                    </c:if>
+                                </c:forEach>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Full Name:</td>
+                            <td><input type="text" name="fullname" value="${user.fullName}"></td>
+                        </tr>
+                        <tr>
+                            <td>Email:</td>
+                            <td><input type="text" name="email" value="${user.email}" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Phone:</td>
+                            <td><input type="text" name="phone" value="${user.phone}"></td>
+                        </tr>
+                        <tr>
+                            <td>Status:</td>
+                            <td>
+                                <select name="status">
+                                    <option value="Active" ${user.status == 'Active' ? 'selected' : ''}>Active</option>
+                                    <option value="Inactive" ${user.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tax Code:</td>
+                            <td><input type="text" name="taxCode" value="${customer.taxCode}" required></td>
+                        </tr>
+                        <tr>
+                            <td>Type:</td>
+                            <td><input type="text" name="type" value="${customer.type}" required></td>
+                        </tr>
+                        <tr>
+                            <td>Created At:</td>
+                            <td><input type="text" value="${customer.createAt}" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Updated At:</td>
+                            <td><input type="text" value="${customer.updateAt}" readonly></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <br>
+                                <button type="submit">Save changes</button>
+                                <a href="CustomerDetail?id=${customer.customerId}">Cancel</a>
+                            </td>
+                        </tr>
+                    </table>
                 </form>
             </c:if>
         </div>
