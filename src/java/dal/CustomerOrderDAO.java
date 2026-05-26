@@ -22,30 +22,13 @@ public class CustomerOrderDAO extends DBContext {
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                CustomerOrder co = new CustomerOrder();
-                co.setCustomerOrderId(rs.getInt("customer_order_id"));
-                co.setCustomerId(rs.getInt("customer_id"));
-                co.setStatus(rs.getString("status"));
-                co.setCreateBy((Integer) rs.getObject("create_by"));
-                if (rs.getTimestamp("create_at") != null) {
-                    co.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
-                }
-                
-                Customer c = new Customer();
-                c.setCustomerId(rs.getInt("customer_id"));
-                c.setTaxCode(rs.getString("tax_code"));
-                
-                User u = new User();
-                u.setFullName(rs.getString("full_name"));
-                
-                list.add(new CustomerOrderDTO(co, c, u));
+                list.add(mapResultSetToDTO(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
     }
-
 
     public CustomerOrderDTO getCustomerOrderDTOById(int id) {
         String sql = "SELECT co.*, c.tax_code, u.full_name " +
@@ -96,6 +79,66 @@ public class CustomerOrderDAO extends DBContext {
             e.printStackTrace();
         }
         return details;
+    }
+
+    public boolean createOrder(CustomerOrder order, List<model.CustomerOrderDetail> details) {
+        String insertOrderSql = "INSERT INTO customer_order (customer_id, status, create_by, create_at, update_at) VALUES (?, ?, ?, GETDATE(), GETDATE())";
+        String insertDetailSql = "INSERT INTO customer_order_detail (customer_order_id, product_id, quantity) VALUES (?, ?, ?)";
+        
+        try {
+            connection.setAutoCommit(false);
+            
+            // 1. Insert Order and get generated ID
+            try (PreparedStatement psOrder = connection.prepareStatement(insertOrderSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                psOrder.setInt(1, order.getCustomerId());
+                psOrder.setString(2, order.getStatus());
+                psOrder.setObject(3, order.getCreateBy());
+                
+                int affectedRows = psOrder.executeUpdate();
+                if (affectedRows == 0) {
+                    connection.rollback();
+                    return false;
+                }
+                
+                int orderId;
+                try (ResultSet generatedKeys = psOrder.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        orderId = generatedKeys.getInt(1);
+                    } else {
+                        connection.rollback();
+                        return false;
+                    }
+                }
+                
+                // 2. Insert Details
+                try (PreparedStatement psDetail = connection.prepareStatement(insertDetailSql)) {
+                    for (model.CustomerOrderDetail detail : details) {
+                        psDetail.setInt(1, orderId);
+                        psDetail.setInt(2, detail.getProductId());
+                        psDetail.setInt(3, detail.getQuantity());
+                        psDetail.addBatch();
+                    }
+                    psDetail.executeBatch();
+                }
+            }
+            
+            connection.commit();
+            return true;
+        } catch (Exception e) {
+            try {
+                connection.rollback();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private CustomerOrderDTO mapResultSetToDTO(ResultSet rs) throws java.sql.SQLException {

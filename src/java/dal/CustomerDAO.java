@@ -43,6 +43,25 @@ public class CustomerDAO extends DBContext {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
+    public Customer getCustomerByUserId(int userId) {
+        String sql = "SELECT * FROM customer WHERE user_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Customer c = new Customer();
+                c.setCustomerId(rs.getInt("customer_id"));
+                c.setUserId(rs.getInt("user_id"));
+                c.setTaxCode(rs.getString("tax_code"));
+                c.setType(rs.getString("type"));
+                return c;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<User> getAllUsers() { return new ArrayList<>(); }
     public Customer getCustomerByCustomerId(int id) { return null; }
     public User getUserByEmail(String email) { return null; }

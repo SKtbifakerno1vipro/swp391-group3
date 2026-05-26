@@ -20,4 +20,8 @@ public class CustomerOrderService {
         return customerOrderDAO.getDetailsByOrderId(orderId);
     }
 
+    public boolean createOrder(model.CustomerOrder order, List<model.CustomerOrderDetail> details) {
+        return customerOrderDAO.createOrder(order, details);
+    }
+
 }

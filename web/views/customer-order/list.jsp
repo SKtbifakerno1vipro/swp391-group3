@@ -10,7 +10,7 @@
 <body>
     <h2>Customer Order List</h2>
     <hr>
-    <a href="#">Create Order</a>
+    <a href="${pageContext.request.contextPath}/create-customer-order">Create Order</a>
     <hr>
 
     <table border="1" cellpadding="10" cellspacing="0">
@@ -36,11 +36,7 @@
                         <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
                     </td>
                     <td>
-
                         <a href="${pageContext.request.contextPath}/customer-order-detail?id=${item.customerOrder.customerOrderId}">View Details</a>
-
-                        <a href="#">View Details</a>
-
                     </td>
                 </tr>
             </c:forEach>
