@@ -11,7 +11,7 @@ public class UserDAO extends DBContext {
 
     public List<User> searchUsers(String roleId, String status) {
         List<User> list = new ArrayList<>();
-        String sql = "selec * from [user] where 1=1";
+        String sql = "select * from [user] where 1=1";
         if (roleId != null && !roleId.isEmpty()) {
             sql += "and role_id=" + roleId;
         }
@@ -27,7 +27,7 @@ public class UserDAO extends DBContext {
                 u.setEmail(rs.getString("email"));
                 u.setFullName("full_name");
                 u.setPhone(rs.getString("phone"));
-//                u.setStatus(rs.getString("status"));
+                u.setStatus(rs.getString("status"));
                 u.setRoleId(rs.getInt("role_id"));
                 list.add(u);
             }
