@@ -5,40 +5,36 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import model.User;
-import dal.DBContext;
 
 public class UserDAO extends DBContext {
 
+
     public List<User> searchUsers(String roleId, String status) {
         List<User> list = new ArrayList<>();
-        String sql = "SELECT * FROM [user] WHERE 1=1";
+        String sql = "selec * from [user] where 1=1";
         if (roleId != null && !roleId.isEmpty()) {
-            sql += " AND role_id = " + roleId;
+            sql += "and role_id=" + roleId;
         }
         if (status != null && !status.isEmpty()) {
-            sql += " AND status = '" + status + "'";
+            sql += "and status=" + status;
         }
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
+        try (PreparedStatement ps= connection.prepareStatement(sql)){
+            ResultSet rs= ps.executeQuery();
+            while(rs.next()){
                 User u = new User();
                 u.setUserId(rs.getInt("user_id"));
-                u.setUserName(rs.getString("user_name"));
+                u.setUserName("user_name");
                 u.setEmail(rs.getString("email"));
-                u.setFullName(rs.getString("full_name"));
+                u.setFullName("full_name");
                 u.setPhone(rs.getString("phone"));
                 u.setStatus(rs.getString("status"));
                 u.setRoleId(rs.getInt("role_id"));
                 list.add(u);
             }
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return list;
     }
-    
- 
 
     public List<User> getAllUsers() {
         return searchUsers(null, null);
@@ -88,6 +84,8 @@ public class UserDAO extends DBContext {
             e.printStackTrace();
         }
     }
+    
+
 
     public void updateUser(User u) {
         String sql = "UPDATE [user] SET full_name=?, phone=?, status=?, role_id=? WHERE user_id=?";
@@ -126,7 +124,5 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
-    
 
 }
-
