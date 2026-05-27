@@ -14,11 +14,9 @@
             <c:choose>
                 <c:when test="${empty u}">
                     <h1>Create User</h1>
-                    <p>This screen show create user form for purpose of allowing administrators to add new users to the system, assign appropriate roles, and set up initial account credentials.</p>
                 </c:when>
                 <c:otherwise>
                     <h1>Edit User</h1>
-                    <p>This screen show edit user form for purpose of updating an existing user's information, modifying contact details, changing access roles, or updating account status.</p>
                 </c:otherwise>
             </c:choose>
 
