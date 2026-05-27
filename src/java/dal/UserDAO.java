@@ -90,19 +90,22 @@ public class UserDAO extends DBContext {
     
 
 
-    public void updateUser(User u) {
-        String sql = "UPDATE [user] SET full_name=?, phone=?, status=?, role_id=? WHERE user_id=?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, u.getFullName());
-            ps.setString(2, u.getPhone());
-            ps.setString(3, u.getStatus());
-            ps.setInt(4, u.getRoleId());
-            ps.setInt(5, u.getUserId());
-            ps.executeUpdate();
+    public boolean updateUser(User user) {
+        try {
+            String sql = "UPDATE [user] SET full_name = ?, phone = ?, status = ?, password = ?, update_at = GETDATE() WHERE user_id = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setString(1, user.getFullName());
+            stm.setString(2, user.getPhone());
+            stm.setString(3, user.getStatus());
+            stm.setString(4, user.getPassword());
+            stm.setInt(5, user.getUserId());
+            return stm.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("updateUser" + e.getMessage());
         }
+        return false;
     }
+
 
     public User login(String username, String password) {
         String sql = "SELECT * FROM [user] WHERE user_name = ?  AND status = 'Active'";
