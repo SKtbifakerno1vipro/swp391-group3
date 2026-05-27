@@ -1,4 +1,5 @@
 package dal;
+
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,7 +8,6 @@ import java.util.List;
 import model.User;
 
 public class UserDAO extends DBContext {
-
 
     public List<User> searchUsers(String roleId, String status) {
         List<User> list = new ArrayList<>();
@@ -18,9 +18,9 @@ public class UserDAO extends DBContext {
         if (status != null && !status.isEmpty()) {
             sql += " and status=" + status;
         }
-        try (PreparedStatement ps= connection.prepareStatement(sql)){
-            ResultSet rs= ps.executeQuery();
-            while(rs.next()){
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
                 User u = new User();
                 u.setUserId(rs.getInt("user_id"));
                 u.setUserName(rs.getString("user_name"));
@@ -35,8 +35,6 @@ public class UserDAO extends DBContext {
         }
         return list;
     }
-    
- 
 
     public List<User> getAllUsers() {
         return searchUsers(null, null);
@@ -87,8 +85,6 @@ public class UserDAO extends DBContext {
             e.printStackTrace();
         }
     }
-    
-
 
     public boolean updateUser(User user) {
         try {
@@ -97,7 +93,8 @@ public class UserDAO extends DBContext {
             stm.setString(1, user.getFullName());
             stm.setString(2, user.getPhone());
             stm.setString(3, user.getStatus());
-            stm.setString(4, user.getPassword());
+            String hash = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+            stm.setString(4, hash);
             stm.setInt(5, user.getUserId());
             return stm.executeUpdate() > 0;
         } catch (Exception e) {
@@ -106,27 +103,26 @@ public class UserDAO extends DBContext {
         return false;
     }
 
-
     public User login(String username, String password) {
         String sql = "SELECT * FROM [user] WHERE user_name = ?  AND status = 'Active'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                String hashPass= rs.getString("password");
-                if(BCrypt.checkpw(password, hashPass)){
+                String hashPass = rs.getString("password");
+                if (BCrypt.checkpw(password, hashPass)) {
                     User user = new User();
-                user.setUserId(rs.getInt("user_id"));
-                user.setUserName(rs.getString("user_name"));
-                user.setPassword(rs.getString("password"));
-                user.setEmail(rs.getString("email"));
-                user.setFullName(rs.getString("full_name"));
-                user.setPhone(rs.getString("phone"));
-                user.setStatus(rs.getString("status"));
-                user.setRoleId(rs.getInt("role_id"));
-                return user;
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUserName(rs.getString("user_name"));
+                    user.setPassword(rs.getString("password"));
+                    user.setEmail(rs.getString("email"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setStatus(rs.getString("status"));
+                    user.setRoleId(rs.getInt("role_id"));
+                    return user;
                 }
-                
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,6 +130,4 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-
 }
-
