@@ -64,7 +64,7 @@ public class CustomerDAO extends DBContext {
                 list.add(new CustomerDTO(c, u, null));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("getAllCustomerDTOs" + e.getMessage());
         }
         return list;
     }
@@ -84,7 +84,7 @@ public class CustomerDAO extends DBContext {
                 return c;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("getCustomerByUserId" + e.getMessage());
         }
         return null;
     }
@@ -116,7 +116,7 @@ public class CustomerDAO extends DBContext {
                 return c;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("getCustomerByCustomerId" + e.getMessage());
         }
         return null;
     }
@@ -140,7 +140,7 @@ public class CustomerDAO extends DBContext {
                 return rs.getInt("role_id");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("getRoleIdByName" + e.getMessage());
         }
         return null;
     }
@@ -171,7 +171,7 @@ public class CustomerDAO extends DBContext {
                 return customer;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("createCustomer" + e.getMessage());
         }
         return null;
     }
@@ -187,7 +187,7 @@ public class CustomerDAO extends DBContext {
             stm.setInt(5, user.getUserId());
             return stm.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("updateUser" + e.getMessage());
         }
         return false;
     }
@@ -201,7 +201,7 @@ public class CustomerDAO extends DBContext {
             stm.setInt(3, customer.getCustomerId());
             return stm.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("updateCustomer" + e.getMessage());
         }
         return false;
     }
