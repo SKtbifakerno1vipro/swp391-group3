@@ -85,6 +85,7 @@ public class CustomerDAO extends DBContext {
             }
         } catch (Exception e) {
             System.out.println("getCustomerByUserId" + e.getMessage());
+
         }
         return null;
     }
@@ -141,6 +142,7 @@ public class CustomerDAO extends DBContext {
             }
         } catch (Exception e) {
             System.out.println("getRoleIdByName" + e.getMessage());
+
         }
         return null;
     }
