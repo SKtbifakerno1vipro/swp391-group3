@@ -30,7 +30,7 @@ public class EditUserController extends HttpServlet {
         u.setFullName(request.getParameter("fullName"));
         u.setPhone(request.getParameter("phone"));
         u.setStatus(request.getParameter("status"));
-        u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
+        u.setRoleId(Integer.valueOf(request.getParameter("roleId")));
         userService.updateUser(u);
         response.sendRedirect(request.getContextPath() + "/user-list");
     }
