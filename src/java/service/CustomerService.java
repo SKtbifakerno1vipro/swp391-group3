@@ -1,6 +1,7 @@
 package service;
 
 import dal.CustomerDAO;
+import dal.UserDAO;
 import java.util.List;
 import model.Customer;
 import dto.CustomerDTO;
@@ -8,7 +9,7 @@ import model.User;
 
 public class CustomerService {
     private final CustomerDAO customerDAO = new CustomerDAO();
-
+    private final UserDAO userDAO = new UserDAO();
     public List<CustomerDTO> getAllCustomerDTOs() {
         return customerDAO.getAllCustomerDTOs();
     }
@@ -46,7 +47,7 @@ public class CustomerService {
     }
 
     public boolean updateUser(User user) {
-        return customerDAO.updateUser(user);
+        return userDAO.updateUser(user);
     }
 
     public boolean updateCustomer(Customer customer) {
