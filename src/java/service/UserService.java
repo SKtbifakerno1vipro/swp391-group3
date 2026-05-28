@@ -8,6 +8,7 @@ public class UserService {
     private final UserDAO userDAO = new UserDAO();
 
     public List<User> searchUsers(String roleId, String status) {
+        //logic
         return userDAO.searchUsers(roleId, status);
     }
 

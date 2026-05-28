@@ -1,38 +1,35 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${empty u ? "Create User" : "Edit User"}</title>
-        
-        
+        <title>${(empty u or u.userId == 0) ? "Create User" : "Edit User"}</title>
+
+
     </head>
     <body>
         <div>
-            <c:choose>
-                <c:when test="${empty u}">
-                    <h1>Create User</h1>
-                </c:when>
-                <c:otherwise>
-                    <h1>Edit User</h1>
-                </c:otherwise>
-            </c:choose>
+            <h1>${(empty u or u.userId == 0) ? "Create User" : "Edit User"}</h1>
 
+            <div><c:if test="${not empty error}">
+                    <div>${error}</div>
+                </c:if></div>
             <div>
-                <form action="${empty u ? 'create-user' : 'edit-user'}" method="post">
+                <form action="${ (empty u or u.userId == 0 ) ?'create-user' : 'edit-user'}" method="post">
+
                     <input type="hidden" name="userId" value="${u.userId}" />
 
                     <div>
                         <label for="userName">Username</label>
                         <input id="userName" type="text" name="userName" value="${u.userName}"
-                               <c:if test="${not empty u}">readonly="readonly"</c:if> required />
+                               ${(not empty u and u.userId != 0) ? 'readonly="readonly"' : ''} required />
                     </div>
 
                     <div>
                         <label for="password">Password</label>
-                        <input id="password" type="password" name="password" <c:if test="${empty u}">required</c:if> />
+                        <input id="password" type="password" name="password" ${(empty u or u.userId == 0) ? 'required' : ''} />
                         <c:if test="${not empty u}">
                             <div>Leave blank to keep current password</div>
                         </c:if>
@@ -54,8 +51,12 @@
                     </div>
 
                     <div>
-                        <label for="roleId">Role ID</label>
-                        <input id="roleId" type="number" name="roleId" value="${u.roleId}" required />
+                        <label for="roleId">Role</label>
+                        <select id="roleId" name ="roleId">
+                            <c:forEach items= "${roleList}" var="role">
+                                <option value="${role.roleId}" ${(u.roleId == role.roleId) ? 'selected' : ''} >${role.roleName}</option>
+                            </c:forEach>
+                        </select>
                     </div>
 
                     <div>
