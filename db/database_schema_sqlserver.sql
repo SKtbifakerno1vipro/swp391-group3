@@ -258,3 +258,41 @@ INSERT INTO provider_order (customer_order_id, status) VALUES (1, 'In Progress')
 INSERT INTO provider_contract (provider_order_id, start_date, end_date, status) VALUES (1, '2026-05-20', '2026-06-20', 'Active');
 
 GO
+
+INSERT INTO [user] (user_name, password, email, full_name, phone, status, role_id, create_at, update_at) VALUES
+('khachhang06', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer6@gmail.com', 'Ngo Bao F', '0912345676', 1, 2, GETDATE(), GETDATE()),
+('khachhang07', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer7@gmail.com', 'Vu Hoang G', '0912345677', 1, 2, GETDATE(), GETDATE()),
+('khachhang08', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer8@gmail.com', 'Do Tien H', '0912345678', 1, 2, GETDATE(), GETDATE()),
+('khachhang09', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer9@gmail.com', 'Dang Minh I', '0912345679', 1, 2, GETDATE(), GETDATE()),
+('khachhang10', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer10@gmail.com', 'Bui Thu K', '0912345680', 1, 2, GETDATE(), GETDATE()),
+('khachhang11', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer11@gmail.com', 'Dinh Quang L', '0912345681', 1, 2, GETDATE(), GETDATE()),
+('khachhang12', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer12@gmail.com', 'Ly Phuong M', '0912345682', 1, 2, GETDATE(), GETDATE()),
+('khachhang13', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer13@gmail.com', 'Hoang Gia N', '0912345683', 1, 2, GETDATE(), GETDATE()),
+('khachhang14', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer14@gmail.com', 'Phan Van O', '0912345684', 1, 2, GETDATE(), GETDATE()),
+('khachhang15', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer15@gmail.com', 'To Minh P', '0912345685', 1, 2, GETDATE(), GETDATE()),
+('khachhang16', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer16@gmail.com', 'Trinh Duy Q', '0912345686', 1, 2, GETDATE(), GETDATE()),
+('khachhang17', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer17@gmail.com', 'Cao Xuan R', '0912345687', 1, 2, GETDATE(), GETDATE()),
+('khachhang18', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer18@gmail.com', 'Mai Thanh S', '0912345688', 1, 2, GETDATE(), GETDATE()),
+('khachhang19', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer19@gmail.com', 'Doan Ngoc T', '0912345689', 1, 2, GETDATE(), GETDATE()),
+('khachhang20', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer20@gmail.com', 'Ta Van U', '0912345690', 1, 2, GETDATE(), GETDATE()),
+('khachhang21', '$2a$10$R77Bq6X7qG7QeclM8967Iecv1RclE8N2r6uY9kP9vXp35658EOCmK', 'customer21@gmail.com', 'Phung Quoc V', '0912345691', 1, 2, GETDATE(), GETDATE());
+
+INSERT INTO customer (user_id, tax_code, type, create_by, create_at, update_at) VALUES
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang06'), '0601234567', 'Khach hang Ca nhan', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang07'), '0701234567', 'Doanh nghiep Vừa', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang08'), '0801234567', 'Khach hang V.I.P', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang09'), '0901234567', 'Doanh nghiep Nuoc ngoai', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang10'), '1001234567', 'Khach hang Ca nhan', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang11'), '1101234567', 'Dai ly Chinh thuc', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang12'), '1201234567', 'Khach hang Ca nhan', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang13'), '1301234567', 'Doanh nghiep Tu nhan', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang14'), '1401234567', 'Khach hang Ca nhan', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang15'), '1501234567', 'Doi tac Chien luoc', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang16'), '1601234567', 'Khach hang Ca nhan', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang17'), '1701234567', 'Doanh nghiep Ban le', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang18'), '1801234567', 'Khach hang V.I.P', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang19'), '1901234567', 'Doanh nghiep San xuat', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang20'), '2001234567', 'Khach hang Ca nhan', 1, GETDATE(), GETDATE()),
+((SELECT user_id FROM [user] WHERE user_name = 'khachhang21'), '2101234567', 'Nha phan phoi', 1, GETDATE(), GETDATE());
+
+select * from [user]

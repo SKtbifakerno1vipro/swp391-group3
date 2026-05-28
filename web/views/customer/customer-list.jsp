@@ -46,6 +46,59 @@
             </tbody>
         </table>
 
+        <c:set var="currentPage" value="${empty currentPage ? 1 : currentPage}" />
+        <c:set var="totalPages" value="${empty totalPages ? 1 : totalPages}" />
+
+        <c:if test="${totalPages > 1}">
+            <div style="margin-top: 16px;">
+                <c:set var="startPage" value="${currentPage - 9}" />
+                <c:if test="${startPage < 1}">
+                    <c:set var="startPage" value="1" />
+                </c:if>
+
+                <c:set var="endPage" value="${startPage + 19}" />
+                <c:if test="${endPage > totalPages}">
+                    <c:set var="endPage" value="${totalPages}" />
+                </c:if>
+
+                <c:if test="${(endPage - startPage) < 19 && startPage > 1}">
+                    <c:set var="startPage" value="${endPage - 19}" />
+                    <c:if test="${startPage < 1}">
+                        <c:set var="startPage" value="1" />
+                    </c:if>
+                </c:if>
+
+                <c:choose>
+                    <c:when test="${currentPage > 1}">
+                        <a href="${pageContext.request.contextPath}/customer-list?page=${currentPage - 1}">&lt;</a>
+                    </c:when>
+                    <c:otherwise>
+                        <span style="color: #999;">&lt;</span>
+                    </c:otherwise>
+                </c:choose>
+
+                <c:forEach var="i" begin="${startPage}" end="${endPage}">
+                    <c:choose>
+                        <c:when test="${i == currentPage}">
+                            <strong style="margin: 0 6px;">${i}</strong>
+                        </c:when>
+                        <c:otherwise>
+                            <a style="margin: 0 6px;" href="${pageContext.request.contextPath}/customer-list?page=${i}">${i}</a>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
+
+                <c:choose>
+                    <c:when test="${currentPage < totalPages}">
+                        <a href="${pageContext.request.contextPath}/customer-list?page=${currentPage + 1}">&gt;</a>
+                    </c:when>
+                    <c:otherwise>
+                        <span style="color: #999;">&gt;</span>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </c:if>
+
     </body>
 </html>
 
