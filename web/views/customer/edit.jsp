@@ -5,40 +5,42 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Edit Customer - Terra Enterprise</title>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
-    
-    
-    
-    
-    
-</head>
-<body>
-  
+    <head>
+        <meta charset="utf-8"/>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+        <title>Edit Customer - Terra Enterprise</title>
+        <link href="https://fonts.googleapis.com" rel="preconnect"/>
+        <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
 
-    <main>
-        <div>
-            <h2>Edit Customer</h2>
 
-            <c:if test="${not empty success}">
-                <div>Edit successful</div>
-            </c:if>
-            <c:if test="${not empty error}">
-                <div>Edit failed</div>
-                <c:if test="${not empty errorDetail}">
-                    <div>${errorDetail}</div>
+
+
+
+    </head>
+    <body>
+
+
+        <main>
+            <div>
+                <h2>Edit Customer</h2>
+                <c:if test="${not empty success}">
+                    <div>Edit successful</div>
                 </c:if>
-            </c:if>
+                <c:if test="${not empty success}">
+                    <div>Edit successful</div>
+                </c:if>
+                <c:if test="${not empty error}">
+                    <div>Edit failed</div>
+                    <c:if test="${not empty errorDetail}">
+                        <div>${errorDetail}</div>
+                    </c:if>
+                </c:if>
 
-            <c:if test="${not empty customer}">
+
                 <form action="EditCustomer" method="post">
                     <input type="hidden" name="customerId" value="${customer.customerId}" />
                     <input type="hidden" name="userId" value="${customer.userId}" />
-                    
+
                     <table>
                         <tr>
                             <td>Customer ID:</td>
@@ -114,10 +116,9 @@
                         </tr>
                     </table>
                 </form>
-            </c:if>
-        </div>
-    </main>
-</body>
+            </div>
+        </main>
+    </body>
 </html>
 
 

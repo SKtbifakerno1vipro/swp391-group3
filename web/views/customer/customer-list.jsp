@@ -23,29 +23,31 @@
                 </tr>
             </thead>
             <tbody>
-                <c:if test="${empty customerList}">
-                    <tr>
-                        <td colspan="7">Khong co du lieu khach hang</td>
-                    </tr>
-                </c:if>
+            <a href="${pageContext.request.contextPath}/EditCustomer">Add</a>
+            <c:if test="${empty customerList}">
+                <tr>
+                    <td colspan="7">Khong co du lieu khach hang</td>
+                </tr>
+            </c:if>
 
-                <c:forEach var="cust" items="${customerList}">
-                    <tr>
-                        <td>${cust.customer.customerId}</td>
-                        <td><strong>${cust.user.fullName}</strong></td>
-                        <td>${cust.user.email}</td>
-                        <td>${cust.user.phone}</td>
-                        <td>${cust.customer.taxCode}</td>
-                        <td><span>${cust.user.status}</span></td>
-                        <td>
-                        <a href="${pageContext.request.contextPath}/CustomerDetail?id=${cust.customer.customerId}">View</a>
+            <c:forEach var="cust" items="${customerList}">
+                <tr>
+                    <td>${cust.customer.customerId}</td>
+                    <td><strong>${cust.user.fullName}</strong></td>
+                    <td>${cust.user.email}</td>
+                    <td>${cust.user.phone}</td>
+                    <td>${cust.customer.taxCode}</td>
+                    <td><span>${cust.user.status}</span></td>
+                    <td>
+
                         <a href="${pageContext.request.contextPath}/EditCustomer?id=${cust.customer.customerId}">Edit</a>
+                        
                     </td>
-                    </tr>
-                </c:forEach>
-            </tbody>
-        </table>
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
 
-    </body>
+</body>
 </html>
 

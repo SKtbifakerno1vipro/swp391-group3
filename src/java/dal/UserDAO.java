@@ -32,6 +32,7 @@ public class UserDAO extends DBContext {
                 list.add(u);
             }
         } catch (Exception e) {
+            System.out.println("searchUser" + e.getMessage());
         }
         return list;
     }
@@ -40,6 +41,15 @@ public class UserDAO extends DBContext {
         return searchUsers(null, null);
     }
 
+//        boolean isDuplicate( User u) {
+//            List<
+//        for (User t : list) {
+//            if (t.getEmail().equals(u.getEmail()) || (t.getPhone() != null && t.getPhone().equals(u.getPhone()))) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
     public User getUserById(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -64,7 +74,7 @@ public class UserDAO extends DBContext {
                 return u;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("getUserById" + e.getMessage());
         }
         return null;
     }
@@ -82,7 +92,7 @@ public class UserDAO extends DBContext {
             ps.setInt(7, u.getRoleId());
             ps.executeUpdate();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("createUser" + e.getMessage());
         }
     }
 
@@ -125,7 +135,7 @@ public class UserDAO extends DBContext {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("login" + e.getMessage());
         }
         return null;
     }

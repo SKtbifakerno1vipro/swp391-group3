@@ -59,7 +59,7 @@
                             <td>${u.status}</td>
                             <td>${u.roleId}</td>
                             <td>
-                                <a href="${pageContext.request.contextPath}/user-detail?id=${u.userId}">View</a>
+                                
                                 <a href="${pageContext.request.contextPath}/edit-user?id=${u.userId}">Edit</a>
                             </td>
                         </tr>
