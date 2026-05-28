@@ -296,3 +296,5 @@ INSERT INTO customer (user_id, tax_code, type, create_by, create_at, update_at) 
 ((SELECT user_id FROM [user] WHERE user_name = 'khachhang21'), '2101234567', 'Nha phan phoi', 1, GETDATE(), GETDATE());
 
 select * from [user]
+update [user]
+]

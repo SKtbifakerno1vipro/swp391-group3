@@ -157,7 +157,8 @@ public class CustomerDAO extends DBContext {
             ResultSet rs = stmId.executeQuery();
             if (rs.next()) {
                 int userId = rs.getInt("user_id");
-                String sqlCustomer = "INSERT INTO [customer] (user_id, tax_code, type, create_by) VALUES (?,?,?,?)";
+                String sqlCustomer = "INSERT INTO [customer] (user_id, tax_code, type, create_by, create_at, update_at) "
+                   + "VALUES (?, ?, ?, ?, GETDATE(), GETDATE())";
                 PreparedStatement stmCustomer = connection.prepareStatement(sqlCustomer);
                 stmCustomer.setInt(1, userId);
                 stmCustomer.setString(2, customer.getTaxCode());

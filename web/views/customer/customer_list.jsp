@@ -10,7 +10,7 @@
 
         <h2>Danh sach khach hang</h2>
         <h2>Quá quản lý danh sách khách hàng (Hệ thống thành viên)</h2>
-        <a href="{pageContext.request.contextPath}"> Add Customer</a>
+        <a href="${pageContext.request.contextPath}/customer/create"> Add Customer</a>
         <table>
             <thead>
                 <tr>
@@ -48,6 +48,8 @@
             </tbody>
         </table>
 
+        
+       
         <c:set var="currentPage" value="${empty currentPage ? 1 : currentPage}" />
         <c:set var="totalPages" value="${empty totalPages ? 1 : totalPages}" />
 
@@ -72,7 +74,7 @@
 
                 <c:choose>
                     <c:when test="${currentPage > 1}">
-                        <a href="${pageContext.request.contextPath}/customer-list?page=${currentPage - 1}">&lt;</a>
+                        <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}">&lt;</a>
                     </c:when>
                     <c:otherwise>
                         <span style="color: #999;">&lt;</span>
@@ -85,14 +87,14 @@
                             <strong style="margin: 0 6px;">${i}</strong>
                         </c:when>
                         <c:otherwise>
-                            <a style="margin: 0 6px;" href="${pageContext.request.contextPath}/customer-list?page=${i}">${i}</a>
+                            <a style="margin: 0 6px;" href="${pageContext.request.contextPath}/customer/list?page=${i}">${i}</a>
                         </c:otherwise>
                     </c:choose>
                 </c:forEach>
 
                 <c:choose>
                     <c:when test="${currentPage < totalPages}">
-                        <a href="${pageContext.request.contextPath}/customer-list?page=${currentPage + 1}">&gt;</a>
+                        <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}">&gt;</a>
                     </c:when>
                     <c:otherwise>
                         <span style="color: #999;">&gt;</span>

@@ -72,17 +72,8 @@
                     <input type="text" id="type" name="type" required>
                 </div>
                 <div>
-                    <label for="createBy">Created By</label>
-                    <select id="createBy" name="createBy" required>
-                        <option value="">Choose staff</option>
-                        <c:forEach var="user" items="${users}">
-                            <option value="${user.userId}">${user.fullName != null && !user.fullName.isEmpty() ? user.fullName : user.userName}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <div>
                     <button type="submit">Create</button>
-                    <a href="dashboard">Cancel</a>
+                    <a href="${pageContext.request.contextPath}/dashboard">Cancel</a>
                 </div>
             </form>
         </div>

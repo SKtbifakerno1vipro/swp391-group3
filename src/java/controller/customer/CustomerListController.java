@@ -44,7 +44,7 @@ public class CustomerListController extends HttpServlet {
         request.setAttribute("customerList", pageCustomers);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
-        request.getRequestDispatcher("/views/customer/customer-list.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
     }
 
     @Override
