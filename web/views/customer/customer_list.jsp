@@ -10,7 +10,7 @@
 
         <h2>Danh sach khach hang</h2>
         <h2>Quá quản lý danh sách khách hàng (Hệ thống thành viên)</h2>
-
+        <a href="{pageContext.request.contextPath}"> Add Customer</a>
         <table>
             <thead>
                 <tr>
@@ -20,6 +20,8 @@
                     <th>So dien thoai</th>
                     <th>Ma so thue</th>
                     <th>Trang thai</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,10 +39,10 @@
                         <td>${cust.user.phone}</td>
                         <td>${cust.customer.taxCode}</td>
                         <td><span>${cust.user.status}</span></td>
-                        <td>
-                        <a href="${pageContext.request.contextPath}/CustomerDetail?id=${cust.customer.customerId}">View</a>
-                        <a href="${pageContext.request.contextPath}/EditCustomer?id=${cust.customer.customerId}">Edit</a>
-                    </td>
+                        <td>${customer.createAt}</td>
+                        <td>${customer.updateAt}</td>
+                        <td><a href="${pageContext.request.contextPath}/customer/edit?id=${cust.customer.customerId}">Edit</a></td>
+                            
                     </tr>
                 </c:forEach>
             </tbody>

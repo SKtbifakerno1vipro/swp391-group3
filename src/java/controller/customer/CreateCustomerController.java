@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
 import model.User;
 
-@WebServlet(name = "CreateCustomerController", urlPatterns = {"/CreateCustomer"})
+@WebServlet(name = "CreateCustomerController", urlPatterns = {"/customer/create"})
 public class CreateCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();

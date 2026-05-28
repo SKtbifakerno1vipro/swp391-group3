@@ -12,7 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import model.Customer;
 import model.User;
 
-@WebServlet(name = "EditCustomerController", urlPatterns = {"/EditCustomer"})
+@WebServlet(name = "EditCustomerController", urlPatterns = {"/customer/edit"})
 public class EditCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();

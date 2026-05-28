@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
 import dto.CustomerDTO;
-@WebServlet(name = "CustomerDetailController", urlPatterns = {"/CustomerDetail"})
+@WebServlet(name = "CustomerDetailController", urlPatterns = {"/customer/detail"})
 public class CustomerDetailController extends HttpServlet {
     private final CustomerService customerService = new CustomerService();
     @Override

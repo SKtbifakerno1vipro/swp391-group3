@@ -12,14 +12,8 @@
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
     
-    
-    
-    
-    
 </head>
 <body>
-  
-
     <main>
         <div>
             <h2>Edit Customer</h2>
@@ -42,11 +36,11 @@
                     <table>
                         <tr>
                             <td>Customer ID:</td>
-                            <td><input type="text" value="${customer.customerId}" readonly></td>
+                            <td>${customer.customerId}</td>
                         </tr>
                         <tr>
                             <td>User ID:</td>
-                            <td><input type="text" value="${customer.userId}" readonly></td>
+                            <td>${customer.userId}</td>
                         </tr>
                         <tr>
                             <td>Username:</td>
@@ -96,14 +90,7 @@
                             <td>Type:</td>
                             <td><input type="text" name="type" value="${customer.type}" required></td>
                         </tr>
-                        <tr>
-                            <td>Created At:</td>
-                            <td><input type="text" value="${customer.createAt}" readonly></td>
-                        </tr>
-                        <tr>
-                            <td>Updated At:</td>
-                            <td><input type="text" value="${customer.updateAt}" readonly></td>
-                        </tr>
+                        
                         <tr>
                             <td></td>
                             <td>

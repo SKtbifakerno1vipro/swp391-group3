@@ -10,7 +10,7 @@ import dto.CustomerDTO;
 
 import jakarta.servlet.annotation.WebServlet;
 
-@WebServlet(name = "CustomerListController", urlPatterns = {"/customer-list"})
+@WebServlet(name = "CustomerListController", urlPatterns = {"/customer/list"})
 public class CustomerListController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
