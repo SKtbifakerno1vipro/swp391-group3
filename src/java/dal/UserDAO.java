@@ -88,18 +88,21 @@ public class UserDAO extends DBContext {
     
 
 
-    public void updateUser(User u) {
-        String sql = "UPDATE [user] SET full_name=?, phone=?, status=?, role_id=? WHERE user_id=?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, u.getFullName());
-            ps.setString(2, u.getPhone());
-            ps.setString(3, u.getStatus());
-            ps.setInt(4, u.getRoleId());
-            ps.setInt(5, u.getUserId());
-            ps.executeUpdate();
+    public boolean updateUser(User user) {
+        try {
+            String sql = "UPDATE [user] SET full_name = ?, phone = ?, status = ?, password = ?, update_at = GETDATE() WHERE user_id = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setString(1, user.getFullName());
+            stm.setString(2, user.getPhone());
+            stm.setString(3, user.getStatus());
+            String hash = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+            stm.setString(4, hash);
+            stm.setInt(5, user.getUserId());
+            return stm.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("updateUser" + e.getMessage());
         }
+        return false;
     }
 
     public User login(String username, String password) {
@@ -108,20 +111,19 @@ public class UserDAO extends DBContext {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                String hashPass= rs.getString("password");
-                if(BCrypt.checkpw(password, hashPass)){
+                String hashPass = rs.getString("password");
+                if (BCrypt.checkpw(password, hashPass)) {
                     User user = new User();
-                user.setUserId(rs.getInt("user_id"));
-                user.setUserName(rs.getString("user_name"));
-                user.setPassword(rs.getString("password"));
-                user.setEmail(rs.getString("email"));
-                user.setFullName(rs.getString("full_name"));
-                user.setPhone(rs.getString("phone"));
-                user.setStatus(rs.getString("status"));
-                user.setRoleId(rs.getInt("role_id"));
-                return user;
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUserName(rs.getString("user_name"));
+                    user.setPassword(rs.getString("password"));
+                    user.setEmail(rs.getString("email"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setStatus(rs.getString("status"));
+                    user.setRoleId(rs.getInt("role_id"));
+                    return user;
                 }
-                
             }
         } catch (Exception e) {
             e.printStackTrace();
