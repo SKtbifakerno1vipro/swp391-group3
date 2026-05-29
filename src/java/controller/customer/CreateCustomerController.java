@@ -80,11 +80,11 @@ public class CreateCustomerController extends HttpServlet {
             } else {
                 request.setAttribute("error", "Create failed. " + (customerService.getLastError() != null ? customerService.getLastError() : "Unknown error"));
             }
-            request.getRequestDispatcher("/views/customer/create.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Create failed");
             request.setAttribute("errorDetail", ex.getMessage());
-            request.getRequestDispatcher("/views/customer/create.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
         }
     }
 }

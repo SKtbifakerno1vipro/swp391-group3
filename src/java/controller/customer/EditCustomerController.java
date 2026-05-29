@@ -25,7 +25,7 @@ public class EditCustomerController extends HttpServlet {
         String customerIdStr = request.getParameter("id");
         if (customerIdStr == null || customerIdStr.isBlank()) {
             request.setAttribute("error", "Edit failed");
-            request.getRequestDispatcher("/views/customer/edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
             return;
         }
 
@@ -52,7 +52,7 @@ public class EditCustomerController extends HttpServlet {
             request.setAttribute("errorDetail", ex.getMessage());
         }
 
-        request.getRequestDispatcher("/views/customer/edit.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class EditCustomerController extends HttpServlet {
 
         if (customerIdStr == null || customerIdStr.isBlank() || userIdStr == null || userIdStr.isBlank()) {
             request.setAttribute("error", "Update failed: missing IDs");
-            request.getRequestDispatcher("/views/customer/edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
             return;
         }
 
@@ -109,15 +109,15 @@ public class EditCustomerController extends HttpServlet {
                 request.setAttribute("user", customerService.getUserById(userId));
                 request.setAttribute("roles", roleService.getAllRoles());
                 request.setAttribute("error", "Update failed");
-                request.getRequestDispatcher("/views/customer/edit.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
                 return;
             }
 
-            response.sendRedirect(request.getContextPath() + "/CustomerDetail?id=" + customerId);
+            response.sendRedirect(request.getContextPath() + "/customer/detail?id=" + customerId);
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Update failed");
             request.setAttribute("errorDetail", ex.getMessage());
-            request.getRequestDispatcher("/views/customer/edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
         }
     }
 }
