@@ -1,6 +1,5 @@
 package controller.customer;
 
-
 import service.CustomerService;
 import java.io.IOException;
 import java.util.List;
@@ -15,7 +14,7 @@ import model.User;
 public class CreateCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -37,8 +36,9 @@ public class CreateCustomerController extends HttpServlet {
         String phone = request.getParameter("phone");
         String status = request.getParameter("status");
         String taxCode = request.getParameter("taxCode");
-        String type = request.getParameter("type");
-        String createByValue = request.getParameter("createBy");
+        String companyName = request.getParameter("companyName");
+        String customerType = request.getParameter("customerType");
+        String assignedToUserIdValue = request.getParameter("assignedToUserId");
         String roleIdValue = request.getParameter("roleId");
 
         List<User> users = customerService.getAllUsers();
@@ -46,14 +46,18 @@ public class CreateCustomerController extends HttpServlet {
         Integer customerRoleId = customerService.getRoleIdByName("Customer");
         request.setAttribute("customerRoleId", customerRoleId);
 
-        if (userName == null || userName.isBlank() || password == null || password.isBlank() || email == null || email.isBlank() || createByValue == null || createByValue.isBlank() || taxCode == null || taxCode.isBlank() || type == null || type.isBlank()) {
+        if (userName == null || userName.isBlank()
+                || password == null || password.isBlank()
+                || email == null || email.isBlank()
+                || taxCode == null || taxCode.isBlank()
+                || companyName == null || companyName.isBlank()
+                || customerType == null || customerType.isBlank()) {
             request.setAttribute("error", "Create failed");
             request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
             return;
         }
 
         try {
-            Integer createBy = Integer.parseInt(createByValue);
             Integer roleId = null;
             if (roleIdValue != null && !roleIdValue.isBlank()) {
                 roleId = Integer.parseInt(roleIdValue);
@@ -70,12 +74,15 @@ public class CreateCustomerController extends HttpServlet {
 
             model.Customer c = new model.Customer();
             c.setTaxCode(taxCode);
-            c.setType(type);
-            c.setCreateBy(createBy);
+            c.setCompanyName(companyName);
+            c.setCustomerType(customerType);
+            if (assignedToUserIdValue != null && !assignedToUserIdValue.isBlank()) {
+                c.setAssignedToUserId(Integer.parseInt(assignedToUserIdValue));
+            }
 
             model.Customer createdCustomer = customerService.createUserAndCustomer(u, c);
 
-            if (createdCustomer != null && createdCustomer.getUserId() > 0) {
+            if (createdCustomer != null && createdCustomer.getUserId() != null && createdCustomer.getUserId() > 0) {
                 request.setAttribute("success", true);
             } else {
                 request.setAttribute("error", "Create failed. " + (customerService.getLastError() != null ? customerService.getLastError() : "Unknown error"));
@@ -88,7 +95,3 @@ public class CreateCustomerController extends HttpServlet {
         }
     }
 }
-
-
-
-
