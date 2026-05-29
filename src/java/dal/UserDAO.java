@@ -1,5 +1,4 @@
 package dal;
-
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,6 +7,7 @@ import java.util.List;
 import model.User;
 
 public class UserDAO extends DBContext {
+
 
     public List<User> searchUsers(String roleId, String status) {
         List<User> list = new ArrayList<>();
@@ -18,9 +18,9 @@ public class UserDAO extends DBContext {
         if (status != null && !status.isEmpty()) {
             sql += " and status=" + status;
         }
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
+        try (PreparedStatement ps= connection.prepareStatement(sql)){
+            ResultSet rs= ps.executeQuery();
+            while(rs.next()){
                 User u = new User();
                 u.setUserId(rs.getInt("user_id"));
                 u.setUserName(rs.getString("user_name"));
@@ -95,6 +95,8 @@ public class UserDAO extends DBContext {
             System.out.println("createUser" + e.getMessage());
         }
     }
+    
+
 
     public boolean updateUser(User user) {
         try {
@@ -132,7 +134,6 @@ public class UserDAO extends DBContext {
                     user.setRoleId(rs.getInt("role_id"));
                     return user;
                 }
-
             }
         } catch (Exception e) {
             System.out.println("login" + e.getMessage());

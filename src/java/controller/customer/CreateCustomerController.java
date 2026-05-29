@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
 import model.User;
 
-@WebServlet(name = "CreateCustomerController", urlPatterns = {"/CreateCustomer"})
+@WebServlet(name = "CreateCustomerController", urlPatterns = {"/customer/create"})
 public class CreateCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
@@ -23,7 +23,7 @@ public class CreateCustomerController extends HttpServlet {
         Integer customerRoleId = customerService.getRoleIdByName("Customer");
         request.setAttribute("users", users);
         request.setAttribute("customerRoleId", customerRoleId);
-        request.getRequestDispatcher("/views/customer/create.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class CreateCustomerController extends HttpServlet {
 
         if (userName == null || userName.isBlank() || password == null || password.isBlank() || email == null || email.isBlank() || createByValue == null || createByValue.isBlank() || taxCode == null || taxCode.isBlank() || type == null || type.isBlank()) {
             request.setAttribute("error", "Create failed");
-            request.getRequestDispatcher("/views/customer/create.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
             return;
         }
 
@@ -80,11 +80,11 @@ public class CreateCustomerController extends HttpServlet {
             } else {
                 request.setAttribute("error", "Create failed. " + (customerService.getLastError() != null ? customerService.getLastError() : "Unknown error"));
             }
-            request.getRequestDispatcher("/views/customer/create.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Create failed");
             request.setAttribute("errorDetail", ex.getMessage());
-            request.getRequestDispatcher("/views/customer/create.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
         }
     }
 }
