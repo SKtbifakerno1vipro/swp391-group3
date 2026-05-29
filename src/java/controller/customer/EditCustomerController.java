@@ -2,6 +2,7 @@ package controller.customer;
 
 import service.CustomerService;
 import java.io.IOException;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +15,6 @@ import model.User;
 public class EditCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
-
     private final service.RoleService roleService = new service.RoleService();
 
     @Override
@@ -23,10 +23,8 @@ public class EditCustomerController extends HttpServlet {
         String customerIdStr = request.getParameter("id");
 
         if (customerIdStr == null || customerIdStr.isBlank()) {
-
             request.setAttribute("error", "Edit failed");
             request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
-
             return;
         }
 
@@ -46,8 +44,9 @@ public class EditCustomerController extends HttpServlet {
                         request.setAttribute("user", user);
                     }
                 }
-                java.util.List<model.Role> roles = roleService.getAllRoles();
-                request.setAttribute("roles", roles);
+                List<User> users = customerService.getAllUsers();
+                request.setAttribute("users", users);
+                request.setAttribute("roles", roleService.getAllRoles());
             }
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Edit failed");
@@ -55,7 +54,6 @@ public class EditCustomerController extends HttpServlet {
         }
 
         request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
-
     }
 
     @Override
@@ -83,7 +81,9 @@ public class EditCustomerController extends HttpServlet {
             String status = request.getParameter("status");
             String roleIdStr = request.getParameter("roleId");
             String taxCode = request.getParameter("taxCode");
-            String type = request.getParameter("type");
+            String companyName = request.getParameter("companyName");
+            String customerType = request.getParameter("customerType");
+            String assignedToUserIdValue = request.getParameter("assignedToUserId");
 
             User u = new User();
             u.setUserId(userId);
@@ -102,7 +102,13 @@ public class EditCustomerController extends HttpServlet {
             Customer c = new Customer();
             c.setCustomerId(customerId);
             c.setTaxCode(taxCode);
-            c.setType(type);
+            c.setCompanyName(companyName);
+            c.setCustomerType(customerType);
+            if (assignedToUserIdValue != null && !assignedToUserIdValue.isBlank()) {
+                c.setAssignedToUserId(Integer.parseInt(assignedToUserIdValue));
+            } else {
+                c.setAssignedToUserId(null);
+            }
 
             boolean userUpdated = customerService.updateUser(u);
             boolean custUpdated = customerService.updateCustomer(c);
@@ -110,6 +116,7 @@ public class EditCustomerController extends HttpServlet {
             if (!userUpdated || !custUpdated) {
                 request.setAttribute("customer", customerService.getCustomerByCustomerId(customerId));
                 request.setAttribute("user", customerService.getUserById(userId));
+                request.setAttribute("users", customerService.getAllUsers());
                 request.setAttribute("roles", roleService.getAllRoles());
                 request.setAttribute("error", "Update failed");
                 request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);

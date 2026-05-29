@@ -14,8 +14,6 @@
         <title>Create Customer</title>
         <link href="https://fonts.googleapis.com" rel="preconnect">
         <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-
-
     </head>
     <body>
         <main>
@@ -30,7 +28,7 @@
                         <div>${errorDetail}</div>
                     </c:if>
                 </c:if>
-                <form action="CreateCustomer" method="post">
+                <form action="${pageContext.request.contextPath}/customer/create" method="post">
                     <div>
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" required>
@@ -68,8 +66,21 @@
                         <input type="text" id="taxCode" name="taxCode" required>
                     </div>
                     <div>
-                        <label for="type">Type</label>
-                        <input type="text" id="type" name="type" required>
+                        <label for="companyName">Company Name</label>
+                        <input type="text" id="companyName" name="companyName" required>
+                    </div>
+                    <div>
+                        <label for="customerType">Customer Type</label>
+                        <input type="text" id="customerType" name="customerType" required>
+                    </div>
+                    <div>
+                        <label for="assignedToUserId">Assigned To</label>
+                        <select id="assignedToUserId" name="assignedToUserId">
+                            <option value="">-- None --</option>
+                            <c:forEach var="u" items="${users}">
+                                <option value="${u.userId}">${u.fullName} (${u.userName})</option>
+                            </c:forEach>
+                        </select>
                     </div>
                     <div>
                         <button type="submit">Create</button>
@@ -80,5 +91,3 @@
         </main>
     </body>
 </html>
-
-

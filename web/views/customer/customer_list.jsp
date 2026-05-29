@@ -9,25 +9,27 @@
     <body>
 
         <h2>Danh sach khach hang</h2>
-        <h2>Quá quản lý danh sách khách hàng (Hệ thống thành viên)</h2>
+        <h2>Quản lý danh sách khách hàng (Hệ thống thành viên)</h2>
         <a href="${pageContext.request.contextPath}/customer/create"> Add Customer</a>
         <table>
             <thead>
                 <tr>
-                    <th>Ma customer (ID) </th>
-                    <th>Ten khach hang‹</th>
+                    <th>Ma customer (ID)</th>
+                    <th>Ten khach hang</th>
+                    <th>Company Name</th>
                     <th>Email</th>
                     <th>So dien thoai</th>
                     <th>Ma so thue</th>
                     <th>Trang thai</th>
                     <th>Created At</th>
                     <th>Updated At</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 <c:if test="${empty customerList}">
                     <tr>
-                        <td colspan="7">Khong co du lieu khach hang</td>
+                        <td colspan="10">Khong co du lieu khach hang</td>
                     </tr>
                 </c:if>
 
@@ -35,21 +37,22 @@
                     <tr>
                         <td>${cust.customer.customerId}</td>
                         <td><strong>${cust.user.fullName}</strong></td>
+                        <td>${cust.customer.companyName}</td>
                         <td>${cust.user.email}</td>
                         <td>${cust.user.phone}</td>
                         <td>${cust.customer.taxCode}</td>
                         <td><span>${cust.user.status}</span></td>
-                        <td>${customer.createAt}</td>
-                        <td>${customer.updateAt}</td>
-                        <td><a href="${pageContext.request.contextPath}/customer/edit?id=${cust.customer.customerId}">Edit</a></td>
-                        <td><a href="${pageContext.request.contextPath}/customer-order-list?id=${cust.customer.customerId}">Orders</a></td>
+                        <td>${cust.customer.createdAt}</td>
+                        <td>${cust.customer.updatedAt}</td>
+                        <td>
+                            <a href="${pageContext.request.contextPath}/customer/edit?id=${cust.customer.customerId}">Edit</a>
+                            <a href="${pageContext.request.contextPath}/customer-order-list?id=${cust.customer.customerId}">Orders</a>
+                        </td>
                     </tr>
                 </c:forEach>
             </tbody>
         </table>
 
-        
-       
         <c:set var="currentPage" value="${empty currentPage ? 1 : currentPage}" />
         <c:set var="totalPages" value="${empty totalPages ? 1 : totalPages}" />
 
@@ -105,4 +108,3 @@
 
     </body>
 </html>
-
