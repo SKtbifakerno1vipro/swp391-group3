@@ -42,7 +42,7 @@
                         <td>${customer.createAt}</td>
                         <td>${customer.updateAt}</td>
                         <td><a href="${pageContext.request.contextPath}/customer/edit?id=${cust.customer.customerId}">Edit</a></td>
-                            
+                        <td><a href="${pageContext.request.contextPath}/customer-order-list?id=${cust.customer.customerId}">Orders</a></td>
                     </tr>
                 </c:forEach>
             </tbody>
