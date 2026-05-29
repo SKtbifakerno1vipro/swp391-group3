@@ -14,25 +14,31 @@
     
 </head>
 <body>
-    <main>
-        <div>
-            <h2>Edit Customer</h2>
-
-            <c:if test="${not empty success}">
-                <div>Edit successful</div>
-            </c:if>
-            <c:if test="${not empty error}">
-                <div>Edit failed</div>
-                <c:if test="${not empty errorDetail}">
-                    <div>${errorDetail}</div>
+    <div>
+        <h2>Edit Customer</h2>
+    </div>
+</head>
+        <main>
+            <div>
+                <h2>Edit Customer</h2>
+                <c:if test="${not empty success}">
+                    <div>Edit successful</div>
                 </c:if>
-            </c:if>
+                <c:if test="${not empty success}">
+                    <div>Edit successful</div>
+                </c:if>
+                <c:if test="${not empty error}">
+                    <div>Edit failed</div>
+                    <c:if test="${not empty errorDetail}">
+                        <div>${errorDetail}</div>
+                    </c:if>
+                </c:if>
 
-            <c:if test="${not empty customer}">
+
                 <form action="EditCustomer" method="post">
                     <input type="hidden" name="customerId" value="${customer.customerId}" />
                     <input type="hidden" name="userId" value="${customer.userId}" />
-                    
+
                     <table>
                         <tr>
                             <td>Customer ID:</td>
@@ -101,9 +107,8 @@
                         </tr>
                     </table>
                 </form>
-            </c:if>
-        </div>
-    </main>
+            </div>
+        </main>
 </body>
 </html>
 

@@ -11,7 +11,9 @@ import service.CustomerService;
 import service.UserService;
 
 public class CustomerDAO extends DBContext {
+
     private final UserService userService = new UserService();
+
     public CustomerDTO getCustomerDTOByCustomerId(int id) {
         try {
             String sql = "select c.*, u.user_id as u_id, u.email, u.full_name, u.role_id, r.role_name from customer c "
@@ -69,8 +71,7 @@ public class CustomerDAO extends DBContext {
         return list;
     }
 
-
-       public Customer getCustomerByUserId(int userId) {
+    public Customer getCustomerByUserId(int userId) {
         String sql = "SELECT * FROM customer WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -103,7 +104,6 @@ public class CustomerDAO extends DBContext {
             ResultSet rs = stm.executeQuery();
             if (rs.next()) {
                 Customer c = new Customer();
-                c.setCustomerId(rs.getInt("customer_id"));
                 c.setUserId((Integer) rs.getObject("user_id"));
                 c.setTaxCode(rs.getString("tax_code"));
                 c.setType(rs.getString("type"));
