@@ -2,38 +2,58 @@ package dal;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import model.Customer;
 import dto.CustomerDTO;
 import model.User;
-import service.CustomerService;
-import service.UserService;
 
 public class CustomerDAO extends DBContext {
-
-    private final UserService userService = new UserService();
+    
+    String error = "";
+    
+    private Customer mapCustomer(ResultSet rs) throws Exception {
+        Customer c = new Customer();
+        c.setCustomerId(rs.getInt("customer_id"));
+        c.setUserId((Integer) rs.getObject("user_id"));
+        c.setTaxCode(rs.getString("tax_code"));
+        c.setCustomerType(rs.getString("customer_type"));
+        c.setCompanyName(rs.getString("company_name"));
+        c.setAssignedToUserId((Integer) rs.getObject("assigned_to_user_id"));
+        if (rs.getTimestamp("created_at") != null) {
+            c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+        }
+        if (rs.getTimestamp("updated_at") != null) {
+            c.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+        }
+        return c;
+    }
 
     public CustomerDTO getCustomerDTOByCustomerId(int id) {
         try {
-            String sql = "select c.*, u.user_id as u_id, u.email, u.full_name, u.role_id, r.role_name from customer c "
-                    + "left join [user] u on c.user_id = u.user_id left join role r on u.role_id = r.role_id where c.customer_id = ?";
+            String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, "
+                    + "c.assigned_to_user_id, c.created_at, c.updated_at, u.user_name,"
+                    + "u.user_id AS u_id, u.email, u.full_name, u.phone, u.account_status, u.role_id, r.role_name "
+                    + "FROM customer c "
+                    + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                    + "LEFT JOIN role r ON u.role_id = r.role_id "
+                    + "WHERE c.customer_id = ?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, id);
             ResultSet rs = stm.executeQuery();
             if (rs.next()) {
-                Customer c = new Customer();
-                c.setCustomerId(rs.getInt("customer_id"));
-                c.setUserId((Integer) rs.getObject("user_id"));
-                c.setTaxCode(rs.getString("tax_code"));
-                c.setType(rs.getString("type"));
+                Customer c = mapCustomer(rs);
                 User u = null;
                 String rName = null;
                 if (rs.getObject("u_id") != null) {
                     u = new User();
+                    u.setUserName(rs.getString("user_name"));
                     u.setUserId(rs.getInt("u_id"));
                     u.setEmail(rs.getString("email"));
                     u.setFullName(rs.getString("full_name"));
+                    u.setPhone(rs.getString("phone"));
+                    u.setStatus(rs.getString("account_status"));
                     u.setRoleId((Integer) rs.getObject("role_id"));
                     rName = rs.getString("role_name");
                 }
@@ -41,6 +61,7 @@ public class CustomerDAO extends DBContext {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            error = "getCustomerDTOByCustomerId " + e.getMessage();
         }
         return null;
     }
@@ -48,25 +69,25 @@ public class CustomerDAO extends DBContext {
     public List<CustomerDTO> getAllCustomerDTOs() {
         List<CustomerDTO> list = new ArrayList<>();
         try {
-            String sql = "select * from customer c left join [user] u on c.user_id = u.user_id";
+            String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, "
+                    + "c.assigned_to_user_id, c.created_at, c.updated_at, "
+                    + "u.full_name, u.email, u.phone, u.account_status, u.user_name "
+                    + "FROM customer c LEFT JOIN [user] u ON c.user_id = u.user_id";
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-
-                Customer c = new Customer();
-                c.setCustomerId(rs.getInt("customer_id"));
-                c.setUserId((Integer) rs.getObject("user_id"));
-                c.setTaxCode(rs.getString("tax_code"));
-                c.setType(rs.getString("type"));
+                Customer c = mapCustomer(rs);
                 User u = new User();
+                u.setUserName(rs.getString("user_name"));
                 u.setFullName(rs.getString("full_name"));
                 u.setEmail(rs.getString("email"));
-                u.setStatus(rs.getString("status"));
+                u.setStatus(rs.getString("account_status"));
                 u.setPhone(rs.getString("phone"));
                 list.add(new CustomerDTO(c, u, null));
             }
         } catch (Exception e) {
-            System.out.println("getAllCustomerDTOs" + e.getMessage());
+            e.printStackTrace();
+            error = "getAllCustomerDTOs" + e.getMessage();
         }
         return list;
     }
@@ -77,47 +98,31 @@ public class CustomerDAO extends DBContext {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                Customer c = new Customer();
-                c.setCustomerId(rs.getInt("customer_id"));
-                c.setUserId((Integer) rs.getObject("user_id"));
-                c.setTaxCode(rs.getString("tax_code"));
-                c.setType(rs.getString("type"));
-                return c;
+                return mapCustomer(rs);
             }
         } catch (Exception e) {
-            System.out.println("getCustomerByUserId" + e.getMessage());
-
+            e.printStackTrace();
+            error = "getCustomerByUserId" + e.getMessage();
         }
         return null;
     }
 
     public List<User> getAllUsers() {
         UserDAO uDAO = new UserDAO();
-        return uDAO.getAllUsers();
+        return uDAO.getAllUsersV1();
     }
-
     public Customer getCustomerByCustomerId(int id) {
         try {
-            String sql = "select * from [customer] where customer_id = ?";
+            String sql = "SELECT * FROM [customer] WHERE customer_id = ?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, id);
             ResultSet rs = stm.executeQuery();
             if (rs.next()) {
-                Customer c = new Customer();
-                c.setUserId((Integer) rs.getObject("user_id"));
-                c.setTaxCode(rs.getString("tax_code"));
-                c.setType(rs.getString("type"));
-                c.setCreateBy((Integer) rs.getObject("create_by"));
-                if (rs.getTimestamp("create_at") != null) {
-                    c.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
-                }
-                if (rs.getTimestamp("update_at") != null) {
-                    c.setUpdateAt(rs.getTimestamp("update_at").toLocalDateTime());
-                }
-                return c;
+                return mapCustomer(rs);
             }
         } catch (Exception e) {
-            System.out.println("getCustomerByCustomerId" + e.getMessage());
+            e.printStackTrace();
+            error = "getCustomerByCustomerId" + e.getMessage();
         }
         return null;
     }
@@ -141,8 +146,8 @@ public class CustomerDAO extends DBContext {
                 return rs.getInt("role_id");
             }
         } catch (Exception e) {
-            System.out.println("getRoleIdByName" + e.getMessage());
-
+            e.printStackTrace();
+            error = "getRoleIdByName " + e.getMessage();
         }
         return null;
     }
@@ -157,59 +162,52 @@ public class CustomerDAO extends DBContext {
             ResultSet rs = stmId.executeQuery();
             if (rs.next()) {
                 int userId = rs.getInt("user_id");
-                String sqlCustomer = "INSERT INTO [customer] (user_id, tax_code, type, create_by, create_at, update_at) "
-                   + "VALUES (?, ?, ?, ?, GETDATE(), GETDATE())";
+
+                String sqlCustomer = "INSERT INTO [customer] (user_id, tax_code, customer_type, company_name, assigned_to_user_id, created_at, updated_at) "
+                        + "VALUES (?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+
                 PreparedStatement stmCustomer = connection.prepareStatement(sqlCustomer);
                 stmCustomer.setInt(1, userId);
                 stmCustomer.setString(2, customer.getTaxCode());
-                stmCustomer.setString(3, customer.getType());
-                if (customer.getCreateBy() != null) {
-                    stmCustomer.setInt(4, customer.getCreateBy());
+                stmCustomer.setString(3, customer.getCustomerType());
+                stmCustomer.setString(4, customer.getCompanyName());
+                if (customer.getAssignedToUserId() != null) {
+                    stmCustomer.setInt(5, customer.getAssignedToUserId());
                 } else {
-                    stmCustomer.setNull(4, java.sql.Types.INTEGER);
+                    stmCustomer.setNull(5, Types.INTEGER);
                 }
-
                 stmCustomer.executeUpdate();
                 customer.setUserId(userId);
                 return customer;
             }
         } catch (Exception e) {
-            System.out.println("createCustomer" + e.getMessage());
+            e.printStackTrace();
+            error = "createCustomer " + e.getMessage();
         }
         return null;
     }
 
-    public boolean updateUser(User user) {
-        try {
-            String sql = "UPDATE [user] SET full_name = ?, phone = ?, status = ?, password = ?, update_at = GETDATE() WHERE user_id = ?";
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setString(1, user.getFullName());
-            stm.setString(2, user.getPhone());
-            stm.setString(3, user.getStatus());
-            stm.setString(4, user.getPassword());
-            stm.setInt(5, user.getUserId());
-            return stm.executeUpdate() > 0;
-        } catch (Exception e) {
-            System.out.println("updateUser" + e.getMessage());
-        }
-        return false;
-    }
-
     public boolean updateCustomer(Customer customer) {
         try {
-            String sql = "UPDATE [customer] SET tax_code = ?, type = ?, update_at = GETDATE() WHERE customer_id = ?";
+            String sql = "UPDATE [customer] SET tax_code = ?, customer_type = ?, company_name = ?, assigned_to_user_id = ?, updated_at = GETDATE() WHERE customer_id = ?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1, customer.getTaxCode());
-            stm.setString(2, customer.getType());
-            stm.setInt(3, customer.getCustomerId());
+            stm.setString(2, customer.getCustomerType());
+            stm.setString(3, customer.getCompanyName());
+            if (customer.getAssignedToUserId() != null) {
+                stm.setInt(4, customer.getAssignedToUserId());
+            } else {
+                stm.setNull(4, Types.INTEGER);
+            }
+            stm.setInt(5, customer.getCustomerId());
             return stm.executeUpdate() > 0;
         } catch (Exception e) {
-            System.out.println("updateCustomer" + e.getMessage());
+            e.printStackTrace();
+            error = "updateCustomer " + e.getMessage();
         }
         return false;
     }
-
     public String getLastError() {
-        return "";
+        return "error: " + error;
     }
 }

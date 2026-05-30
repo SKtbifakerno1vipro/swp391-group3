@@ -1,26 +1,33 @@
 package model;
+
 import java.time.LocalDateTime;
+
 public class Customer {
     private int customerId;
     private Integer userId;
     private String taxCode;
-    private String type;
-    private Integer createBy;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private String customerType;
+    private String companyName;
+    private Integer assignedToUserId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
     public Customer() {}
+
     public int getCustomerId() { return customerId; }
     public void setCustomerId(int customerId) { this.customerId = customerId; }
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
     public String getTaxCode() { return taxCode; }
     public void setTaxCode(String taxCode) { this.taxCode = taxCode; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-    public Integer getCreateBy() { return createBy; }
-    public void setCreateBy(Integer createBy) { this.createBy = createBy; }
-    public LocalDateTime getCreateAt() { return createAt; }
-    public void setCreateAt(LocalDateTime createAt) { this.createAt = createAt; }
-    public LocalDateTime getUpdateAt() { return updateAt; }
-    public void setUpdateAt(LocalDateTime updateAt) { this.updateAt = updateAt; }
+    public String getCustomerType() { return customerType; }
+    public void setCustomerType(String customerType) { this.customerType = customerType; }
+    public String getCompanyName() { return companyName; }
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public Integer getAssignedToUserId() { return assignedToUserId; }
+    public void setAssignedToUserId(Integer assignedToUserId) { this.assignedToUserId = assignedToUserId; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

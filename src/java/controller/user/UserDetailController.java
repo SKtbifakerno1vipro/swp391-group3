@@ -1,6 +1,7 @@
 package controller.user;
 
 import service.UserService;
+import service.RoleService;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -13,6 +14,7 @@ import model.User;
 public class UserDetailController extends HttpServlet {
 
     private final UserService userService = new UserService();
+    private final RoleService roleService = new RoleService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -24,6 +26,7 @@ public class UserDetailController extends HttpServlet {
                 return;
             }
             request.setAttribute("u", u);
+            request.setAttribute("roles", roleService.getAllRoles());
             request.getRequestDispatcher("/views/user/detail.jsp").forward(request, response);
         } catch (Exception e) {
             System.out.println(e.getMessage());

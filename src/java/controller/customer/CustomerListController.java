@@ -29,8 +29,8 @@ public class CustomerListController extends HttpServlet {
             currentPage = 1;
         }
 
-        List<CustomerDTO> allCustomers = customerService.getAllCustomerDTOs();
-        int totalRecords = allCustomers == null ? 0 : allCustomers.size();
+        List<CustomerDTO> allCustomerDTOs = customerService.getAllCustomerDTOs();
+        int totalRecords = allCustomerDTOs == null ? 0 : allCustomerDTOs.size();
         int totalPages = (int) Math.ceil(totalRecords / (double) PAGE_SIZE);
         if (totalPages < 1) totalPages = 1;
 
@@ -39,9 +39,9 @@ public class CustomerListController extends HttpServlet {
 
         int fromIndex = (currentPage - 1) * PAGE_SIZE;
         int toIndex = Math.min(fromIndex + PAGE_SIZE, totalRecords);
-        List<CustomerDTO> pageCustomers = (totalRecords == 0) ? List.of() : allCustomers.subList(fromIndex, toIndex);
+        List<CustomerDTO> pageCustomerDTOs = (totalRecords == 0) ? List.of() : allCustomerDTOs.subList(fromIndex, toIndex);
 
-        request.setAttribute("customerList", pageCustomers);
+        request.setAttribute("CustomerDTOList", pageCustomerDTOs);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
         request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);

@@ -1,18 +1,20 @@
 package service;
 
 import dal.UserDAO;
+import dto.UserRoleDTO;
 import java.util.List;
 import model.User;
 
 public class UserService {
+
     private final UserDAO userDAO = new UserDAO();
 
-    public List<User> searchUsers(String roleId, String status) {
+    public List<UserRoleDTO> searchUsers(int roleId, String status) {
         //logic
         return userDAO.searchUsers(roleId, status);
     }
 
-    public List<User> getAllUsers() {
+    public List<UserRoleDTO> getAllUsers() {
         return userDAO.getAllUsers();
     }
 
@@ -20,8 +22,8 @@ public class UserService {
         return userDAO.getUserById(id);
     }
 
-    public void createUser(User user) {
-        userDAO.createUser(user);
+    public boolean createUser(User user) {
+        return userDAO.createUser(user);
     }
 
     public void updateUser(User user) {
@@ -32,4 +34,3 @@ public class UserService {
         return userDAO.login(username, password);
     }
 }
-

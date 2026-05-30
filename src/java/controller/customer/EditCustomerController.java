@@ -2,6 +2,7 @@ package controller.customer;
 
 import service.CustomerService;
 import java.io.IOException;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,12 +10,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
 import model.Customer;
 import model.User;
+import dto.*;
 
 @WebServlet(name = "EditCustomerController", urlPatterns = {"/customer/edit"})
 public class EditCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
-
     private final service.RoleService roleService = new service.RoleService();
 
     @Override
@@ -23,39 +24,28 @@ public class EditCustomerController extends HttpServlet {
         String customerIdStr = request.getParameter("id");
 
         if (customerIdStr == null || customerIdStr.isBlank()) {
-
             request.setAttribute("error", "Edit failed");
             request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
-
             return;
         }
 
         try {
             int customerId = Integer.parseInt(customerIdStr);
-            Customer customer = customerService.getCustomerByCustomerId(customerId);
+            CustomerDTO cusDTO = customerService.getCustomerDTOByCustomerId(customerId);
 
-            if (customer == null) {
+            if (cusDTO == null) {
                 request.setAttribute("error", "Edit failed");
                 request.setAttribute("errorDetail", "Customer not found");
             } else {
-                customer.setCustomerId(customerId);
-                request.setAttribute("customer", customer);
-                if (customer.getUserId() != null) {
-                    User user = customerService.getUserById(customer.getUserId());
-                    if (user != null) {
-                        request.setAttribute("user", user);
-                    }
-                }
-                java.util.List<model.Role> roles = roleService.getAllRoles();
-                request.setAttribute("roles", roles);
+                request.setAttribute("cusDTO", cusDTO);
+                request.setAttribute("users", customerService.getAllUsers());
+                request.setAttribute("roles", roleService.getAllRoles());
             }
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Edit failed");
             request.setAttribute("errorDetail", ex.getMessage());
         }
-
         request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
-
     }
 
     @Override
@@ -83,7 +73,9 @@ public class EditCustomerController extends HttpServlet {
             String status = request.getParameter("status");
             String roleIdStr = request.getParameter("roleId");
             String taxCode = request.getParameter("taxCode");
-            String type = request.getParameter("type");
+            String companyName = request.getParameter("companyName");
+            String customerType = request.getParameter("customerType");
+            String assignedToUserIdValue = request.getParameter("assignedToUserId");
 
             User u = new User();
             u.setUserId(userId);
@@ -102,24 +94,31 @@ public class EditCustomerController extends HttpServlet {
             Customer c = new Customer();
             c.setCustomerId(customerId);
             c.setTaxCode(taxCode);
-            c.setType(type);
+            c.setCompanyName(companyName);
+            c.setCustomerType(customerType);
+            if (assignedToUserIdValue != null && !assignedToUserIdValue.isBlank()) {
+                c.setAssignedToUserId(Integer.parseInt(assignedToUserIdValue));
+            } else {
+                c.setAssignedToUserId(null);
+            }
+            boolean cusDTOUpdated = customerService.updateCustomerDTOByOJB(u,c);
 
-            boolean userUpdated = customerService.updateUser(u);
-            boolean custUpdated = customerService.updateCustomer(c);
-
-            if (!userUpdated || !custUpdated) {
-                request.setAttribute("customer", customerService.getCustomerByCustomerId(customerId));
-                request.setAttribute("user", customerService.getUserById(userId));
+            if (!cusDTOUpdated) {
+                request.setAttribute("user", customerService.getCustomerDTOByCustomerId(userId));
+                request.setAttribute("users", customerService.getAllUsers());
                 request.setAttribute("roles", roleService.getAllRoles());
                 request.setAttribute("error", "Update failed");
-                request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
-                return;
+            }else{
+                CustomerDTO cusDTO = customerService.getCustomerDTOByCustomerId(customerId);
+                request.setAttribute("users", customerService.getAllUsers());
+                request.setAttribute("roles", roleService.getAllRoles());
+                request.setAttribute("cusDTO", cusDTO);
+                request.setAttribute("success", "Updated");
             }
-            response.sendRedirect(request.getContextPath() + "/customer/detail?id=" + customerId);
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Update failed");
             request.setAttribute("errorDetail", ex.getMessage());
-            request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
         }
+        request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
     }
 }
