@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
-import model.User;
+import model.*;
 
 @WebServlet(name = "CreateCustomerController", urlPatterns = {"/customer/create"})
 public class CreateCustomerController extends HttpServlet {
@@ -51,7 +51,7 @@ public class CreateCustomerController extends HttpServlet {
                 || taxCode == null || taxCode.isBlank()
                 || companyName == null || companyName.isBlank()
                 || customerType == null || customerType.isBlank()) {
-            request.setAttribute("error", "Create failed");
+            request.setAttribute("error", "Create failed: Must input enough");
             request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
             return;
         }
@@ -71,7 +71,7 @@ public class CreateCustomerController extends HttpServlet {
             u.setStatus(status);
             u.setRoleId(roleId);
 
-            model.Customer c = new model.Customer();
+            Customer c = new Customer();
             c.setTaxCode(taxCode);
             c.setCompanyName(companyName);
             c.setCustomerType(customerType);
@@ -79,7 +79,7 @@ public class CreateCustomerController extends HttpServlet {
                 c.setAssignedToUserId(Integer.parseInt(assignedToUserIdValue));
             }
 
-            model.Customer createdCustomer = customerService.createUserAndCustomer(u, c);
+            Customer createdCustomer = customerService.createUserAndCustomer(u, c);
 
             if (createdCustomer != null && createdCustomer.getUserId() != null && createdCustomer.getUserId() > 0) {
                 request.setAttribute("success", true);
@@ -89,7 +89,6 @@ public class CreateCustomerController extends HttpServlet {
             request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Create failed");
-            request.setAttribute("errorDetail", ex.getMessage());
             request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
         }
     }

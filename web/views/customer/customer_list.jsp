@@ -20,6 +20,31 @@
                     </c:if>
         <a href="${pageContext.request.contextPath}/customer/create"> Add Customer</a>
         <a href="${pageContext.request.contextPath}/dashboard"> DashBoard</a>
+        <form action="${pageContext.request.contextPath}/customer/list" method="GET">
+            <table style="border: none; width: auto;">
+                <tr style="border: none;">
+                    <td style="border: none; padding: 5px 10px;">
+                        <label>Tìm kiếm:</label><br/>
+                        <input type="text" name="searchKeyword" value="${param.searchKeyword}" 
+                               placeholder="Nhập tên, SĐT hoặc email..." style="padding: 5px; width: 250px;"/>
+                    </td>
+
+                    <td style="border: none; padding: 5px 10px;">
+                        <label>Loại khách hàng:</label><br/>
+                        <select name="customerType" style="padding: 5px; width: 150px;">
+                            <option value="">-- Tất cả --</option>
+                            <option value="B2B" ${param.customerType == 'B2B' ? 'selected' : ''}>B2B (Doanh nghiệp)</option>
+                            <option value="B2C" ${param.customerType == 'B2C' ? 'selected' : ''}>B2C (Cá nhân)</option>
+                        </select>
+                    </td>
+
+                    <td style="border: none; padding: 5px 10px; vertical-align: bottom;">
+                        <button type="submit" style="padding: 6px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Tìm kiếm</button>
+                        <a href="${pageContext.request.contextPath}/customer/list" style="padding: 6px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; margin-left: 5px;">Xóa bộ lọc</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
         <table>
             <thead>
                 <tr>
@@ -114,6 +139,5 @@
                 </c:choose>
             </div>
         </c:if>
-
     </body>
 </html>
