@@ -36,7 +36,7 @@
                 </tr>
             </thead>
             <tbody>
-                <c:if test="${empty customerList}">
+                <c:if test="${empty CustomerDTOList}">
                     <tr>
                         <td colspan="10">Khong co du lieu khach hang</td>
                     </tr>
