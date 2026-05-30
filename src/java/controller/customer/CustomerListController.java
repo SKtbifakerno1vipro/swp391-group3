@@ -19,6 +19,17 @@ public class CustomerListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        List<CustomerDTO> allCustomerDTOs;
+        
+        //filter
+        String key = request.getParameter("searchKeyword");
+        String cusType = request.getParameter("customerType");
+        if (key != null && !key.isBlank() || cusType != null && !cusType.isBlank())
+            allCustomerDTOs = customerService.FilterCustomerDTOs(key, cusType);
+        else
+            allCustomerDTOs = customerService.getAllCustomerDTOs();
+        
+        // page
         int currentPage = 1;
         try {
             String pageParam = request.getParameter("page");
@@ -29,7 +40,7 @@ public class CustomerListController extends HttpServlet {
             currentPage = 1;
         }
 
-        List<CustomerDTO> allCustomerDTOs = customerService.getAllCustomerDTOs();
+
         int totalRecords = allCustomerDTOs == null ? 0 : allCustomerDTOs.size();
         int totalPages = (int) Math.ceil(totalRecords / (double) PAGE_SIZE);
         if (totalPages < 1) totalPages = 1;
