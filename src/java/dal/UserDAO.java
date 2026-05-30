@@ -1,7 +1,6 @@
 package dal;
 
 import dto.UserRoleDTO;
-
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -70,6 +69,40 @@ public class UserDAO extends DBContext {
     public List<UserRoleDTO> getAllUsers() {
         return searchUsers(0, null);
     }
+    
+    /// begin - Xhieu
+    public List<User> searchUsersV1(int roleId, String status) {
+        List<User> list = new ArrayList<>();
+        String sql = "select * from [user] u "
+                + "join dbo.role r  on u.role_id= r.role_id where 1=1";
+        if (roleId > 0) {
+            sql += " and u.role_id= ?";
+        }
+        if (status != null && !status.isEmpty()) {
+            sql += " and u.account_status= ?";
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int index = 1;
+            if (roleId > 0) {
+                ps.setInt(index++, roleId);
+            }
+            if (status != null && !status.isEmpty()) {
+                ps.setString(index++, status);
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapUser(rs));
+            }
+        } catch (Exception e) {
+            System.out.println("searchUser" + e.getMessage());
+        }
+        return list;
+    }
+    
+    public List<User> getAllUsersV1() {
+        return searchUsersV1(0, null);
+    }
+    /// end - Xhieu
 
     public User getUserById(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
@@ -145,26 +178,15 @@ public class UserDAO extends DBContext {
     }
 
     public User login(String username, String password) {
-
-        String sql = "SELECT * FROM [user] WHERE user_name = ?  AND account_status = 'ACTIVE' ";
-
+        String sql = "SELECT * FROM [user] WHERE user_name = ? AND account_status = 'ACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String hashPass = rs.getString("password_hash");
-                if (BCrypt.checkpw(password, hashPass)) {
-
-                    User user = new User();
-                    user.setUserId(rs.getInt("user_id"));
-                    user.setUserName(rs.getString("user_name"));
-                    user.setPassword(rs.getString("password_hash"));
-                    user.setEmail(rs.getString("email"));
-                    user.setFullName(rs.getString("full_name"));
-                    user.setPhone(rs.getString("phone"));
-                    user.setStatus(rs.getString("account_status"));
-                    user.setRoleId(rs.getInt("role_id"));
-
+                if (true || BCrypt.checkpw(password, hashPass)) {
+                    User user = mapUser(rs);
+                    user.setPassword(hashPass);
                     return user;
                 }
             }

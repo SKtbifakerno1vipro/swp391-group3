@@ -7,10 +7,19 @@
         <title>Danh sach khach hang</title>
     </head>
     <body>
-
         <h2>Danh sach khach hang</h2>
         <h2>Quản lý danh sách khách hàng (Hệ thống thành viên)</h2>
+                    <c:if test="${not empty success}">
+                        <div>Edit successful</div>
+                    </c:if>
+                    <c:if test="${not empty error}">
+                        <div>${error}</div>
+                        <c:if test="${not empty errorDetail}">
+                            <div>${errorDetail}</div>
+                        </c:if>
+                    </c:if>
         <a href="${pageContext.request.contextPath}/customer/create"> Add Customer</a>
+        <a href="${pageContext.request.contextPath}/dashboard"> DashBoard</a>
         <table>
             <thead>
                 <tr>
@@ -27,13 +36,13 @@
                 </tr>
             </thead>
             <tbody>
-                <c:if test="${empty customerList}">
+                <c:if test="${empty CustomerDTOList}">
                     <tr>
                         <td colspan="10">Khong co du lieu khach hang</td>
                     </tr>
                 </c:if>
 
-                <c:forEach var="cust" items="${customerList}">
+                <c:forEach var="cust" items="${CustomerDTOList}">
                     <tr>
                         <td>${cust.customer.customerId}</td>
                         <td><strong>${cust.user.fullName}</strong></td>

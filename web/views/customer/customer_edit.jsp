@@ -17,31 +17,31 @@
             <div>
                 <h2>Edit Customer</h2>
                 <c:if test="${not empty success}">
-                    <div>Edit successful</div>
+                    <div>${success}</div>
                 </c:if>
                 <c:if test="${not empty error}">
-                    <div>Edit failed</div>
+                    <div>${error}</div>
                     <c:if test="${not empty errorDetail}">
                         <div>${errorDetail}</div>
                     </c:if>
                 </c:if>
 
                 <form action="${pageContext.request.contextPath}/customer/edit" method="post">
-                    <input type="hidden" name="customerId" value="${customer.customerId}" />
-                    <input type="hidden" name="userId" value="${customer.userId}" />
+                    <input type="hidden" name="customerId" value="${cusDTO.customer.customerId}" />
+                    <input type="hidden" name="userId" value="${cusDTO.customer.userId}" />
 
                     <table>
                         <tr>
                             <td>Customer ID:</td>
-                            <td>${customer.customerId}</td>
+                            <td>${cusDTO.customer.customerId}</td>
                         </tr>
                         <tr>
                             <td>User ID:</td>
-                            <td>${customer.userId}</td>
+                            <td>${cusDTO.customer.userId}</td>
                         </tr>
                         <tr>
                             <td>Username:</td>
-                            <td><input type="text" name="username" value="${user.userName}" readonly></td>
+                            <td><input type="text" name="username" value="${cusDTO.user.userName}" readonly></td>
                         </tr>
                         <tr>
                             <td>Password:</td>
@@ -51,7 +51,7 @@
                             <td>Role:</td>
                             <td>
                                 <c:forEach var="role" items="${roles}">
-                                    <c:if test="${role.roleId == user.roleId}">
+                                    <c:if test="${role.roleId == cusDTO.user.roleId}">
                                         <input type="text" value="${role.roleName}" readonly>
                                         <input type="hidden" name="roleId" value="${role.roleId}">
                                     </c:if>
@@ -60,36 +60,36 @@
                         </tr>
                         <tr>
                             <td>Full Name:</td>
-                            <td><input type="text" name="fullname" value="${user.fullName}"></td>
+                            <td><input type="text" name="fullname" value="${cusDTO.user.fullName}"></td>
                         </tr>
                         <tr>
                             <td>Email:</td>
-                            <td><input type="text" name="email" value="${user.email}" readonly></td>
+                            <td><input type="text" name="email" value="${cusDTO.user.email}" readonly></td>
                         </tr>
                         <tr>
                             <td>Phone:</td>
-                            <td><input type="text" name="phone" value="${user.phone}"></td>
+                            <td><input type="text" name="phone" value="${cusDTO.user.phone}"></td>
                         </tr>
                         <tr>
                             <td>Status:</td>
                             <td>
                                 <select name="status">
-                                    <option value="Active" ${user.status == 'Active' ? 'selected' : ''}>Active</option>
-                                    <option value="Inactive" ${user.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                    <option value="Active" ${cusDTO.user.status == 'Active' ? 'selected' : ''}>Active</option>
+                                    <option value="Inactive" ${cusDTO.user.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
                                 </select>
                             </td>
                         </tr>
                         <tr>
                             <td>Tax Code:</td>
-                            <td><input type="text" name="taxCode" value="${customer.taxCode}" required></td>
+                            <td><input type="text" name="taxCode" value="${cusDTO.customer.taxCode}" required></td>
                         </tr>
                         <tr>
                             <td>Company Name:</td>
-                            <td><input type="text" name="companyName" value="${customer.companyName}" required></td>
+                            <td><input type="text" name="companyName" value="${cusDTO.customer.companyName}" required></td>
                         </tr>
                         <tr>
                             <td>Customer Type:</td>
-                            <td><input type="text" name="customerType" value="${customer.customerType}" required></td>
+                            <td><input type="text" name="customerType" value="${cusDTO.customer.customerType}" required></td>
                         </tr>
                         <tr>
                             <td>Assigned To:</td>
@@ -97,7 +97,7 @@
                                 <select name="assignedToUserId">
                                     <option value="">-- None --</option>
                                     <c:forEach var="u" items="${users}">
-                                        <option value="${u.userId}" ${customer.assignedToUserId == u.userId ? 'selected' : ''}>
+                                        <option value="${u.userId}" ${cusDTO.customer.assignedToUserId == u.userId ? 'selected' : ''}>
                                             ${u.fullName} (${u.userName})
                                         </option>
                                     </c:forEach>

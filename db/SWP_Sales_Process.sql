@@ -326,3 +326,5 @@ INSERT INTO stock_transaction (product_id, transaction_type, quantity_in, quanti
 -- Cập nhật lại số lượng khả dụng ở bảng Product
 UPDATE product SET quantity_available = quantity_available - 1 WHERE product_id = 1;
 UPDATE product SET quantity_available = quantity_available - 2 WHERE product_id = 2;
+
+select * from [user]

@@ -84,7 +84,7 @@
                     </div>
                     <div>
                         <button type="submit">Create</button>
-                        <a href="${pageContext.request.contextPath}/dashboard">Cancel</a>
+                        <a href="${pageContext.request.contextPath}/customer/list">Cancel</a>
                     </div>
                 </form>
             </div>

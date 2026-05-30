@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
 import model.Customer;
 import model.User;
+import dto.*;
 
 @WebServlet(name = "EditCustomerController", urlPatterns = {"/customer/edit"})
 public class EditCustomerController extends HttpServlet {
@@ -30,29 +31,20 @@ public class EditCustomerController extends HttpServlet {
 
         try {
             int customerId = Integer.parseInt(customerIdStr);
-            Customer customer = customerService.getCustomerByCustomerId(customerId);
+            CustomerDTO cusDTO = customerService.getCustomerDTOByCustomerId(customerId);
 
-            if (customer == null) {
+            if (cusDTO == null) {
                 request.setAttribute("error", "Edit failed");
                 request.setAttribute("errorDetail", "Customer not found");
             } else {
-                customer.setCustomerId(customerId);
-                request.setAttribute("customer", customer);
-                if (customer.getUserId() != null) {
-                    User user = customerService.getUserById(customer.getUserId());
-                    if (user != null) {
-                        request.setAttribute("user", user);
-                    }
-                }
-                List<User> users = customerService.getAllUsers();
-                request.setAttribute("users", users);
+                request.setAttribute("cusDTO", cusDTO);
+                request.setAttribute("users", customerService.getAllUsers());
                 request.setAttribute("roles", roleService.getAllRoles());
             }
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Edit failed");
             request.setAttribute("errorDetail", ex.getMessage());
         }
-
         request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
     }
 
@@ -109,24 +101,24 @@ public class EditCustomerController extends HttpServlet {
             } else {
                 c.setAssignedToUserId(null);
             }
+            boolean cusDTOUpdated = customerService.updateCustomerDTOByOJB(u,c);
 
-            boolean userUpdated = customerService.updateUser(u);
-            boolean custUpdated = customerService.updateCustomer(c);
-
-            if (!userUpdated || !custUpdated) {
-                request.setAttribute("customer", customerService.getCustomerByCustomerId(customerId));
-                request.setAttribute("user", customerService.getUserById(userId));
+            if (!cusDTOUpdated) {
+                request.setAttribute("user", customerService.getCustomerDTOByCustomerId(userId));
                 request.setAttribute("users", customerService.getAllUsers());
                 request.setAttribute("roles", roleService.getAllRoles());
                 request.setAttribute("error", "Update failed");
-                request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
-                return;
+            }else{
+                CustomerDTO cusDTO = customerService.getCustomerDTOByCustomerId(customerId);
+                request.setAttribute("users", customerService.getAllUsers());
+                request.setAttribute("roles", roleService.getAllRoles());
+                request.setAttribute("cusDTO", cusDTO);
+                request.setAttribute("success", "Updated");
             }
-            response.sendRedirect(request.getContextPath() + "/customer/detail?id=" + customerId);
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Update failed");
             request.setAttribute("errorDetail", ex.getMessage());
-            request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
         }
+        request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
     }
 }

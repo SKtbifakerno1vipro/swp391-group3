@@ -17,14 +17,20 @@ public class CustomerService {
     public CustomerDTO getCustomerDTOByCustomerId(int id) {
         return customerDAO.getCustomerDTOByCustomerId(id);
     }
+    
+    public boolean updateCustomerDTOByOJB(User u, Customer c) {
+        boolean userUpdated = updateUser(u);
+        boolean customerUpdated = updateCustomer(c);
+        return userUpdated && customerUpdated;
+    }
 
     public Customer getCustomerByUserId(int userId) {
         return customerDAO.getCustomerByUserId(userId);
     }
 
-//    public List<User> getAllUsers() {
-//        return customerDAO.getAllUsers();
-//    }
+    public List<User> getAllUsers() {
+        return customerDAO.getAllUsers();
+    }
 
     public Customer getCustomerByCustomerId(int id) {
         return customerDAO.getCustomerByCustomerId(id);
