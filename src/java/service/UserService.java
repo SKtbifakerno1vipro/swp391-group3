@@ -33,4 +33,9 @@ public class UserService {
     public User login(String username, String password) {
         return userDAO.login(username, password);
     }
+
+    public String checkDuplicate(String username, String email, String phone) {
+        return userDAO.checkDuplicate(username, email, phone);
+    }
+
 }

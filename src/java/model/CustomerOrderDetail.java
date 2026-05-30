@@ -1,10 +1,14 @@
 package model;
 
+import java.math.BigDecimal;
+
 public class CustomerOrderDetail {
     private int customerOrderDetailId;
     private int customerOrderId;
     private int productId;
     private int quantity;
+    private BigDecimal costPrice;
+    private BigDecimal sellingPrice;
 
     public CustomerOrderDetail() {}
 
@@ -16,5 +20,8 @@ public class CustomerOrderDetail {
     public void setProductId(int productId) { this.productId = productId; }
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+    public BigDecimal getCostPrice() { return costPrice; }
+    public void setCostPrice(BigDecimal costPrice) { this.costPrice = costPrice; }
+    public BigDecimal getSellingPrice() { return sellingPrice; }
+    public void setSellingPrice(BigDecimal sellingPrice) { this.sellingPrice = sellingPrice; }
 }
-
