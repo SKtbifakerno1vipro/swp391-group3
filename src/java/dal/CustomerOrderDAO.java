@@ -8,6 +8,7 @@ import model.CustomerOrder;
 import model.Customer;
 import model.User;
 import dto.CustomerOrderDTO;
+import java.sql.Timestamp;
 
 public class CustomerOrderDAO extends DBContext {
 
@@ -17,7 +18,7 @@ public class CustomerOrderDAO extends DBContext {
                      "FROM customer_order co " +
                      "JOIN customer c ON co.customer_id = c.customer_id " +
                      "LEFT JOIN [user] u ON c.user_id = u.user_id " +
-                     "ORDER BY co.create_at DESC";
+                     "ORDER BY co.created_at DESC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
@@ -50,7 +51,7 @@ public class CustomerOrderDAO extends DBContext {
 
     public List<dto.CustomerOrderDetailDTO> getDetailsByOrderId(int orderId) {
         List<dto.CustomerOrderDetailDTO> details = new ArrayList<>();
-        String sql = "SELECT cod.*, p.product_name, p.selling_price, p.unit " +
+        String sql = "SELECT cod.*, p.product_name, p.unit " +
                      "FROM customer_order_detail cod " +
                      "JOIN product p ON cod.product_id = p.product_id " +
                      "WHERE cod.customer_order_id = ?";
@@ -63,11 +64,12 @@ public class CustomerOrderDAO extends DBContext {
                 cod.setCustomerOrderId(rs.getInt("customer_order_id"));
                 cod.setProductId(rs.getInt("product_id"));
                 cod.setQuantity(rs.getInt("quantity"));
+                cod.setCostPrice(rs.getBigDecimal("cost_price"));
+                cod.setSellingPrice(rs.getBigDecimal("selling_price"));
 
                 model.Product p = new model.Product();
                 p.setProductId(rs.getInt("product_id"));
                 p.setProductName(rs.getString("product_name"));
-                p.setSellingPrice(rs.getBigDecimal("selling_price"));
                 p.setUnit(rs.getString("unit"));
 
                 dto.CustomerOrderDetailDTO detailDto = new dto.CustomerOrderDetailDTO();
@@ -82,8 +84,8 @@ public class CustomerOrderDAO extends DBContext {
     }
 
     public boolean createOrder(CustomerOrder order, List<model.CustomerOrderDetail> details) {
-        String insertOrderSql = "INSERT INTO customer_order (customer_id, status, create_by, create_at, update_at) VALUES (?, ?, ?, GETDATE(), GETDATE())";
-        String insertDetailSql = "INSERT INTO customer_order_detail (customer_order_id, product_id, quantity) VALUES (?, ?, ?)";
+        String insertOrderSql = "INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by, created_at) VALUES (?, ?, ?, ?, GETDATE())";
+        String insertDetailSql = "INSERT INTO customer_order_detail (customer_order_id, product_id, quantity, cost_price, selling_price) VALUES (?, ?, ?, ?, ?)";
         
         try {
             connection.setAutoCommit(false);
@@ -91,8 +93,9 @@ public class CustomerOrderDAO extends DBContext {
             // 1. Insert Order and get generated ID
             try (PreparedStatement psOrder = connection.prepareStatement(insertOrderSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 psOrder.setInt(1, order.getCustomerId());
-                psOrder.setString(2, order.getStatus());
-                psOrder.setObject(3, order.getCreateBy());
+                psOrder.setInt(2, order.getCustomerContractId());
+                psOrder.setString(3, order.getOrderStatus());
+                psOrder.setObject(4, order.getCreatedBy());
                 
                 int affectedRows = psOrder.executeUpdate();
                 if (affectedRows == 0) {
@@ -116,6 +119,8 @@ public class CustomerOrderDAO extends DBContext {
                         psDetail.setInt(1, orderId);
                         psDetail.setInt(2, detail.getProductId());
                         psDetail.setInt(3, detail.getQuantity());
+                        psDetail.setBigDecimal(4, detail.getCostPrice());
+                        psDetail.setBigDecimal(5, detail.getSellingPrice());
                         psDetail.addBatch();
                     }
                     psDetail.executeBatch();
@@ -145,10 +150,12 @@ public class CustomerOrderDAO extends DBContext {
         CustomerOrder co = new CustomerOrder();
         co.setCustomerOrderId(rs.getInt("customer_order_id"));
         co.setCustomerId(rs.getInt("customer_id"));
-        co.setStatus(rs.getString("status"));
-        co.setCreateBy((Integer) rs.getObject("create_by"));
-        if (rs.getTimestamp("create_at") != null) {
-            co.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
+        co.setCustomerContractId(rs.getInt("customer_contract_id"));
+        co.setOrderStatus(rs.getString("order_status"));
+        co.setCreatedBy((Integer) rs.getObject("created_by"));
+        Timestamp createdAt = rs.getTimestamp("created_at");
+        if (createdAt != null) {
+            co.setCreatedAt(createdAt.toLocalDateTime());
         }
         
         Customer c = new Customer();
