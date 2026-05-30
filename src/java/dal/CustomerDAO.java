@@ -10,7 +10,9 @@ import dto.CustomerDTO;
 import model.User;
 
 public class CustomerDAO extends DBContext {
-
+    
+    String error = "";
+    
     private Customer mapCustomer(ResultSet rs) throws Exception {
         Customer c = new Customer();
         c.setCustomerId(rs.getInt("customer_id"));
@@ -31,7 +33,7 @@ public class CustomerDAO extends DBContext {
     public CustomerDTO getCustomerDTOByCustomerId(int id) {
         try {
             String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, "
-                    + "c.assigned_to_user_id, c.created_at, c.updated_at, "
+                    + "c.assigned_to_user_id, c.created_at, c.updated_at, u.user_name,"
                     + "u.user_id AS u_id, u.email, u.full_name, u.phone, u.account_status, u.role_id, r.role_name "
                     + "FROM customer c "
                     + "LEFT JOIN [user] u ON c.user_id = u.user_id "
@@ -46,6 +48,7 @@ public class CustomerDAO extends DBContext {
                 String rName = null;
                 if (rs.getObject("u_id") != null) {
                     u = new User();
+                    u.setUserName(rs.getString("user_name"));
                     u.setUserId(rs.getInt("u_id"));
                     u.setEmail(rs.getString("email"));
                     u.setFullName(rs.getString("full_name"));
@@ -58,6 +61,7 @@ public class CustomerDAO extends DBContext {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            error = "getCustomerDTOByCustomerId " + e.getMessage();
         }
         return null;
     }
@@ -67,13 +71,14 @@ public class CustomerDAO extends DBContext {
         try {
             String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, "
                     + "c.assigned_to_user_id, c.created_at, c.updated_at, "
-                    + "u.full_name, u.email, u.phone, u.account_status "
+                    + "u.full_name, u.email, u.phone, u.account_status, u.user_name "
                     + "FROM customer c LEFT JOIN [user] u ON c.user_id = u.user_id";
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
                 Customer c = mapCustomer(rs);
                 User u = new User();
+                u.setUserName(rs.getString("user_name"));
                 u.setFullName(rs.getString("full_name"));
                 u.setEmail(rs.getString("email"));
                 u.setStatus(rs.getString("account_status"));
@@ -81,7 +86,8 @@ public class CustomerDAO extends DBContext {
                 list.add(new CustomerDTO(c, u, null));
             }
         } catch (Exception e) {
-            System.out.println("getAllCustomerDTOs" + e.getMessage());
+            e.printStackTrace();
+            error = "getAllCustomerDTOs" + e.getMessage();
         }
         return list;
     }
@@ -95,7 +101,8 @@ public class CustomerDAO extends DBContext {
                 return mapCustomer(rs);
             }
         } catch (Exception e) {
-            System.out.println("getCustomerByUserId" + e.getMessage());
+            e.printStackTrace();
+            error = "getCustomerByUserId" + e.getMessage();
         }
         return null;
     }
@@ -115,7 +122,8 @@ public class CustomerDAO extends DBContext {
                 return mapCustomer(rs);
             }
         } catch (Exception e) {
-            System.out.println("getCustomerByCustomerId" + e.getMessage());
+            e.printStackTrace();
+            error = "getCustomerByCustomerId" + e.getMessage();
         }
         return null;
     }
@@ -139,7 +147,8 @@ public class CustomerDAO extends DBContext {
                 return rs.getInt("role_id");
             }
         } catch (Exception e) {
-            System.out.println("getRoleIdByName" + e.getMessage());
+            e.printStackTrace();
+            error = "getRoleIdByName " + e.getMessage();
         }
         return null;
     }
@@ -171,7 +180,8 @@ public class CustomerDAO extends DBContext {
                 return customer;
             }
         } catch (Exception e) {
-            System.out.println("createCustomer" + e.getMessage());
+            e.printStackTrace();
+            error = "createCustomer " + e.getMessage();
         }
         return null;
     }
@@ -191,12 +201,12 @@ public class CustomerDAO extends DBContext {
             stm.setInt(5, customer.getCustomerId());
             return stm.executeUpdate() > 0;
         } catch (Exception e) {
-            System.out.println("updateCustomer" + e.getMessage());
+            e.printStackTrace();
+            error = "updateCustomer " + e.getMessage();
         }
         return false;
     }
-
     public String getLastError() {
-        return "";
+        return "error: " + error;
     }
 }

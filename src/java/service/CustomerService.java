@@ -17,6 +17,12 @@ public class CustomerService {
     public CustomerDTO getCustomerDTOByCustomerId(int id) {
         return customerDAO.getCustomerDTOByCustomerId(id);
     }
+    
+    public boolean updateCustomerDTOByOJB(User u, Customer c) {
+        boolean userUpdated = updateUser(u);
+        boolean customerUpdated = updateCustomer(c);
+        return userUpdated && customerUpdated;
+    }
 
     public Customer getCustomerByUserId(int userId) {
         return customerDAO.getCustomerByUserId(userId);
