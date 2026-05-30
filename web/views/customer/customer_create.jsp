@@ -23,7 +23,7 @@
                     <div>Create successful</div>
                 </c:if>
                 <c:if test="${not empty error}">
-                    <div>Create failed</div>
+                    <div>${error}</div>
                     <c:if test="${not empty errorDetail}">
                         <div>${errorDetail}</div>
                     </c:if>

@@ -30,9 +30,9 @@
                     <td>${item.customerOrder.customerOrderId}</td>
                     <td>${item.customerUser.fullName}</td>
                     <td>${item.customer.taxCode}</td>
-                    <td>${item.customerOrder.status}</td>
+                    <td>${item.customerOrder.orderStatus}</td>
                     <td>
-                        <fmt:parseDate value="${item.customerOrder.createAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
+                        <fmt:parseDate value="${item.customerOrder.createdAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
                         <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
                     </td>
                     <td>

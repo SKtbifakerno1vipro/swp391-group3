@@ -111,6 +111,7 @@ public class CustomerDAO extends DBContext {
         UserDAO uDAO = new UserDAO();
         return uDAO.getAllUsersV1();
     }
+    
     public Customer getCustomerByCustomerId(int id) {
         try {
             String sql = "SELECT * FROM [customer] WHERE customer_id = ?";
@@ -207,7 +208,8 @@ public class CustomerDAO extends DBContext {
         }
         return false;
     }
+    
     public String getLastError() {
-        return "error: " + error;
+        return error;
     }
 }

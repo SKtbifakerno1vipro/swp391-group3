@@ -16,9 +16,9 @@
             <li><strong>Order ID:</strong> ${order.customerOrder.customerOrderId}</li>
             <li><strong>Customer Name:</strong> ${order.customerUser.fullName}</li>
             <li><strong>Tax Code:</strong> ${order.customer.taxCode}</li>
-            <li><strong>Status:</strong> ${order.customerOrder.status}</li>
+            <li><strong>Status:</strong> ${order.customerOrder.orderStatus}</li>
             <li><strong>Created At:</strong> 
-                <fmt:parseDate value="${order.customerOrder.createAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
+                <fmt:parseDate value="${order.customerOrder.createdAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
                 <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
             </li>
         </ul>
@@ -37,13 +37,13 @@
             <tbody>
                 <c:set var="totalOrderAmount" value="0" />
                 <c:forEach var="item" items="${details}">
-                    <c:set var="itemTotal" value="${item.detail.quantity * item.product.sellingPrice}" />
+                    <c:set var="itemTotal" value="${item.detail.quantity * item.detail.sellingPrice}" />
                     <c:set var="totalOrderAmount" value="${totalOrderAmount + itemTotal}" />
                     <tr>
                         <td>${item.product.productId}</td>
                         <td>${item.product.productName}</td>
                         <td>${item.detail.quantity} ${item.product.unit}</td>
-                        <td><fmt:formatNumber value="${item.product.sellingPrice}" type="currency" currencySymbol="₫"/></td>
+                        <td><fmt:formatNumber value="${item.detail.sellingPrice}" type="currency" currencySymbol="₫"/></td>
                         <td><fmt:formatNumber value="${itemTotal}" type="currency" currencySymbol="₫"/></td>
                     </tr>
                 </c:forEach>
