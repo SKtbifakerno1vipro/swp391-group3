@@ -84,7 +84,7 @@ public class ProductDAO extends DBContext {
         }
         try {
             String sql = "UPDATE product SET product_name = ?, cost_price = ?, selling_price = ?, "
-                    + "[description] = ?, unit = ?, product_status = ?, reorder_level = ?, "
+                    + "[description] = ?, unit = ?, product_status = ?, "
                     + "quantity_available = ?, category_id = ?, updated_by = ?, updated_at = GETDATE() "
                     + "WHERE product_id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -94,11 +94,10 @@ public class ProductDAO extends DBContext {
             ps.setString(4, product.getDescription());
             ps.setString(5, product.getUnit());
             ps.setString(6, product.getProductStatus());
-            ps.setInt(7, product.getReorderLevel());
-            ps.setInt(8, product.getQuantityAvailable());
-            ps.setObject(9, product.getCategoryId());
-            ps.setObject(10, product.getUpdatedBy());
-            ps.setInt(11, product.getProductId());
+            ps.setInt(7, product.getQuantityAvailable());
+            ps.setObject(8, product.getCategoryId());
+            ps.setObject(9, product.getUpdatedBy());
+            ps.setInt(10, product.getProductId());
 
             ps.executeUpdate();
             return true;
@@ -161,22 +160,33 @@ public class ProductDAO extends DBContext {
         if (!rs.wasNull()) {
             p.setUpdatedBy(updatedBy);
         }
-
         Timestamp createdAt = rs.getTimestamp("created_at");
-        if (createdAt != null) {
-            p.setCreatedAt(createdAt.toLocalDateTime());
-        }
-
+        p.setCreatedAt(createdAt);
         Timestamp updatedAt = rs.getTimestamp("updated_at");
-        if (updatedAt != null) {
-            p.setUpdatedAt(updatedAt.toLocalDateTime());
-        }
-
+        p.setUpdatedAt(updatedAt);
         p.setCategoryId(rs.getInt("category_id"));
         p.setCategoryName(rs.getString("category_name"));
         return p;
     }
 
+    public String getUpdateByWithProductId(int id){
+        try {
+            String sql = """
+                         select u.user_name as update_by from product p join [user] u on u.user_id = p.updated_by
+                         where product_id = ?
+                         """;
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("update_by");
+            }
+        } catch (Exception e) {
+            System.out.println("getProductUnit: " + e.getMessage());
+        }
+        return null;
+    }
+    
     public List<String> getProductUnit(){
         List<String> list = new ArrayList<>();
         try {
@@ -195,6 +205,7 @@ public class ProductDAO extends DBContext {
         }
         return list;
     }
+    
     
     public List<String> getProductStatus(){
         List<String> list = new ArrayList<>();

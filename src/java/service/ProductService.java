@@ -39,4 +39,8 @@ public class ProductService {
     public List<String> getProductStatus(){
         return productDAO.getProductStatus();
     }
+    
+    public String getUpdateByWithProductId(int id){
+        return productDAO.getUpdateByWithProductId(id);
+    }
 }

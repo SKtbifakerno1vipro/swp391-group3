@@ -11,7 +11,7 @@ public class CustomerOrderDetail {
     private BigDecimal sellingPrice;
 
     public CustomerOrderDetail() {}
-
+    
     public int getCustomerOrderDetailId() { return customerOrderDetailId; }
     public void setCustomerOrderDetailId(int customerOrderDetailId) { this.customerOrderDetailId = customerOrderDetailId; }
     public int getCustomerOrderId() { return customerOrderId; }

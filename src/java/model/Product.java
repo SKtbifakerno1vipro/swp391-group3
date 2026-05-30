@@ -1,7 +1,7 @@
 package model;
 
 
-import java.time.LocalDateTime;
+import  java.sql.Timestamp;
 
 public class Product {
     private int productId;
@@ -14,8 +14,8 @@ public class Product {
     private int reorderLevel;
     private int quantityAvailable;
     private Integer updatedBy;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
     private Integer categoryId;
     private String categoryName;
 
@@ -101,19 +101,19 @@ public class Product {
         this.updatedBy = updatedBy;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 

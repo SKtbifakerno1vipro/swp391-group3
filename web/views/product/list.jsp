@@ -15,8 +15,8 @@
     </head>
     <body>
         <div>
-            <h2>Products</h2>
-            
+            <h1>Products</h1>
+
             <div><form action="${pageContext.request.contextPath}/product-list" method="get">
                     <table>
                         <tr>
@@ -47,38 +47,45 @@
             <div>
                 <h3>Product List</h3>
                 <div><a href="${pageContext.request.contextPath}/create-product">Create Product</a></div>
-                
-                <table border="1">
-                    <tr>
-                        <th>Product Id</th>
-                        <th>Product Name</th>
-                        <th>Cost Price</th>
-                        <th>Selling Price</th>
-                        <th>Unit</th>
-                        <th>Quantity</th>
-                        <th>Category Name</th>
-                        <th>Status</th>
-                    </tr>
-                    <c:if test="${empty products}">
+                <div>
+                    <table border="1">
                         <tr>
-                            <td colspan="8">No product found.</td>
+                            <th>Product Id</th>
+                            <th>Product Name</th>
+                            <th>Cost Price</th>
+                            <th>Selling Price</th>
+                            <th>Unit</th>
+                            <th>Quantity</th>
+                            <th>Category Name</th>
+                            <th>Status</th>
+                            <th>Action</th>
                         </tr>
-                    </c:if>
-                    <c:forEach var="p" items="${products}">
-                        <tr>
-                            <td>${p.productId}</td>
-                            <td>${p.productName}</td>
-                            <td><fmt:formatNumber value="${p.costPrice}" pattern="#,##0.##"/></td>
-                            <td><fmt:formatNumber value="${p.sellingPrice}" pattern="#,##0.##"/></td>
-                            <td>${p.unit}</td>
-                            <td><fmt:formatNumber value="${p.quantityAvailable}" pattern="#,##0"/></td>
-                            <td>${p.categoryName}</td>
-                            <td>${p.productStatus}</td>
-                        </tr>
-                    </c:forEach>
-                </table>
+                        <c:if test="${empty products}">
+                            <tr>
+                                <td colspan="8">No product found.</td>
+                            </tr>
+                        </c:if>
+                        <c:forEach var="p" items="${products}">
+                            <tr>
+                                <td>${p.productId}</td>
+                                <td>${p.productName}</td>
+                                <td><fmt:formatNumber value="${p.costPrice}" pattern="#,##0.##"/></td>
+                                <td><fmt:formatNumber value="${p.sellingPrice}" pattern="#,##0.##"/></td>
+                                <td>${p.unit}</td>
+                                <td><fmt:formatNumber value="${p.quantityAvailable}" pattern="#,##0"/></td>
+                                <td>${p.categoryName}</td>
+                                <td>${p.productStatus}</td>
+                                <td>
+                                    <a href="${pageContext.request.contextPath}/product-detail?id=${p.productId}">View</a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </table>
+                </div>
+                <div>Paging</div>
+                <div><a href="${pageContext.request.contextPath}/dashboard">Back to Dashboard</a></div>
             </div>
         </div>
-        <div><a href="${pageContext.request.contextPath}/dashboard">Back to Dashboard</a></div>
+
     </body>
 </html>

@@ -22,8 +22,8 @@ import service.ProductService;
  *
  * @author ADMIN
  */
-@WebServlet(name = "CreateProduct", urlPatterns = {"/create-product"})
-public class CreateProduct extends HttpServlet {
+@WebServlet(name = "EditProduct", urlPatterns = {"/edit-product"})
+public class EditProduct extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,10 +42,10 @@ public class CreateProduct extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet CreateProduct</title>");
+            out.println("<title>Servlet EditProduct</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet CreateProduct at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet EditProduct at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -68,15 +68,23 @@ public class CreateProduct extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        User u = (User)session.getAttribute("user");
         ProductService pService = new ProductService();
+        String productId = request.getParameter("id");
+        int id = Integer.parseInt(productId);
+        String action = request.getParameter("action");
+        Product p = pService.getProductById(Integer.parseInt(productId));
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();
+        String updateBy = pService.getUpdateByWithProductId(id);
         List<String> statusList = pService.getProductStatus();
-
         request.setAttribute("units", units);
-        request.setAttribute("statusList", statusList);
         request.setAttribute("categories", categories);
-        request.getRequestDispatcher("/views/product/create.jsp").forward(request, response);
+        request.setAttribute("statusList", statusList);
+        request.setAttribute("update_by", updateBy);
+        request.setAttribute("action", action);
+        request.setAttribute("product", p);
+        request.getRequestDispatcher("/views/product/detail.jsp").forward(request, response);
     }
 
     /**
@@ -91,11 +99,18 @@ public class CreateProduct extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        User u = (User)session.getAttribute("user");
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        String productId = request.getParameter("id");
+        int id = Integer.parseInt(productId);
         ProductService pService = new ProductService();
+        Product p = pService.getProductById(Integer.parseInt(productId));
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();
         List<String> statusList = pService.getProductStatus();
+        String updateBy = pService.getUpdateByWithProductId(id);
         String name = request.getParameter("name");
         String costRaw = request.getParameter("cost");
         String sellRaw = request.getParameter("sell");
@@ -104,6 +119,7 @@ public class CreateProduct extends HttpServlet {
         String status = request.getParameter("status");
         String qRaw = request.getParameter("quantity");
         String cRaw = request.getParameter("categoryId");
+        User u = (User)session.getAttribute("user");
         request.setAttribute("units", units);
         request.setAttribute("categories", categories);
         request.setAttribute("statusList", statusList);
@@ -115,8 +131,10 @@ public class CreateProduct extends HttpServlet {
         request.setAttribute("status", status);
         request.setAttribute("quantity", qRaw);
         request.setAttribute("categoryId", cRaw);
+        request.setAttribute("update_by", updateBy);
+        request.setAttribute("product", p);
         String error = null;
-        Product p = new Product();
+        Product p1 = new Product();
         if (name == null || name.trim().isEmpty()
                 || des == null || des.trim().isEmpty()) {
             error = "Please fill data all";
@@ -127,21 +145,22 @@ public class CreateProduct extends HttpServlet {
                 double sell = Double.parseDouble(sellRaw);
                 int q = Integer.parseInt(qRaw);
                 int categoryId = Integer.parseInt(cRaw);
-                p.setCostPrice(cost);
-                p.setSellingPrice(sell);
-                p.setQuantityAvailable(q);
-                p.setUpdatedBy(u.getUserId());
-                p.setCategoryId(categoryId);
-                p.setProductName(name);
-                p.setDescription(des);
-                p.setUnit(unit);
-                p.setProductStatus(status);
-                boolean create = pService.createProduct(p);
-                if (create) {
-                    response.sendRedirect(request.getContextPath() + "/product-list");
+                p1.setCostPrice(cost);
+                p1.setSellingPrice(sell);
+                p1.setQuantityAvailable(q);
+                p1.setUpdatedBy(u.getUserId());
+                p1.setCategoryId(categoryId);
+                p1.setProductName(name);
+                p1.setDescription(des);
+                p1.setUnit(unit);
+                p1.setProductStatus(status);
+                p1.setProductId(id);
+                boolean update = pService.updateProduct(p1);
+                if (update) {
+                    response.sendRedirect(request.getContextPath() + "/product-detail?id="+id);
                     return;
                 } else {
-                    error = "Create Product Failed";
+                    error = "Update Product Failed";
 
                 }
             } catch (NumberFormatException e) {
@@ -149,8 +168,7 @@ public class CreateProduct extends HttpServlet {
             }
 
         }
-        request.setAttribute("error", error);
-        request.getRequestDispatcher("/views/product/create.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/product/detail.jsp").forward(request, response);
 
     }
 
