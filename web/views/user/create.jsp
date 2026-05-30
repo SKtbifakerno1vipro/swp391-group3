@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : create
     Created on : May 29, 2026, 10:53:57 PM
     Author     : omovi
@@ -21,32 +21,32 @@
             <table>
                 <tr>
                     <td>User name: </td>
-                    <td><input type="text" name="userName"></td>
+                    <td><input type="text" name="userName" value="${u.userName}"></td>
                 </tr>
 
                 <tr>
                     <td>Password: </td>
-                    <td><input type="text" name="password"></td>
+                    <td><input type="text" name="password" value="${u.password}"></td>
                 </tr>
                 <tr>
                     <td>Email:  </td>
-                    <td><input type="text" name="email"></td>
+                    <td><input type="text" name="email" value="${u.email}"></td>
                 </tr><tr>
                     <td>Full Name:   </td>
-                    <td><input type="text" name="fullName"></td>
+                    <td><input type="text" name="fullName" value="${u.fullName}"></td>
                 </tr>
                 <tr>
                     <td>Phone:  </td>
-                    <td><input type="text" name="phone"></td>
+                    <td><input type="text" name="phone" value="${u.phone}"></td>
                 </tr>
 
                 <tr>
                     <td>Gender:  </td>
                     <td>
                         <select name="gender">
-                            <option value="M">Male</option>
-                            <option value="F">Female</option>
-                            <option value="O">Other</option>
+                            <option value="M" ${u.gender =='M' ? 'selected' : ''}>Male</option>
+                            <option value="F" ${u.gender =='F' ? 'selected' : ' '} >Female</option>
+                            <option value="O" ${u.gender =='O' ? 'selected' : ''}>Other</option>
                         </select>
                     </td>
                 </tr>
@@ -55,7 +55,7 @@
                     <td>
                         <select id="roleId" name="roleId">
                             <c:forEach var="r" items="${roles}">
-                                <option value="${r.roleId}">${r.roleName}</option>
+                                <option value="${r.roleId}"  ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option>
                             </c:forEach>
                         </select>
 

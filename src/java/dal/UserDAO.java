@@ -69,7 +69,7 @@ public class UserDAO extends DBContext {
     public List<UserRoleDTO> getAllUsers() {
         return searchUsers(0, null);
     }
-    
+
     /// begin - Xhieu
     public List<User> searchUsersV1(int roleId, String status) {
         List<User> list = new ArrayList<>();
@@ -98,7 +98,7 @@ public class UserDAO extends DBContext {
         }
         return list;
     }
-    
+
     public List<User> getAllUsersV1() {
         return searchUsersV1(0, null);
     }
@@ -195,4 +195,33 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
+
+    // Kiem tra trung lap 3 truong cung 1 luc
+    public String checkDuplicate(String username, String email, String phone) {
+        String sql = """
+                     select u.user_name, u.phone, u.email  from [user] u
+                     where  u.user_name= ? or u.phone=? or u.email= ?""";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, phone);
+            ps.setString(3, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                if (username.equals(rs.getString("user_name"))) {
+                    return "User name duplicated";
+                }
+                if (phone.equals(rs.getString("phone"))) {
+                    return "Phone duplicated";
+                }
+                if (email.equals(rs.getString("email"))) {
+                    return "Email duplicated";
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+
+    }
+
 }
