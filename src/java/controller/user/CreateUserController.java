@@ -34,9 +34,16 @@ public class CreateUserController extends HttpServlet {
         u.setEmail(request.getParameter("email"));
         u.setFullName(request.getParameter("fullName"));
         u.setPhone(request.getParameter("phone"));
-        u.setStatus("Active");
+        u.setStatus("ACTIVE");
+        u.setGender(request.getParameter("gender"));
         u.setRoleId(Integer.valueOf(request.getParameter("roleId")));
-        userService.createUser(u);
-        response.sendRedirect(request.getContextPath() + "/user-list");
+        boolean success = userService.createUser(u);
+        if (success) {
+            response.sendRedirect(request.getContextPath() + "/user-list");
+        } else {
+            request.setAttribute("error", "Username, Email da ton tai hoac da xay ra loi!");
+            request.setAttribute("roles", roleService.getAllRoles());
+            request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
+        }
     }
 }

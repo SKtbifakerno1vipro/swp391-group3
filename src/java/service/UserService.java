@@ -22,8 +22,8 @@ public class UserService {
         return userDAO.getUserById(id);
     }
 
-    public void createUser(User user) {
-        userDAO.createUser(user);
+    public boolean createUser(User user) {
+        return userDAO.createUser(user);
     }
 
     public void updateUser(User user) {

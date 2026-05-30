@@ -103,7 +103,7 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-    public void createUser(User u) {
+    public boolean createUser(User u) {
         String sql = "INSERT INTO [user] (user_name, password_hash, email, full_name,gender, phone, account_status, role_id) VALUES (?,?,?,?,?,?,?,?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -117,9 +117,10 @@ public class UserDAO extends DBContext {
             ps.setString(7, u.getStatus());
             ps.setInt(8, u.getRoleId());
 
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("createUser" + e.getMessage());
+            return false;
         }
     }
 

@@ -62,8 +62,8 @@
                                     <td>${u.fullName}</td>
                                     <td>${u.phone}</td>
                                     <td>${u.status}</td>
-                                    <td>${u.roleName}<td>
-
+                                    <td>${u.roleName}</td>
+                                    <td>
                                         <a href="${pageContext.request.contextPath}/user-detail?id=${u.userId}">View</a>
                                     </td>
                                 </tr>

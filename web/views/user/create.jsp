@@ -14,6 +14,9 @@
     </head>
     <body>
         <h1>Create User</h1>
+        <c:if test="${not empty error}">
+            <p style="color:red">${error}</p>
+        </c:if>
         <form action="create-user" method="post">
             <table>
                 <tr>
@@ -37,6 +40,16 @@
                     <td><input type="text" name="phone"></td>
                 </tr>
 
+                <tr>
+                    <td>Gender:  </td>
+                    <td>
+                        <select name="gender">
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                            <option value="O">Other</option>
+                        </select>
+                    </td>
+                </tr>
                 <tr>
                     <td>Role:  </td>
                     <td>
