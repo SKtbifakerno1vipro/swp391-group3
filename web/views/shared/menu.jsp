@@ -12,9 +12,9 @@
         <li><a href="${pageContext.request.contextPath}/user-list">Users</a></li>
 
         <li><a href="${pageContext.request.contextPath}/customer-order-list">Customer Orders</a></li>
-
+        
         <li><a href="${pageContext.request.contextPath}/customer/list">Customers</a></li>
-        <li><a href="${pageContext.request.contextPath}/provider-list">Providers</a></li>
+        <li><a href="${pageContext.request.contextPath}/product-list">Product</a></li>
         <li><a href="${pageContext.request.contextPath}/role-list">Roles</a></li>
         <li><a href="${pageContext.request.contextPath}/logout">Logout</a></li>
     </ul>
