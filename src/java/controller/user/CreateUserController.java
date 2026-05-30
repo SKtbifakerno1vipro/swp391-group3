@@ -20,18 +20,11 @@ public class CreateUserController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("roleList", roleService.getAllRoles());
-        request.getRequestDispatcher("/views/user/form.jsp").forward(request, response);
+        request.setAttribute("roles", roleService.getAllRoles());
+        request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
     }
 
-    boolean isDuplicate(List<User> list, User u) {
-        for (User t : list) {
-            if (t.getEmail().equals(u.getEmail()) || (t.getPhone() != null && t.getPhone().equals(u.getPhone()))) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -41,16 +34,16 @@ public class CreateUserController extends HttpServlet {
         u.setEmail(request.getParameter("email"));
         u.setFullName(request.getParameter("fullName"));
         u.setPhone(request.getParameter("phone"));
-        u.setStatus(request.getParameter("status"));
+        u.setStatus("ACTIVE");
+        u.setGender(request.getParameter("gender"));
         u.setRoleId(Integer.valueOf(request.getParameter("roleId")));
-        List<User> list = userService.getAllUsers();
-        if (isDuplicate(list, u)) {
-            request.setAttribute("error", "Duplicate email or phone");
-            request.setAttribute("u", u);
-            request.setAttribute("roleList", roleService.getAllRoles());
-            request.getRequestDispatcher("/views/user/form.jsp").forward(request, response);
+        boolean success = userService.createUser(u);
+        if (success) {
+            response.sendRedirect(request.getContextPath() + "/user-list");
+        } else {
+            request.setAttribute("error", "Username, Email da ton tai hoac da xay ra loi!");
+            request.setAttribute("roles", roleService.getAllRoles());
+            request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
         }
-        userService.createUser(u);
-        response.sendRedirect(request.getContextPath() + "/user-list");
     }
 }

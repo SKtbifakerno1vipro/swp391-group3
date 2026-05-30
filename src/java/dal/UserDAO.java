@@ -1,5 +1,6 @@
 package dal;
 
+import dto.UserRoleDTO;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,26 +28,66 @@ public class UserDAO extends DBContext {
         return u;
     }
 
-    public List<User> searchUsers(String roleId, String status) {
-        List<User> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM [user] WHERE 1=1");
-        List<Object> params = new ArrayList<>();
-        if (roleId != null && !roleId.isEmpty()) {
-            sql.append(" AND role_id = ?");
-            params.add(Integer.parseInt(roleId));
+    public List<UserRoleDTO> searchUsers(int roleId, String status) {
+        List<UserRoleDTO> list = new ArrayList<>();
+        String sql = "select * from [user] u "
+                + "join dbo.role r  on u.role_id= r.role_id where 1=1";
+        if (roleId > 0) {
+            sql += " and u.role_id= ?";
         }
         if (status != null && !status.isEmpty()) {
-            sql.append(" AND account_status = ?");
-            params.add(status);
+            sql += " and u.account_status= ?";
         }
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) {
-                Object param = params.get(i);
-                if (param instanceof Integer) {
-                    ps.setInt(i + 1, (Integer) param);
-                } else {
-                    ps.setString(i + 1, param.toString());
-                }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int index = 1;
+            if (roleId > 0) {
+                ps.setInt(index++, roleId);
+            }
+            if (status != null && !status.isEmpty()) {
+                ps.setString(index++, status);
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                UserRoleDTO u = new UserRoleDTO();
+                u.setUserId(rs.getInt("user_id"));
+                u.setUserName(rs.getString("user_name"));
+                u.setEmail(rs.getString("email"));
+                u.setFullName(rs.getString("full_name"));
+                u.setPhone(rs.getString("phone"));
+                u.setStatus(rs.getString("account_status"));
+                u.setRoleId(rs.getInt("role_id"));
+                u.setRoleName(rs.getString("role_name"));
+                list.add(u);
+
+            }
+        } catch (Exception e) {
+            System.out.println("searchUser" + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<UserRoleDTO> getAllUsers() {
+        return searchUsers(0, null);
+    }
+    
+    /// begin - Xhieu
+    public List<User> searchUsersV1(int roleId, String status) {
+        List<User> list = new ArrayList<>();
+        String sql = "select * from [user] u "
+                + "join dbo.role r  on u.role_id= r.role_id where 1=1";
+        if (roleId > 0) {
+            sql += " and u.role_id= ?";
+        }
+        if (status != null && !status.isEmpty()) {
+            sql += " and u.account_status= ?";
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int index = 1;
+            if (roleId > 0) {
+                ps.setInt(index++, roleId);
+            }
+            if (status != null && !status.isEmpty()) {
+                ps.setString(index++, status);
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -57,10 +98,11 @@ public class UserDAO extends DBContext {
         }
         return list;
     }
-
-    public List<User> getAllUsers() {
-        return searchUsers(null, null);
+    
+    public List<User> getAllUsersV1() {
+        return searchUsersV1(0, null);
     }
+    /// end - Xhieu
 
     public User getUserById(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
@@ -68,8 +110,24 @@ public class UserDAO extends DBContext {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                User u = mapUser(rs);
+
+                User u = new User();
+                u.setUserId(rs.getInt("user_id"));
+                u.setUserName(rs.getString("user_name"));
                 u.setPassword(rs.getString("password_hash"));
+                u.setEmail(rs.getString("email"));
+                u.setGender(rs.getString("gender"));
+                u.setFullName(rs.getString("full_name"));
+                u.setPhone(rs.getString("phone"));
+                u.setStatus(rs.getString("account_status"));
+                u.setRoleId(rs.getInt("role_id"));
+//                if (rs.getTimestamp("create_at") != null) {
+//                    u.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
+//                }
+//                if (rs.getTimestamp("update_at") != null) {
+//                    u.setUpdateAt(rs.getTimestamp("update_at").toLocalDateTime());
+//                }
+
                 return u;
             }
         } catch (Exception e) {
@@ -78,40 +136,40 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-    public void createUser(User u) {
-        String sql = "INSERT INTO [user] (user_name, password_hash, email, full_name, phone, account_status, role_id) VALUES (?,?,?,?,?,?,?)";
+    public boolean createUser(User u) {
+        String sql = "INSERT INTO [user] (user_name, password_hash, email, full_name,gender, phone, account_status, role_id) VALUES (?,?,?,?,?,?,?,?)";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, u.getUserName());
             String hash = BCrypt.hashpw(u.getPassword(), BCrypt.gensalt());
             ps.setString(2, hash);
             ps.setString(3, u.getEmail());
             ps.setString(4, u.getFullName());
-            ps.setString(5, u.getPhone());
-            ps.setString(6, u.getStatus());
-            ps.setInt(7, u.getRoleId());
-            ps.executeUpdate();
+            ps.setString(5, u.getGender());
+            ps.setString(6, u.getPhone());
+            ps.setString(7, u.getStatus());
+            ps.setInt(8, u.getRoleId());
+
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("createUser" + e.getMessage());
+            return false;
         }
     }
 
     public boolean updateUser(User user) {
         try {
-            boolean hasPassword = user.getPassword() != null && !user.getPassword().isBlank();
-            String sql = hasPassword
-                    ? "UPDATE [user] SET full_name = ?, phone = ?, account_status = ?, password_hash = ?, updated_at = GETDATE() WHERE user_id = ?"
-                    : "UPDATE [user] SET full_name = ?, phone = ?, account_status = ?, updated_at = GETDATE() WHERE user_id = ?";
+
+            String sql = "UPDATE [user] SET full_name = ?, phone = ?, account_status = ?, gender = ?, role_id=? ,  updated_at = GETDATE() WHERE user_id = ?";
+
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1, user.getFullName());
             stm.setString(2, user.getPhone());
             stm.setString(3, user.getStatus());
-            if (hasPassword) {
-                String hash = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-                stm.setString(4, hash);
-                stm.setInt(5, user.getUserId());
-            } else {
-                stm.setInt(4, user.getUserId());
-            }
+            stm.setString(4, user.getGender());
+            stm.setInt(5, user.getRoleId());
+            stm.setInt(6, user.getUserId());
+
             return stm.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("updateUser" + e.getMessage());

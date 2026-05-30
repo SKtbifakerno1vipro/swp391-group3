@@ -109,9 +109,8 @@ public class CustomerDAO extends DBContext {
 
     public List<User> getAllUsers() {
         UserDAO uDAO = new UserDAO();
-        return uDAO.getAllUsers();
+        return uDAO.getAllUsersV1();
     }
-
     public Customer getCustomerByCustomerId(int id) {
         try {
             String sql = "SELECT * FROM [customer] WHERE customer_id = ?";
@@ -163,8 +162,10 @@ public class CustomerDAO extends DBContext {
             ResultSet rs = stmId.executeQuery();
             if (rs.next()) {
                 int userId = rs.getInt("user_id");
+
                 String sqlCustomer = "INSERT INTO [customer] (user_id, tax_code, customer_type, company_name, assigned_to_user_id, created_at, updated_at) "
                         + "VALUES (?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+
                 PreparedStatement stmCustomer = connection.prepareStatement(sqlCustomer);
                 stmCustomer.setInt(1, userId);
                 stmCustomer.setString(2, customer.getTaxCode());
