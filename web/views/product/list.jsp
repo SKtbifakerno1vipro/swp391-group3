@@ -6,6 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -15,7 +16,7 @@
     <body>
         <div>
             <h2>Products</h2>
-            <div><a href="${pageContext.request.contextPath}/create-product"></a></div>
+            
             <div><form action="${pageContext.request.contextPath}/product-list" method="get">
                     <table>
                         <tr>
@@ -24,21 +25,17 @@
                         </tr>
                         <tr>
                             <td colspan="2">
-                               
-                                    Category
-                                    <select name="categoryId">
-                                        <c:forEach var="c" items="${categories}">
-                                            <option value="${c.categoryId}" ${c.categoryId == categoryId ? 'selected' : ''}>${c.categoryName}</option>
-                                        </c:forEach>
-                                    </select>
-
-                                
-                                | Status
+                                Category
+                                <select name="categoryId">
+                                    <c:forEach var="c" items="${categories}">
+                                        <option value="${c.categoryId}" ${c.categoryId == categoryId ? 'selected' : ''}>${c.categoryName}</option>
+                                    </c:forEach>
+                                </select>
+                                |Status
                                 <select name="status">
                                     <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Active</option>
                                     <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>Inactive</option>
                                 </select>
-
                             </td>
                         </tr>
                         <tr>
@@ -49,6 +46,8 @@
             </div>
             <div>
                 <h3>Product List</h3>
+                <div><a href="${pageContext.request.contextPath}/create-product">Create Product</a></div>
+                
                 <table border="1">
                     <tr>
                         <th>Product Id</th>
@@ -69,10 +68,10 @@
                         <tr>
                             <td>${p.productId}</td>
                             <td>${p.productName}</td>
-                            <td>${p.costPrice}</td>
-                            <td>${p.sellingPrice}</td>
+                            <td><fmt:formatNumber value="${p.costPrice}" pattern="#,##0.##"/></td>
+                            <td><fmt:formatNumber value="${p.sellingPrice}" pattern="#,##0.##"/></td>
                             <td>${p.unit}</td>
-                            <td>${p.quantityAvailable}</td>
+                            <td><fmt:formatNumber value="${p.quantityAvailable}" pattern="#,##0"/></td>
                             <td>${p.categoryName}</td>
                             <td>${p.productStatus}</td>
                         </tr>
@@ -80,5 +79,6 @@
                 </table>
             </div>
         </div>
+        <div><a href="${pageContext.request.contextPath}/dashboard">Back to Dashboard</a></div>
     </body>
 </html>

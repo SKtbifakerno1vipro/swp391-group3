@@ -1,13 +1,13 @@
 package model;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDateTime;
 
 public class Product {
     private int productId;
     private String productName;
-    private BigDecimal costPrice;
-    private BigDecimal sellingPrice;
+    private double costPrice;
+    private double sellingPrice;
     private String description;
     private String unit;
     private String productStatus;
@@ -37,19 +37,19 @@ public class Product {
         this.productName = productName;
     }
 
-    public BigDecimal getCostPrice() {
+    public double getCostPrice() {
         return costPrice;
     }
 
-    public void setCostPrice(BigDecimal costPrice) {
+    public void setCostPrice(double costPrice) {
         this.costPrice = costPrice;
     }
 
-    public BigDecimal getSellingPrice() {
+    public double getSellingPrice() {
         return sellingPrice;
     }
 
-    public void setSellingPrice(BigDecimal sellingPrice) {
+    public void setSellingPrice(double sellingPrice) {
         this.sellingPrice = sellingPrice;
     }
 

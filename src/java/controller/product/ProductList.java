@@ -11,6 +11,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import model.Category;
@@ -62,27 +63,29 @@ public class ProductList extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
         ProductService pService = new ProductService();
         List<Product> products = pService.getAllProducts();
         List<Category> categories = pService.getAllCategory();
-
+        String status = request.getParameter("status");
+        String search = request.getParameter("search");
+        String searchText = request.getParameter("searchText");
         Category c = new Category();
         c.setCategoryId(0);
         c.setCategoryName("All Category");
         categories.add(0, c);
-        String status = request.getParameter("status");
-        String search = request.getParameter("search");
-        String searchText = request.getParameter("searchText");
         Integer categoryId = null;
         if ("Search".equals(search)) {
             request.setAttribute("searchText", searchText);
             categoryId = Integer.parseInt(request.getParameter("categoryId"));
             request.setAttribute("categoryId", categoryId);
             request.setAttribute("status", status);
-            request.setAttribute("products", pService.searchProduct(searchText, categoryId, status));
-        } else {
-            request.setAttribute("products", pService.getAllProducts());
         }
+        request.setAttribute("products", pService.searchProduct(searchText, categoryId, status));
         request.setAttribute("categories", categories);
         request.getRequestDispatcher("/views/product/list.jsp").forward(request, response);
     }

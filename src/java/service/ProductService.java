@@ -31,4 +31,12 @@ public class ProductService {
     public List<Category> getAllCategory(){
         return productDAO.getAllCategory();
     }
+    
+    public List<String> getProductUnit(){
+        return productDAO.getProductUnit();
+    }
+    
+    public List<String> getProductStatus(){
+        return productDAO.getProductStatus();
+    }
 }
