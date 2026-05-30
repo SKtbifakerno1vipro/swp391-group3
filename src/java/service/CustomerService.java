@@ -22,9 +22,9 @@ public class CustomerService {
         return customerDAO.getCustomerByUserId(userId);
     }
 
-    public List<User> getAllUsers() {
-        return customerDAO.getAllUsers();
-    }
+//    public List<User> getAllUsers() {
+//        return customerDAO.getAllUsers();
+//    }
 
     public Customer getCustomerByCustomerId(int id) {
         return customerDAO.getCustomerByCustomerId(id);

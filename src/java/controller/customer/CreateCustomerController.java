@@ -19,9 +19,9 @@ public class CreateCustomerController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<User> users = customerService.getAllUsers();
+     //   List<User> users = customerService.getAllUsers();
         Integer customerRoleId = customerService.getRoleIdByName("Customer");
-        request.setAttribute("users", users);
+     //   request.setAttribute("users", users);
         request.setAttribute("customerRoleId", customerRoleId);
         request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
     }
