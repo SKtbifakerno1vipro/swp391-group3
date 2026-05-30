@@ -24,8 +24,6 @@ public class CreateUserController extends HttpServlet {
         request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
     }
 
-
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User u = new User();
@@ -36,12 +34,24 @@ public class CreateUserController extends HttpServlet {
         u.setPhone(request.getParameter("phone"));
         u.setStatus("ACTIVE");
         u.setGender(request.getParameter("gender"));
-        u.setRoleId(Integer.valueOf(request.getParameter("roleId")));
+        u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
+
+        // 1. Kiem tra trung lap bang 1 ham duy nhat
+        String duplicateError = userService.checkDuplicate(u.getUserName(), u.getEmail(), u.getPhone());
+        if (duplicateError != null) {
+            request.setAttribute("error", duplicateError);
+            request.setAttribute("roles", roleService.getAllRoles());
+            request.setAttribute("u", u);
+            request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
+            return;
+        }
+
+        // 2. Neu khong trung lap thi thuc thi insert
         boolean success = userService.createUser(u);
         if (success) {
             response.sendRedirect(request.getContextPath() + "/user-list");
         } else {
-            request.setAttribute("error", "Username, Email da ton tai hoac da xay ra loi!");
+            request.setAttribute("error", "Loi he thong khi tao User!");
             request.setAttribute("roles", roleService.getAllRoles());
             request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
         }
