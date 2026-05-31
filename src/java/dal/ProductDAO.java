@@ -42,7 +42,7 @@ public class ProductDAO extends DBContext {
     }
 
     public boolean createProduct(Product product) {
-        
+
         try {
             String sql = "INSERT INTO product (product_name, cost_price, selling_price, [description], "
                     + "unit, product_status, quantity_available, category_id, updated_by) "
@@ -58,13 +58,13 @@ public class ProductDAO extends DBContext {
             ps.setInt(7, product.getQuantityAvailable());
             ps.setInt(8, product.getCategoryId());
             ps.setObject(9, product.getUpdatedBy());
-            if (product.getCategoryId()!= null){
+            if (product.getCategoryId() != null) {
                 ps.setInt(8, product.getCategoryId());
             } else {
                 ps.setInt(8, java.sql.Types.INTEGER);
             }
-            
-            if (product.getUpdatedBy()!= null){
+
+            if (product.getUpdatedBy() != null) {
                 ps.setInt(9, product.getUpdatedBy());
             } else {
                 ps.setInt(9, java.sql.Types.INTEGER);
@@ -73,8 +73,9 @@ public class ProductDAO extends DBContext {
             return true;
         } catch (Exception e) {
             System.out.println("createProduct: " + e.getMessage());
-            
-        }return false;
+
+        }
+        return false;
     }
 
     public boolean updateProduct(Product product) {
@@ -116,11 +117,57 @@ public class ProductDAO extends DBContext {
             if (searchText != null && !searchText.trim().isEmpty()) {
                 sql += " and product_name LIKE ?";
             }
-            if ( categoryId != null && categoryId != 0) {
+            if (categoryId != null && categoryId > 0) {
                 sql += " and p.category_id = ?";
             }
             if (status != null && !status.trim().isEmpty()) {
                 sql += " and p.product_status = ?";
+            }
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            int index = 1;
+            if (searchText != null && !searchText.trim().isEmpty()) {
+                ps.setString(index++, "%" + searchText + "%");
+            }
+            if (categoryId != null && categoryId != 0) {
+                ps.setInt(index++, categoryId);
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Product p = mapResultSetToProduct(rs);
+                list.add(p);
+            }
+        } catch (Exception e) {
+            System.out.println("searchProduct: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<Product> searchProduct(String searchText, Integer categoryId, String status, int pageSize, int totalRow, int page, int totalPage) {
+        List<Product> list = new ArrayList<>();
+        try {
+            String sql = """
+                         select * from product p join category c on p.category_id = c.category_id WHERE 1 = 1
+                         """;
+            if (searchText != null && !searchText.trim().isEmpty()) {
+                sql += " and product_name LIKE ?";
+            }
+            if (categoryId != null && categoryId > 0) {
+                sql += " and p.category_id = ?";
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                sql += " and p.product_status = ?";
+            }
+            
+            if ((page > 0 && page <= totalPage) && pageSize > 0 && totalRow > 0) {
+                sql += """
+                   \n order by product_id
+                   offset ? rows
+                   fetch next ? rows only
+                   """;
             }
             PreparedStatement ps = connection.prepareStatement(sql);
             int index = 1;
@@ -128,10 +175,16 @@ public class ProductDAO extends DBContext {
                 ps.setString(index++, "%" + searchText + "%");
             }
             if (categoryId != null && categoryId != 0) {
-               ps.setInt(index++, categoryId);
+                ps.setInt(index++, categoryId);
             }
             if (status != null && !status.trim().isEmpty()) {
-                 ps.setString(index++, status);
+                ps.setString(index++, status);
+            }
+
+            if ((page > 0 && page <= totalPage) && pageSize > 0 && totalRow > 0) {
+
+                ps.setInt(index++, (int) ((page - 1) * pageSize));
+                ps.setInt(index++, pageSize);
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -169,7 +222,45 @@ public class ProductDAO extends DBContext {
         return p;
     }
 
-    public String getUpdateByWithProductId(int id){
+    public int countProduct(String searchText, Integer categoryId, String status) {
+        try {
+            String sql = """
+                         select COUNT(*) as total
+                         from product p join category c on c.category_id = p.category_id
+                         where 1=1
+                         """;
+            if (searchText != null && !searchText.trim().isEmpty()) {
+                sql += " and product_name LIKE ?";
+            }
+            if (categoryId != null && categoryId > 0) {
+                sql += " and p.category_id = ?";
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                sql += " and p.product_status = ?";
+            }
+            PreparedStatement ps = connection.prepareStatement(sql);
+            int index = 1;
+            if (searchText != null && !searchText.trim().isEmpty()) {
+                ps.setString(index++, "%" + searchText + "%");
+            }
+            if (categoryId != null && categoryId != 0) {
+                ps.setInt(index++, categoryId);
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+
+        } catch (Exception e) {
+            System.out.println("countProduct: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public String getUpdateByWithProductId(int id) {
         try {
             String sql = """
                          select u.user_name as update_by from product p join [user] u on u.user_id = p.updated_by
@@ -186,8 +277,8 @@ public class ProductDAO extends DBContext {
         }
         return null;
     }
-    
-    public List<String> getProductUnit(){
+
+    public List<String> getProductUnit() {
         List<String> list = new ArrayList<>();
         try {
             String sql = """
@@ -197,7 +288,7 @@ public class ProductDAO extends DBContext {
                          """;
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {                
+            while (rs.next()) {
                 list.add(rs.getString("unit"));
             }
         } catch (Exception e) {
@@ -205,9 +296,8 @@ public class ProductDAO extends DBContext {
         }
         return list;
     }
-    
-    
-    public List<String> getProductStatus(){
+
+    public List<String> getProductStatus() {
         List<String> list = new ArrayList<>();
         try {
             String sql = """
@@ -217,7 +307,7 @@ public class ProductDAO extends DBContext {
                          """;
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {                
+            while (rs.next()) {
                 list.add(rs.getString("product_status"));
             }
         } catch (Exception e) {
@@ -225,7 +315,7 @@ public class ProductDAO extends DBContext {
         }
         return list;
     }
-    
+
     public List<Category> getAllCategory() {
         List<Category> list = new ArrayList<>();
         try {

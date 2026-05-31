@@ -24,7 +24,7 @@ import service.ProductService;
  */
 @WebServlet(name = "CreateProduct", urlPatterns = {"/create-product"})
 public class CreateProduct extends HttpServlet {
-
+    private final ProductService pService = new ProductService();
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -68,7 +68,7 @@ public class CreateProduct extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        ProductService pService = new ProductService();
+        
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();
         List<String> statusList = pService.getProductStatus();
@@ -92,7 +92,6 @@ public class CreateProduct extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         User u = (User)session.getAttribute("user");
-        ProductService pService = new ProductService();
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();
         List<String> statusList = pService.getProductStatus();
