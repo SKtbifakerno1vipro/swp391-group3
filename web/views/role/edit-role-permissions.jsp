@@ -1,150 +1,56 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.util.List"%>
-<%@page import="java.util.Set"%>
-<%@page import="model.Role"%>
-<%@page import="model.Permission"%>
-
-<%
-    Role role = (Role) request.getAttribute("role");
-    List<Permission> permissionList = (List<Permission>) request.getAttribute("permissionList");
-    Set<Integer> selectedPermissionIds = (Set<Integer>) request.getAttribute("selectedPermissionIds");
-
-    if (role == null) {
-        response.sendRedirect(request.getContextPath() + "/role-list");
-        return;
-    }
-
-    if (permissionList == null) {
-        permissionList = new java.util.ArrayList<>();
-    }
-
-    if (selectedPermissionIds == null) {
-        selectedPermissionIds = new java.util.HashSet<>();
-    }
-%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <title>Edit Role Permissions</title>
-    
 </head>
-
 <body>
 
-<main>
+    <h2>Edit Permissions for Role: ${role.roleName}</h2>
 
-    <a href="${pageContext.request.contextPath}/role-list">
-        &larr; Back to Role List
-    </a>
-
-    <h1>Edit Role Permissions</h1>
     <p>
-        Manage permissions for role:
-        <strong><%= role.getRoleName() %></strong>
+        <a href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}">
+            Back to Role Detail
+        </a>
     </p>
 
-    <div>
-        <div>
-            <div>
-                <p>Role ID</p>
-                <p>R-<%= role.getRoleId() %></p>
-            </div>
-
-            <div>
-                <p>Role Name</p>
-                <p><%= role.getRoleName() %></p>
-            </div>
-
-            <div>
-                <p>Created At</p>
-                <p><%= role.getCreateAt() != null ? role.getCreateAt() : "-" %></p>
-            </div>
-
-            <div>
-                <p>Updated At</p>
-                <p><%= role.getUpdateAt() != null ? role.getUpdateAt() : "-" %></p>
-            </div>
-        </div>
-    </div>
-
     <form action="${pageContext.request.contextPath}/edit-role-permissions" method="post">
+        <input type="hidden" name="roleId" value="${role.roleId}">
 
-        <input type="hidden" name="roleId" value="<%= role.getRoleId() %>">
+        <table border="1" cellpadding="8" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Permission ID</th>
+                    <th>Permission Name</th>
+                    <th>Enabled</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="permission" items="${permissionList}">
+                    <tr>
+                        <td>${permission.permissionId}</td>
+                        <td>${permission.permissionName}</td>
+                        <td>
+                            <input type="checkbox"
+                                   name="permissionIds"
+                                   value="${permission.permissionId}"
+                                   <c:if test="${selectedPermissionIds.contains(permission.permissionId)}">checked</c:if>>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
 
-        <div>
-            <span>
-                <%= selectedPermissionIds.size() %> permissions enabled
-            </span>
+        <br>
 
-            <label>
-                <input type="checkbox" id="selectAll">
-                Select All Permissions
-            </label>
-        </div>
-
-        <div>
-
-            <div>
-                System Permissions
-            </div>
-
-            <div>
-
-                <%
-                    for (Permission permission : permissionList) {
-                        boolean checked = selectedPermissionIds.contains(permission.getPermissionId());
-                %>
-
-                <div>
-
-                    <div>
-                        <p><%= permission.getPermissionName() %></p>
-                        <p>
-                            Allow this role to access <%= permission.getPermissionName() %>.
-                        </p>
-                    </div>
-
-                    <input type="checkbox"
-                           name="permissionIds"
-                           value="<%= permission.getPermissionId() %>"
-                           <%= checked ? "checked" : "" %>>
-
-                </div>
-
-                <%
-                    }
-                %>
-
-            </div>
-        </div>
-
-        <div>
-
-            <a href="${pageContext.request.contextPath}/role-list">
-                Cancel
-            </a>
-
-            <button type="submit">
-                Save Permission Changes
-            </button>
-
-        </div>
-
+        <button type="submit">Save Permissions</button>
+        <a href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}">
+            Cancel
+        </a>
     </form>
-
-</main>
-
-<script>
-    const selectAll = document.getElementById("selectAll");
-    const checkboxes = document.querySelectorAll(".permission-checkbox");
-
-    selectAll.addEventListener("change", function () {
-        checkboxes.forEach(cb => cb.checked = selectAll.checked);
-    });
-</script>
 
 </body>
 </html>
-
