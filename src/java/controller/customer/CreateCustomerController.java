@@ -24,7 +24,6 @@ public class CreateCustomerController extends HttpServlet {
             throws ServletException, IOException {
         Integer customerRoleId = roleService.getRoleIdByName("Customer");
         request.setAttribute("users", userService.getAllUsersReturnUser());
-        request.setAttribute("customerRoleId", customerRoleId);
         request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
     }
 
@@ -47,7 +46,6 @@ public class CreateCustomerController extends HttpServlet {
         List<User> users = new ArrayList<>();
         request.setAttribute("users", users);
         Integer customerRoleId = roleService.getRoleIdByName("Customer");
-        request.setAttribute("customerRoleId", customerRoleId);
 
         if (userName == null || userName.isBlank()
                 || password == null || password.isBlank()
@@ -73,7 +71,6 @@ public class CreateCustomerController extends HttpServlet {
             u.setFullName(fullName);
             u.setPhone(phone);
             u.setStatus(status);
-            u.setRoleId(roleId);
 
             Customer c = new Customer();
             c.setTaxCode(taxCode);
@@ -84,7 +81,6 @@ public class CreateCustomerController extends HttpServlet {
             }
 
             Customer createdCustomer = customerService.createCustomerDTO(u, c);
-
             if (createdCustomer != null && createdCustomer.getUserId() != null && createdCustomer.getUserId() > 0) {
                 request.setAttribute("success", true);
             } else {
