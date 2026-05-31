@@ -28,7 +28,7 @@ public class UserDAO extends DBContext {
         return u;
     }
 
-    public List<UserRoleDTO> searchUsers(int roleId, String status) {
+    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword) {
         List<UserRoleDTO> list = new ArrayList<>();
         String sql = "select * from [user] u "
                 + "join dbo.role r  on u.role_id= r.role_id where 1=1";
@@ -38,6 +38,11 @@ public class UserDAO extends DBContext {
         if (status != null && !status.isEmpty()) {
             sql += " and u.account_status= ?";
         }
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql += " AND (u.full_name LIKE ? OR u.phone LIKE ?)";
+        }
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
             if (roleId > 0) {
@@ -45,6 +50,11 @@ public class UserDAO extends DBContext {
             }
             if (status != null && !status.isEmpty()) {
                 ps.setString(index++, status);
+            }
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String searchPattern = "%" + keyword.trim() + "%";
+                ps.setString(index++, searchPattern);
+                ps.setString(index++, searchPattern);
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -67,7 +77,7 @@ public class UserDAO extends DBContext {
     }
 
     public List<UserRoleDTO> getAllUsers() {
-        return searchUsers(0, null);
+        return searchUsers(0, null, null);
     }
 
     /// begin - Xhieu
@@ -197,14 +207,15 @@ public class UserDAO extends DBContext {
     }
 
     // Kiem tra trung lap 3 truong cung 1 luc
-    public String checkDuplicate(String username, String email, String phone) {
+    public String checkDuplicate(String username, String email, String phone, int userId) {
         String sql = """
                      select u.user_name, u.phone, u.email  from [user] u
-                     where  u.user_name= ? or u.phone=? or u.email= ?""";
+                     where  (u.user_name= ? or u.phone=? or u.email= ?) and u.user_id != ?""";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             ps.setString(2, phone);
             ps.setString(3, email);
+            ps.setInt(4, userId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 if (username.equals(rs.getString("user_name"))) {
