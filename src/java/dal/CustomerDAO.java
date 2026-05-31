@@ -6,7 +6,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import model.Customer;
-import dto.CustomerDTO;
 import model.User;
 
 public class CustomerDAO extends DBContext {
@@ -138,5 +137,94 @@ public class CustomerDAO extends DBContext {
     
     public String getLastError() {
         return error;
+    }
+    
+    public List<Customer> searchAndPaginateCustomers(String searchName, String type, int page, int pageSize) {
+        List<Customer> list = new ArrayList<>();
+
+        // 1. Dùng LEFT JOIN để kéo dữ liệu từ bảng [user] sang so khớp
+        String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id "
+                   + ", u.created_at, u.updated_at "
+                   + "FROM customer c "
+                   + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                   + "WHERE 1=1 "; 
+
+        // 2. Xử lý cụm tìm kiếm chung (Gộp bằng toán tử OR và bọc trong ngoặc đơn để không phá vỡ logic các điều kiện khác)
+        boolean hasSearch = (searchName != null && !searchName.isBlank());
+        if (hasSearch) {
+            sql += "AND (u.full_name LIKE ? OR u.phone LIKE ? OR c.tax_code LIKE ? OR u.email LIKE ?) ";
+        }
+
+        // 3. Điều kiện loại khách hàng (Bắt buộc thỏa mãn đồng thời nên dùng AND bên ngoài)
+        if (type != null && !type.isBlank()) {
+            sql += "AND c.customer_type = ? ";
+        }
+
+        // 4. Đuôi phân trang cố định
+        sql += "ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        int offset = (page - 1) * pageSize;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            int index = 1;
+
+            // 5. Gán giá trị động cho cụm OR (1 từ khóa searchName được gán lặp lại cho 4 dấu chấm hỏi)
+            if (hasSearch) {
+                String searchPattern = "%" + searchName.trim() + "%";
+                stm.setString(index++, searchPattern); // u.full_name
+                stm.setString(index++, searchPattern); // u.phone
+                stm.setString(index++, searchPattern); // c.tax_code
+                stm.setString(index++, searchPattern); // u.email
+            }
+
+            // 6. Gán giá trị cho customer_type
+            if (type != null && !type.isBlank()) {
+                stm.setString(index++, type.trim());
+            }
+
+            // 7. Gán tham số phân trang
+            stm.setInt(index++, offset);
+            stm.setInt(index++, pageSize);
+
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                list.add(mapCustomer(rs)); // Trả về Customer thô, map bằng hàm nội bộ sẵn có của bạn
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            error = "searchAndPaginateCustomers: " + e.getMessage();
+        }
+        return list;
+    }
+    public int getTotalCustomersCount(String searchName, String type) {
+        String sql = "SELECT COUNT(*) FROM customer c LEFT JOIN [user] u ON c.user_id = u.user_id WHERE 1=1 ";
+
+        boolean hasSearch = (searchName != null && !searchName.isBlank());
+        if (hasSearch) {
+            sql += "AND (u.full_name LIKE ? OR u.phone LIKE ? OR c.tax_code LIKE ? OR u.email LIKE ?) ";
+        }
+        if (type != null && !type.isBlank()) {
+            sql += "AND c.customer_type = ? ";
+        }
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            int index = 1;
+            if (hasSearch) {
+                String searchPattern = "%" + searchName.trim() + "%";
+                stm.setString(index++, searchPattern);
+                stm.setString(index++, searchPattern);
+                stm.setString(index++, searchPattern);
+                stm.setString(index++, searchPattern);
+            }
+            if (type != null && !type.isBlank()) {
+                stm.setString(index++, type.trim());
+            }
+
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
