@@ -31,12 +31,12 @@
 
                 <tr>
                     <td>Email:  </td>
-                    <td><input type="email" name="email" value="${u.email}"></td>
+                    <td><input type="email" name="email" value="${u.email}" required></td>
                 </tr>
 
                 <tr>
                     <td>Full Name:   </td>
-                    <td><input type="text" name="fullName" value="${u.fullName}"></td>
+                    <td><input type="text" name="fullName" value="${u.fullName}" required minlength="4" maxlength="50"></td>
                 </tr>
                 <tr>
                     <td>Phone:  </td>

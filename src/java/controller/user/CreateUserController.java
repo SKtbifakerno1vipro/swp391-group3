@@ -17,8 +17,7 @@ public class CreateUserController extends HttpServlet {
 
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
-    private final Validation validate = new Validation();
-
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setAttribute("roles", roleService.getAllRoles());
@@ -41,16 +40,16 @@ public class CreateUserController extends HttpServlet {
 
         //1. check validate data
         if (error == null) {
-            error = validate.validateEmpty(u.getUserName(), "User name");
+            error = Validation.validateEmpty(u.getUserName(), "User name");
         }
         if (error == null) {
-            error = validate.validateEmpty(u.getPassword(), "Password");
+            error = Validation.validatePassword(u.getPassword());
         }
         if (error == null) {
-            error = validate.validateEmail(u.getEmail());
+            error = Validation.validateEmail(u.getEmail());
         }
         if (error == null) {
-            error = validate.validatePhone(u.getPhone());
+            error = Validation.validatePhone(u.getPhone());
         }
 
         if (error == null) {

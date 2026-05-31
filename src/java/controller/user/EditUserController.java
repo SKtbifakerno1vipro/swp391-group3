@@ -1,6 +1,7 @@
 package controller.user;
 
 import service.*;
+import utils.Validation;
 import dal.RoleDAO;
 import model.User;
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class EditUserController extends HttpServlet {
 
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
-
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String idStr = request.getParameter("id");
@@ -43,28 +44,68 @@ public class EditUserController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User u = new User();
+        String error = null;
 
+        // 1. Gán dữ liệu cơ bản
         String userIdStr = request.getParameter("id");
         if (userIdStr != null && !userIdStr.isEmpty()) {
-            u.setUserId(Integer.parseInt(userIdStr));
+            try {
+                u.setUserId(Integer.parseInt(userIdStr));
+            } catch (NumberFormatException e) {
+                u.setUserId(0);
+            }
         }
+        
+        u.setUserName(request.getParameter("userName")); // Dù readonly vẫn được gửi lên để hiển thị lại nếu có lỗi
         u.setEmail(request.getParameter("email"));
         u.setFullName(request.getParameter("fullName"));
         u.setPhone(request.getParameter("phone"));
         u.setStatus(request.getParameter("status"));
         u.setGender(request.getParameter("gender"));
-        u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
-        String duplicateError = userService.checkDuplicate(u.getUserName(), u.getEmail(), u.getPhone(), u.getUserId());
-        if (duplicateError != null) {
-            request.setAttribute("u", u);
+        
+        try {
+            u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
+        } catch (NumberFormatException e) {
+            u.setRoleId(0);
+        }
+
+
+        if (error == null) {
+            error = Validation.validateEmpty(u.getFullName(), "Full Name");
+        }
+        if (error == null) {
+            error = Validation.validateEmail(u.getEmail());
+        }
+        if (error == null) {
+            error = Validation.validatePhone(u.getPhone());
+        }
+
+      
+        if (error == null) {
+           
+            error = userService.checkDuplicate(u.getUserName(), u.getEmail(), u.getPhone(), u.getUserId());
+        }
+
+        
+        if (error != null) {
+            request.setAttribute("error", error);
             request.setAttribute("roles", roleService.getAllRoles());
+            request.setAttribute("u", u);
             request.setAttribute("mode", "edit");
-            request.setAttribute("error", duplicateError);
             request.getRequestDispatcher("/views/user/detail.jsp").forward(request, response);
             return;
         }
 
-        userService.updateUser(u);
-        response.sendRedirect(request.getContextPath() + "/user-list");
+        
+        boolean success = userService.updateUser(u);
+        if (success) {
+            response.sendRedirect(request.getContextPath() + "/user-list");
+        } else {
+            request.setAttribute("error", "Lỗi hệ thống khi cập nhật User!");
+            request.setAttribute("roles", roleService.getAllRoles());
+            request.setAttribute("u", u);
+            request.setAttribute("mode", "edit");
+            request.getRequestDispatcher("/views/user/detail.jsp").forward(request, response);
+        }
     }
 }

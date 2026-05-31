@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import model.Role;
-import org.apache.tomcat.jakartaee.EESpecProfile;
 
 public class RoleDAO extends DBContext {
 
