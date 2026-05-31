@@ -26,15 +26,15 @@ public class UserService {
         return userDAO.createUser(user);
     }
 
-    public void updateUser(User user) {
-        userDAO.updateUser(user);
+    public boolean updateUser(User user) {
+        return userDAO.updateUser(user);
     }
 
     public User login(String username, String password) {
         return userDAO.login(username, password);
     }
     
-    /// begin - Xhieu - có thắc mắc gì nói với tôi
+    // begin - Xhieu - contact me wwhen remove
     public User getUserByIdFullParameter(int id) {
         return userDAO.getUserByIdFullParameter(id);
     }

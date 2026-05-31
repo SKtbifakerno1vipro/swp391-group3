@@ -1,7 +1,6 @@
 package service;
 
-import dal.CustomerDAO;
-import dal.UserDAO;
+import dal.*;
 import java.util.List;
 import model.Customer;
 import dto.CustomerDTO;
@@ -12,7 +11,8 @@ import model.User;
 
 public class CustomerService {
     private final CustomerDAO customerDAO = new CustomerDAO();
-    private final UserDAO userDAO = new UserDAO();
+    private final UserService userService = new UserService();
+    private final RoleService roleService = new RoleService();
     private String error = "";
     
     // new
@@ -24,10 +24,8 @@ public class CustomerService {
             return dtoList; 
         }
 
-        // 2. TỐI ƯU HIỆU NĂNG: Lấy toàn bộ danh sách User lên RAM 1 lần duy nhất
-        List<User> userList = userDAO.getAllUsersReturnUser(); // Hoặc hàm lấy tất cả user của UserDAO
+        List<User> userList = userService.getAllUsersReturnUser(); 
 
-        // Tạo một bản đồ (Map) trên RAM để tìm User theo ID với tốc độ O(1)
         Map<Integer, User> userMap = new HashMap<>();
         if (userList != null) {
             for (User u : userList) {
@@ -36,10 +34,8 @@ public class CustomerService {
         }
 
         for (Customer c : customerList) {
-            // Tìm nhanh User tương ứng trong Map bằng user_id của Customer
             User u = userMap.get(c.getUserId());
 
-            // Nếu tìm thấy tài khoản User hợp lệ đi kèm
             if (u != null) {
                 CustomerDTO dto = new CustomerDTO(c, u, "Customer");
                 dtoList.add(dto);
@@ -56,7 +52,7 @@ public class CustomerService {
     }
     
     int userId = c.getUserId();
-    User u = userDAO.getUserByIdFullParameter(userId);
+    User u = userService.getUserByIdFullParameter(userId);
 
     if (u == null) {
         return null;
@@ -66,8 +62,8 @@ public class CustomerService {
 }
     // new
     public String isDuplicateCusFields(String userName, String phone, String email, String taxCode) {
-        // 1. Gọi các hàm DAO thô để lấy dữ liệu kiểm tra từ Database lên
-        List<User> cus = userDAO.searchUserFieldsByOR(userName, phone, email);
+        // tim cac custome trung du lieu
+        List<User> cus = userService.searchUserFieldsByOR(userName, phone, email);
         Integer id = customerDAO.getCustomerIdByTaxCode(taxCode);
 
         // 2. Trường hợp 1: Phát hiện trùng Mã Số Thuế trước (vì biến id đã check riêng lẻ)
@@ -94,17 +90,17 @@ public class CustomerService {
         return "SUCCESS";
     }
 
-    public boolean updateCustomerDTOByOJB(User u, Customer c) {
-        boolean userUpdated = userDAO.updateUser(u);
+    public boolean updateCustomerDTO(User u, Customer c) {
+        boolean userUpdated = userService.updateUser(u);
         boolean customerUpdated = updateCustomer(c);
         return userUpdated && customerUpdated;
     }
 
 public Customer createCustomerDTO(User u, Customer c) {
-        boolean isDuplicate = isDuplicateCusFields(u.)
-        if (!isDuplicate) {
-        return customerDAO.createCustomer(user, customer);
-    }
+        String isDuplicate = isDuplicateCusFields(u.getUserName(), u.getPhone(), u.getEmail(), c.getTaxCode());
+        if (isDuplicate.contentEquals("SUCESS")) {
+            return customerDAO.createCustomer(u, c);
+        }
         return null;
     }
 
@@ -114,14 +110,5 @@ public Customer createCustomerDTO(User u, Customer c) {
 
     public String getLastError() {
         return customerDAO.getLastError() + error;
-    }
-    
-    // tạo tạm để dùng
-    public Integer getRoleIdByName(String roleName) {
-        // Nếu truyền vào null hoặc chuỗi trống, mặc định đi tìm role_id của "Customer"
-        if (roleName == null || roleName.isBlank()) {
-            roleName = "Customer";
-        }
-        return customerDAO.getRoleIdByName(roleName.trim());
     }
 }
