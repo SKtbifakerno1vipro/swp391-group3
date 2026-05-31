@@ -24,7 +24,7 @@ import service.ProductService;
  */
 @WebServlet(name = "ProductList", urlPatterns = {"/product-list"})
 public class ProductList extends HttpServlet {
-
+    private ProductService pService = new ProductService();
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -68,24 +68,33 @@ public class ProductList extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        ProductService pService = new ProductService();
-        List<Product> products = pService.getAllProducts();
         List<Category> categories = pService.getAllCategory();
         String status = request.getParameter("status");
-        String search = request.getParameter("search");
         String searchText = request.getParameter("searchText");
+        String pageSizeRaw = request.getParameter("pageSize");
+        String pageRaw = request.getParameter("page");
+        String totalPageRaw = request.getParameter("totalPage");
         Category c = new Category();
         c.setCategoryId(0);
         c.setCategoryName("All Category");
         categories.add(0, c);
-        Integer categoryId = null;
-        if ("Search".equals(search)) {
-            request.setAttribute("searchText", searchText);
-            categoryId = Integer.parseInt(request.getParameter("categoryId"));
-            request.setAttribute("categoryId", categoryId);
-            request.setAttribute("status", status);
-        }
-        request.setAttribute("products", pService.searchProduct(searchText, categoryId, status));
+        int categoryId = (request.getParameter("categoryId") == null || request.getParameter("categoryId").isEmpty()) ? 0 : Integer.parseInt(request.getParameter("categoryId"));
+        int pageSize = (pageSizeRaw == null || pageSizeRaw.isEmpty()) ? 5 : Integer.parseInt(pageSizeRaw);
+        int page = (pageRaw == null || pageRaw.isEmpty()) ? 1 : Integer.parseInt(pageRaw);
+        int totalPage = (totalPageRaw == null || totalPageRaw.isEmpty()) ? 1 : Integer.parseInt(totalPageRaw);
+        
+        request.setAttribute("categoryId", categoryId);
+        request.setAttribute("searchText", searchText);
+            
+        request.setAttribute("status", status);
+        int totalRow = pService.countProduct(searchText, categoryId, status);
+        totalPage = pService.calculateTotalPage(totalRow, pageSize);
+        page = pService.nomalizePage(page, totalPage);
+        request.setAttribute("products", pService.searchProduct(searchText, categoryId, status, pageSize, totalRow, page, totalPage));
+        request.setAttribute("totalPage", totalPage);
+        request.setAttribute("page", page);
+        request.setAttribute("totalRow", totalRow);
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("categories", categories);
         request.getRequestDispatcher("/views/product/list.jsp").forward(request, response);
     }

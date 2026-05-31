@@ -21,23 +21,26 @@
             <table>
                 <tr>
                     <td>User name: </td>
-                    <td><input type="text" name="userName" value="${u.userName}"></td>
+                    <td><input type="text" name="userName" value="${u.userName}" required maxlength="50" minlength="4"></td>
                 </tr>
 
                 <tr>
-                    <td>Password: </td>
-                    <td><input type="text" name="password" value="${u.password}"></td>
+                    <td>Password:</td>
+                    <td><input type="password" name="password" value="${u.password}" required maxlength="50" minlength="4"></td>
                 </tr>
+
                 <tr>
                     <td>Email:  </td>
-                    <td><input type="text" name="email" value="${u.email}"></td>
-                </tr><tr>
+                    <td><input type="email" name="email" value="${u.email}"></td>
+                </tr>
+
+                <tr>
                     <td>Full Name:   </td>
                     <td><input type="text" name="fullName" value="${u.fullName}"></td>
                 </tr>
                 <tr>
                     <td>Phone:  </td>
-                    <td><input type="text" name="phone" value="${u.phone}"></td>
+                    <td><input type="tel" name="phone" value="${u.phone}" required pattern="[0-9]{10}"></td>
                 </tr>
 
                 <tr>

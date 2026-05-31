@@ -145,4 +145,10 @@ public class CustomerService {
     public String getLastError() {
         return customerDAO.getLastError();
     }
+    public Customer getCustomerByUserId(int userId) {
+        return customerDAO.getCustomerByCusId(userId);
+    }
+    public CustomerDTO getCustomerDTOByCustomerId(int id) {
+        return customerDAO.getCustomerDTOByCustomerId(id);
+    }
 }

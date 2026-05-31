@@ -1,7 +1,5 @@
 package controller.role;
 
-
-
 import service.RoleService;
 import model.Permission;
 import model.Role;
@@ -22,47 +20,46 @@ public class EditRolePermissionsController extends HttpServlet {
     private final RoleService roleService = new RoleService();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String roleIdParam = request.getParameter("roleId");
-        if (roleIdParam == null || roleIdParam.isBlank()) {
-            response.sendRedirect(request.getContextPath() + "/role-list");
-            return;
-        }
-
-        int roleId = Integer.parseInt(roleIdParam);
-        Role role = roleService.getRoleDetail(roleId);
-        List<Permission> permissionList = roleService.getAllPermissions();
-
-        Set<Integer> selectedPermissionIds = new HashSet<>();
-        if (role != null && role.getPermissions() != null) {
-            for (Permission p : role.getPermissions()) {
-                selectedPermissionIds.add(p.getPermissionId());
+        protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
+            String roleIdParam = request.getParameter("roleId");
+            if (roleIdParam == null || roleIdParam.isBlank()) {
+                response.sendRedirect(request.getContextPath() + "/role-list");
+                return;
             }
-        }
 
-        request.setAttribute("role", role);
-        request.setAttribute("permissionList", permissionList);
-        request.setAttribute("selectedPermissionIds", selectedPermissionIds);
-        request.getRequestDispatcher("/views/role/edit-role-permissions.jsp").forward(request, response);
-    }
+            int roleId = Integer.parseInt(roleIdParam);
+            Role role = roleService.getRoleDetail(roleId);
+            List<Permission> permissionList = roleService.getAllPermissions();
 
+            Set<Integer> selectedPermissionIds = new HashSet<>();
+            if (role != null && role.getPermissions() != null) {
+                for (Permission p : role.getPermissions()) {
+                    selectedPermissionIds.add(p.getPermissionId());
+                }
+            }
+
+            request.setAttribute("role", role);
+            request.setAttribute("permissionList", permissionList);
+            request.setAttribute("selectedPermissionIds", selectedPermissionIds);
+            request.getRequestDispatcher("/views/role/edit-role-permissions.jsp").forward(request, response);
+}
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        int roleId = Integer.parseInt(request.getParameter("roleId"));
-        String[] permissionIdValues = request.getParameterValues("permissionIds");
+        protected void doPost(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
+            int roleId = Integer.parseInt(request.getParameter("roleId"));
+            String[] permissionIdValues = request.getParameterValues("permissionIds");
 
-        List<Integer> permissionIds = new ArrayList<>();
-        if (permissionIdValues != null) {
-            for (String val : permissionIdValues) {
-                permissionIds.add(Integer.parseInt(val));
+            List<Integer> permissionIds = new ArrayList<>();
+            if (permissionIdValues != null) {
+                for (String val : permissionIdValues) {
+                    permissionIds.add(Integer.parseInt(val));
+                }
             }
-        }
 
-        roleService.updateRolePermissions(roleId, permissionIds);
-        response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
-    }
+            roleService.updateRolePermissions(roleId, permissionIds);
+            response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
+        }
 }
 
 

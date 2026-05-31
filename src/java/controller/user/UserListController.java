@@ -19,7 +19,7 @@ public class UserListController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String roleIdString = request.getParameter("roleId");
         String status = request.getParameter("status");
-
+        String keyword = request.getParameter("keyword");
         int roleId = 0;
         if (roleIdString != null && !roleIdString.trim().isEmpty()) {
             try {
@@ -30,7 +30,7 @@ public class UserListController extends HttpServlet {
         }
         request.setAttribute("roleId", roleId);
         request.setAttribute("status", status);
-        request.setAttribute("users", userService.searchUsers(roleId, status));
+        request.setAttribute("users", userService.searchUsers(roleId, status, keyword));
         request.setAttribute("roles", roleService.getAllRoles());
         request.getRequestDispatcher("/views/user/list.jsp").forward(request, response);
     }
