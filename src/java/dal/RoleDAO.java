@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import model.Role;
+import org.apache.tomcat.jakartaee.EESpecProfile;
 
 public class RoleDAO extends DBContext {
 
@@ -14,32 +15,46 @@ public class RoleDAO extends DBContext {
     public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {
-            String sql = "select role_id, role_name from role";
+            String sql = "select role_id, role_name, created_at, updated_at from role";
             stm = connection.prepareStatement(sql);
             rs = stm.executeQuery();
             while (rs.next()) {
                 Role role = new Role();
                 role.setRoleId(rs.getInt("role_id"));
                 role.setRoleName(rs.getString("role_name"));
+                role.setCreateAt(rs.getTimestamp("created_at"));
+                role.setUpdateAt(rs.getTimestamp("updated_at"));
                 roles.add(role);
             }
         } catch (Exception e) {
-            System.out.println("getAllRoles: " + e.getMessage());
+            System.out.println("getAllRoles eror: ");
+            e.printStackTrace();
         }
         return roles;
     }
 
-    public boolean insertRole(String roleName) {
-        String sql = "INSERT INTO role (role_name) VALUES (?)";
-        try {
-            java.sql.PreparedStatement st = connection.prepareStatement(sql);
-            st.setString(1, roleName);
-            return st.executeUpdate() > 0;
-        } catch (java.sql.SQLException e) {
-            System.out.println("RoleDAO insertRole error: " + e.getMessage());
-        }
-        return false;
-    }
+        public int createRole(String roleName) {
+            String sql = "INSERT INTO role (role_name) VALUES (?)";
+    
+            try {
+                java.sql.PreparedStatement st = connection.prepareStatement(sql,java.sql.Statement.RETURN_GENERATED_KEYS);
+        
+                st.setString(1, roleName);
+                int affectedRows = st.executeUpdate();
+        
+                if (affectedRows > 0) {
+                    java.sql.ResultSet rs = st.getGeneratedKeys();
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }       
+            } catch (java.sql.SQLException e) {
+                System.out.println("RoleDAO createRole error:");
+                e.printStackTrace();
+            }
+    
+            return -1;
+}
 
     public model.Role getRoleById(int id) {
         String sql = "SELECT * FROM role WHERE role_id = ?";
@@ -60,7 +75,7 @@ public class RoleDAO extends DBContext {
     }
 
     public boolean updateRole(model.Role role) {
-        String sql = "UPDATE role SET role_name = ? WHERE role_id = ?";
+        String sql = "UPDATE role SET role_name = ?, updated_at = GETDATE() WHERE role_id = ?";
         try {
             java.sql.PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, role.getRoleName());
@@ -73,7 +88,41 @@ public class RoleDAO extends DBContext {
     }
 
     public model.Role getRoleDetail(int id) {
-        return getRoleById(id);
+        model.Role role = null;
+        String sql = """
+                     SELECT r.role_id, r.role_name, r.created_at, r.updated_at,p.permission_id, p.permission_name
+                     FROM role r
+                     LEFT JOIN role_permission rp ON r.role_id = rp.role_id
+                     LEFT JOIN permission p ON rp.permission_id = p.permission_id
+                     WHERE r.role_id = ?
+                     """;
+        try {
+            java.sql.PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, id);
+            java.sql.ResultSet rs = st.executeQuery();
+            
+            while (rs.next()){
+                if (role == null){
+                    role = new model.Role();
+                    role.setRoleId(rs.getInt("role_id"));
+                    role.setRoleName(rs.getString("role_name"));
+                    role.setCreateAt(rs.getTimestamp("created_at"));
+                    role.setUpdateAt(rs.getTimestamp("updated_at"));
+                    
+                }
+                int permissionId = rs.getInt("permission_id");
+                if (permissionId >0){
+                    model.Permission p = new model.Permission();
+                    p.setPermissionId(permissionId);
+                    p.setPermissionName(rs.getString("permission_name"));
+                    role.getPermissions().add(p);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("RoleDAO getRoleDetail error:");
+            e.printStackTrace();
+        }
+        return role;
     }
 
     public java.util.List<model.Permission> getAllPermissions() {
@@ -119,6 +168,91 @@ public class RoleDAO extends DBContext {
         } catch (java.sql.SQLException e) {
             System.out.println("RoleDAO updateRolePermissions error: " + e.getMessage());
         }
+    }
+    // begin - Xhieu - contact me wwhen remove
+    public Integer getRoleIdByName(String roleName) {
+        String sql = "SELECT role_id FROM role WHERE role_name = ?";
+        try {
+            stm.setString(1, roleName != null ? roleName.trim() : "");
+            rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("role_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    // end - Xhieu
+    
+    public boolean isRoleNameExists(String roleName){
+        String sql = "SELECT COUNT(*) FROM role WHERE role_name = ?";
+        try {
+            java.sql.PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, roleName);
+            java.sql.ResultSet rs = st.executeQuery();
+            if (rs.next()){
+                return rs.getInt(1)>0;
+                
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("RoleDao isRoleNameExists error: " + e.getMessage());
+        }
+        return false;       
+    }
+    
+    public int countUsersByRoleId(int roleId) {
+        String sql = "SELECT COUNT(*) FROM [user] WHERE role_id = ?";
+    
+        try {
+            java.sql.PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, roleId);
+            java.sql.ResultSet rs = st.executeQuery();
+        
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("RoleDAO countUsersByRoleId error:");
+            e.printStackTrace();
+        }
+    
+        return 0;
+    }
+    
+    public boolean deleteRole(int roleId) {
+        try {
+            connection.setAutoCommit(false);
+        
+        // Bước 1: Xóa permissions của role
+            String sqlDeletePermissions = "DELETE FROM role_permission WHERE role_id = ?";
+            java.sql.PreparedStatement stPerm = connection.prepareStatement(sqlDeletePermissions);
+            stPerm.setInt(1, roleId);
+            stPerm.executeUpdate();
+        
+        // Bước 2: Xóa role
+            String sqlDeleteRole = "DELETE FROM role WHERE role_id = ?";
+            java.sql.PreparedStatement stRole = connection.prepareStatement(sqlDeleteRole);
+            stRole.setInt(1, roleId);
+            int rowsAffected = stRole.executeUpdate();
+        
+            connection.commit();
+            connection.setAutoCommit(true);
+        
+            return rowsAffected > 0;
+        
+        } catch (java.sql.SQLException e) {
+            System.out.println("RoleDAO deleteRole error:");
+            e.printStackTrace();
+        
+            try {
+                connection.rollback();
+            } catch (java.sql.SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    
+        return false;
     }
 }
 

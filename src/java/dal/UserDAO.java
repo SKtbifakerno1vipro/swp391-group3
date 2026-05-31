@@ -9,6 +9,8 @@ import java.util.List;
 import model.User;
 
 public class UserDAO extends DBContext {
+    
+    String error;
 
     private User mapUser(ResultSet rs) throws Exception {
         User u = new User();
@@ -28,7 +30,7 @@ public class UserDAO extends DBContext {
         return u;
     }
 
-    public List<UserRoleDTO> searchUsers(int roleId, String status) {
+    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword) {
         List<UserRoleDTO> list = new ArrayList<>();
         String sql = "select * from [user] u "
                 + "join dbo.role r  on u.role_id= r.role_id where 1=1";
@@ -38,6 +40,11 @@ public class UserDAO extends DBContext {
         if (status != null && !status.isEmpty()) {
             sql += " and u.account_status= ?";
         }
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql += " AND (u.full_name LIKE ? OR u.phone LIKE ?)";
+        }
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
             if (roleId > 0) {
@@ -45,6 +52,11 @@ public class UserDAO extends DBContext {
             }
             if (status != null && !status.isEmpty()) {
                 ps.setString(index++, status);
+            }
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String searchPattern = "%" + keyword.trim() + "%";
+                ps.setString(index++, searchPattern);
+                ps.setString(index++, searchPattern);
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -67,40 +79,96 @@ public class UserDAO extends DBContext {
     }
 
     public List<UserRoleDTO> getAllUsers() {
-        return searchUsers(0, null);
+        return searchUsers(0, null, null);
     }
-
-    /// begin - Xhieu
-    public List<User> searchUsersV1(int roleId, String status) {
-        List<User> list = new ArrayList<>();
-        String sql = "select * from [user] u "
-                + "join dbo.role r  on u.role_id= r.role_id where 1=1";
-        if (roleId > 0) {
-            sql += " and u.role_id= ?";
-        }
-        if (status != null && !status.isEmpty()) {
-            sql += " and u.account_status= ?";
-        }
+    
+    // begin - Xhieu - contact me wwhen remove
+    public User getUserByIdFullParameter(int id) {
+        String sql = "SELECT * FROM [user] WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            int index = 1;
-            if (roleId > 0) {
-                ps.setInt(index++, roleId);
-            }
-            if (status != null && !status.isEmpty()) {
-                ps.setString(index++, status);
-            }
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapUser(rs));
+            if (rs.next()) {
+
+                User u = new User();
+                u.setUserId(rs.getInt("user_id"));
+                u.setUserName(rs.getString("user_name"));
+                u.setPassword(rs.getString("password_hash"));
+                u.setEmail(rs.getString("email"));
+                u.setGender(rs.getString("gender"));
+                u.setFullName(rs.getString("full_name"));
+                u.setPhone(rs.getString("phone"));
+                u.setStatus(rs.getString("account_status"));
+                u.setRoleId(rs.getInt("role_id"));
+                if (rs.getTimestamp("create_at") != null) {
+                    u.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
+                }
+                if (rs.getTimestamp("update_at") != null) {
+                    u.setUpdateAt(rs.getTimestamp("update_at").toLocalDateTime());
+                }
+
+                return u;
             }
         } catch (Exception e) {
-            System.out.println("searchUser" + e.getMessage());
+            System.out.println("getUserById" + e.getMessage());
+        }
+        return null;
+    }
+    
+    public List<User> getAllUsersReturnUser() {
+        List<User> list = new ArrayList<>();
+        String sql = "SELECT * FROM [user]";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                User u = mapUser(rs);
+                list.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return list;
     }
 
-    public List<User> getAllUsersV1() {
-        return searchUsersV1(0, null);
+    public List<User> searchUserFieldsByOR(String userName, String phone, String email) {
+        List<User> list = new ArrayList<>();
+        
+        String sql = "SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name"
+                + ", address, phone, account_status, created_at, updated_at, role_id "
+                   + "FROM [user] WHERE 1=2 ";
+
+        if ((userName == null || userName.isBlank()) && 
+            (phone == null || phone.isBlank()) && 
+            (email == null || email.isBlank())) {
+            return null;
+        }
+
+        if (userName != null && !userName.isBlank()) sql += "OR user_name = ? ";
+        if (phone != null && !phone.isBlank())       sql += "OR phone = ? ";
+        if (email != null && !email.isBlank())       sql += "OR email = ? ";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int index = 1;
+
+            if (userName != null && !userName.isBlank()) ps.setString(index++, userName.trim());
+            if (phone != null && !phone.isBlank())       ps.setString(index++, phone.trim());
+            if (email != null && !email.isBlank())       ps.setString(index++, email.trim());
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User u = mapUser(rs);
+                list.add(u);
+            }
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+        return list;
+    }
+    
+    public String getLastError() {
+        return error;
+
     }
     /// end - Xhieu
 
@@ -197,14 +265,15 @@ public class UserDAO extends DBContext {
     }
 
     // Kiem tra trung lap 3 truong cung 1 luc
-    public String checkDuplicate(String username, String email, String phone) {
+    public String checkDuplicate(String username, String email, String phone, int userId) {
         String sql = """
                      select u.user_name, u.phone, u.email  from [user] u
-                     where  u.user_name= ? or u.phone=? or u.email= ?""";
+                     where  (u.user_name= ? or u.phone=? or u.email= ?) and u.user_id != ?""";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             ps.setString(2, phone);
             ps.setString(3, email);
+            ps.setInt(4, userId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 if (username.equals(rs.getString("user_name"))) {

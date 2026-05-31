@@ -1,123 +1,107 @@
 package service;
 
-import dal.CustomerDAO;
-import dal.UserDAO;
+import dal.*;
 import java.util.List;
 import model.Customer;
 import dto.CustomerDTO;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import model.User;
 
 public class CustomerService {
     private final CustomerDAO customerDAO = new CustomerDAO();
-    private final UserDAO userDAO = new UserDAO();
+    private final UserService userService = new UserService();
+    private final RoleService roleService = new RoleService();
     private String error = "";
     
+    // new
     public List<CustomerDTO> getAllCustomerDTOs() {
-        return customerDAO.getAllCustomerDTOs();
-    }
-public List<CustomerDTO> FilterCustomerDTOs(String keyword, String cusType) {
-    List<CustomerDTO> list = new ArrayList<>();
-    
-    String searchKeyword = (keyword != null) ? keyword.trim().toLowerCase() : "";
-    String filterType = (cusType != null) ? cusType.trim() : "";
+        List<CustomerDTO> dtoList = new ArrayList<>();
+        List<Customer> customerList = customerDAO.getAllCustomers();
 
-    for (CustomerDTO allCustomerDTO : customerDAO.getAllCustomerDTOs()) {
-        boolean isTypeMatched = false;
-        boolean isKeywordMatched = false;
-
-        // 2. CHECK CUSTOMER TYPE
-        
-        if (filterType.isBlank()) {
-            isTypeMatched = true;
-        } else if (allCustomerDTO.getCustomer().getCustomerType() != null 
-                && allCustomerDTO.getCustomer().getCustomerType().equalsIgnoreCase(filterType)) {
-            isTypeMatched = true;
+        if (customerList == null || customerList.isEmpty()) {
+            return dtoList; 
         }
 
-        // 3. CHECK KEYWORD 
-        if (searchKeyword.isBlank()) {
-            isKeywordMatched = true;
-        } else {
-            String fullName = (allCustomerDTO.getUser().getFullName() != null) ? allCustomerDTO.getUser().getFullName().toLowerCase() : "";
-            String email = (allCustomerDTO.getUser().getEmail() != null) ? allCustomerDTO.getUser().getEmail().toLowerCase() : "";
-            String phone = (allCustomerDTO.getUser().getPhone() != null) ? allCustomerDTO.getUser().getPhone() : "";
+        List<User> userList = userService.getAllUsersReturnUser(); 
 
-            if (fullName.contains(searchKeyword) || email.contains(searchKeyword) || phone.contains(searchKeyword)) {
-                isKeywordMatched = true;
+        Map<Integer, User> userMap = new HashMap<>();
+        if (userList != null) {
+            for (User u : userList) {
+                userMap.put(u.getUserId(), u);
             }
         }
 
-        if (isTypeMatched && isKeywordMatched) {
-            list.add(allCustomerDTO);
+        for (Customer c : customerList) {
+            User u = userMap.get(c.getUserId());
+
+            if (u != null) {
+                CustomerDTO dto = new CustomerDTO(c, u, "Customer");
+                dtoList.add(dto);
+            }
         }
+        return dtoList;
     }
-    return list;
-}
-    public CustomerDTO getCustomerDTOByCustomerId(int id) {
-        return customerDAO.getCustomerDTOByCustomerId(id);
+    // new 
+    public CustomerDTO getCustomerDTOByCusId(int customerId) {
+    // 
+    Customer c = customerDAO.getCustomerByCusId(customerId);
+    if (c == null) {
+        return null;
     }
     
-    public boolean updateCustomerDTOByOJB(User u, Customer c) {
-        boolean userUpdated = updateUser(u);
+    int userId = c.getUserId();
+    User u = userService.getUserByIdFullParameter(userId);
+
+    if (u == null) {
+        return null;
+    }
+    CustomerDTO dto = new CustomerDTO(c, u, "Customer");
+    return dto;
+}
+    // new
+    public String isDuplicateCusFields(String userName, String phone, String email, String taxCode) {
+        // tim cac custome trung du lieu
+        List<User> cus = userService.searchUserFieldsByOR(userName, phone, email);
+        Integer id = customerDAO.getCustomerIdByTaxCode(taxCode);
+
+        // 2. Trường hợp 1: Phát hiện trùng Mã Số Thuế trước (vì biến id đã check riêng lẻ)
+        if (id != null) {
+            return "Tax Code is already registered by another customer";
+        }
+
+        // 3. Trường hợp 2: Kiểm tra danh sách User trả về xem trùng cụ thể trường nào
+        if (cus != null && !cus.isEmpty()) {
+            for (User cu : cus) {
+                // Sử dụng equalsIgnoreCase để ép chữ hoa/chữ thường check cho chính xác
+                if (userName != null && userName.trim().equalsIgnoreCase(cu.getUserName())) {
+                    return "Username already exists in the system";
+                }
+                if (email != null && email.trim().equalsIgnoreCase(cu.getEmail())) {
+                    return "Email address is already registered";
+                }
+                if (phone != null && phone.trim().equalsIgnoreCase(cu.getPhone())) {
+                    return "Phone number is already in use!";
+                }
+            }
+        }
+        // 4. Trường hợp 3: Không trùng bất kỳ trường nào cả, dữ liệu hoàn toàn sạch
+        return "SUCCESS";
+    }
+
+    public boolean updateCustomerDTO(User u, Customer c) {
+        boolean userUpdated = userService.updateUser(u);
         boolean customerUpdated = updateCustomer(c);
         return userUpdated && customerUpdated;
     }
 
-    public Customer getCustomerByUserId(int userId) {
-        return customerDAO.getCustomerByUserId(userId);
-    }
-
-    public List<User> getAllUsers() {
-        return customerDAO.getAllUsers();
-    }
-
-    public Customer getCustomerByCustomerId(int id) {
-        return customerDAO.getCustomerByCustomerId(id);
-    }
-
-    public User getUserByEmail(String email) {
-        return customerDAO.getUserByEmail(email);
-    }
-    
-    public User getUserById(int userId) {
-        return customerDAO.getUserById(userId);
-    }
-
-    public Integer getRoleIdByName(String roleName) {
-        return customerDAO.getRoleIdByName(roleName);
-    }
-
-public Customer createUserAndCustomer(User user, Customer customer) {
-        boolean isDuplicate = false;
-        
-        for (User allUser : getAllUsers()) {
-            if (user.getUserName().equals(allUser.getUserName())) {
-                isDuplicate = true;
-                error = "Username already exists!";
-                break;
-            }
-            
-            if (user.getEmail() != null && user.getEmail().equals(allUser.getEmail())) {
-                isDuplicate = true;
-                error = "Email is already registered!";
-                break;
-            }
-            
-            if (user.getPhone() != null && user.getPhone().equals(allUser.getPhone())) {
-                isDuplicate = true;
-                error = "Phone number is already registered!";
-                break;
-            }
-        }
-        if (!isDuplicate) {
-            return customerDAO.createCustomer(user, customer);
+public Customer createCustomerDTO(User u, Customer c) {
+        String isDuplicate = isDuplicateCusFields(u.getUserName(), u.getPhone(), u.getEmail(), c.getTaxCode());
+        if (isDuplicate.contentEquals("SUCESS")) {
+            return customerDAO.createCustomer(u, c);
         }
         return null;
-    }
-
-    public boolean updateUser(User user) {
-        return userDAO.updateUser(user);
     }
 
     public boolean updateCustomer(Customer customer) {
@@ -126,5 +110,11 @@ public Customer createUserAndCustomer(User user, Customer customer) {
 
     public String getLastError() {
         return customerDAO.getLastError() + error;
+    }
+    public Customer getCustomerByUserId(int userId) {
+        return customerDAO.getCustomerByCusId(userId);
+    }
+    public CustomerDTO getCustomerDTOByCustomerId(int id) {
+        return customerDAO.getCustomerDTOByCustomerId(id);
     }
 }

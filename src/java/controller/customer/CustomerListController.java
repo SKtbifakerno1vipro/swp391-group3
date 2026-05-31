@@ -25,7 +25,8 @@ public class CustomerListController extends HttpServlet {
         String key = request.getParameter("searchKeyword");
         String cusType = request.getParameter("customerType");
         if (key != null && !key.isBlank() || cusType != null && !cusType.isBlank())
-            allCustomerDTOs = customerService.FilterCustomerDTOs(key, cusType);
+            allCustomerDTOs = customerService.getAllCustomerDTOs();
+        // toi chua fix cho nay
         else
             allCustomerDTOs = customerService.getAllCustomerDTOs();
         
