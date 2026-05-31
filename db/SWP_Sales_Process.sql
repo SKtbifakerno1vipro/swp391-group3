@@ -328,3 +328,130 @@ UPDATE product SET quantity_available = quantity_available - 1 WHERE product_id 
 UPDATE product SET quantity_available = quantity_available - 2 WHERE product_id = 2;
 
 select * from [user]
+select * from [customer]
+USE SWP_Sales_Process;
+GO
+
+-- ====================================================================================
+-- BƯỚC 1: TẠO CÁC TÀI KHOẢN [user] CHO KHÁCH HÀNG (Mỗi khách hàng cần 1 tài khoản login riêng)
+-- Lưu ý: role_id = 3 đại diện cho vai trò 'Customer' như bạn đã định nghĩa ở phần INSERT gốc
+-- ====================================================================================
+INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, full_name, address, phone, account_status, role_id) VALUES 
+('khachhang_b', 'hash_4', 'info@companyb.com', 'F', '1992-05-15', N'Nguyễn Thị Bình', N'123 Nguyễn Du, Hà Nội', '0933333333', 'ACTIVE', 3),
+('khachhang_c', 'hash_5', 'contact@companyc.vn', 'M', '1988-10-20', N'Phạm Minh Chính', N'456 Lê Lợi, TP.HCM', '0944444444', 'ACTIVE', 3),
+('khachhang_d', 'hash_6', 'hello@companyd.com', 'O', '1995-02-28', N'Trần Anh Dương', N'789 Trần Hưng Đạo, Đà Nẵng', '0955555555', 'ACTIVE', 3),
+('khachhang_e', 'hash_7', 'office@companye.vn', 'F', '1990-12-05', N'Lê Hoàng Yến', N'101 Điện Biên Phủ, Hải Phòng', '0966666666', 'ACTIVE', 3),
+('khachhang_f', 'hash_8', 'support@companyf.com', 'M', '1985-07-19', N'Vũ Hoàng Phúc', N'202 Quang Trung, Cần Thơ', '0977777777', 'ACTIVE', 3);
+GO
+
+-- ====================================================================================
+-- BƯỚC 2: TẠO THÔNG TIN DOANH NGHIỆP TRONG BẢNG [customer]
+-- Sử dụng câu lệnh sub-query SELECT để tự động tìm đúng user_id vừa tạo theo tên đăng nhập,
+-- tránh việc phải gõ cứng (hardcode) ID số tăng tự động.
+-- Mặc định assigned_to_user_id = 2 (Nhân viên Sales phụ trách chăm sóc)
+-- ====================================================================================
+INSERT INTO customer (tax_code, customer_type, company_name, user_id, assigned_to_user_id) VALUES 
+
+('0312345679', 'B2B', N'Công ty TNHH Thương mại B', 
+  (SELECT user_id FROM [user] WHERE user_name = 'khachhang_b'), 2),
+
+('0312345680', 'B2C', N'Khách hàng Cá nhân Phạm Minh Chính', 
+  (SELECT user_id FROM [user] WHERE user_name = 'khachhang_c'), 2),
+
+('0312345681', 'B2B', N'Tập đoàn Công nghệ D', 
+  (SELECT user_id FROM [user] WHERE user_name = 'khachhang_d'), 2),
+
+('0312345682', 'B2B', N'Công ty Cổ phần Xuất Nhập Khẩu E', 
+  (SELECT user_id FROM [user] WHERE user_name = 'khachhang_e'), 2),
+
+('0312345683', 'B2C', N'Cửa hàng Bán lẻ Vũ Hoàng Phúc', 
+  (SELECT user_id FROM [user] WHERE user_name = 'khachhang_f'), 2);
+GO
+
+-- ====================================================================================
+-- BƯỚC 3: KIỂM TRA LẠI DỮ LIỆU SAU KHI CHÈN
+-- ====================================================================================
+SELECT 
+    c.customer_id, 
+    c.company_name, 
+    c.tax_code, 
+    c.customer_type, 
+    u.user_name AS [Account_Login], 
+    u.full_name AS [Owner_Name],
+    u.phone,
+    u.email
+FROM customer c
+INNER JOIN [user] u ON c.user_id = u.user_id;
+GO
+
+USE SWP_Sales_Process;
+GO
+
+-- ====================================================================================
+-- BƯỚC 1: TẠO 15 TÀI KHOẢN [user] CHO KHÁCH HÀNG (role_id = 3)
+-- Tên đăng nhập chạy từ khachhang_01 đến khachhang_15
+-- ====================================================================================
+INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, full_name, address, phone, account_status, role_id) VALUES 
+('khachhang_01', 'hash_01', 'customer01@gmail.com', 'M', '1990-01-01', N'Nguyễn Văn Một', N'1 Đại Cồ Việt, Hà Nội', '0981000001', 'ACTIVE', 3),
+('khachhang_02', 'hash_02', 'customer02@gmail.com', 'F', '1991-02-02', N'Trần Thị Hai', N'2 Lê Thanh Nghị, Hà Nội', '0981000002', 'ACTIVE', 3),
+('khachhang_03', 'hash_03', 'customer03@gmail.com', 'M', '1992-03-03', N'Phạm Văn Ba', N'3 Giải Phóng, Hà Nội', '0981000003', 'ACTIVE', 3),
+('khachhang_04', 'hash_04', 'customer04@gmail.com', 'F', '1993-04-04', N'Lê Thị Bốn', N'4 Trần Đại Nghĩa, Hà Nội', '0981000004', 'ACTIVE', 3),
+('khachhang_05', 'hash_05', 'customer05@gmail.com', 'M', '1994-05-05', N'Hoàng Văn Năm', N'5 Phố Huế, Hà Nội', '0981000005', 'ACTIVE', 3),
+('khachhang_06', 'hash_06', 'customer06@gmail.com', 'F', '1995-06-06', N'Vũ Thị Sáu', N'6 Hàng Bài, Hà Nội', '0981000006', 'ACTIVE', 3),
+('khachhang_07', 'hash_07', 'customer07@gmail.com', 'M', '1996-07-07', N'Đặng Văn Bảy', N'7 Đinh Tiên Hoàng, Hà Nội', '0981000007', 'ACTIVE', 3),
+('khachhang_08', 'hash_08', 'customer08@gmail.com', 'F', '1997-08-08', N'Bùi Thị Tám', N'8 Nguyễn Du, Hà Nội', '0981000008', 'ACTIVE', 3),
+('khachhang_09', 'hash_09', 'customer09@gmail.com', 'M', '1998-09-09', N'Đỗ Văn Chín', N'9 Bà Triệu, Hà Nội', '0981000009', 'ACTIVE', 3),
+('khachhang_10', 'hash_10', 'customer10@gmail.com', 'F', '1999-10-10', N'Ngô Thị Mười', N'10 Quang Trung, Hà Nội', '0981000010', 'ACTIVE', 3),
+('khachhang_11', 'hash_11', 'customer11@gmail.com', 'M', '2000-11-11', N'Lý Văn Mười Một', N'11 Tràng Thi, Hà Nội', '0981000011', 'ACTIVE', 3),
+('khachhang_12', 'hash_12', 'customer12@gmail.com', 'F', '2001-12-12', N'Đoàn Thị Mười Hai', N'12 Điện Biên Phủ, Hà Nội', '0981000012', 'ACTIVE', 3),
+('khachhang_13', 'hash_13', 'customer13@gmail.com', 'M', '1991-05-20', N'Phùng Văn Mười Ba', N'13 Kim Mã, Hà Nội', '0981000013', 'ACTIVE', 3),
+('khachhang_14', 'hash_14', 'customer14@gmail.com', 'F', '1992-06-25', N'Tô Thị Mười Bốn', N'14 Nguyễn Thái Học, Hà Nội', '0981000014', 'ACTIVE', 3),
+('khachhang_15', 'hash_15', 'customer15@gmail.com', 'M', '1993-07-30', N'Đinh Văn Mười Lăm', N'15 Liễu Giai, Hà Nội', '0981000015', 'ACTIVE', 3);
+GO
+
+-- ====================================================================================
+-- BƯỚC 2: TẠO THÔNG TIN DOANH NGHIỆP TRONG BẢNG customer TƯƠNG ỨNG
+-- Sử dụng SELECT lồng để tự tìm user_id theo user_name vừa tạo ở trên
+-- Phân công mặc định cho nhân viên Sales có id = 2 phụ trách chăm sóc
+-- ====================================================================================
+INSERT INTO customer (tax_code, customer_type, company_name, user_id, assigned_to_user_id) VALUES 
+('0390000001', 'B2B', N'Công ty TNHH Một Thành Viên', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'), 2),
+('0390000002', 'B2C', N'Cửa hàng Bán lẻ Hai Thủy', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_02'), 2),
+('0390000003', 'B2B', N'Công ty Cổ phần Xây dựng Ba Đình', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_03'), 2),
+('0390000004', 'B2B', N'Tập đoàn May mặc Bốn Phương', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_04'), 2),
+('0390000005', 'B2C', N'Đại lý Phân phối Năm Sao', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_05'), 2),
+('0390000006', 'B2B', N'Công ty TNHH Logistics Sáu Tấm', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_06'), 2),
+('0390000007', 'B2B', N'Doanh nghiệp Tư nhân Bảy Hiền', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_07'), 2),
+('0390000008', 'B2C', N'Cửa hàng Thực phẩm Sạch Tám Oanh', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_08'), 2),
+('0390000009', 'B2B', N'Công ty Cổ phần Đầu tư Chín Chín', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_09'), 2),
+('0390000010', 'B2B', N'Tập đoàn Xuất Nhập Khẩu Mười Điểm', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_10'), 2),
+('0390000011', 'B2C', N'Nhà thuốc Tư nhân Mười Một', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_11'), 2),
+('0390000012', 'B2B', N'Công ty TNHH Công nghệ Mười Hai', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_12'), 2),
+('0390000013', 'B2B', N'Hợp tác xã Nông nghiệp Mười Ba', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_13'), 2),
+('0390000014', 'B2C', N'Cửa hàng Thời trang Mười Bốn', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_14'), 2),
+('0390000015', 'B2B', N'Chuỗi Siêu thị Điện máy Mười Lăm', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_15'), 2);
+GO
+
+-- ====================================================================================
+-- BƯỚC 3: XEM TOÀN BỘ DANH SÁCH CUSTOMER DTO (Giống hệt câu query trong hàm getAllCustomerDTOs)
+-- ====================================================================================
+select * from [role]
+SELECT 
+    c.customer_id, 
+    c.tax_code, 
+    c.customer_type, 
+    c.company_name, 
+    c.user_id, 
+    c.assigned_to_user_id, 
+    c.created_at, 
+    c.updated_at, 
+    u.user_id AS u_id, 
+    u.full_name, 
+    u.email, 
+    u.phone, 
+    u.account_status, 
+    u.user_name,
+    u.role_id
+FROM customer c 
+LEFT JOIN [user] u ON c.user_id = u.user_id;
+GO

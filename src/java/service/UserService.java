@@ -33,9 +33,22 @@ public class UserService {
     public User login(String username, String password) {
         return userDAO.login(username, password);
     }
-
-    public String checkDuplicate(String username, String email, String phone) {
-        return userDAO.checkDuplicate(username, email, phone);
+    
+    /// begin - Xhieu - có thắc mắc gì nói với tôi
+    public User getUserByIdFullParameter(int id) {
+        return userDAO.getUserByIdFullParameter(id);
     }
 
+    public List<User> getAllUsersReturnUser() {
+        return userDAO.getAllUsersReturnUser();
+    }
+
+    public List<User> searchUserFieldsByOR(String userName, String phone, String email) {
+        return userDAO.searchUserFieldsByOR(userName, phone, email);
+    }
+
+    public String getLastError() {
+        return userDAO.getLastError();
+    }
+    // end - Xhieu
 }

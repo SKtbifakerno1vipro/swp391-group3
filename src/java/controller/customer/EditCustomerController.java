@@ -8,15 +8,16 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
-import model.Customer;
-import model.User;
+import model.*;
 import dto.*;
+import service.*;
 
 @WebServlet(name = "EditCustomerController", urlPatterns = {"/customer/edit"})
 public class EditCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
-    private final service.RoleService roleService = new service.RoleService();
+    private final RoleService roleService = new service.RoleService();
+    private final UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,15 +32,14 @@ public class EditCustomerController extends HttpServlet {
 
         try {
             int customerId = Integer.parseInt(customerIdStr);
-            CustomerDTO cusDTO = customerService.getCustomerDTOByCustomerId(customerId);
-
+            CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(customerId);
+            request.setAttribute("users", userService.getAllUsersReturnUser());
+            request.setAttribute("roles", roleService.getAllRoles());
             if (cusDTO == null) {
                 request.setAttribute("error", "Edit failed");
                 request.setAttribute("errorDetail", "Customer not found");
             } else {
                 request.setAttribute("cusDTO", cusDTO);
-                request.setAttribute("users", customerService.getAllUsers());
-                request.setAttribute("roles", roleService.getAllRoles());
             }
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Edit failed");
@@ -102,16 +102,14 @@ public class EditCustomerController extends HttpServlet {
                 c.setAssignedToUserId(null);
             }
             boolean cusDTOUpdated = customerService.updateCustomerDTOByOJB(u,c);
-
+            
+            request.setAttribute("users", userService.getAllUsersReturnUser());
+            request.setAttribute("roles", roleService.getAllRoles());
+            
             if (!cusDTOUpdated) {
-                request.setAttribute("user", customerService.getCustomerDTOByCustomerId(userId));
-                request.setAttribute("users", customerService.getAllUsers());
-                request.setAttribute("roles", roleService.getAllRoles());
                 request.setAttribute("error", "Update failed");
             }else{
-                CustomerDTO cusDTO = customerService.getCustomerDTOByCustomerId(customerId);
-                request.setAttribute("users", customerService.getAllUsers());
-                request.setAttribute("roles", roleService.getAllRoles());
+                CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(customerId);
                 request.setAttribute("cusDTO", cusDTO);
                 request.setAttribute("success", "Updated");
             }
