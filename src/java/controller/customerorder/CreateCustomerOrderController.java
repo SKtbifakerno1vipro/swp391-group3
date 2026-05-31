@@ -122,7 +122,7 @@ public class CreateCustomerOrderController extends HttpServlet {
                         CustomerOrderDetail detail = new CustomerOrderDetail();
                         detail.setProductId(pid);
                         detail.setQuantity(quantity);
-                        detail.setSellingPrice(p.getSellingPrice());
+//                        detail.setSellingPrice(p.getSellingPrice());
                         // For cost price, if model has it use it, otherwise use a default or 0
                         // SQL product has cost_price, let's check if Product model has it.
                         // I checked Product.java earlier, it didn't have costPrice.
