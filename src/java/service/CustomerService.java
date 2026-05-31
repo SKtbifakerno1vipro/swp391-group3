@@ -17,14 +17,12 @@ public class CustomerService {
     // new
     public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String type, int page, int pageSize) {
         List<CustomerDTO> dtoList = new ArrayList<>();
-        
-        // 1. Gọi CustomerDAO lấy danh sách khách hàng thô đã được lọc và cắt trang dưới DB
+
         List<Customer> customerList = customerDAO.searchAndPaginateCustomers(searchName, type, page, pageSize);
         if (customerList == null || customerList.isEmpty()) {
-            return dtoList; // Trả về danh sách rỗng, không trả về null để tránh lỗi sập trang
+            return dtoList; 
         }
 
-        // 2. Tối ưu hiệu năng: Kéo toàn bộ danh sách User lên RAM qua UserService để map chéo
         List<User> userList = userService.getAllUsersReturnUser();
         Map<Integer, User> userMap = new HashMap<>();
         if (userList != null) {
@@ -33,7 +31,6 @@ public class CustomerService {
             }
         }
 
-        // 3. Tiến hành ghép đôi dữ liệu tạo DTO hoàn chỉnh trên RAM
         for (Customer c : customerList) {
             User u = userMap.get(c.getUserId());
             if (u != null) {
