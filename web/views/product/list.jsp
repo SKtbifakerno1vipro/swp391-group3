@@ -83,17 +83,17 @@
                     </table>
                 </div>
                 <div>
-                    <%--
+                    
                     <div>Show 
-                        <select name="pageSize">
+                        <select onchange="window.location.href='${pageContext.request.contextPath}/product-list?pageSize='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&status=${status}'" >
                             <c:forEach var="p" begin="5" step="5" end="${totalRow}">
-                                <option value="${pageSize}" ${pageSize == p ? 'selected' : ''}>${p}</option>
+                                <option value="${p}" ${pageSize == p ? 'selected' : ''}>${p}</option>
                             </c:forEach>
                         </select>
 
                         in ${totalRow}</div>
-                    --%>
-                    <select  onchange="window.location.href='${pageContext.request.contextPath}/product-list?page='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&status=${status}'">
+                    
+                    <select  onchange="window.location.href='${pageContext.request.contextPath}/product-list?page='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&status=${status}&pageSize=${pageSize}'">
                         <c:forEach var="i" begin="1" end="${totalPage}">
                             <option value="${i}" ${page == i ? 'selected' : ''}>${i}</option>
                         </c:forEach>
