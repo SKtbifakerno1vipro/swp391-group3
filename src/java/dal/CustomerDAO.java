@@ -47,7 +47,41 @@ public class CustomerDAO extends DBContext {
         }
         return list;
     }
-    
+    public CustomerDTO getCustomerDTOByCustomerId(int id) {
+        try {
+            String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, "
+                    + "c.assigned_to_user_id, c.created_at, c.updated_at, u.user_name,"
+                    + "u.user_id AS u_id, u.email, u.full_name, u.phone, u.account_status, u.role_id, r.role_name "
+                    + "FROM customer c "
+                    + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                    + "LEFT JOIN role r ON u.role_id = r.role_id "
+                    + "WHERE c.customer_id = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, id);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                Customer c = mapCustomer(rs);
+                User u = null;
+                String rName = null;
+                if (rs.getObject("u_id") != null) {
+                    u = new User();
+                    u.setUserName(rs.getString("user_name"));
+                    u.setUserId(rs.getInt("u_id"));
+                    u.setEmail(rs.getString("email"));
+                    u.setFullName(rs.getString("full_name"));
+                    u.setPhone(rs.getString("phone"));
+                    u.setStatus(rs.getString("account_status"));
+                    u.setRoleId((Integer) rs.getObject("role_id"));
+                    rName = rs.getString("role_name");
+                }
+                return new CustomerDTO(c, u, rName);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            error = "getCustomerDTOByCustomerId " + e.getMessage();
+        }
+        return null;
+    }
     public Customer getCustomerByCusId(int id) {
         try {
             String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
