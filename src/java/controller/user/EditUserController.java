@@ -54,7 +54,7 @@ public class EditUserController extends HttpServlet {
         u.setStatus(request.getParameter("status"));
         u.setGender(request.getParameter("gender"));
         u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
-        String duplicateError = userService.checkDuplicate(u.getUserName(), u.getEmail(), u.getPhone());
+        String duplicateError = userService.checkDuplicate(u.getUserName(), u.getEmail(), u.getPhone(), u.getUserId());
         if (duplicateError != null) {
             request.setAttribute("u", u);
             request.setAttribute("roles", roleService.getAllRoles());

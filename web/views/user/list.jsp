@@ -28,6 +28,8 @@
                     <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
                 </select>
 
+                <label for="keyword">Keyword</label>
+                <input type="text" name="keyword">
                 <button type="submit">Filter</button>
             </form>
 

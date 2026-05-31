@@ -9,9 +9,9 @@ public class UserService {
 
     private final UserDAO userDAO = new UserDAO();
 
-    public List<UserRoleDTO> searchUsers(int roleId, String status) {
+    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword) {
         //logic
-        return userDAO.searchUsers(roleId, status);
+        return userDAO.searchUsers(roleId, status, keyword);
     }
 
     public List<UserRoleDTO> getAllUsers() {
@@ -33,6 +33,7 @@ public class UserService {
     public User login(String username, String password) {
         return userDAO.login(username, password);
     }
+
     
     // begin - Xhieu - contact me wwhen remove
     public User getUserByIdFullParameter(int id) {
@@ -51,4 +52,11 @@ public class UserService {
         return userDAO.getLastError();
     }
     // end - Xhieu
+
+
+    public String checkDuplicate(String username, String email, String phone, int userId) {
+        return userDAO.checkDuplicate(username, email, phone, userId);
+    }
+
+
 }
