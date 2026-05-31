@@ -37,7 +37,7 @@
 
                 <tr>
                     <td>Phone:</td>
-                    <td><input type="text" name="phone" 
+                    <td><input type="text" name="phone"  required pattern="[0-9]{10}"
                                value="${u.phone}" ${mode=='edit' ? '' : 'readonly'}></td>
                 </tr>
 
