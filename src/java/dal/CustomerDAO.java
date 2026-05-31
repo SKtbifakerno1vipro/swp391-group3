@@ -30,6 +30,23 @@ public class CustomerDAO extends DBContext {
         return c;
     }
 
+    public List<Customer> getAllCustomers() {
+        List<Customer> list = new ArrayList<>(); 
+        String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
+                + "FROM customer";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Customer c = mapCustomer(rs);
+                list.add(c);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            error = "getAllCustomers: " + e.getMessage();
+        }
+        return list;
+    }
     public CustomerDTO getCustomerDTOByCustomerId(int id) {
         try {
             String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, "
@@ -65,56 +82,10 @@ public class CustomerDAO extends DBContext {
         }
         return null;
     }
-
-    public List<CustomerDTO> getAllCustomerDTOs() {
-        List<CustomerDTO> list = new ArrayList<>();
+    public Customer getCustomerByCusId(int id) {
         try {
-            String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, "
-                    + "c.assigned_to_user_id, c.created_at, c.updated_at, "
-                    + "u.full_name, u.email, u.phone, u.account_status, u.user_name "
-                    + "FROM customer c LEFT JOIN [user] u ON c.user_id = u.user_id";
-            PreparedStatement stm = connection.prepareStatement(sql);
-            ResultSet rs = stm.executeQuery();
-            while (rs.next()) {
-                Customer c = mapCustomer(rs);
-                User u = new User();
-                u.setUserName(rs.getString("user_name"));
-                u.setFullName(rs.getString("full_name"));
-                u.setEmail(rs.getString("email"));
-                u.setStatus(rs.getString("account_status"));
-                u.setPhone(rs.getString("phone"));
-                list.add(new CustomerDTO(c, u, null));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            error = "getAllCustomerDTOs" + e.getMessage();
-        }
-        return list;
-    }
-
-    public Customer getCustomerByUserId(int userId) {
-        String sql = "SELECT * FROM customer WHERE user_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return mapCustomer(rs);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            error = "getCustomerByUserId" + e.getMessage();
-        }
-        return null;
-    }
-
-    public List<User> getAllUsers() {
-        UserDAO uDAO = new UserDAO();
-        return uDAO.getAllUsersV1();
-    }
-    
-    public Customer getCustomerByCustomerId(int id) {
-        try {
-            String sql = "SELECT * FROM [customer] WHERE customer_id = ?";
+            String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
+                    + "FROM customer WHERE customer_id = ?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, id);
             ResultSet rs = stm.executeQuery();
@@ -128,29 +99,19 @@ public class CustomerDAO extends DBContext {
         return null;
     }
 
-    public User getUserByEmail(String email) {
-        return null;
-    }
-
-    public User getUserById(int userId) {
-        UserDAO uDAO = new UserDAO();
-        return uDAO.getUserById(userId);
-    }
-
-    public Integer getRoleIdByName(String roleName) {
-        try {
-            String sql = "SELECT role_id FROM role WHERE role_name = ?";
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setString(1, roleName);
+    public Integer getCustomerIdByTaxCode(String taxCode) {
+        String sql = "SELECT customer_id FROM customer WHERE tax_code = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, taxCode != null ? taxCode.trim() : "");
             ResultSet rs = stm.executeQuery();
             if (rs.next()) {
-                return rs.getInt("role_id");
+                return rs.getInt("customer_id");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            error = "getRoleIdByName " + e.getMessage();
+            error = "getCustomerIdByTaxCode: " + e.getMessage();
         }
-        return null;
+        return null; // Trả về null nếu không tìm thấy khách hàng nào khớp với mã số thuế này
     }
 
     public Customer createCustomer(User user, Customer customer) {

@@ -24,8 +24,8 @@ public class RoleService {
         return roleDAO.getAllPermissions();
     }
 
-    public boolean insertRole(String roleName) {
-        return roleDAO.insertRole(roleName);
+    public int createRole(String roleName) {
+        return roleDAO.createRole(roleName);
     }
 
     public void updateRole(Role role) {
@@ -35,5 +35,18 @@ public class RoleService {
     public void updateRolePermissions(int roleId, List<Integer> permissionIds) {
         roleDAO.updateRolePermissions(roleId, permissionIds);
     }
+    // begin - Xhieu - contact me wwhen remove
+    public Integer getRoleIdByName(String roleName) {
+        
+        if (roleName == null || roleName.isBlank()) {
+            return null;
+        }
+        return roleDAO.getRoleIdByName(roleName.trim());
+    }
+    // end - Xhieu
+    public boolean isRoleNameExists(String roleName){
+        return roleDAO.isRoleNameExists(roleName);
+    }
+
 }
 

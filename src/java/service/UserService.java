@@ -9,9 +9,9 @@ public class UserService {
 
     private final UserDAO userDAO = new UserDAO();
 
-    public List<UserRoleDTO> searchUsers(int roleId, String status) {
+    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword) {
         //logic
-        return userDAO.searchUsers(roleId, status);
+        return userDAO.searchUsers(roleId, status, keyword);
     }
 
     public List<UserRoleDTO> getAllUsers() {
@@ -26,16 +26,37 @@ public class UserService {
         return userDAO.createUser(user);
     }
 
-    public void updateUser(User user) {
-        userDAO.updateUser(user);
+    public boolean updateUser(User user) {
+        return userDAO.updateUser(user);
     }
 
     public User login(String username, String password) {
         return userDAO.login(username, password);
     }
 
-    public String checkDuplicate(String username, String email, String phone) {
-        return userDAO.checkDuplicate(username, email, phone);
+    
+    // begin - Xhieu - contact me wwhen remove
+    public User getUserByIdFullParameter(int id) {
+        return userDAO.getUserByIdFullParameter(id);
     }
+
+    public List<User> getAllUsersReturnUser() {
+        return userDAO.getAllUsersReturnUser();
+    }
+
+    public List<User> searchUserFieldsByOR(String userName, String phone, String email) {
+        return userDAO.searchUserFieldsByOR(userName, phone, email);
+    }
+
+    public String getLastError() {
+        return userDAO.getLastError();
+    }
+    // end - Xhieu
+
+
+    public String checkDuplicate(String username, String email, String phone, int userId) {
+        return userDAO.checkDuplicate(username, email, phone, userId);
+    }
+
 
 }

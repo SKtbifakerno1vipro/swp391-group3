@@ -36,8 +36,8 @@ public class CreateUserController extends HttpServlet {
         u.setGender(request.getParameter("gender"));
         u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
 
-        // 1. Kiem tra trung lap bang 1 ham duy nhat
-        String duplicateError = userService.checkDuplicate(u.getUserName(), u.getEmail(), u.getPhone());
+        // 1. Check duplicate
+        String duplicateError = userService.checkDuplicate(u.getUserName(), u.getEmail(), u.getPhone(), u.getUserId());
         if (duplicateError != null) {
             request.setAttribute("error", duplicateError);
             request.setAttribute("roles", roleService.getAllRoles());
@@ -46,12 +46,12 @@ public class CreateUserController extends HttpServlet {
             return;
         }
 
-        // 2. Neu khong trung lap thi thuc thi insert
+        // 2. Neu khong duplicate thi insert
         boolean success = userService.createUser(u);
         if (success) {
             response.sendRedirect(request.getContextPath() + "/user-list");
         } else {
-            request.setAttribute("error", "Loi he thong khi tao User!");
+            request.setAttribute("error", "Error insert  user!");
             request.setAttribute("roles", roleService.getAllRoles());
             request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
         }

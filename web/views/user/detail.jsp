@@ -11,8 +11,11 @@
             <c:if test="${mode=='edit'}">Edit User</c:if>
             <c:if test="${mode!='edit'}">User Detail</c:if>
             </h1>
+        <c:if test="${not empty error}">
+            <p style="color: red">${error}</p>
+        </c:if>
 
-            <form action="edit-user?id=${u.userId}" method="post">
+        <form action="edit-user?id=${u.userId}" method="post">
             <table border="1">
                 <tr>
                     <td>User Name:</td>
@@ -81,7 +84,7 @@
                 <c:if test="${mode == 'edit'}">
 
                     <button type="submit">Save</button>
-                    
+
                     <a href="user-detail?id=${u.userId}"><button type="button">Cancel</button></a>
                 </c:if>
             </table>
