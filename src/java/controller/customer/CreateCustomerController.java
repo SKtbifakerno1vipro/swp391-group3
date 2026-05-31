@@ -33,7 +33,6 @@ public class CreateCustomerController extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String userName = request.getParameter("username");
-        String password = request.getParameter("password");
         String email = request.getParameter("email");
         String fullName = request.getParameter("fullname");
         String phone = request.getParameter("phone");
@@ -50,7 +49,6 @@ public class CreateCustomerController extends HttpServlet {
         request.setAttribute("customerRoleId", customerRoleId);
 
         if (userName == null || userName.isBlank()
-                || password == null || password.isBlank()
                 || email == null || email.isBlank()
                 || taxCode == null || taxCode.isBlank()
                 || companyName == null || companyName.isBlank()
@@ -68,7 +66,6 @@ public class CreateCustomerController extends HttpServlet {
 
             model.User u = new model.User();
             u.setUserName(userName);
-            u.setPassword(password);
             u.setEmail(email);
             u.setFullName(fullName);
             u.setPhone(phone);
