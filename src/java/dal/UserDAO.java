@@ -72,7 +72,7 @@ public class UserDAO extends DBContext {
         return searchUsers(0, null);
     }
     
-    /// begin - Xhieu - có thắc mắc gì nói với tôi
+    // begin - Xhieu - contact me wwhen remove
     public User getUserByIdFullParameter(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -123,7 +123,7 @@ public class UserDAO extends DBContext {
 
     public List<User> searchUserFieldsByOR(String userName, String phone, String email) {
         List<User> list = new ArrayList<>();
-        // 1. Câu lệnh gốc dùng WHERE 1=2 để chuẩn bị nối các điều kiện OR
+        
         String sql = "SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name"
                 + ", address, phone, account_status, created_at, updated_at, role_id "
                    + "FROM [user] WHERE 1=2 ";

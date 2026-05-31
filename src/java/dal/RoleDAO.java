@@ -120,5 +120,20 @@ public class RoleDAO extends DBContext {
             System.out.println("RoleDAO updateRolePermissions error: " + e.getMessage());
         }
     }
+    // begin - Xhieu - contact me wwhen remove
+    public Integer getRoleIdByName(String roleName) {
+        String sql = "SELECT role_id FROM role WHERE role_name = ?";
+        try {
+            stm.setString(1, roleName != null ? roleName.trim() : "");
+            rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("role_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    // end - Xhieu
 }
 

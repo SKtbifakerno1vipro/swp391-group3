@@ -17,11 +17,12 @@ public class CreateCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
     private final UserService userService = new UserService();
+    private final RoleService roleService = new RoleService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Integer customerRoleId = customerService.getRoleIdByName("Customer");
+        Integer customerRoleId = roleService.getRoleIdByName("Customer");
         request.setAttribute("users", userService.getAllUsersReturnUser());
         request.setAttribute("customerRoleId", customerRoleId);
         request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
@@ -45,7 +46,7 @@ public class CreateCustomerController extends HttpServlet {
 
         List<User> users = new ArrayList<>();
         request.setAttribute("users", users);
-        Integer customerRoleId = customerService.getRoleIdByName("Customer");
+        Integer customerRoleId = roleService.getRoleIdByName("Customer");
         request.setAttribute("customerRoleId", customerRoleId);
 
         if (userName == null || userName.isBlank()

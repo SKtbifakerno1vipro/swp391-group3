@@ -35,5 +35,14 @@ public class RoleService {
     public void updateRolePermissions(int roleId, List<Integer> permissionIds) {
         roleDAO.updateRolePermissions(roleId, permissionIds);
     }
+    // begin - Xhieu - contact me wwhen remove
+    public Integer getRoleIdByName(String roleName) {
+        
+        if (roleName == null || roleName.isBlank()) {
+            return null;
+        }
+        return roleDAO.getRoleIdByName(roleName.trim());
+    }
+    // end - Xhieu
 }
 

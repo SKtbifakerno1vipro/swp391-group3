@@ -101,7 +101,7 @@ public class EditCustomerController extends HttpServlet {
             } else {
                 c.setAssignedToUserId(null);
             }
-            boolean cusDTOUpdated = customerService.updateCustomerDTOByOJB(u,c);
+            boolean cusDTOUpdated = customerService.updateCustomerDTO(u,c);
             
             request.setAttribute("users", userService.getAllUsersReturnUser());
             request.setAttribute("roles", roleService.getAllRoles());
