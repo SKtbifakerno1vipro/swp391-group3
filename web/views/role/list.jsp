@@ -14,14 +14,16 @@
         <thead>
             <tr>
                 <th>Role ID</th>
-                <th>Role Name</th>
+                <th>Role Name</th> 
+                <th>Created At</th>
+                <th>Updated At</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <c:if test="${empty roleList}">
                 <tr>
-                    <td colspan="3">No roles found.</td>
+                    <td colspan="5">No roles found.</td>
                 </tr>
             </c:if>
 
@@ -29,14 +31,17 @@
                 <tr>
                     <td>R-${role.roleId}</td>
                     <td>${role.roleName}</td>
+                    <td>${role.createAt}</td>
+                    <td>${role.updateAt}</td>                   
                     <td>
                         <a href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}">View</a>
-                        <a href="${pageContext.request.contextPath}/edit-role?id=${role.roleId}">Edit</a>
                         <a href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}">Permissions</a>
                     </td>
+                    
                 </tr>
             </c:forEach>
         </tbody>
     </table>
 </body>
 </html>
+    

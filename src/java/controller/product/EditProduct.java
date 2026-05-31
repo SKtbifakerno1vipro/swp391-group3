@@ -24,7 +24,7 @@ import service.ProductService;
  */
 @WebServlet(name = "EditProduct", urlPatterns = {"/edit-product"})
 public class EditProduct extends HttpServlet {
-
+    private final ProductService pService = new ProductService();
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -69,7 +69,7 @@ public class EditProduct extends HttpServlet {
             return;
         }
         User u = (User)session.getAttribute("user");
-        ProductService pService = new ProductService();
+        
         String productId = request.getParameter("id");
         int id = Integer.parseInt(productId);
         String action = request.getParameter("action");
@@ -105,7 +105,7 @@ public class EditProduct extends HttpServlet {
         }
         String productId = request.getParameter("id");
         int id = Integer.parseInt(productId);
-        ProductService pService = new ProductService();
+        
         Product p = pService.getProductById(Integer.parseInt(productId));
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();

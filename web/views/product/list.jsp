@@ -16,7 +16,7 @@
     <body>
         <div>
             <h1>Products</h1>
-
+            
             <div><form action="${pageContext.request.contextPath}/product-list" method="get">
                     <table>
                         <tr>
@@ -39,7 +39,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td><input type="submit" name="search" value="Search"></td>
+                            <td><input type="submit" value="Search"></td>
                         </tr>
                     </table>
                 </form>
@@ -82,7 +82,24 @@
                         </c:forEach>
                     </table>
                 </div>
-                <div>Paging</div>
+                <div>
+                    <%--
+                    <div>Show 
+                        <select name="pageSize">
+                            <c:forEach var="p" begin="5" step="5" end="${totalRow}">
+                                <option value="${pageSize}" ${pageSize == p ? 'selected' : ''}>${p}</option>
+                            </c:forEach>
+                        </select>
+
+                        in ${totalRow}</div>
+                    --%>
+                    <select  onchange="window.location.href='${pageContext.request.contextPath}/product-list?page='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&status=${status}'">
+                        <c:forEach var="i" begin="1" end="${totalPage}">
+                            <option value="${i}" ${page == i ? 'selected' : ''}>${i}</option>
+                        </c:forEach>
+                    </select>
+                    
+                </div>
                 <div><a href="${pageContext.request.contextPath}/dashboard">Back to Dashboard</a></div>
             </div>
         </div>

@@ -24,8 +24,8 @@ public class RoleService {
         return roleDAO.getAllPermissions();
     }
 
-    public boolean insertRole(String roleName) {
-        return roleDAO.insertRole(roleName);
+    public int createRole(String roleName) {
+        return roleDAO.createRole(roleName);
     }
 
     public void updateRole(Role role) {
@@ -44,5 +44,9 @@ public class RoleService {
         return roleDAO.getRoleIdByName(roleName.trim());
     }
     // end - Xhieu
+    public boolean isRoleNameExists(String roleName){
+        return roleDAO.isRoleNameExists(roleName);
+    }
+
 }
 
