@@ -22,7 +22,7 @@ public class CreateCustomerController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Integer customerRoleId = roleService.getRoleIdByName("Customer");
+        request.setAttribute("customerRoleId", roleService.getRoleIdByName("Customer"));
         request.setAttribute("users", userService.getAllUsersReturnUser());
         request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
     }
@@ -32,7 +32,6 @@ public class CreateCustomerController extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String userName = request.getParameter("username");
-        String password = request.getParameter("password");
         String email = request.getParameter("email");
         String fullName = request.getParameter("fullname");
         String phone = request.getParameter("phone");
@@ -43,12 +42,11 @@ public class CreateCustomerController extends HttpServlet {
         String assignedToUserIdValue = request.getParameter("assignedToUserId");
         String roleIdValue = request.getParameter("roleId");
 
-        List<User> users = new ArrayList<>();
-        request.setAttribute("users", users);
+        request.setAttribute("users", userService.getAllUsersReturnUser());
         Integer customerRoleId = roleService.getRoleIdByName("Customer");
+        request.setAttribute("customerRoleId", customerRoleId);
 
         if (userName == null || userName.isBlank()
-                || password == null || password.isBlank()
                 || email == null || email.isBlank()
                 || taxCode == null || taxCode.isBlank()
                 || companyName == null || companyName.isBlank()
@@ -64,14 +62,13 @@ public class CreateCustomerController extends HttpServlet {
                 roleId = Integer.parseInt(roleIdValue);
             }
 
-            model.User u = new model.User();
+            User u = new model.User();
             u.setUserName(userName);
-            u.setPassword(password);
             u.setEmail(email);
             u.setFullName(fullName);
             u.setPhone(phone);
             u.setStatus(status);
-
+            u.setRoleId(roleId);
             Customer c = new Customer();
             c.setTaxCode(taxCode);
             c.setCompanyName(companyName);
@@ -81,6 +78,7 @@ public class CreateCustomerController extends HttpServlet {
             }
 
             Customer createdCustomer = customerService.createCustomerDTO(u, c);
+
             if (createdCustomer != null && createdCustomer.getUserId() != null && createdCustomer.getUserId() > 0) {
                 request.setAttribute("success", true);
             } else {

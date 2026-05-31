@@ -19,43 +19,34 @@ public class CustomerListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<CustomerDTO> allCustomerDTOs;
+        String searchName = request.getParameter("searchName");
+        String type = request.getParameter("type");
+        String pageRaw = request.getParameter("page");
         
-        //filter
-        String key = request.getParameter("searchKeyword");
-        String cusType = request.getParameter("customerType");
-        if (key != null && !key.isBlank() || cusType != null && !cusType.isBlank())
-            allCustomerDTOs = customerService.getAllCustomerDTOs();
-        // toi chua fix cho nay
-        else
-            allCustomerDTOs = customerService.getAllCustomerDTOs();
+        int page = 1;       // Trang mặc định nếu người dùng mới vào lần đầu
+        int pageSize = 10;  // Hiển thị cố định 10 dòng trên 1 trang
         
-        // page
-        int currentPage = 1;
-        try {
-            String pageParam = request.getParameter("page");
-            if (pageParam != null && !pageParam.isBlank()) {
-                currentPage = Integer.parseInt(pageParam);
+        if (pageRaw != null && !pageRaw.isBlank()) {
+            try {
+                page = Integer.parseInt(pageRaw);
+            } catch (NumberFormatException e) {
+                page = 1;
             }
-        } catch (NumberFormatException ignored) {
-            currentPage = 1;
         }
 
+        // 2. Gọi Service xử lý gộp Lọc + Phân trang
+        List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, type, page, pageSize);
+        int totalPages = customerService.getTotalPages(searchName, type, pageSize);
 
-        int totalRecords = allCustomerDTOs == null ? 0 : allCustomerDTOs.size();
-        int totalPages = (int) Math.ceil(totalRecords / (double) PAGE_SIZE);
-        if (totalPages < 1) totalPages = 1;
-
-        if (currentPage < 1) currentPage = 1;
-        if (currentPage > totalPages) currentPage = totalPages;
-
-        int fromIndex = (currentPage - 1) * PAGE_SIZE;
-        int toIndex = Math.min(fromIndex + PAGE_SIZE, totalRecords);
-        List<CustomerDTO> pageCustomerDTOs = (totalRecords == 0) ? List.of() : allCustomerDTOs.subList(fromIndex, toIndex);
-
-        request.setAttribute("CustomerDTOList", pageCustomerDTOs);
-        request.setAttribute("currentPage", currentPage);
+        // 3. Đẩy dữ liệu ra trang JSP hiển thị
+        request.setAttribute("customers", list);
+        request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        
+        // Bắt buộc giữ lại các từ khóa tìm kiếm để đẩy ngược lại các ô input/select ngoài giao diện JSP
+        request.setAttribute("searchName", searchName);
+        request.setAttribute("type", type);
+
         request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
     }
 
