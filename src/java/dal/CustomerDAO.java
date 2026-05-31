@@ -80,22 +80,6 @@ public class CustomerDAO extends DBContext {
         return null; // Trả về null nếu không tìm thấy khách hàng nào khớp với mã số thuế này
     }
 
-    public Integer getRoleIdByName(String roleName) {
-        try {
-            String sql = "SELECT role_id FROM role WHERE role_name = ?";
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setString(1, roleName);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("role_id");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            error = "getRoleIdByName " + e.getMessage();
-        }
-        return null;
-    }
-
     public Customer createCustomer(User user, Customer customer) {
         UserDAO userDAO = new UserDAO();
         try {
@@ -154,5 +138,21 @@ public class CustomerDAO extends DBContext {
     
     public String getLastError() {
         return error;
+    }
+    
+    // tạo tạm để dùng
+    public Integer getRoleIdByName(String roleName) {
+        String sql = "SELECT role_id FROM role WHERE role_name = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, roleName != null ? roleName.trim() : "");
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("role_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            error = "getRoleIdByName: " + e.getMessage();
+        }
+        return null; // Trả về null nếu không tìm thấy tên vai trò này trong DB
     }
 }

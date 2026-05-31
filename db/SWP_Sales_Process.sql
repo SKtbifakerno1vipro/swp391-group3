@@ -435,6 +435,7 @@ GO
 -- ====================================================================================
 -- BƯỚC 3: XEM TOÀN BỘ DANH SÁCH CUSTOMER DTO (Giống hệt câu query trong hàm getAllCustomerDTOs)
 -- ====================================================================================
+select * from [role]
 SELECT 
     c.customer_id, 
     c.tax_code, 

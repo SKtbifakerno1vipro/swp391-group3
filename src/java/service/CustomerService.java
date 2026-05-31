@@ -115,4 +115,13 @@ public Customer createCustomerDTO(User u, Customer c) {
     public String getLastError() {
         return customerDAO.getLastError() + error;
     }
+    
+    // tạo tạm để dùng
+    public Integer getRoleIdByName(String roleName) {
+        // Nếu truyền vào null hoặc chuỗi trống, mặc định đi tìm role_id của "Customer"
+        if (roleName == null || roleName.isBlank()) {
+            roleName = "Customer";
+        }
+        return customerDAO.getRoleIdByName(roleName.trim());
+    }
 }
