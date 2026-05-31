@@ -1,7 +1,6 @@
 package controller.user;
 
 import service.UserService;
-import dal.RoleDAO;
 import model.User;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
