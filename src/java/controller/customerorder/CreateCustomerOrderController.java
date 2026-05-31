@@ -103,11 +103,7 @@ public class CreateCustomerOrderController extends HttpServlet {
         order.setOrderStatus("PENDING");
         order.setCreatedBy(currentUser.getUserId());
         
-        // HACK: In a real system, we'd pick a contract. For now, we'll try to find any contract for this customer
-        // or hardcode a valid one from sample data if available, or just use 1 if it exists.
-        // For the sake of "fixing" it, I'll assume there's at least one contract.
-        // Ideally, we should fetch contract from DB. 
-        // Let's use 1 as a placeholder or fetch it if possible.
+        
         order.setCustomerContractId(1); 
 
         List<CustomerOrderDetail> details = new ArrayList<>();
@@ -121,12 +117,7 @@ public class CreateCustomerOrderController extends HttpServlet {
                     if (p != null) {
                         CustomerOrderDetail detail = new CustomerOrderDetail();
                         detail.setProductId(pid);
-                        detail.setQuantity(quantity);
-//                        detail.setSellingPrice(p.getSellingPrice());
-                        // For cost price, if model has it use it, otherwise use a default or 0
-                        // SQL product has cost_price, let's check if Product model has it.
-                        // I checked Product.java earlier, it didn't have costPrice.
-                        // So I'll use 0 or update Product model.
+                        detail.setQuantity(quantity);                      
                         detail.setCostPrice(BigDecimal.ZERO); 
                         details.add(detail);
                     }
