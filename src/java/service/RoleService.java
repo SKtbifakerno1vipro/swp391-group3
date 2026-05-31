@@ -37,7 +37,6 @@ public class RoleService {
     }
     // begin - Xhieu - contact me wwhen remove
     public Integer getRoleIdByName(String roleName) {
-        
         if (roleName == null || roleName.isBlank()) {
             return null;
         }

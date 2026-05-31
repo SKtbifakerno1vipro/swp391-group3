@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Customer;
 import model.User;
+import dto.*;
 
 public class CustomerDAO extends DBContext {
     
@@ -20,12 +21,6 @@ public class CustomerDAO extends DBContext {
         c.setCustomerType(rs.getString("customer_type"));
         c.setCompanyName(rs.getString("company_name"));
         c.setAssignedToUserId((Integer) rs.getObject("assigned_to_user_id"));
-        if (rs.getTimestamp("created_at") != null) {
-            c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-        }
-        if (rs.getTimestamp("updated_at") != null) {
-            c.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-        }
         return c;
     }
 

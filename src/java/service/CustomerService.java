@@ -132,7 +132,7 @@ public class CustomerService {
 
     public Customer createCustomerDTO(User u, Customer c) {
         String isDuplicate = isDuplicateCusFields(u.getUserName(), u.getPhone(), u.getEmail(), c.getTaxCode());
-        if (isDuplicate.contentEquals("SUCESS")) {
+        if (isDuplicate.contentEquals("SUCCESS")) {
             return customerDAO.createCustomer(u, c);
         }
         return null;

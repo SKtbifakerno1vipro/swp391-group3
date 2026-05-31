@@ -100,17 +100,16 @@ public class UserDAO extends DBContext {
                 u.setPhone(rs.getString("phone"));
                 u.setStatus(rs.getString("account_status"));
                 u.setRoleId(rs.getInt("role_id"));
-                if (rs.getTimestamp("create_at") != null) {
-                    u.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
+                if (rs.getTimestamp("created_at") != null) {
+                    u.setCreateAt(rs.getTimestamp("created_at").toLocalDateTime());
                 }
-                if (rs.getTimestamp("update_at") != null) {
-                    u.setUpdateAt(rs.getTimestamp("update_at").toLocalDateTime());
+                if (rs.getTimestamp("updated_at") != null) {
+                    u.setUpdateAt(rs.getTimestamp("updated_at").toLocalDateTime());
                 }
-
                 return u;
             }
         } catch (Exception e) {
-            System.out.println("getUserById" + e.getMessage());
+            System.out.println("getUserByIdFullParameter" + e.getMessage());
         }
         return null;
     }

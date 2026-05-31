@@ -171,18 +171,20 @@ public class RoleDAO extends DBContext {
     }
     // begin - Xhieu - contact me wwhen remove
     public Integer getRoleIdByName(String roleName) {
-        String sql = "SELECT role_id FROM role WHERE role_name = ?";
-        try {
-            stm.setString(1, roleName != null ? roleName.trim() : "");
-            rs = stm.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("role_id");
+    String sql = "SELECT role_id FROM role WHERE role_name = ?";
+    
+    try (PreparedStatement stm1 = connection.prepareStatement(sql)) {
+        stm1.setString(1, roleName); 
+        try (ResultSet rs1 = stm1.executeQuery()) {
+            if (rs1.next()) {
+                return rs1.getInt("role_id");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return null;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    return null; // Trả về null nếu không tìm thấy role tương ứng
+}
     // end - Xhieu
     
     public boolean isRoleNameExists(String roleName){

@@ -75,7 +75,7 @@
                             <td>
                                 <select name="status">
                                     <option value="Active" ${cusDTO.user.status == 'Active' ? 'selected' : ''}>Active</option>
-                                    <option value="Inactive" ${cusDTO.user.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                    <option value="Inactive " ${cusDTO.user.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
                                 </select>
                             </td>
                         </tr>
