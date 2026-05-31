@@ -8,18 +8,22 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
+import java.util.ArrayList;
 import model.*;
+import service.*;
 
 @WebServlet(name = "CreateCustomerController", urlPatterns = {"/customer/create"})
 public class CreateCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
+    private final UserService userService = new UserService();
+    private final RoleService roleService = new RoleService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Integer customerRoleId = customerService.getRoleIdByName("Customer");
-        request.setAttribute("users", customerService.getAllUsers());
+        Integer customerRoleId = roleService.getRoleIdByName("Customer");
+        request.setAttribute("users", userService.getAllUsersReturnUser());
         request.setAttribute("customerRoleId", customerRoleId);
         request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
     }
@@ -40,9 +44,9 @@ public class CreateCustomerController extends HttpServlet {
         String assignedToUserIdValue = request.getParameter("assignedToUserId");
         String roleIdValue = request.getParameter("roleId");
 
-        List<User> users = customerService.getAllUsers();
+        List<User> users = new ArrayList<>();
         request.setAttribute("users", users);
-        Integer customerRoleId = customerService.getRoleIdByName("Customer");
+        Integer customerRoleId = roleService.getRoleIdByName("Customer");
         request.setAttribute("customerRoleId", customerRoleId);
 
         if (userName == null || userName.isBlank()
@@ -79,7 +83,7 @@ public class CreateCustomerController extends HttpServlet {
                 c.setAssignedToUserId(Integer.parseInt(assignedToUserIdValue));
             }
 
-            Customer createdCustomer = customerService.createUserAndCustomer(u, c);
+            Customer createdCustomer = customerService.createCustomerDTO(u, c);
 
             if (createdCustomer != null && createdCustomer.getUserId() != null && createdCustomer.getUserId() > 0) {
                 request.setAttribute("success", true);

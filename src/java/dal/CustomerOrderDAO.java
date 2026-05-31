@@ -70,6 +70,9 @@ public class CustomerOrderDAO extends DBContext {
                 model.Product p = new model.Product();
                 p.setProductId(rs.getInt("product_id"));
                 p.setProductName(rs.getString("product_name"));
+
+                p.setSellingPrice(rs.getDouble("selling_price"));
+
                 p.setUnit(rs.getString("unit"));
 
                 dto.CustomerOrderDetailDTO detailDto = new dto.CustomerOrderDetailDTO();
