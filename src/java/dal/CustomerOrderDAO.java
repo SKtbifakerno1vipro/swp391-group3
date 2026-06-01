@@ -194,4 +194,27 @@ public class CustomerOrderDAO extends DBContext {
         }
         return list;
     }
+
+    public List<CustomerOrderDTO> getAllCustomerOrdersByName(String keyword) {
+         List<CustomerOrderDTO> list = new ArrayList<>();
+        String sql = "SELECT co.*, c.tax_code, u.full_name "
+                + "FROM customer_order co "
+                + "JOIN customer c ON co.customer_id = c.customer_id "
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "WHERE u.full_name like ? "
+                + "or c.tax_code like ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            String searchPattern = "%" + keyword + "%";
+            ps.setString(1, searchPattern);
+            ps.setString(2, searchPattern);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                // Tái sử dụng hàm mapResultSetToDTO đã có sẵn trong DAO của bạn
+                list.add(mapResultSetToDTO(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
