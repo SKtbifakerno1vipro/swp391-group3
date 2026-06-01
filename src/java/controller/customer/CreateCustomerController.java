@@ -2,15 +2,14 @@ package controller.customer;
 
 import service.CustomerService;
 import java.io.IOException;
-import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
-import java.util.ArrayList;
 import model.*;
 import service.*;
+import utils.*;
 
 @WebServlet(name = "CreateCustomerController", urlPatterns = {"/customer/create"})
 public class CreateCustomerController extends HttpServlet {
@@ -23,7 +22,9 @@ public class CreateCustomerController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setAttribute("customerRoleId", roleService.getRoleIdByName("Customer"));
-        request.setAttribute("users", userService.getAllUsersReturnUser());
+        request.setAttribute("listTypeCus", customerService.getCusTypeList());
+        request.setAttribute("users", customerService.getAllSalesExecutiveUsers());
+        System.out.println(customerService.getAllSalesExecutiveUsers());
         request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
     }
 
@@ -46,14 +47,33 @@ public class CreateCustomerController extends HttpServlet {
         Integer customerRoleId = roleService.getRoleIdByName("Customer");
         request.setAttribute("customerRoleId", customerRoleId);
 
-        if (userName == null || userName.isBlank()
-                || email == null || email.isBlank()
-                || taxCode == null || taxCode.isBlank()
-                || companyName == null || companyName.isBlank()
-                || customerType == null || customerType.isBlank()) {
-            request.setAttribute("error", "Create failed: Must input enough");
+        String errorMsg = null;
+
+        if ((errorMsg = Validation.validateUsername(userName)) != null) {
+            // Gặp lỗi dừng luôn, không check các trường phía sau nữa
+        } else if ((errorMsg = Validation.validateEmail(email)) != null) {
+            // Cấu trúc else-if giúp tối giản code và bắt lỗi theo thứ tự từ trên xuống
+        } else if ((errorMsg = Validation.validateFullName(fullName)) != null) {
+            
+        } else if ((errorMsg = Validation.validatePhone(phone)) != null) {
+            
+        } else if ((errorMsg = Validation.validateTaxCode(taxCode)) != null) {
+            
+        } else if ((errorMsg = Validation.validateCompanyName(companyName)) != null) {
+            
+        }
+
+        // BIỆN PHÁP TẬP TRUNG: Nếu có bất kỳ lỗi nào ở trên, nạp data 1 lần duy nhất rồi forward
+        if (errorMsg != null) {
+            request.setAttribute("error", errorMsg); // Gửi mã lỗi chi tiết của trường bị sai về JSP
+            
+            // Chỉ viết đúng 1 lần ở đây, không bị trùng lặp nữa
+            request.setAttribute("users", userService.getAllUsersReturnUser());
+            request.setAttribute("listTypeCus", customerService.getCusTypeList());
+            request.setAttribute("customerRoleId", roleService.getRoleIdByName("Customer"));
+            
             request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
-            return;
+            return; // Chặn đứng không cho xuống phần lưu DB
         }
 
         try {

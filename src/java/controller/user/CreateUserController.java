@@ -17,7 +17,7 @@ public class CreateUserController extends HttpServlet {
 
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setAttribute("roles", roleService.getAllRoles());
@@ -37,7 +37,7 @@ public class CreateUserController extends HttpServlet {
         u.setStatus("ACTIVE");
         u.setGender(request.getParameter("gender"));
         u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //1. check validate data
         if (error == null) {
             error = Validation.validateEmpty(u.getUserName(), "User name");
@@ -53,9 +53,17 @@ public class CreateUserController extends HttpServlet {
         }
 
         if (error == null) {
-            error = userService.checkDuplicate(u.getUserName(), u.getEmail(), u.getPhone(), u.getUserId());
+            if (userService.isEmailDuplicate(u.getEmail(), u.getUserId())) {
+                error = "Email duplicated, please enter again!";
+            }
+            if (userService.isPhoneDuplicate(u.getPhone(), u.getUserId())) {
+                error = "Phone duplicated, please enter again!";
+            }
+            if (userService.isUsernameDuplicate(u.getUserName(), u.getUserId())) {
+                error = "User Name duplicated, please enter again!";
+            }
         }
-        
+
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("roles", roleService.getAllRoles());
@@ -63,7 +71,7 @@ public class CreateUserController extends HttpServlet {
             request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
             return;
         }
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 2. Neu khong error thi insert
         boolean success = userService.createUser(u);
         if (success) {

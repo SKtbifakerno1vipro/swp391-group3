@@ -9,8 +9,6 @@ import java.util.List;
 import model.User;
 
 public class UserDAO extends DBContext {
-    
-    String error;
 
     private User mapUser(ResultSet rs) throws Exception {
         User u = new User();
@@ -30,7 +28,11 @@ public class UserDAO extends DBContext {
         return u;
     }
 
-    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword) {
+
+    /*
+    created by phu
+     */
+    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword, int pageIndex, int pageSize) {
         List<UserRoleDTO> list = new ArrayList<>();
         String sql = "select * from [user] u "
                 + "join dbo.role r  on u.role_id= r.role_id where 1=1";
@@ -45,6 +47,9 @@ public class UserDAO extends DBContext {
             sql += " AND (u.full_name LIKE ? OR u.phone LIKE ?)";
         }
 
+        //paging querry
+        sql += " ORDER BY u.user_id asc OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
             if (roleId > 0) {
@@ -58,6 +63,11 @@ public class UserDAO extends DBContext {
                 ps.setString(index++, searchPattern);
                 ps.setString(index++, searchPattern);
             }
+
+            int offset = (pageIndex - 1) * pageSize;
+            ps.setInt(index++, offset);
+            ps.setInt(index++, pageSize);
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 UserRoleDTO u = new UserRoleDTO();
@@ -79,9 +89,48 @@ public class UserDAO extends DBContext {
     }
 
     public List<UserRoleDTO> getAllUsers() {
-        return searchUsers(0, null, null);
+        return searchUsers(0, null, null, 1, 10);
     }
-    
+
+    public int getTotalUsers(int roleId, String status, String keyword) {
+        String sql = "select count(*) from [user] u where 1=1 ";
+        if (roleId > 0) {
+            sql += "and u.role_id=?";
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            sql += "and u.account_status= ?";
+        }
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql += " and (u.full_name like ? or u.phone like ?)";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int index = 1;
+            if (roleId > 0) {
+                ps.setInt(index++, roleId);
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String searchPattern = "%" + keyword.trim() + "%";
+                ps.setString(index++, searchPattern);
+                ps.setString(index++, searchPattern);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // return total of column
+                }
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error getTotalUsers: " + e.getMessage());
+        }
+        return 0;
+    }
+
     // begin - Xhieu - contact me wwhen remove
     public User getUserByIdFullParameter(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
@@ -113,7 +162,7 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
-    
+
     public List<User> getAllUsersReturnUser() {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM [user]";
@@ -130,44 +179,58 @@ public class UserDAO extends DBContext {
         return list;
     }
 
-    public List<User> searchUserFieldsByOR(String userName, String phone, String email) {
+    public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer roleId) {
         List<User> list = new ArrayList<>();
-        
+
         String sql = "SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name"
                 + ", address, phone, account_status, created_at, updated_at, role_id "
-                   + "FROM [user] WHERE 1=2 ";
+                + "FROM [user] WHERE 1=2 ";
 
-        if ((userName == null || userName.isBlank()) && 
-            (phone == null || phone.isBlank()) && 
-            (email == null || email.isBlank())) {
-            return null;
+        if ((userName == null || userName.isBlank())
+                && (phone == null || phone.isBlank())
+                && (email == null || email.isBlank())
+                && (roleId == null || roleId == 0)) {
+            return list;
         }
 
-        if (userName != null && !userName.isBlank()) sql += "OR user_name = ? ";
-        if (phone != null && !phone.isBlank())       sql += "OR phone = ? ";
-        if (email != null && !email.isBlank())       sql += "OR email = ? ";
+        if (userName != null && !userName.isBlank()) {
+            sql += "OR user_name = ? ";
+        }
+        if (phone != null && !phone.isBlank()) {
+            sql += "OR phone = ? ";
+        }
+        if (email != null && !email.isBlank()) {
+            sql += "OR email = ? ";
+        }
+        if (roleId != null && roleId != 0) {
+            sql += "OR role_id = ? ";
+        }
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
 
-            if (userName != null && !userName.isBlank()) ps.setString(index++, userName.trim());
-            if (phone != null && !phone.isBlank())       ps.setString(index++, phone.trim());
-            if (email != null && !email.isBlank())       ps.setString(index++, email.trim());
-
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                User u = mapUser(rs);
-                list.add(u);
+            if (userName != null && !userName.isBlank()) {
+                ps.setString(index++, userName.trim());
+            }
+            if (phone != null && !phone.isBlank()) {
+                ps.setString(index++, phone.trim());
+            }
+            if (email != null && !email.isBlank()) {
+                ps.setString(index++, email.trim());
+            }
+            if (roleId != null && roleId != 0) {
+                ps.setInt(index++, roleId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User u = mapUser(rs);
+                    list.add(u);
+                }
             }
         } catch (Exception e) {
-            error = e.getMessage();
+            e.printStackTrace();
         }
         return list;
-    }
-    
-    public String getLastError() {
-        return error;
-
     }
     /// end - Xhieu
 
@@ -263,33 +326,57 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-    // Kiem tra trung lap 3 truong cung 1 luc
-    public String checkDuplicate(String username, String email, String phone, int userId) {
-        String sql = """
-                     select u.user_name, u.phone, u.email  from [user] u
-                     where  (u.user_name= ? or u.phone=? or u.email= ?) and u.user_id != ?""";
+    public boolean isUsernameDuplicate(String username, int userId) {
+        String sql = "SELECT 1 FROM [user] WHERE user_name = ? AND user_id != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
-            ps.setString(2, phone);
-            ps.setString(3, email);
-            ps.setInt(4, userId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                if (username.equals(rs.getString("user_name"))) {
-                    return "User name duplicated";
-                }
-                if (phone.equals(rs.getString("phone"))) {
-                    return "Phone duplicated";
-                }
-                if (email.equals(rs.getString("email"))) {
-                    return "Email duplicated";
-                }
+            ps.setInt(2, userId);
+
+            // Dùng try-with-resources để đảm bảo ResultSet tự động được đóng
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Trả về true nếu bản ghi tồn tại
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error checking username: " + e.getMessage());
         }
-        return null;
+        return false;
+    }
 
+    public boolean isEmailDuplicate(String email, int userId) {
+        String sql = "SELECT 1 FROM [user] WHERE email = ? AND user_id != ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            System.out.println("Error checking email: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param phone
+     * @param userId
+     * @return
+     */
+    public boolean isPhoneDuplicate(String phone, int userId) {
+        String sql = "SELECT 1 FROM [user] WHERE phone = ? AND user_id != ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            ps.setInt(2, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            System.out.println("Error checking phone: " + e.getMessage());
+        }
+        return false;
     }
 
 }
+

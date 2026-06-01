@@ -9,13 +9,16 @@ public class UserService {
 
     private final UserDAO userDAO = new UserDAO();
 
-    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword) {
+    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword, int offset, int pageIndex) {
         //logic
-        return userDAO.searchUsers(roleId, status, keyword);
+        return userDAO.searchUsers(roleId, status, keyword, offset, pageIndex);
     }
 
     public List<UserRoleDTO> getAllUsers() {
         return userDAO.getAllUsers();
+    }
+    public int getTotalUsers(int roleId, String status, String keyword){
+        return userDAO.getTotalUsers(roleId, status, keyword);
     }
 
     public User getUserById(int id) {
@@ -43,16 +46,20 @@ public class UserService {
         return userDAO.getAllUsersReturnUser();
     }
 
-    public String checkDuplicate(String username, String email, String phone, int userId) {
-        return userDAO.checkDuplicate(username, email, phone, userId);
+    public boolean isEmailDuplicate(String email, int userId) {
+        return userDAO.isEmailDuplicate(email, userId);
     }
 
-    public List<User> searchUserFieldsByOR(String userName, String phone, String email) {
-        return userDAO.searchUserFieldsByOR(userName, phone, email);
+    public boolean isPhoneDuplicate(String phone, int userId) {
+        return userDAO.isPhoneDuplicate(phone, userId);
     }
 
-    public String getLastError() {
-        return userDAO.getLastError();
+    public boolean isUsernameDuplicate(String userName, int userId) {
+        return userDAO.isUsernameDuplicate(userName, userId);
+    }
+
+    public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer role_id) {
+        return userDAO.searchUserFieldsByOR(userName, phone, email, role_id);
     }
     // end - Xhieu
 

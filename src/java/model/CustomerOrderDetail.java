@@ -7,8 +7,8 @@ public class CustomerOrderDetail {
     private int customerOrderId;
     private int productId;
     private int quantity;
-    private BigDecimal costPrice;
-    private BigDecimal sellingPrice;
+    private double costPrice;
+    private double sellingPrice;
 
     public CustomerOrderDetail() {}
     
@@ -20,8 +20,8 @@ public class CustomerOrderDetail {
     public void setProductId(int productId) { this.productId = productId; }
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
-    public BigDecimal getCostPrice() { return costPrice; }
-    public void setCostPrice(BigDecimal costPrice) { this.costPrice = costPrice; }
-    public BigDecimal getSellingPrice() { return sellingPrice; }
-    public void setSellingPrice(BigDecimal sellingPrice) { this.sellingPrice = sellingPrice; }
+    public double getCostPrice() { return costPrice; }
+    public void setCostPrice(double costPrice) { this.costPrice = costPrice; }
+    public double getSellingPrice() { return sellingPrice; }
+    public void setSellingPrice(double sellingPrice) { this.sellingPrice = sellingPrice; }
 }
