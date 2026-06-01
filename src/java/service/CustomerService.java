@@ -13,8 +13,45 @@ public class CustomerService {
     private final CustomerDAO customerDAO = new CustomerDAO();
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
-    private String error = "";
     
+    // new
+    public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String type, int page, int pageSize) {
+        List<CustomerDTO> dtoList = new ArrayList<>();
+        
+        // 1. Gọi CustomerDAO lấy danh sách khách hàng thô đã được lọc và cắt trang dưới DB
+        List<Customer> customerList = customerDAO.searchAndPaginateCustomers(searchName, type, page, pageSize);
+        if (customerList == null || customerList.isEmpty()) {
+            return dtoList; // Trả về danh sách rỗng, không trả về null để tránh lỗi sập trang
+        }
+
+        // 2. Tối ưu hiệu năng: Kéo toàn bộ danh sách User lên RAM qua UserService để map chéo
+        List<User> userList = userService.getAllUsersReturnUser();
+        Map<Integer, User> userMap = new HashMap<>();
+        if (userList != null) {
+            for (User u : userList) {
+                userMap.put(u.getUserId(), u);
+            }
+        }
+
+        // 3. Tiến hành ghép đôi dữ liệu tạo DTO hoàn chỉnh trên RAM
+        for (Customer c : customerList) {
+            User u = userMap.get(c.getUserId());
+            if (u != null) {
+                dtoList.add(new CustomerDTO(c, u, null));
+            }
+        }
+        return dtoList;
+    }
+    // new 
+    public int getTotalPages(String searchName, String type, int pageSize) {
+        // Gọi hàm đếm tổng số dòng thỏa mãn điều kiện lọc dưới DAO
+        int totalRecords = customerDAO.getTotalCustomersCount(searchName, type);
+        
+        if (totalRecords == 0) return 1;
+        
+        // Công thức tính tổng số trang chuẩn (Làm tròn lên)
+        return (int) Math.ceil((double) totalRecords / pageSize);
+    }
     // new
     public List<CustomerDTO> getAllCustomerDTOs() {
         List<CustomerDTO> dtoList = new ArrayList<>();
@@ -66,15 +103,13 @@ public class CustomerService {
         List<User> cus = userService.searchUserFieldsByOR(userName, phone, email);
         Integer id = customerDAO.getCustomerIdByTaxCode(taxCode);
 
-        // 2. Trường hợp 1: Phát hiện trùng Mã Số Thuế trước (vì biến id đã check riêng lẻ)
         if (id != null) {
             return "Tax Code is already registered by another customer";
         }
 
-        // 3. Trường hợp 2: Kiểm tra danh sách User trả về xem trùng cụ thể trường nào
         if (cus != null && !cus.isEmpty()) {
             for (User cu : cus) {
-                // Sử dụng equalsIgnoreCase để ép chữ hoa/chữ thường check cho chính xác
+
                 if (userName != null && userName.trim().equalsIgnoreCase(cu.getUserName())) {
                     return "Username already exists in the system";
                 }
@@ -86,7 +121,6 @@ public class CustomerService {
                 }
             }
         }
-        // 4. Trường hợp 3: Không trùng bất kỳ trường nào cả, dữ liệu hoàn toàn sạch
         return "SUCCESS";
     }
 
@@ -96,9 +130,9 @@ public class CustomerService {
         return userUpdated && customerUpdated;
     }
 
-public Customer createCustomerDTO(User u, Customer c) {
+    public Customer createCustomerDTO(User u, Customer c) {
         String isDuplicate = isDuplicateCusFields(u.getUserName(), u.getPhone(), u.getEmail(), c.getTaxCode());
-        if (isDuplicate.contentEquals("SUCESS")) {
+        if (isDuplicate.contentEquals("SUCCESS")) {
             return customerDAO.createCustomer(u, c);
         }
         return null;
@@ -109,7 +143,7 @@ public Customer createCustomerDTO(User u, Customer c) {
     }
 
     public String getLastError() {
-        return customerDAO.getLastError() + error;
+        return customerDAO.getLastError();
     }
     public Customer getCustomerByCusId(int userId) {
         return customerDAO.getCustomerByCusId(userId);

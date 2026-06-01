@@ -34,10 +34,6 @@
                         <input type="text" id="username" name="username" required>
                     </div>
                     <div>
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                    </div>
-                    <div>
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" required>
                     </div>
@@ -52,8 +48,8 @@
                     <div>
                         <label for="status">Status</label>
                         <select id="status" name="status">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
                         </select>
                     </div>
                     <div>

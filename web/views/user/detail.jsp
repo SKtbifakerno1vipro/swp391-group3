@@ -25,19 +25,19 @@
 
                 <tr>
                     <td>Full Name:</td>
-                    <td><input type="text" name="fullName" 
-                               value="${u.fullName}   " ${mode=='edit' ? '' : 'readonly'}></td>
+                    <td><input type="text" name="fullName" minlength="4" maxlength="50" required
+                               value="${u.fullName}" ${mode=='edit' ? '' : 'readonly'}></td>
                 </tr>
 
                 <tr>
                     <td>Email:</td>
                     <td><input type="text" name="email" 
-                               value="${u.email} " readonly=""></td>
+                               value="${u.email}" readonly=""></td>
                 </tr>
 
                 <tr>
                     <td>Phone:</td>
-                    <td><input type="text" name="phone" 
+                    <td><input type="text" name="phone"  required pattern="[0-9]{10}"
                                value="${u.phone}" ${mode=='edit' ? '' : 'readonly'}></td>
                 </tr>
 
