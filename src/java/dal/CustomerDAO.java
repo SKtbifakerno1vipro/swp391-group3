@@ -2,7 +2,7 @@ package dal;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Types;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import model.Customer;
@@ -110,61 +110,117 @@ public class CustomerDAO extends DBContext {
         return null; // Trả về null nếu không tìm thấy khách hàng nào khớp với mã số thuế này
     }
 
-    public Customer createCustomer(User user, Customer customer) {
-        UserDAO userDAO = new UserDAO();
-        try {
-            userDAO.createUser(user);
-            String sqlGetId = "SELECT user_id FROM [user] WHERE user_name = ?";
-            PreparedStatement stmId = connection.prepareStatement(sqlGetId);
-            stmId.setString(1, user.getUserName());
-            ResultSet rs = stmId.executeQuery();
-            if (rs.next()) {
-                int userId = rs.getInt("user_id");
-
-                String sqlCustomer = "INSERT INTO [customer] (user_id, tax_code, customer_type, company_name, assigned_to_user_id, created_at, updated_at) "
-                        + "VALUES (?, ?, ?, ?, ?, GETDATE(), GETDATE())";
-
-                PreparedStatement stmCustomer = connection.prepareStatement(sqlCustomer);
-                stmCustomer.setInt(1, userId);
-                stmCustomer.setString(2, customer.getTaxCode());
-                stmCustomer.setString(3, customer.getCustomerType());
-                stmCustomer.setString(4, customer.getCompanyName());
-                if (customer.getAssignedToUserId() != null) {
-                    stmCustomer.setInt(5, customer.getAssignedToUserId());
-                } else {
-                    stmCustomer.setNull(5, Types.INTEGER);
-                }
-                stmCustomer.executeUpdate();
-                customer.setUserId(userId);
-                return customer;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            error = "createCustomer " + e.getMessage();
-        }
-        return null;
-    }
-
-    public boolean updateCustomer(Customer customer) {
-        try {
-            String sql = "UPDATE [customer] SET tax_code = ?, customer_type = ?, company_name = ?, assigned_to_user_id = ?, updated_at = GETDATE() WHERE customer_id = ?";
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setString(1, customer.getTaxCode());
-            stm.setString(2, customer.getCustomerType());
-            stm.setString(3, customer.getCompanyName());
-            if (customer.getAssignedToUserId() != null) {
-                stm.setInt(4, customer.getAssignedToUserId());
-            } else {
-                stm.setNull(4, Types.INTEGER);
-            }
-            stm.setInt(5, customer.getCustomerId());
-            return stm.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            error = "updateCustomer " + e.getMessage();
-        }
+    public boolean updateCustomerDynamic(Customer customer) {
+    // 1. Pre-condition check: user_id is mandatory for the WHERE clause
+    if (customer.getUserId() == null || customer.getUserId() <= 0) {
+        System.out.println("Error: Invalid user_id provided for the update condition!");
         return false;
     }
+
+    // Initialize StringBuilder with the base UPDATE statement
+    StringBuilder sql = new StringBuilder("UPDATE [customer] SET ");
+    
+    // List to store parameter values in the exact order of appearance of "?"
+    List<Object> parameters = new ArrayList<>();
+
+    // 2. Dynamically check each field; only append to SQL if data is present
+    if (customer.getTaxCode() != null && !customer.getTaxCode().trim().isEmpty()) {
+        sql.append("tax_code = ?, ");
+        parameters.add(customer.getTaxCode());
+    }
+
+    if (customer.getCustomerType() != null && !customer.getCustomerType().trim().isEmpty()) {
+        sql.append("customer_type = ?, ");
+        parameters.add(customer.getCustomerType());
+    }
+
+    if (customer.getCompanyName() != null && !customer.getCompanyName().trim().isEmpty()) {
+        sql.append("company_name = ?, ");
+        parameters.add(customer.getCompanyName());
+    }
+
+    // Handle assigned_to_user_id (which can legally accept NULL in DB)
+    if (customer.getAssignedToUserId() != null) {
+        sql.append("assigned_to_user_id = ? ");
+        parameters.add(customer.getAssignedToUserId());
+    }
+
+    // 3. If no fields were appended for update -> Terminate early
+    if (parameters.isEmpty()) {
+        System.out.println("Warning: No fields have changed. Update skipped!");
+        return false;
+    }
+
+    // 4. Append the WHERE clause using user_id as requested
+    sql.append(" WHERE user_id = ?");
+    parameters.add(customer.getUserId()); // Add user_id to the end of the parameters list
+
+    // 5. Execute the dynamic query using PreparedStatement
+    try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+        
+        // Loop to dynamically bind parameters to corresponding "?" markers
+        for (int i = 0; i < parameters.size(); i++) {
+            Object param = parameters.get(i);
+            
+            // Map the Java types properly
+            if (param instanceof String) {
+                stm.setString(i + 1, (String) param);
+            } else if (param instanceof Integer) {
+                stm.setInt(i + 1, (Integer) param);
+            } else {
+                stm.setObject(i + 1, param);
+            }
+        }
+        System.out.println("Thực thi câu lệnh: " + stm);
+        // Execute and return execution status
+        return stm.executeUpdate() > 0;
+    } catch (Exception e) {
+        e.printStackTrace();
+        error = "updateCustomerDynamic error: " + e.getMessage();
+    }
+    return false;
+}
+    
+    public boolean insertCustomer(Customer customer, Connection conn) {
+
+    String sql = "INSERT INTO [customer] (tax_code, customer_type, company_name, user_id, assigned_to_user_id) "
+               + "VALUES (?, ?, ?, ?, ?)";
+    
+    try (PreparedStatement stm = conn.prepareStatement(sql)) {
+        
+        // 1. tax_code
+        if (customer.getTaxCode() != null && !customer.getTaxCode().trim().isEmpty()) {
+            stm.setString(1, customer.getTaxCode());
+        } else {
+            stm.setNull(1, java.sql.Types.VARCHAR);
+        }
+        
+        // 2. customer_type
+        if (customer.getCustomerType() != null && !customer.getCustomerType().trim().isEmpty()) {
+            stm.setString(2, customer.getCustomerType());
+        } else {
+            stm.setNull(2, java.sql.Types.VARCHAR);
+        }
+        // 3. company_name
+        stm.setString(3, customer.getCompanyName());
+        
+        // 4. user_id
+        stm.setInt(4, customer.getUserId());
+        
+        // 5. assigned_to_user_id
+        if (customer.getAssignedToUserId() != null) {
+            stm.setInt(5, customer.getAssignedToUserId());
+        } else {
+            stm.setNull(5, java.sql.Types.INTEGER);
+        }
+        return stm.executeUpdate() > 0;
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        this.error = "insertCustomer: " + e.getMessage();
+    }
+    return false;
+}
     
     public String getLastError() {
         return error;
@@ -227,6 +283,7 @@ public class CustomerDAO extends DBContext {
         }
         return list;
     }
+    
     public int getTotalCustomersCount(String searchName, String type) {
         String sql = "SELECT COUNT(*) FROM customer c LEFT JOIN [user] u ON c.user_id = u.user_id WHERE 1=1 ";
 
