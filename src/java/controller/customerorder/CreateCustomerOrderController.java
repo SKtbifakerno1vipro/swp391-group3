@@ -9,6 +9,7 @@ import service.CustomerOrderService;
 import service.CustomerService;
 import service.ProductService;
 
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,7 +17,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +44,10 @@ public class CreateCustomerOrderController extends HttpServlet {
         int customerId = -1;
 
         if (customerIdParam != null && !customerIdParam.isBlank()) {
-            customerId = Integer.parseInt(customerIdParam);
-        } else {
-            // If no customerId in param, check if current user is a customer
-            model.Customer customer = customerService.getCustomerByUserId(currentUser.getUserId());
-            if (customer != null) {
-                customerId = customer.getCustomerId();
+            try {
+                customerId = Integer.parseInt(customerIdParam);
+            } catch (NumberFormatException e) {
+                // Ignore invalid customerId
             }
         }
 
@@ -60,8 +58,24 @@ public class CreateCustomerOrderController extends HttpServlet {
             if (customerId != -1) {
                 CustomerDTO customerDto = customerService.getCustomerDTOByCustomerId(customerId);
                 request.setAttribute("customer", customerDto);
+                
+                if (customerDto != null) {
+                    // Fetch signed contracts for this customer
+                    List<model.CustomerContract> contracts = customerOrderService.getSignedContractsByCustomerId(customerId);
+                    request.setAttribute("contracts", contracts);
+                    
+                    if (contracts.isEmpty()) {
+                        request.setAttribute("error", "No signed contracts found for this customer. A signed contract is required to create an order.");
+                    }
+                } else {
+                    request.setAttribute("error", "Customer not found.");
+                    // Reset customerId if not found to show customer list
+                    customerId = -1;
+                    List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
+                    request.setAttribute("customers", customers);
+                }
             } else {
-                // If still no customerId, it means a staff is creating an order but hasn't picked a customer yet
+                // If no customerId provided, show customer list for Admin/Staff to choose
                 List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
                 request.setAttribute("customers", customers);
             }
@@ -85,11 +99,30 @@ public class CreateCustomerOrderController extends HttpServlet {
             return;
         }
 
-        int customerId = Integer.parseInt(request.getParameter("customerId"));
+        String customerIdStr = request.getParameter("customerId");
+        String contractIdStr = request.getParameter("customerContractId");
         String[] productIds = request.getParameterValues("productIds");
 
+        if (customerIdStr == null || customerIdStr.isBlank() || contractIdStr == null || contractIdStr.isBlank()) {
+            request.setAttribute("error", "Customer and Contract are required.");
+            doGet(request, response);
+            return;
+        }
+
+        int customerId;
+        int contractId;
+        try {
+            customerId = Integer.parseInt(customerIdStr);
+            contractId = Integer.parseInt(contractIdStr);
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Invalid Customer or Contract ID.");
+            doGet(request, response);
+            return;
+        }
+
         if (productIds == null || productIds.length == 0) {
-            response.sendRedirect(request.getContextPath() + "/create-customer-order?customerId=" + customerId);
+            request.setAttribute("error", "Please select at least one product.");
+            doGet(request, response);
             return;
         }
 
@@ -100,42 +133,37 @@ public class CreateCustomerOrderController extends HttpServlet {
 
         CustomerOrder order = new CustomerOrder();
         order.setCustomerId(customerId);
+        order.setCustomerContractId(contractId);
         order.setOrderStatus("PENDING");
         order.setCreatedBy(currentUser.getUserId());
-        
-        // HACK: In a real system, we'd pick a contract. For now, we'll try to find any contract for this customer
-        // or hardcode a valid one from sample data if available, or just use 1 if it exists.
-        // For the sake of "fixing" it, I'll assume there's at least one contract.
-        // Ideally, we should fetch contract from DB. 
-        // Let's use 1 as a placeholder or fetch it if possible.
-        order.setCustomerContractId(1); 
 
         List<CustomerOrderDetail> details = new ArrayList<>();
         for (String pidStr : productIds) {
-            int pid = Integer.parseInt(pidStr);
-            String qtyStr = request.getParameter("qty_" + pid);
-            if (qtyStr != null && !qtyStr.isBlank()) {
-                int quantity = Integer.parseInt(qtyStr);
-                if (quantity > 0) {
-                    Product p = productMap.get(pid);
-                    if (p != null) {
-                        CustomerOrderDetail detail = new CustomerOrderDetail();
-                        detail.setProductId(pid);
-                        detail.setQuantity(quantity);
-//                        detail.setSellingPrice(p.getSellingPrice());
-                        // For cost price, if model has it use it, otherwise use a default or 0
-                        // SQL product has cost_price, let's check if Product model has it.
-                        // I checked Product.java earlier, it didn't have costPrice.
-                        // So I'll use 0 or update Product model.
-                        detail.setCostPrice(BigDecimal.ZERO); 
-                        details.add(detail);
+            try {
+                int pid = Integer.parseInt(pidStr);
+                String qtyStr = request.getParameter("qty_" + pid);
+                if (qtyStr != null && !qtyStr.isBlank()) {
+                    int quantity = Integer.parseInt(qtyStr);
+                    if (quantity > 0) {
+                        Product p = productMap.get(pid);
+                        if (p != null) {
+                            CustomerOrderDetail detail = new CustomerOrderDetail();
+                            detail.setProductId(pid);
+                            detail.setQuantity(quantity);                      
+                            detail.setCostPrice(p.getCostPrice()); 
+                            detail.setSellingPrice(p.getSellingPrice());
+                            details.add(detail);
+                        }
                     }
                 }
+            } catch (NumberFormatException e) {
+                // Skip invalid product ids or quantities
             }
         }
 
         if (details.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/create-customer-order?customerId=" + customerId);
+            request.setAttribute("error", "No valid products or quantities selected.");
+            doGet(request, response);
             return;
         }
 
@@ -144,8 +172,7 @@ public class CreateCustomerOrderController extends HttpServlet {
         if (success) {
             response.sendRedirect(request.getContextPath() + "/customer-order-list");
         } else {
-            // Handle error
-            request.setAttribute("error", "Failed to create order. Make sure a valid contract exists.");
+            request.setAttribute("error", "Failed to create order. Please try again.");
             doGet(request, response);
         }
     }

@@ -2,6 +2,8 @@ package dto;
 
 import model.CustomerOrder;
 import model.Customer;
+import model.CustomerOrderDetail;
+import model.Product;
 import model.User;
 
 public class CustomerOrderDTO {
@@ -9,15 +11,36 @@ public class CustomerOrderDTO {
     private Customer customer;
 
     public CustomerOrderDTO() {}
-
+    private CustomerOrderDetail detail;
+    private Product product;
 
     private User customerUser; // The user linked to the customer
 
  
-    public CustomerOrderDTO(CustomerOrder customerOrder, Customer customer, User customerUser) {
+    
+
+    public CustomerOrderDTO(CustomerOrder customerOrder, Customer customer, CustomerOrderDetail detail, Product product, User customerUser) {
         this.customerOrder = customerOrder;
         this.customer = customer;
+        this.detail = detail;
+        this.product = product;
         this.customerUser = customerUser;
+    }
+
+    public CustomerOrderDetail getDetail() {
+        return detail;
+    }
+
+    public void setDetail(CustomerOrderDetail detail) {
+        this.detail = detail;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
 
