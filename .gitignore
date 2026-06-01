@@ -36,4 +36,6 @@ Thumbs.db
 /code template/nbproject/private/
 # Claude local metadata
 .claude/
-nbproject/
+nbproject/build-impl.xml
+nbproject/genfiles.properties
+nbproject/project.properties
