@@ -5,6 +5,7 @@ import java.util.List;
 import model.Customer;
 import dto.CustomerDTO;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import model.User;
@@ -14,6 +15,11 @@ public class CustomerService {
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
     
+    private List<String> cusTypeList = Arrays.asList("NEW CUSTOMER", "LOYAL CUSTOMER"); 
+    
+    public List<String> getCusTypeList() {
+        return cusTypeList;
+    }
     // new
     public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String type, int page, int pageSize) {
         List<CustomerDTO> dtoList = new ArrayList<>();
@@ -97,7 +103,7 @@ public class CustomerService {
     // new
     public String isDuplicateCusFields(String userName, String phone, String email, String taxCode) {
         // tim cac custome trung du lieu
-        List<User> cus = userService.searchUserFieldsByOR(userName, phone, email);
+        List<User> cus = userService.searchUserFieldsByOR(userName, phone, email, null);
         Integer id = customerDAO.getCustomerIdByTaxCode(taxCode);
 
         if (id != null) {
@@ -120,7 +126,7 @@ public class CustomerService {
         }
         return "SUCCESS";
     }
-
+    
     public boolean updateCustomerDTO(User u, Customer c) {
         boolean userUpdated = userService.updateUser(u);
         boolean customerUpdated = updateCustomer(c);
@@ -138,7 +144,7 @@ public class CustomerService {
     public boolean updateCustomer(Customer customer) {
         return customerDAO.updateCustomer(customer);
     }
-
+    
     public String getLastError() {
         return customerDAO.getLastError();
     }
@@ -147,5 +153,15 @@ public class CustomerService {
     }
     public CustomerDTO getCustomerDTOByCustomerId(int id) {
         return customerDAO.getCustomerDTOByCustomerId(id);
+    }
+    public List<User> getAllSalesExecutiveUsers() {
+
+        int salesExecutiveRoleId = roleService.getRoleIdByName("Sales Executive");
+        
+        if (salesExecutiveRoleId == 0) {
+            salesExecutiveRoleId = 2; // Sales Executive trong DB 
+        }
+
+        return userService.searchUserFieldsByOR(null, null, null, salesExecutiveRoleId);
     }
 }

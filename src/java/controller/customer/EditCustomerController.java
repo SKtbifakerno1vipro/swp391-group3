@@ -33,8 +33,10 @@ public class EditCustomerController extends HttpServlet {
         try {
             int customerId = Integer.parseInt(customerIdStr);
             CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(customerId);
-            request.setAttribute("users", userService.getAllUsersReturnUser());
+            request.setAttribute("users", customerService.getAllSalesExecutiveUsers());
             request.setAttribute("roles", roleService.getAllRoles());
+            request.setAttribute("listTypeCus", customerService.getCusTypeList());
+            
             if (cusDTO == null) {
                 request.setAttribute("error", "Edit failed");
                 request.setAttribute("errorDetail", "Customer not found");

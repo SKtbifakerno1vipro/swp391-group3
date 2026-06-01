@@ -34,6 +34,10 @@ public class UserService {
         return userDAO.login(username, password);
     }
 
+    public String checkDuplicate(String username, String email, String phone, int userId) {
+        return userDAO.checkDuplicate(username, email, phone, userId);
+    }
+    
     // begin - Xhieu - contact me wwhen remove
     public User getUserByIdFullParameter(int id) {
         return userDAO.getUserByIdFullParameter(id);
@@ -43,16 +47,8 @@ public class UserService {
         return userDAO.getAllUsersReturnUser();
     }
 
-    public String checkDuplicate(String username, String email, String phone, int userId) {
-        return userDAO.checkDuplicate(username, email, phone, userId);
-    }
-
-    public List<User> searchUserFieldsByOR(String userName, String phone, String email) {
-        return userDAO.searchUserFieldsByOR(userName, phone, email);
-    }
-
-    public String getLastError() {
-        return userDAO.getLastError();
+    public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer role_id) {
+        return userDAO.searchUserFieldsByOR(userName, phone, email, role_id);
     }
     // end - Xhieu
 
