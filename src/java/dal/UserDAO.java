@@ -79,7 +79,7 @@ public class UserDAO extends DBContext {
     public List<UserRoleDTO> getAllUsers() {
         return searchUsers(0, null, null);
     }
-    
+
     // begin - Xhieu - contact me wwhen remove
     public User getUserByIdFullParameter(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
@@ -111,7 +111,7 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
-    
+
     public List<User> getAllUsersReturnUser() {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM [user]";
@@ -154,7 +154,6 @@ public class UserDAO extends DBContext {
         if (phone != null && !phone.isBlank())       ps.setString(index++, phone.trim());
         if (email != null && !email.isBlank())       ps.setString(index++, email.trim());
         if (roleId != null && roleId != 0)           ps.setInt(index++, roleId); 
-
         try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) { 
                 User u = mapUser(rs);
@@ -260,33 +259,56 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-    // Kiem tra trung lap 3 truong cung 1 luc
-    public String checkDuplicate(String username, String email, String phone, int userId) {
-        String sql = """
-                     select u.user_name, u.phone, u.email  from [user] u
-                     where  (u.user_name= ? or u.phone=? or u.email= ?) and u.user_id != ?""";
+    public boolean isUsernameDuplicate(String username, int userId) {
+        String sql = "SELECT 1 FROM [user] WHERE user_name = ? AND user_id != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
-            ps.setString(2, phone);
-            ps.setString(3, email);
-            ps.setInt(4, userId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                if (username.equals(rs.getString("user_name"))) {
-                    return "User name duplicated";
-                }
-                if (phone.equals(rs.getString("phone"))) {
-                    return "Phone duplicated";
-                }
-                if (email.equals(rs.getString("email"))) {
-                    return "Email duplicated";
-                }
+            ps.setInt(2, userId);
+
+            // Dùng try-with-resources để đảm bảo ResultSet tự động được đóng
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Trả về true nếu bản ghi tồn tại
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error checking username: " + e.getMessage());
         }
-        return null;
+        return false;
+    }
 
+    public boolean isEmailDuplicate(String email, int userId) {
+        String sql = "SELECT 1 FROM [user] WHERE email = ? AND user_id != ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            System.out.println("Error checking email: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param phone
+     * @param userId
+     * @return
+     */
+    public boolean isPhoneDuplicate(String phone, int userId) {
+        String sql = "SELECT 1 FROM [user] WHERE phone = ? AND user_id != ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            ps.setInt(2, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            System.out.println("Error checking phone: " + e.getMessage());
+        }
+        return false;
     }
 
 }
