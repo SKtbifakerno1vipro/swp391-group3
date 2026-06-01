@@ -41,6 +41,7 @@ public class CustomerDAO extends DBContext {
         }
         return list;
     }
+    // giang
     public CustomerDTO getCustomerDTOByCustomerId(int id) {
         try {
             String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, "
@@ -76,6 +77,7 @@ public class CustomerDAO extends DBContext {
         }
         return null;
     }
+    // giang - end
     public Customer getCustomerByCusId(int id) {
         try {
             String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "

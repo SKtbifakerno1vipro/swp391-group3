@@ -55,12 +55,8 @@ public class UserService {
         return userDAO.isUsernameDuplicate(userName, userId);
     }
 
-    public List<User> searchUserFieldsByOR(String userName, String phone, String email) {
-        return userDAO.searchUserFieldsByOR(userName, phone, email);
-    }
-
-    public String getLastError() {
-        return userDAO.getLastError();
+    public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer role_id) {
+        return userDAO.searchUserFieldsByOR(userName, phone, email, role_id);
     }
     // end - Xhieu
 

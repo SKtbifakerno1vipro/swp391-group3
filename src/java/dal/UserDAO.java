@@ -10,8 +10,6 @@ import model.User;
 
 public class UserDAO extends DBContext {
 
-    String error;
-
     private User mapUser(ResultSet rs) throws Exception {
         User u = new User();
         u.setUserId(rs.getInt("user_id"));
@@ -129,58 +127,44 @@ public class UserDAO extends DBContext {
         }
         return list;
     }
+    
+    public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer roleId) {
+    List<User> list = new ArrayList<>();
+    
+    String sql = "SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name"
+               + ", address, phone, account_status, created_at, updated_at, role_id "
+               + "FROM [user] WHERE 1=2 "; 
 
-    public List<User> searchUserFieldsByOR(String userName, String phone, String email) {
-        List<User> list = new ArrayList<>();
+    if ((userName == null || userName.isBlank()) && 
+        (phone == null || phone.isBlank()) && 
+        (email == null || email.isBlank()) &&
+        (roleId == null || roleId == 0)) {
+        return list; 
+    }
 
-        String sql = "SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name"
-                + ", address, phone, account_status, created_at, updated_at, role_id "
-                + "FROM [user] WHERE 1=2 ";
+    if (userName != null && !userName.isBlank()) sql += "OR user_name = ? ";
+    if (phone != null && !phone.isBlank())       sql += "OR phone = ? ";
+    if (email != null && !email.isBlank())       sql += "OR email = ? ";
+    if (roleId != null && roleId != 0)           sql += "OR role_id = ? "; 
 
-        if ((userName == null || userName.isBlank())
-                && (phone == null || phone.isBlank())
-                && (email == null || email.isBlank())) {
-            return null;
-        }
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        int index = 1;
 
-        if (userName != null && !userName.isBlank()) {
-            sql += "OR user_name = ? ";
-        }
-        if (phone != null && !phone.isBlank()) {
-            sql += "OR phone = ? ";
-        }
-        if (email != null && !email.isBlank()) {
-            sql += "OR email = ? ";
-        }
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            int index = 1;
-
-            if (userName != null && !userName.isBlank()) {
-                ps.setString(index++, userName.trim());
-            }
-            if (phone != null && !phone.isBlank()) {
-                ps.setString(index++, phone.trim());
-            }
-            if (email != null && !email.isBlank()) {
-                ps.setString(index++, email.trim());
-            }
-
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
+        if (userName != null && !userName.isBlank()) ps.setString(index++, userName.trim());
+        if (phone != null && !phone.isBlank())       ps.setString(index++, phone.trim());
+        if (email != null && !email.isBlank())       ps.setString(index++, email.trim());
+        if (roleId != null && roleId != 0)           ps.setInt(index++, roleId); 
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) { 
                 User u = mapUser(rs);
                 list.add(u);
             }
-        } catch (Exception e) {
-            error = e.getMessage();
         }
-        return list;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
-
-    public String getLastError() {
-        return error;
-
-    }
+    return list;
+}
     /// end - Xhieu
 
     public User getUserById(int id) {
