@@ -28,7 +28,24 @@ public class CustomerOrderService {
     public List<CustomerContract> getSignedContractsByCustomerId(int customerId) {
         return customerOrderDAO.getContractsByCustomerId(customerId);
     }
+
     public List<CustomerOrderDTO> findbyNameOrTaxcode(String keyword) {
         return customerOrderDAO.getAllCustomerOrdersByName(keyword);
+    }
+
+    public int getTotalOrderCount() {
+        return customerOrderDAO.getTotalOrders();
+    }
+
+    public List<CustomerOrderDTO> getOrdersByPage(int page, int size) {
+        return customerOrderDAO.getOrdersWithPaging(page, size);
+    }
+
+    public int getTotalSearchCount(String keyword) {
+        return customerOrderDAO.getTotalOrdersBySearch(keyword);
+    }
+
+    public List<CustomerOrderDTO> searchOrdersByPage(String kw, int p, int s) {
+        return customerOrderDAO.searchOrdersWithPaging(kw, p, s);
     }
 }

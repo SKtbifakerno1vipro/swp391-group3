@@ -196,7 +196,7 @@ public class CustomerOrderDAO extends DBContext {
     }
 
     public List<CustomerOrderDTO> getAllCustomerOrdersByName(String keyword) {
-         List<CustomerOrderDTO> list = new ArrayList<>();
+        List<CustomerOrderDTO> list = new ArrayList<>();
         String sql = "SELECT co.*, c.tax_code, u.full_name "
                 + "FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
@@ -210,6 +210,80 @@ public class CustomerOrderDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 // Tái sử dụng hàm mapResultSetToDTO đã có sẵn trong DAO của bạn
+                list.add(mapResultSetToDTO(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int getTotalOrders() {
+        String sql = "SELECT COUNT(*) FROM customer_order";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<CustomerOrderDTO> getOrdersWithPaging(int pageIndex, int pageSize) {
+        List<CustomerOrderDTO> list = new ArrayList<>();
+        String sql = "SELECT co.*, c.tax_code, u.full_name FROM customer_order co "
+                + "JOIN customer c ON co.customer_id = c.customer_id "
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "ORDER BY co.customer_order_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, (pageIndex - 1) * pageSize);
+            ps.setInt(2, pageSize);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapResultSetToDTO(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int getTotalOrdersBySearch(String keyword) {
+        String sql = "SELECT COUNT(*) FROM customer_order co "
+                + "JOIN customer c ON co.customer_id = c.customer_id "
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "WHERE u.full_name LIKE ? OR c.tax_code LIKE ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            String p = "%" + keyword + "%";
+            ps.setString(1, p);
+            ps.setString(2, p);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<CustomerOrderDTO> searchOrdersWithPaging(String keyword, int pageIndex, int pageSize) {
+        List<CustomerOrderDTO> list = new ArrayList<>();
+        String sql = "SELECT co.*, c.tax_code, u.full_name FROM customer_order co "
+                + "JOIN customer c ON co.customer_id = c.customer_id "
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "WHERE u.full_name LIKE ? OR c.tax_code LIKE ? "
+                + "ORDER BY co.customer_order_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            String p = "%" + keyword + "%";
+            ps.setString(1, p);
+            ps.setString(2, p);
+            ps.setInt(3, (pageIndex - 1) * pageSize);
+            ps.setInt(4, pageSize);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
             }
         } catch (Exception e) {
