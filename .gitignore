@@ -36,3 +36,4 @@ Thumbs.db
 /code template/nbproject/private/
 # Claude local metadata
 .claude/
+nbproject/
