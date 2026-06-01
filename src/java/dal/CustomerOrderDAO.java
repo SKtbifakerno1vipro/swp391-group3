@@ -19,7 +19,7 @@ public class CustomerOrderDAO extends DBContext {
                 + "FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "ORDER BY co.created_at DESC";
+                + "ORDER BY co.customer_order_id DESC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
