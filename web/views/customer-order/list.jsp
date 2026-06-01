@@ -12,6 +12,12 @@
     <hr>
     <a href="${pageContext.request.contextPath}/create-customer-order">Create Order</a>
     <hr>
+    <form action="customer-order-list" method="GET" >
+        <input type="hidden" name="search" value="search">
+        <input type="text" placeholder="Search" name="keyword">
+        <button type="submit">Search</button>
+    </form>
+    <br>
 
     <table border="1" cellpadding="10" cellspacing="0">
         <thead>

@@ -6,12 +6,12 @@ import java.util.List;
 import model.CustomerContract;
 
 public class CustomerOrderService {
+
     private final CustomerOrderDAO customerOrderDAO = new CustomerOrderDAO();
 
     public List<CustomerOrderDTO> getAllCustomerOrders() {
         return customerOrderDAO.getAllCustomerOrders();
     }
-
 
     public CustomerOrderDTO getCustomerOrderById(int id) {
         return customerOrderDAO.getCustomerOrderDTOById(id);
@@ -24,7 +24,11 @@ public class CustomerOrderService {
     public boolean createOrder(model.CustomerOrder order, List<model.CustomerOrderDetail> details) {
         return customerOrderDAO.createOrder(order, details);
     }
- public List<CustomerContract> getSignedContractsByCustomerId(int customerId) {
+
+    public List<CustomerContract> getSignedContractsByCustomerId(int customerId) {
         return customerOrderDAO.getContractsByCustomerId(customerId);
+    }
+    public List<CustomerOrderDTO> findbyNameOrTaxcode(String keyword) {
+        return customerOrderDAO.getAllCustomerOrdersByName(keyword);
     }
 }

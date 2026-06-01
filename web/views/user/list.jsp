@@ -76,5 +76,28 @@
             </table>
         </div>
 
+
+        <div class="d-flex align-items-center justify-content-end my-3">
+            <span class="me-2">Chuyển đến trang: </span>
+
+
+            <select class="form-select w-auto" onchange="window.location.href = this.value">
+
+
+                <c:forEach begin="1" end="${endPage}" var="i">
+
+     
+                    <c:set var="pageUrl" value="user-list?page=${i}&keyword=${keyword}&roleId=${roleId}&status=${status}" />
+
+ 
+                    <option value="${pageUrl}" ${currentPage == i ? 'selected' : ''}>
+                        Page: ${i} 
+                    </option>
+
+                </c:forEach>
+
+            </select>
+        </div>
+
     </body>
 </html>

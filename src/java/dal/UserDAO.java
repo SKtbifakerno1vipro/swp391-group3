@@ -28,7 +28,11 @@ public class UserDAO extends DBContext {
         return u;
     }
 
-    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword) {
+
+    /*
+    created by phu
+     */
+    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword, int pageIndex, int pageSize) {
         List<UserRoleDTO> list = new ArrayList<>();
         String sql = "select * from [user] u "
                 + "join dbo.role r  on u.role_id= r.role_id where 1=1";
@@ -43,6 +47,9 @@ public class UserDAO extends DBContext {
             sql += " AND (u.full_name LIKE ? OR u.phone LIKE ?)";
         }
 
+        //paging querry
+        sql += " ORDER BY u.user_id asc OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
             if (roleId > 0) {
@@ -56,6 +63,11 @@ public class UserDAO extends DBContext {
                 ps.setString(index++, searchPattern);
                 ps.setString(index++, searchPattern);
             }
+
+            int offset = (pageIndex - 1) * pageSize;
+            ps.setInt(index++, offset);
+            ps.setInt(index++, pageSize);
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 UserRoleDTO u = new UserRoleDTO();
@@ -77,7 +89,46 @@ public class UserDAO extends DBContext {
     }
 
     public List<UserRoleDTO> getAllUsers() {
-        return searchUsers(0, null, null);
+        return searchUsers(0, null, null, 1, 10);
+    }
+
+    public int getTotalUsers(int roleId, String status, String keyword) {
+        String sql = "select count(*) from [user] u where 1=1 ";
+        if (roleId > 0) {
+            sql += "and u.role_id=?";
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            sql += "and u.account_status= ?";
+        }
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql += " and (u.full_name like ? or u.phone like ?)";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int index = 1;
+            if (roleId > 0) {
+                ps.setInt(index++, roleId);
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String searchPattern = "%" + keyword.trim() + "%";
+                ps.setString(index++, searchPattern);
+                ps.setString(index++, searchPattern);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // return total of column
+                }
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error getTotalUsers: " + e.getMessage());
+        }
+        return 0;
     }
 
     // begin - Xhieu - contact me wwhen remove
@@ -127,44 +178,60 @@ public class UserDAO extends DBContext {
         }
         return list;
     }
-    
+
     public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer roleId) {
-    List<User> list = new ArrayList<>();
-    
-    String sql = "SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name"
-               + ", address, phone, account_status, created_at, updated_at, role_id "
-               + "FROM [user] WHERE 1=2 "; 
+        List<User> list = new ArrayList<>();
 
-    if ((userName == null || userName.isBlank()) && 
-        (phone == null || phone.isBlank()) && 
-        (email == null || email.isBlank()) &&
-        (roleId == null || roleId == 0)) {
-        return list; 
-    }
+        String sql = "SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name"
+                + ", address, phone, account_status, created_at, updated_at, role_id "
+                + "FROM [user] WHERE 1=2 ";
 
-    if (userName != null && !userName.isBlank()) sql += "OR user_name = ? ";
-    if (phone != null && !phone.isBlank())       sql += "OR phone = ? ";
-    if (email != null && !email.isBlank())       sql += "OR email = ? ";
-    if (roleId != null && roleId != 0)           sql += "OR role_id = ? "; 
-
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        int index = 1;
-
-        if (userName != null && !userName.isBlank()) ps.setString(index++, userName.trim());
-        if (phone != null && !phone.isBlank())       ps.setString(index++, phone.trim());
-        if (email != null && !email.isBlank())       ps.setString(index++, email.trim());
-        if (roleId != null && roleId != 0)           ps.setInt(index++, roleId); 
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) { 
-                User u = mapUser(rs);
-                list.add(u);
-            }
+        if ((userName == null || userName.isBlank())
+                && (phone == null || phone.isBlank())
+                && (email == null || email.isBlank())
+                && (roleId == null || roleId == 0)) {
+            return list;
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+
+        if (userName != null && !userName.isBlank()) {
+            sql += "OR user_name = ? ";
+        }
+        if (phone != null && !phone.isBlank()) {
+            sql += "OR phone = ? ";
+        }
+        if (email != null && !email.isBlank()) {
+            sql += "OR email = ? ";
+        }
+        if (roleId != null && roleId != 0) {
+            sql += "OR role_id = ? ";
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int index = 1;
+
+            if (userName != null && !userName.isBlank()) {
+                ps.setString(index++, userName.trim());
+            }
+            if (phone != null && !phone.isBlank()) {
+                ps.setString(index++, phone.trim());
+            }
+            if (email != null && !email.isBlank()) {
+                ps.setString(index++, email.trim());
+            }
+            if (roleId != null && roleId != 0) {
+                ps.setInt(index++, roleId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User u = mapUser(rs);
+                    list.add(u);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
-    return list;
-}
     /// end - Xhieu
 
     public User getUserById(int id) {
@@ -312,3 +379,4 @@ public class UserDAO extends DBContext {
     }
 
 }
+
