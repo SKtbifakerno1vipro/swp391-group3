@@ -43,8 +43,16 @@ public class UserService {
         return userDAO.getAllUsersReturnUser();
     }
 
-    public String checkDuplicate(String username, String email, String phone, int userId) {
-        return userDAO.checkDuplicate(username, email, phone, userId);
+    public boolean isEmailDuplicate(String email, int userId) {
+        return userDAO.isEmailDuplicate(email, userId);
+    }
+
+    public boolean isPhoneDuplicate(String phone, int userId) {
+        return userDAO.isPhoneDuplicate(phone, userId);
+    }
+
+    public boolean isUsernameDuplicate(String userName, int userId) {
+        return userDAO.isUsernameDuplicate(userName, userId);
     }
 
     public List<User> searchUserFieldsByOR(String userName, String phone, String email) {

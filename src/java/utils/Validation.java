@@ -2,7 +2,6 @@ package utils;
 
 public class Validation {
 
-
     public static String validateEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             return "Email không được để trống!";
@@ -23,7 +22,7 @@ public class Validation {
         return null; // OK
     }
 
-public static String validatePassword(String password) {
+    public static String validatePassword(String password) {
         if (password == null || password.trim().isEmpty()) {
             return "Password cannot be empty!";
         }
@@ -32,8 +31,6 @@ public static String validatePassword(String password) {
         }
         return null; // OK
     }
-//        return null; // OK
-//    }
 
     public static String validateEmpty(String value, String fieldName) {
         if (value == null || value.trim().isEmpty()) {

@@ -16,7 +16,7 @@ public class EditUserController extends HttpServlet {
 
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String idStr = request.getParameter("id");
@@ -55,20 +55,19 @@ public class EditUserController extends HttpServlet {
                 u.setUserId(0);
             }
         }
-        
-        u.setUserName(request.getParameter("userName")); // Dù readonly vẫn được gửi lên để hiển thị lại nếu có lỗi
+
+        u.setUserName(request.getParameter("userName"));
         u.setEmail(request.getParameter("email"));
         u.setFullName(request.getParameter("fullName"));
         u.setPhone(request.getParameter("phone"));
         u.setStatus(request.getParameter("status"));
         u.setGender(request.getParameter("gender"));
-        
+
         try {
             u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
         } catch (NumberFormatException e) {
             u.setRoleId(0);
         }
-
 
         if (error == null) {
             error = Validation.validateEmpty(u.getFullName(), "Full Name");
@@ -80,13 +79,18 @@ public class EditUserController extends HttpServlet {
             error = Validation.validatePhone(u.getPhone());
         }
 
-      
         if (error == null) {
-           
-            error = userService.checkDuplicate(u.getUserName(), u.getEmail(), u.getPhone(), u.getUserId());
+            if (userService.isEmailDuplicate(u.getEmail(), u.getUserId())) {
+                error = "Email duplicated, please enter again!";
+            }
+            if (userService.isPhoneDuplicate(u.getPhone(), u.getUserId())) {
+                error = "Phone duplicated, please enter again!";
+            }
+            if (userService.isUsernameDuplicate(u.getUserName(), u.getUserId())) {
+                error = "User Name duplicated, please enter again!";
+            }
         }
 
-        
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("roles", roleService.getAllRoles());
@@ -96,7 +100,6 @@ public class EditUserController extends HttpServlet {
             return;
         }
 
-        
         boolean success = userService.updateUser(u);
         if (success) {
             response.sendRedirect(request.getContextPath() + "/user-list");
