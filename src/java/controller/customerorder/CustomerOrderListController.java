@@ -18,29 +18,32 @@ public class CustomerOrderListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<CustomerOrderDTO> listOrder = handleListRequest(request);
-        request.setAttribute("orders", listOrder);
-        request.getRequestDispatcher("/views/customer-order/list.jsp").forward(request, response);
-    }
-
-    private List<CustomerOrderDTO> handleListRequest(HttpServletRequest request) {
         String action = request.getParameter("search");
-        if (action == null) {
-            action = "default";
+        String keyword = request.getParameter("keyword");
+        String pageRaw = request.getParameter("page");
+
+        int pageIndex = (pageRaw != null && !pageRaw.isEmpty()) ? Integer.parseInt(pageRaw) : 1;
+        int pageSize = 10;
+        List<CustomerOrderDTO> listOrder;
+        int totalRecords;
+
+        if ("search".equals(action) && keyword != null && !keyword.trim().isEmpty()) {
+            keyword = keyword.trim();
+            listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize);
+            totalRecords = customerOrderService.getTotalSearchCount(keyword);
+        } else {
+            listOrder = customerOrderService.getOrdersByPage(pageIndex, pageSize);
+            totalRecords = customerOrderService.getTotalOrderCount();
         }
 
-        List<CustomerOrderDTO> listCustomerOrderDTOs;
-        switch (action) {
-            case "search":
-                String keyword = request.getParameter("keyword");
-                if (keyword == null) {
-                    keyword = "";
-                }
-                listCustomerOrderDTOs = customerOrderService.findbyNameOrTaxcode(keyword.trim());
-                break;
-            default:
-                listCustomerOrderDTOs = customerOrderService.getAllCustomerOrders();
-        }
-        return listCustomerOrderDTOs;
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+        request.setAttribute("orders", listOrder);
+        request.setAttribute("currentPage", pageIndex);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("keyword", keyword);
+        request.setAttribute("action", action);
+
+        request.getRequestDispatcher("/views/customer-order/list.jsp").forward(request, response);
     }
 }

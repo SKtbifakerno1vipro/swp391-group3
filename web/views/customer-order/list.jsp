@@ -14,7 +14,7 @@
     <hr>
     <form action="customer-order-list" method="GET" >
         <input type="hidden" name="search" value="search">
-        <input type="text" placeholder="Search" name="keyword">
+        <input type="text" placeholder="Search" name="keyword" value="${keyword}">
         <button type="submit">Search</button>
     </form>
     <br>
@@ -53,5 +53,24 @@
             </c:if>
         </tbody>
     </table>
+
+    <div>
+        <c:if test="${totalPages > 1}">
+            <c:set var="queryParams" value="search=${action}&keyword=${keyword}" />
+
+            <c:if test="${currentPage > 1}">
+                <a href="customer-order-list?page=${currentPage - 1}&${queryParams}">Previous</a>
+            </c:if>
+
+            <c:forEach begin="1" end="${totalPages}" var="i">
+                <a href="customer-order-list?page=${i}&${queryParams}" 
+                   style="margin: 0 5px; ${i == currentPage ? 'font-weight:bold; color:red;' : ''}">${i}</a>
+            </c:forEach>
+
+            <c:if test="${currentPage < totalPages}">
+                <a href="customer-order-list?page=${currentPage + 1}&${queryParams}">Next</a>
+            </c:if>
+        </c:if>
+    </div>
 </body>
 </html>
