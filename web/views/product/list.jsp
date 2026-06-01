@@ -22,7 +22,7 @@
                         <tr>
                             <td>Product Name</td>
                             <td><input type="text" name="searchText" value="${searchText}"></td>
-                        
+                            
                             <td colspan="2">
                                 Category
                                 <select name="categoryId">
@@ -40,6 +40,11 @@
                             <td><input type="submit" value="Search"></td>
                         </tr>
                     </table>
+                                   
+                                <input type="hidden" name="page" value="${page}">
+                                <input type="hidden" name="pageSize" value="${pageSize}">
+                                <input type="hidden" name="totalRow" value="${totalRow}">
+                                <input type="hidden" name="totalPage" value="${totalPage}">
                 </form>
             </div>
             <div>
