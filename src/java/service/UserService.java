@@ -9,13 +9,16 @@ public class UserService {
 
     private final UserDAO userDAO = new UserDAO();
 
-    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword) {
+    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword, int offset, int pageIndex) {
         //logic
-        return userDAO.searchUsers(roleId, status, keyword);
+        return userDAO.searchUsers(roleId, status, keyword, offset, pageIndex);
     }
 
     public List<UserRoleDTO> getAllUsers() {
         return userDAO.getAllUsers();
+    }
+    public int getTotalUsers(int roleId, String status, String keyword){
+        return userDAO.getTotalUsers(roleId, status, keyword);
     }
 
     public User getUserById(int id) {

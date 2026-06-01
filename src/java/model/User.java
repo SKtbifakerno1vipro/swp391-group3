@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class User {
 
@@ -15,8 +16,26 @@ public class User {
     private int roleId;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
+    private Date dateBirth;
+    private String address;
 
     public User() {
+    }
+
+    public Date getDateBirth() {
+        return dateBirth;
+    }
+
+    public void setDateBirth(Date dateBirth) {
+        this.dateBirth = dateBirth;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public int getUserId() {
