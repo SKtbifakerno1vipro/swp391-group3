@@ -32,8 +32,7 @@ public class CustomerDAO extends DBContext {
 
     public List<Customer> getAllCustomers() {
         List<Customer> list = new ArrayList<>(); 
-        String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
-                + "FROM customer";
+        String sql = "SELECT * FROM customer";
 
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             ResultSet rs = stm.executeQuery();
@@ -47,11 +46,10 @@ public class CustomerDAO extends DBContext {
         }
         return list;
     }
+
     public CustomerDTO getCustomerDTOByCustomerId(int id) {
         try {
-            String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, "
-                    + "c.assigned_to_user_id, c.created_at, c.updated_at, u.user_name,"
-                    + "u.user_id AS u_id, u.email, u.full_name, u.phone, u.account_status, u.role_id, r.role_name "
+            String sql = "SELECT c.*, u.user_name, u.email, u.full_name, u.phone, u.account_status, u.role_id, r.role_name "
                     + "FROM customer c "
                     + "LEFT JOIN [user] u ON c.user_id = u.user_id "
                     + "LEFT JOIN role r ON u.role_id = r.role_id "
@@ -63,10 +61,10 @@ public class CustomerDAO extends DBContext {
                 Customer c = mapCustomer(rs);
                 User u = null;
                 String rName = null;
-                if (rs.getObject("u_id") != null) {
+                if (rs.getObject("user_id") != null) {
                     u = new User();
                     u.setUserName(rs.getString("user_name"));
-                    u.setUserId(rs.getInt("u_id"));
+                    u.setUserId(rs.getInt("user_id"));
                     u.setEmail(rs.getString("email"));
                     u.setFullName(rs.getString("full_name"));
                     u.setPhone(rs.getString("phone"));
@@ -82,10 +80,10 @@ public class CustomerDAO extends DBContext {
         }
         return null;
     }
+
     public Customer getCustomerByCusId(int id) {
         try {
-            String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
-                    + "FROM customer WHERE customer_id = ?";
+            String sql = "SELECT * FROM customer WHERE customer_id = ?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, id);
             ResultSet rs = stm.executeQuery();
@@ -111,7 +109,7 @@ public class CustomerDAO extends DBContext {
             e.printStackTrace();
             error = "getCustomerIdByTaxCode: " + e.getMessage();
         }
-        return null; // Trả về null nếu không tìm thấy khách hàng nào khớp với mã số thuế này
+        return null; 
     }
 
     public Customer createCustomer(User user, Customer customer) {

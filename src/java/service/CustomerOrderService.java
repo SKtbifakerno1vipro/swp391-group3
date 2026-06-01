@@ -16,7 +16,7 @@ public class CustomerOrderService {
         return customerOrderDAO.getCustomerOrderDTOById(id);
     }
 
-    public List<dto.CustomerOrderDetailDTO> getOrderDetails(int orderId) {
+    public List<dto.CustomerOrderDTO> getOrderDetails(int orderId) {
         return customerOrderDAO.getDetailsByOrderId(orderId);
     }
 

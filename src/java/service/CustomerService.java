@@ -111,9 +111,10 @@ public Customer createCustomerDTO(User u, Customer c) {
     public String getLastError() {
         return customerDAO.getLastError() + error;
     }
-    public Customer getCustomerByUserId(int userId) {
+    public Customer getCustomerByCusId(int userId) {
         return customerDAO.getCustomerByCusId(userId);
     }
+
     public CustomerDTO getCustomerDTOByCustomerId(int id) {
         return customerDAO.getCustomerDTOByCustomerId(id);
     }

@@ -49,8 +49,8 @@ public class CustomerOrderDAO extends DBContext {
         return null;
     }
 
-    public List<dto.CustomerOrderDetailDTO> getDetailsByOrderId(int orderId) {
-        List<dto.CustomerOrderDetailDTO> details = new ArrayList<>();
+    public List<dto.CustomerOrderDTO> getDetailsByOrderId(int orderId) {
+        List<dto.CustomerOrderDTO> details = new ArrayList<>();
         String sql = "SELECT cod.*, p.product_name, p.unit " +
                      "FROM customer_order_detail cod " +
                      "JOIN product p ON cod.product_id = p.product_id " +
@@ -64,8 +64,8 @@ public class CustomerOrderDAO extends DBContext {
                 cod.setCustomerOrderId(rs.getInt("customer_order_id"));
                 cod.setProductId(rs.getInt("product_id"));
                 cod.setQuantity(rs.getInt("quantity"));
-                cod.setCostPrice(rs.getBigDecimal("cost_price"));
-                cod.setSellingPrice(rs.getBigDecimal("selling_price"));
+                cod.setCostPrice(rs.getDouble("cost_price"));
+                cod.setSellingPrice(rs.getDouble("selling_price"));
 
                 model.Product p = new model.Product();
                 p.setProductId(rs.getInt("product_id"));
@@ -75,7 +75,7 @@ public class CustomerOrderDAO extends DBContext {
 
                 p.setUnit(rs.getString("unit"));
 
-                dto.CustomerOrderDetailDTO detailDto = new dto.CustomerOrderDetailDTO();
+                dto.CustomerOrderDTO detailDto = new dto.CustomerOrderDTO();
                 detailDto.setDetail(cod);
                 detailDto.setProduct(p);
                 details.add(detailDto);
@@ -122,8 +122,8 @@ public class CustomerOrderDAO extends DBContext {
                         psDetail.setInt(1, orderId);
                         psDetail.setInt(2, detail.getProductId());
                         psDetail.setInt(3, detail.getQuantity());
-                        psDetail.setBigDecimal(4, detail.getCostPrice());
-                        psDetail.setBigDecimal(5, detail.getSellingPrice());
+                        psDetail.setDouble(4, detail.getCostPrice());
+                        psDetail.setDouble(5, detail.getSellingPrice());
                         psDetail.addBatch();
                     }
                     psDetail.executeBatch();
