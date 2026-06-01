@@ -83,7 +83,7 @@
                 <div>
                     
                     <div>Show 
-                        <select onchange="window.location.href='${pageContext.request.contextPath}/product-list?pageSize='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&status=${status}'" >
+                        <select onchange="window.location.href='${pageContext.request.contextPath}/product-list?pageSize='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&status=${status}&page=${page}'" >
                             <c:forEach var="p" begin="5" step="5" end="${totalRow}">
                                 <option value="${p}" ${pageSize == p ? 'selected' : ''}>${p}</option>
                             </c:forEach>
