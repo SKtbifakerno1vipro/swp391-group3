@@ -21,6 +21,7 @@ public class CustomerService {
         return cusTypeList;
     }
     // new
+    
     public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String type, int page, int pageSize) {
         List<CustomerDTO> dtoList = new ArrayList<>();
 
