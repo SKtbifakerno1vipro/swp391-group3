@@ -24,7 +24,6 @@ public class CreateCustomerController extends HttpServlet {
         request.setAttribute("customerRoleId", roleService.getRoleIdByName("Customer"));
         request.setAttribute("listTypeCus", customerService.getCusTypeList());
         request.setAttribute("users", customerService.getAllSalesExecutiveUsers());
-        System.out.println(customerService.getAllSalesExecutiveUsers());
         request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
     }
 
@@ -43,9 +42,9 @@ public class CreateCustomerController extends HttpServlet {
         String assignedToUserIdValue = request.getParameter("assignedToUserId");
         String roleIdValue = request.getParameter("roleId");
 
-        request.setAttribute("users", userService.getAllUsersReturnUser());
-        Integer customerRoleId = roleService.getRoleIdByName("Customer");
-        request.setAttribute("customerRoleId", customerRoleId);
+        request.setAttribute("users", customerService.getAllSalesExecutiveUsers());
+        request.setAttribute("listTypeCus", customerService.getCusTypeList());
+        request.setAttribute("customerRoleId", roleService.getRoleIdByName("Customer"));
 
         String errorMsg = null;
 
@@ -65,13 +64,7 @@ public class CreateCustomerController extends HttpServlet {
 
         // BIỆN PHÁP TẬP TRUNG: Nếu có bất kỳ lỗi nào ở trên, nạp data 1 lần duy nhất rồi forward
         if (errorMsg != null) {
-            request.setAttribute("error", errorMsg); // Gửi mã lỗi chi tiết của trường bị sai về JSP
-            
-            // Chỉ viết đúng 1 lần ở đây, không bị trùng lặp nữa
-            request.setAttribute("users", userService.getAllUsersReturnUser());
-            request.setAttribute("listTypeCus", customerService.getCusTypeList());
-            request.setAttribute("customerRoleId", roleService.getRoleIdByName("Customer"));
-            
+            request.setAttribute("error", errorMsg); // Gửi mã lỗi chi tiết của trường bị sai về JSP            
             request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
             return; // Chặn đứng không cho xuống phần lưu DB
         }
@@ -97,17 +90,16 @@ public class CreateCustomerController extends HttpServlet {
                 c.setAssignedToUserId(Integer.parseInt(assignedToUserIdValue));
             }
 
-            Customer createdCustomer = customerService.createCustomerDTO(u, c);
+            String msg = customerService.createCustomerDTO(u, c);
 
-            if (createdCustomer != null && createdCustomer.getUserId() != null && createdCustomer.getUserId() > 0) {
+            if (msg == null || msg.trim().isBlank()) {
                 request.setAttribute("success", true);
             } else {
-                request.setAttribute("error", "Create failed. " + (customerService.getLastError() != null ? customerService.getLastError() : "Unknown error"));
+                request.setAttribute("error", "Create failed."+ msg + (customerService.getLastError() != null ? customerService.getLastError() : "Unknown error"));
             }
-            request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Create failed");
-            request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
         }
+        request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
     }
 }

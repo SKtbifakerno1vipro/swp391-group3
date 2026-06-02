@@ -4,6 +4,7 @@ import dal.UserDAO;
 import dto.UserRoleDTO;
 import java.util.List;
 import model.User;
+import java.sql.Connection;
 
 public class UserService {
 
@@ -36,16 +37,7 @@ public class UserService {
     public User login(String username, String password) {
         return userDAO.login(username, password);
     }
-
-    // begin - Xhieu - contact me wwhen remove
-    public User getUserByIdFullParameter(int id) {
-        return userDAO.getUserByIdFullParameter(id);
-    }
-
-    public List<User> getAllUsersReturnUser() {
-        return userDAO.getAllUsersReturnUser();
-    }
-
+    
     public boolean isEmailDuplicate(String email, int userId) {
         return userDAO.isEmailDuplicate(email, userId);
     }
@@ -57,9 +49,24 @@ public class UserService {
     public boolean isUsernameDuplicate(String userName, int userId) {
         return userDAO.isUsernameDuplicate(userName, userId);
     }
+        
+    // begin - Xhieu - contact me wwhen remove
+    public User getUserByIdFullParameter(int id) {
+        return userDAO.getUserByIdFullParameter(id);
+    }
 
+    public List<User> getAllUsersReturnUser() {
+        return userDAO.getAllUsersReturnUser();
+    }
+    public int createUserFullParameter(User user,Connection conn) {
+        return userDAO.createUserFullParameter(user, conn);
+    }
     public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer role_id) {
         return userDAO.searchUserFieldsByOR(userName, phone, email, role_id);
+    }
+    
+    public Connection getConnection() {
+        return userDAO.getConnection(); // Lấy biến connection kế thừa từ DBContext
     }
     // end - Xhieu
 

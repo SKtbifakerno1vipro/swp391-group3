@@ -62,7 +62,11 @@ public class EditCustomerController extends HttpServlet {
             request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
             return;
         }
-
+        
+        request.setAttribute("users", customerService.getAllSalesExecutiveUsers());
+        request.setAttribute("roles", roleService.getAllRoles());
+        request.setAttribute("listTypeCus", customerService.getCusTypeList());
+        
         try {
             int customerId = Integer.parseInt(customerIdStr);
             int userId = Integer.parseInt(userIdStr);
@@ -94,6 +98,7 @@ public class EditCustomerController extends HttpServlet {
             }
 
             Customer c = new Customer();
+            c.setUserId(userId);
             c.setCustomerId(customerId);
             c.setTaxCode(taxCode);
             c.setCompanyName(companyName);
@@ -104,9 +109,6 @@ public class EditCustomerController extends HttpServlet {
                 c.setAssignedToUserId(null);
             }
             boolean cusDTOUpdated = customerService.updateCustomerDTO(u,c);
-            
-            request.setAttribute("users", userService.getAllUsersReturnUser());
-            request.setAttribute("roles", roleService.getAllRoles());
             
             if (!cusDTOUpdated) {
                 request.setAttribute("error", "Update failed");
