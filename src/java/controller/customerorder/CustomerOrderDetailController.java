@@ -1,7 +1,6 @@
 package controller.customerorder;
 
 import dto.CustomerOrderDTO;
-import dto.CustomerOrderDetailDTO;
 import service.CustomerOrderService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,7 +33,7 @@ public class CustomerOrderDetailController extends HttpServlet {
                 return;
             }
 
-            List<CustomerOrderDetailDTO> details = customerOrderService.getOrderDetails(orderId);
+            List<CustomerOrderDTO> details = customerOrderService.getOrderDetails(orderId);
 
             request.setAttribute("order", order);
             request.setAttribute("details", details);

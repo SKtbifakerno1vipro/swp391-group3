@@ -43,8 +43,8 @@
                         <td>${item.product.productId}</td>
                         <td>${item.product.productName}</td>
                         <td>${item.detail.quantity} ${item.product.unit}</td>
-                        <td><fmt:formatNumber value="${item.detail.sellingPrice}" type="currency" currencySymbol="₫"/></td>
-                        <td><fmt:formatNumber value="${itemTotal}" type="currency" currencySymbol="₫"/></td>
+                        <td><fmt:formatNumber value="${item.detail.sellingPrice}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                        <td><fmt:formatNumber value="${itemTotal}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty details}">
@@ -56,7 +56,7 @@
             <tfoot>
                 <tr>
                     <th colspan="4" style="text-align: right;">Grand Total:</th>
-                    <th><fmt:formatNumber value="${totalOrderAmount}" type="currency" currencySymbol="₫"/></th>
+                    <th><fmt:formatNumber value="${totalOrderAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></th>
                 </tr>
             </tfoot>
         </table>

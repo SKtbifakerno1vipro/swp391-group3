@@ -198,9 +198,6 @@ public class CustomerService {
     public Customer getCustomerByUserId(int userId) {
         return customerDAO.getCustomerByCusId(userId);
     }
-    public CustomerDTO getCustomerDTOByCustomerId(int id) {
-        return customerDAO.getCustomerDTOByCustomerId(id);
-    }
     public List<User> getAllSalesExecutiveUsers() {
 
         int salesExecutiveRoleId = roleService.getRoleIdByName("Sales Executive");

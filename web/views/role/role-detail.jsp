@@ -47,7 +47,7 @@
             
             <div>
                 <label>Role Name:</label>
-                <input type="text" name="roleName" value="${role.roleName}" required>
+                <input type="text" name="roleName" value="${role.roleName}" readonly>
             </div>
             
             <div>
@@ -60,10 +60,37 @@
                 <input type="text" value="${role.updateAt != null ? role.updateAt : '-'}" readonly>
             </div>
             
-            <c:if test="${not empty error}">
-                <p style="color: red;">${error}</p>
-            </c:if>
+                <c:if test="${not empty error}">
+                    <p style="color: red;">${error}</p>
+                </c:if>
             
+                
+            <h3>Chọn Permissions</h3>
+            
+            <table border="1" cellpadding="8" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Permission ID</th>
+                        <th>Permission Name</th>
+                        <th>Chọn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="permission" items="${permissionList}">
+                        <tr>
+                            <td>${permission.permissionId}</td>
+                            <td>${permission.permissionName}</td>
+                            <td>
+                                <input type="checkbox"
+                                       name="permissionIds"
+                                       value="${permission.permissionId}"
+                                       <c:if test="${selectedPermissionIds.contains(permission.permissionId)}"> checked </c:if>>
+
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
             <button type="submit">Lưu thay đổi</button>
             <a href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}">
                 <button type="button">Hủy</button>

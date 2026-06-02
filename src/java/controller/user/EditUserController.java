@@ -46,7 +46,6 @@ public class EditUserController extends HttpServlet {
         User u = new User();
         String error = null;
 
-        // 1. Gán dữ liệu cơ bản
         String userIdStr = request.getParameter("id");
         if (userIdStr != null && !userIdStr.isEmpty()) {
             try {
