@@ -532,3 +532,6 @@ GO
 UPDATE product SET quantity_available = quantity_available - 100 WHERE product_name LIKE N'%Meizan%';
 UPDATE product SET quantity_available = quantity_available - 50 WHERE product_name LIKE N'%Biên Hòa%';
 GO
+
+
+select * from [user]

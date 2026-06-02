@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import model.*;
 import java.sql.Connection;
+import utils.*;
 
 public class CustomerService {
     private final CustomerDAO customerDAO = new CustomerDAO();
@@ -30,7 +31,6 @@ public class CustomerService {
         if (customerList == null || customerList.isEmpty()) {
             return dtoList; 
         }
-
         List<User> userList = userService.getAllUsersReturnUser();
         Map<Integer, User> userMap = new HashMap<>();
         if (userList != null) {
@@ -142,6 +142,9 @@ public class CustomerService {
             return validate;
         }
         
+        String pass = PasswordUtils.generateRandomPassword();
+        user.setPassword(pass);
+        
         Connection conn = userService.getConnection(); 
         
         try {
@@ -165,6 +168,8 @@ public class CustomerService {
             if (isCustomerInserted) {
                 // Đạt điều kiện: Cả 2 bước đều THÀNH CÔNG -> Chốt lưu xuống DB
                 conn.commit(); 
+                
+                
             } else {
                 // Bước 3 lỗi -> Rollback để xóa luôn tài khoản User vừa tạo ở Bước 1
                 System.out.println("Lỗi: Tạo Customer thất bại! Tiến hành khôi phục dữ liệu.");

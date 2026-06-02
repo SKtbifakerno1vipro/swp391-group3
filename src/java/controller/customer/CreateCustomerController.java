@@ -49,9 +49,9 @@ public class CreateCustomerController extends HttpServlet {
         String errorMsg = null;
 
         if ((errorMsg = Validation.validateUsername(userName)) != null) {
-            // Gặp lỗi dừng luôn, không check các trường phía sau nữa
+
         } else if ((errorMsg = Validation.validateEmail(email)) != null) {
-            // Cấu trúc else-if giúp tối giản code và bắt lỗi theo thứ tự từ trên xuống
+
         } else if ((errorMsg = Validation.validateFullName(fullName)) != null) {
             
         } else if ((errorMsg = Validation.validatePhone(phone)) != null) {

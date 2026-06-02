@@ -2,50 +2,73 @@ package utils;
 
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class EmailUtils {
 
-    private static final String HOSTNAME = "smtp.gmail.com";
-    private static final String PORT = "587"; // Cổng TLS của Gmail
-    private static final String FROM_EMAIL = "email_cua_ban@gmail.com";
-    private static final String APP_PASSWORD = "chuoi_16_ky_tu_mat_khau_ung_dung";
+    private static final String HOSTNAME = "smtp-relay.brevo.com";
+    private static final String PORT = "587"; 
+    
+    // Helper method to load email configuration from properties file
+    private static Properties loadEmailProperties() {
+        Properties props = new Properties();
+        try (InputStream input = EmailUtils.class.getClassLoader().getResourceAsStream("../../WEB-INF/EmailConfig.properties")) {
+            if (input != null) {
+                props.load(input);
+            } else {
+                System.out.println("[ERROR] EmailConfig.properties file not found!");
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] Failed to load EmailConfig.properties: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return props;
+    }
 
     public static boolean sendEmail(String toEmail, String subject, String content) {
-        // 1. Cấu hình các thuộc tính kết nối SMTP
+        // Read credentials from local properties file
+        Properties config = loadEmailProperties();
+        final String loginUser = config.getProperty("mail.smtp.user");
+        final String smtpKey = config.getProperty("mail.smtp.key");
+
+        if (loginUser == null || smtpKey == null) {
+            System.out.println("[WARNING] Email credentials are empty. Cannot send email!");
+            return false;
+        }
+
+        // Configure SMTP connection properties for Brevo
         Properties props = new Properties();
         props.put("mail.smtp.host", HOSTNAME);
         props.put("mail.smtp.port", PORT);
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true"); // Bắt buộc dùng TLS
+        props.put("mail.smtp.starttls.enable", "true"); // Force TLS encryption
 
-        // 2. Xác thực tài khoản
-        Authenticator auth = new Authenticator() {
+        // Authenticate session with Brevo Server
+        Session session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(FROM_EMAIL, APP_PASSWORD);
+                return new PasswordAuthentication(loginUser, smtpKey);
             }
-        };
-
-        // 3. Tạo Session làm việc
-        Session session = Session.getInstance(props, auth);
+        });
 
         try {
-            // 4. Cấu hình nội dung thư
             MimeMessage msg = new MimeMessage(session);
             msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-            msg.setFrom(new InternetAddress(FROM_EMAIL, "Hệ Thống SWP391"));
-            msg.setReplyTo(InternetAddress.parse(FROM_EMAIL, false));
-            msg.setSubject(subject, "UTF-8");
             
-            // Hỗ trợ viết code HTML trong nội dung mail (gửi mail định dạng đẹp)
-            msg.setContent(content, "text/html; charset=UTF-8"); 
+            // Sender email must match your registered Brevo account email
+            msg.setFrom(new InternetAddress(loginUser, "SWP391 System Notification"));
+            
+            msg.setSubject(subject, "UTF-8");
+            msg.setContent(content, "text/html; charset=UTF-8"); // Supports HTML tags for rich layout
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
 
-            // 5. Gửi hành trình đi
+            System.out.println("[INFO] Attempting to send email to: " + toEmail);
             Transport.send(msg);
+            System.out.println("[SUCCESS] Email sent successfully to: " + toEmail);
             return true;
         } catch (Exception e) {
+            System.out.println("[SEVERE] Failed to send email to: " + toEmail + ". Error: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
