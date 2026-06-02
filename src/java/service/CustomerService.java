@@ -131,7 +131,7 @@ public class CustomerService {
     
     public boolean updateCustomerDTO(User u, Customer c) {
         boolean userUpdated = userService.updateUser(u);
-        boolean customerUpdated = updateCustomer(c);
+        boolean customerUpdated = customerDAO.updateCustomerDynamic(c);
         return userUpdated && customerUpdated;
     }
 
@@ -186,10 +186,6 @@ public class CustomerService {
             }
         }
         return null; 
-    }
-
-    public boolean updateCustomer(Customer customer) {
-        return customerDAO.updateCustomerDynamic(customer);
     }
     
     public String getLastError() {

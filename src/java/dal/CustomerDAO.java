@@ -80,14 +80,11 @@ public class CustomerDAO extends DBContext {
         System.out.println("Error: Invalid user_id provided for the update condition!");
         return false;
     }
-
-    // Initialize StringBuilder with the base UPDATE statement
+    
     StringBuilder sql = new StringBuilder("UPDATE [customer] SET ");
     
-    // List to store parameter values in the exact order of appearance of "?"
     List<Object> parameters = new ArrayList<>();
 
-    // 2. Dynamically check each field; only append to SQL if data is present
     if (customer.getTaxCode() != null && !customer.getTaxCode().trim().isEmpty()) {
         sql.append("tax_code = ?, ");
         parameters.add(customer.getTaxCode());
@@ -103,7 +100,6 @@ public class CustomerDAO extends DBContext {
         parameters.add(customer.getCompanyName());
     }
 
-    // Handle assigned_to_user_id (which can legally accept NULL in DB)
     if (customer.getAssignedToUserId() != null) {
         sql.append("assigned_to_user_id = ? ");
         parameters.add(customer.getAssignedToUserId());
@@ -115,7 +111,6 @@ public class CustomerDAO extends DBContext {
         return false;
     }
 
-    // 4. Append the WHERE clause using user_id as requested
     sql.append(" WHERE user_id = ?");
     parameters.add(customer.getUserId()); // Add user_id to the end of the parameters list
 
@@ -200,13 +195,11 @@ public class CustomerDAO extends DBContext {
                    + "LEFT JOIN [user] u ON c.user_id = u.user_id "
                    + "WHERE 1=1 "; 
 
-        // 2. Xử lý cụm tìm kiếm chung (Gộp bằng toán tử OR và bọc trong ngoặc đơn để không phá vỡ logic các điều kiện khác)
         boolean hasSearch = (searchName != null && !searchName.isBlank());
         if (hasSearch) {
             sql += "AND (u.full_name LIKE ? OR u.phone LIKE ? OR c.tax_code LIKE ? OR u.email LIKE ?) ";
         }
 
-        // 3. Điều kiện loại khách hàng (Bắt buộc thỏa mãn đồng thời nên dùng AND bên ngoài)
         if (type != null && !type.isBlank()) {
             sql += "AND c.customer_type = ? ";
         }

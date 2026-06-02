@@ -197,11 +197,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" placeholder="Leave blank to keep current">
-                </div>
-
-                <div class="form-group">
                     <label>Role</label>
                     <c:forEach var="role" items="${roles}">
                         <c:if test="${role.roleId == cusDTO.user.roleId}">
