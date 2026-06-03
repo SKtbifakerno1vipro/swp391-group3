@@ -120,7 +120,7 @@ public class UserDAO extends DBContext {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1); // return total of column
+                    return rs.getInt(1); // return total of row
                 }
 
             }

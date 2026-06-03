@@ -17,6 +17,7 @@ import model.Category;
 import model.Product;
 import model.User;
 import service.ProductService;
+import utils.Validation;
 
 /**
  *
@@ -25,6 +26,7 @@ import service.ProductService;
 @WebServlet(name = "CreateProduct", urlPatterns = {"/create-product"})
 public class CreateProduct extends HttpServlet {
     private final ProductService pService = new ProductService();
+    private final Validation validation = new Validation();
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -103,22 +105,21 @@ public class CreateProduct extends HttpServlet {
         String status = request.getParameter("status");
         String qRaw = request.getParameter("quantity");
         String cRaw = request.getParameter("categoryId");
-        request.setAttribute("units", units);
-        request.setAttribute("categories", categories);
-        request.setAttribute("statusList", statusList);
-        request.setAttribute("name", name);
-        request.setAttribute("cost", costRaw);
-        request.setAttribute("sell", sellRaw);
-        request.setAttribute("description", des);
-        request.setAttribute("unit", unit);
-        request.setAttribute("status", status);
-        request.setAttribute("quantity", qRaw);
-        request.setAttribute("categoryId", cRaw);
+        
         String error = null;
         Product p = new Product();
         if (name == null || name.trim().isEmpty()
                 || des == null || des.trim().isEmpty()) {
             error = "Please fill data all";
+        }
+        if (error == null) {
+            error = validation.validatePrice(costRaw);
+        }
+        if (error == null) {
+            error = validation.validatePrice(sellRaw);
+        }
+        if (error == null) {
+            error = validation.validateQuantity(qRaw);
         }
         if (error == null) {
             try {
@@ -148,6 +149,17 @@ public class CreateProduct extends HttpServlet {
             }
 
         }
+        request.setAttribute("units", units);
+        request.setAttribute("categories", categories);
+        request.setAttribute("statusList", statusList);
+        request.setAttribute("name", name);
+        request.setAttribute("cost", costRaw);
+        request.setAttribute("sell", sellRaw);
+        request.setAttribute("description", des);
+        request.setAttribute("unit", unit);
+        request.setAttribute("status", status);
+        request.setAttribute("quantity", qRaw);
+        request.setAttribute("categoryId", cRaw);
         request.setAttribute("error", error);
         request.getRequestDispatcher("/views/product/create.jsp").forward(request, response);
 
