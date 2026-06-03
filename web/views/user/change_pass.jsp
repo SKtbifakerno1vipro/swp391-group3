@@ -5,6 +5,7 @@
 --%>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,16 +28,18 @@
 <div class="form-container">
     <h2>Đổi Mật Khẩu</h2>
 
-    <%-- Hiển thị thông báo lỗi nếu có --%>
-    <% if (request.getAttribute("errorMessage") != null) { %>
-        <div class="error"><%= request.getAttribute("errorMessage") %></div>
-    <% } %>
-
-    <%-- Hiển thị thông báo thành công nếu có --%>
-    <% if (request.getAttribute("successMessage") != null) { %>
-        <div class="success"><%= request.getAttribute("successMessage") %></div>
-    <% } %>
-
+    <%-- Thông báo kết quả --%>
+    <c:if test="${not empty success}">
+        <div class="alert alert-success">${success}</div>
+    </c:if>
+    <c:if test="${not empty error}">
+        <div class="alert alert-danger">
+            <strong>Error:</strong> ${error}
+            <c:if test="${not empty errorDetail}">
+                <br><small>${errorDetail}</small>
+            </c:if>
+        </div>
+    </c:if>
     <form action="${pageContext.request.contextPath}/change-password" method="POST">
         <div class="form-group">
             <label for="currentPassword">Mật khẩu hiện tại:</label>

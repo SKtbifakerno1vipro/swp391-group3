@@ -16,6 +16,7 @@
         <li><a href="${pageContext.request.contextPath}/customer/list">Customers</a></li>
         <li><a href="${pageContext.request.contextPath}/product-list">Product</a></li>
         <li><a href="${pageContext.request.contextPath}/role-list">Roles</a></li>
+        <li><a href="${pageContext.request.contextPath}/user/password">Change password</a></li>
         <li><a href="${pageContext.request.contextPath}/logout">Logout</a></li>
     </ul>
 </nav>
