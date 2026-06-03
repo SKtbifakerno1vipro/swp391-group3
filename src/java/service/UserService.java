@@ -69,5 +69,8 @@ public class UserService {
         return userDAO.getConnection(); // Lấy biến connection kế thừa từ DBContext
     }
     // end - Xhieu
-
+public void banUser(int userId, String status){
+    userDAO.banUser(userId, status);
+}
+    
 }
