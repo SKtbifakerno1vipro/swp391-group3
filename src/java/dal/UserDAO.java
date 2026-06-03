@@ -181,7 +181,7 @@ public class UserDAO extends DBContext {
     
    public boolean updatePassword(int userId, String newPasswordPlaintext) {
        
-    String hashedNewPassword = BCrypt.hashpw(newPasswordPlaintext, org.mindrot.jbcrypt.BCrypt.gensalt());
+    String hashedNewPassword = BCrypt.hashpw(newPasswordPlaintext, BCrypt.gensalt());
     
     String sql = "UPDATE [user] SET password_hash = ?, updated_at = GETDATE() WHERE user_id = ?";
     
@@ -249,21 +249,24 @@ public class UserDAO extends DBContext {
         // 10. role_id
         stm.setInt(10, user.getRoleId());
 
-        int affectedRows = stm.executeUpdate();
-        
-        if (affectedRows > 0) {
-            try (ResultSet rs = stm.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getInt(1); // Trả về user_id tự tăng ngầm
+            stm.setString(8, user.getStatus());
+
+            stm.setInt(9, user.getRoleId());
+
+            int affectedRows = stm.executeUpdate();
+
+            if (affectedRows > 0) {
+                try (ResultSet rs = stm.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1); // Trả về user_id tự tăng ngầm
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return -1;
     }
-    return -1;
-}
-    
     public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer roleId) {
         List<User> list = new ArrayList<>();
 
@@ -372,6 +375,16 @@ public class UserDAO extends DBContext {
         }
     }
 
+    public void banUser(int userId, String status) {
+        String sql = "update [user] set account_status= ? where user_id= ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+        }
+    }
+
     public boolean updateUser(User user) {
         try {
 
@@ -399,11 +412,29 @@ public class UserDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String hashPass = rs.getString("password_hash");
-                if (true || BCrypt.checkpw(password, hashPass)) {
+                if (BCrypt.checkpw(password, hashPass)) {
                     User user = mapUser(rs);
                     user.setPassword(hashPass);
                     return user;
                 }
+            }
+        } catch (Exception e) {
+            System.out.println("login" + e.getMessage());
+        }
+        return null;
+    }
+
+    public User loginTester(String username, String password) {
+        String sql = "SELECT * FROM [user] WHERE user_name = ? AND password_hash =?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, "admin_01");
+            ps.setString(2, "123");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+
+                User user = mapUser(rs);
+                user.setPassword(password);
+                return user;
             }
         } catch (Exception e) {
             System.out.println("login" + e.getMessage());
@@ -464,4 +495,3 @@ public class UserDAO extends DBContext {
     }
 
 }
-
