@@ -94,6 +94,9 @@ public class UserDAO extends DBContext {
         return searchUsers(0, null, null, 1, 10);
     }
 
+    /*
+    created by vu trong phu
+    */
     public int getTotalUsers(int roleId, String status, String keyword) {
         String sql = "select count(*) from [user] u where 1=1 ";
         if (roleId > 0) {
@@ -285,6 +288,9 @@ public class UserDAO extends DBContext {
     }
     /// end - Xhieu
 
+    /*
+    created by vu trong phu
+    */
     public User getUserById(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -302,13 +308,6 @@ public class UserDAO extends DBContext {
                 u.setPhone(rs.getString("phone"));
                 u.setStatus(rs.getString("account_status"));
                 u.setRoleId(rs.getInt("role_id"));
-//                if (rs.getTimestamp("create_at") != null) {
-//                    u.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
-//                }
-//                if (rs.getTimestamp("update_at") != null) {
-//                    u.setUpdateAt(rs.getTimestamp("update_at").toLocalDateTime());
-//                }
-
                 return u;
             }
         } catch (Exception e) {
@@ -368,6 +367,9 @@ public class UserDAO extends DBContext {
         return false;
     }
 
+    /*
+    created by vu trong phu
+    */
     public User login(String username, String password) {
         String sql = "SELECT * FROM [user] WHERE user_name = ? AND account_status = 'ACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -386,7 +388,9 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
-
+    /*
+    created by vu trong phu
+    */
     public User loginTester(String username, String password) {
         String sql = "SELECT * FROM [user] WHERE user_name = ? AND password_hash =?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -404,7 +408,9 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
-
+    /*
+    created by vu trong phu
+    */
     public boolean isUsernameDuplicate(String username, int userId) {
         String sql = "SELECT 1 FROM [user] WHERE user_name = ? AND user_id != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -420,7 +426,9 @@ public class UserDAO extends DBContext {
         }
         return false;
     }
-
+    /*
+    created by vu trong phu
+    */
     public boolean isEmailDuplicate(String email, int userId) {
         String sql = "SELECT 1 FROM [user] WHERE email = ? AND user_id != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -436,12 +444,9 @@ public class UserDAO extends DBContext {
         return false;
     }
 
-    /**
-     *
-     * @param phone
-     * @param userId
-     * @return
-     */
+    /*
+    created by vu trong phu
+    */
     public boolean isPhoneDuplicate(String phone, int userId) {
         String sql = "SELECT 1 FROM [user] WHERE phone = ? AND user_id != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
