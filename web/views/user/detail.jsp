@@ -8,37 +8,62 @@
     </head>
     <body>
         <h1>${mode == 'edit' ? 'Edit User' : 'User Detail'}</h1>
+
         <c:if test="${not empty error}"><p style="color: red">${error}</p></c:if>
-        <form action="edit-user?id=${u.userId}" method="post">
+
+            <form action="edit-user?id=${u.userId}" method="post">
             <table border="0">
-                <tr><td>Username:</td><td><input type="text" name="userName" value="${u.userName}" readonly></td></tr>
-                <tr><td>Full Name:</td><td><input type="text" name="fullName" value="${u.fullName}" ${mode=='edit' ? '' : 'readonly'}></td></tr>
-                <tr><td>Email:</td><td><input type="text" name="email" value="${u.email}" readonly></td></tr>
-                <tr><td>Phone:</td><td><input type="text" name="phone" value="${u.phone}" ${mode=='edit' ? '' : 'readonly'}></td></tr>
-                <tr><td>Gender:</td><td>
+                <tr>
+                    <td>Username:</td>
+                    <td><input type="text" name="userName" value="${u.userName}" readonly></td>
+                </tr>
+                <tr>
+                    <td>Full Name:</td>
+                    <td><input type="text" name="fullName" value="${u.fullName}" ${mode=='edit' ? '' : 'readonly'}></td>
+                </tr>
+                <tr>
+                    <td>Email:</td>
+                    <td><input type="text" name="email" value="${u.email}" readonly></td>
+                </tr>
+                <tr>
+                    <td>Phone:</td>
+                    <td><input type="text" name="phone" value="${u.phone}" ${mode=='edit' ? '' : 'readonly'}></td>
+                </tr>
+                <tr>
+                    <td>Gender:</td>
+                    <td>
                         <select name="gender" ${mode=='edit' ? '' : 'disabled'}>
                             <option value="M" ${u.gender == 'M' ? 'selected' : ''}>Male</option>
                             <option value="F" ${u.gender == 'F' ? 'selected' : ''}>Female</option>
                             <option value="O" ${u.gender == 'O' ? 'selected' : ''}>Other</option>
                         </select>
-                    </td></tr>
-                <tr><td>Role:</td><td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Role:</td>
+                    <td>
                         <select name="roleId" ${mode=='edit' ? '' : 'disabled'}>
                             <c:forEach var="r" items="${roles}">
                                 <option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected': ''}>${r.roleName}</option>
                             </c:forEach>
                         </select>
-                    </td></tr>
-                <tr><td>Status:</td><td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Status:</td>
+                    <td>
                         <select name="status" ${mode=='edit' ? '' : 'disabled'}>
                             <option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
                             <option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
                         </select>
-                    </td></tr>
-                <tr><td colspan="2">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
                         <c:if test="${mode != 'edit'}"><a href="edit-user?id=${u.userId}&mode=edit">Edit</a> <a href="user-list">Back</a></c:if>
                         <c:if test="${mode == 'edit'}"><button type="submit">Save</button> <a href="user-detail?id=${u.userId}">Cancel</a></c:if>
-                    </td></tr>
+                    </td>
+                </tr>
             </table>
         </form>
     </body>
