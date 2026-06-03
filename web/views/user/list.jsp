@@ -99,7 +99,7 @@
                         </select>
 
                         <!-- Status Filter -->
-                        <select name="status" class="bg-white border border-outline-variant rounded-lg px-4 py-2 text-sm font-body focus:ring-1 focus:ring-primary">
+                        <select name="status" class="bg-white border border-outline-variant rounded-lg pl-4 pr-10 py-2 text-sm font-body focus:ring-1 focus:ring-primary">
                             <option value="">All Status</option>
                             <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Active</option>
                             <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>Inactive</option>
