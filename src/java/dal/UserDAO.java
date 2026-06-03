@@ -428,9 +428,8 @@ public class UserDAO extends DBContext {
     public User loginTester(String username, String password) {
         String sql = "SELECT * FROM [user] WHERE user_name = ? AND password_hash =?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            //ps.setString(1, "admin_01");
-            ps.setString(1, "vip_nguyen");
-            ps.setString(2, "rnNSCQIP");
+            ps.setString(1, "admin_01");
+            ps.setString(2, "123");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
 
