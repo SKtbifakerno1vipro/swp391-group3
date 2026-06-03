@@ -62,5 +62,8 @@ public class UserService {
         return userDAO.searchUserFieldsByOR(userName, phone, email, role_id);
     }
     // end - Xhieu
-
+public void banUser(int userId, String status){
+    userDAO.banUser(userId, status);
+}
+    
 }

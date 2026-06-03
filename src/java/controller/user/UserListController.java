@@ -49,4 +49,20 @@ public class UserListController extends HttpServlet {
         request.setAttribute("currentPage", pageIndex);
         request.getRequestDispatcher("/views/user/list.jsp").forward(request, response);
     }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        int userId = Integer.parseInt(request.getParameter("userId"));
+        String currentStatus = request.getParameter("status");
+        boolean isActive = "ACTIVE".equals(currentStatus);
+        if (isActive) { // status is active
+            userService.banUser(userId, "INACTIVE");
+        } else {
+            userService.banUser(userId, "ACTIVE");
+        }
+        response.sendRedirect(request.getContextPath() + "/user-list");
+
+    }
+
 }

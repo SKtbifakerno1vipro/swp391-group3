@@ -1,94 +1,173 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html>
+<html class="light" lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>User Detail</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${mode == 'edit' ? 'Edit User' : 'User Detail'}</title>
+        <link href="https://fonts.googleapis.com" rel="preconnect"/>
+        <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;1,6..12,400&display=swap" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "primary": "#4a7c59", "on-primary": "#ffffff", "surface": "#faf6f0",
+                            "on-surface": "#2e3230", "on-surface-variant": "#4a4e4a",
+                            "outline-variant": "#c4c8bc", "surface-container-low": "#f5f1ea", "error": "#b83230"
+                        },
+                        "fontFamily": {"headline": ["Literata", "serif"], "body": ["Nunito Sans", "sans-serif"], "label": ["Nunito Sans", "sans-serif"]}
+                    }
+                }
+            }
+        </script>
+        <style>
+            body {
+                font-family: 'Nunito Sans', sans-serif;
+                background-color: #faf6f0;
+                color: #2e3230;
+            }
+            .material-symbols-outlined {
+                font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 24px rgba(46, 50, 48, 0.08);
+            }
+            /* Tùy chỉnh màu input khi bị khóa */
+            input:read-only, select:disabled {
+                background-color: #f5f1ea;
+                color: #4a4e4a;
+                cursor: not-allowed;
+                border-color: #e4e0d8;
+            }
+        </style>
     </head>
-    <body>
-        <h1>
-            <c:if test="${mode=='edit'}">Edit User</c:if>
-            <c:if test="${mode!='edit'}">User Detail</c:if>
-            </h1>
-        <c:if test="${not empty error}">
-            <p style="color: red">${error}</p>
-        </c:if>
+    <body class="bg-surface text-on-surface py-10">
 
-        <form action="edit-user?id=${u.userId}" method="post">
-            <table border="1">
-                <tr>
-                    <td>User Name:</td>
-                    <td><input type="text" name="userName" 
-                               value="${u.userName}" readonly="" ></td>
-                </tr>
+        <main class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="mb-6 flex items-center gap-3">
+                <a href="user-list" class="p-2 rounded-full hover:bg-outline-variant/30 transition-colors text-on-surface-variant flex items-center justify-center">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </a>
+                <div>
+                    <h2 class="font-headline font-bold text-3xl text-on-surface">
+                        <c:if test="${mode == 'edit'}">Edit User Profile</c:if>
+                        <c:if test="${mode != 'edit'}">User Detail</c:if>
+                        </h2>
+                        <p class="text-sm text-on-surface-variant font-label mt-1">Manage user information and access rights.</p>
+                    </div>
+                </div>
 
-                <tr>
-                    <td>Full Name:</td>
-                    <td><input type="text" name="fullName" minlength="4" maxlength="50" required
-                               value="${u.fullName}" ${mode=='edit' ? '' : 'readonly'}></td>
-                </tr>
+                <!-- Error Alert -->
+            <c:if test="${not empty error}">
+                <div class="mb-6 p-4 bg-error/10 border-l-4 border-error rounded-r-lg flex items-center gap-3">
+                    <span class="material-symbols-outlined text-error">error</span>
+                    <p class="text-error font-semibold text-sm">${error}</p>
+                </div>
+            </c:if>
 
-                <tr>
-                    <td>Email:</td>
-                    <td><input type="text" name="email" 
-                               value="${u.email}" readonly=""></td>
-                </tr>
+            <!-- Form Card -->
+            <div class="bg-white rounded-xl card-shadow border border-outline-variant/20 p-8">
+                <form action="edit-user?id=${u.userId}" method="post">
 
-                <tr>
-                    <td>Phone:</td>
-                    <td><input type="text" name="phone"  required pattern="[0-9]{10}"
-                               value="${u.phone}" ${mode=='edit' ? '' : 'readonly'}></td>
-                </tr>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <!-- Username (Luôn Readonly vì không nên cho đổi username) -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-label font-bold text-on-surface-variant">Username</label>
+                            <input type="text" name="userName" value="<c:out value='${u.userName}' />" readonly 
+                                   class="w-full px-4 py-2.5 border rounded-lg text-sm font-body outline-none" />
+                        </div>
 
-                <tr>
-                    <td>Gender:</td>
-                    <td>
-                        <select name="gender" ${mode=='edit'? '' : 'disabled' }>
-                            <option value="M" ${u.gender== 'M' ? 'selected' : ''} >Male</option>
-                            <option value="F" ${u.gender== 'F' ? 'selected' : ''} >Female</option>
-                            <option value="O" ${u.gender== 'O' ? 'selected' : ''} >Other</option>
+                        <!-- Full Name -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-label font-bold text-on-surface-variant">Full Name <span class="text-error">*</span></label>
+                            <input type="text" name="fullName" value="<c:out value='${u.fullName}' />" required minlength="4" maxlength="50"
+                                   ${mode == 'edit' ? '' : 'readonly'}
+                                   class="w-full px-4 py-2.5 border border-outline-variant rounded-lg text-sm font-body focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" />
+                        </div>
 
-                        </select>
-                    </td>
-                </tr>
+                        <!-- Email -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-label font-bold text-on-surface-variant">Email Address</label>
+                            <input type="email" name="email" value="<c:out value='${u.email}' />" readonly
+                                   class="w-full px-4 py-2.5 border rounded-lg text-sm font-body outline-none" />
+                        </div>
 
-                <tr>
-                    <td>Role:</td>
-                    <td>
-                        <select name="roleId" ${mode=='edit'? '' : 'disabled' }>
-                            <c:forEach var="r" items="${roles}">
-                                <option value="${r.roleId}" ${r.roleId == u.roleId ? 'selected': ''}>${r.roleName}</option>
-                            </c:forEach>
-                        </select>
-                    </td>
-                </tr>
+                        <!-- Phone -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-label font-bold text-on-surface-variant">Phone Number <span class="text-error">*</span></label>
+                            <input type="text" name="phone" value="<c:out value='${u.phone}' />" required pattern="[0-9]{10}"
+                                   ${mode == 'edit' ? '' : 'readonly'}
+                                   class="w-full px-4 py-2.5 border border-outline-variant rounded-lg text-sm font-body focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" />
+                        </div>
 
-                <tr>
-                    <td>Status:</td>
-                    <td>
-                        <select name="status" ${mode == 'edit' ?' ': 'disabled'}>
-                            <option value="ACTIVE" ${u.status =='ACTIVE' ? 'selected' : ''}>ACTIVE</option>
-                            <option value="INACTIVE"  ${u.status =='INACTIVE' ? 'selected' : ''}>INACTIVE</option>
-                        </select>
-                    </td>
-                </tr>
-                <!-- detailing -->
-                <c:if test="${mode != 'edit'}">
+                        <!-- Gender -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-label font-bold text-on-surface-variant">Gender</label>
+                            <select name="gender" ${mode == 'edit' ? '' : 'disabled'}
+                                    class="w-full px-4 py-2.5 border border-outline-variant rounded-lg text-sm font-body focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all">
+                                <option value="M" ${u.gender == 'M' ? 'selected' : ''}>Male</option>
+                                <option value="F" ${u.gender == 'F' ? 'selected' : ''}>Female</option>
+                                <option value="O" ${u.gender == 'O' ? 'selected' : ''}>Other</option>
+                            </select>
+                            <!-- Nếu select bị disabled, nó sẽ ko gửi data. Cần trick nhỏ giấu data để truyền về server nếu muốn -->
+                            <c:if test="${mode != 'edit'}"><input type="hidden" name="gender" value="${u.gender}"></c:if>
+                            </div>
 
-                    <a href="edit-user?id=${u.userId}&mode=edit"><button type="button">Edit User</button></a>
-                    <a href="user-list"><button type="button">Cancel</button></a>
-                </c:if>
+                            <!-- Role -->
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-sm font-label font-bold text-on-surface-variant">Role</label>
+                                <select name="roleId" ${mode == 'edit' ? '' : 'disabled'}
+                                    class="w-full px-4 py-2.5 border border-outline-variant rounded-lg text-sm font-body focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all">
+                                <c:forEach var="r" items="${roles}">
+                                    <option value="${r.roleId}" ${r.roleId == u.roleId ? 'selected': ''}>${r.roleName}</option>
+                                </c:forEach>
+                            </select>
+                            <c:if test="${mode != 'edit'}"><input type="hidden" name="roleId" value="${u.roleId}"></c:if>
+                            </div>
 
-                <!-- editing -->
-                <c:if test="${mode == 'edit'}">
+                            <!-- Status -->
+                            <div class="flex flex-col gap-1.5 md:col-span-2">
+                                <label class="text-sm font-label font-bold text-on-surface-variant">Account Status</label>
+                                <select name="status" ${mode == 'edit' ? '' : 'disabled'}
+                                    class="w-full md:w-1/2 px-4 py-2.5 border border-outline-variant rounded-lg text-sm font-body focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all">
+                                <option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
+                                <option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
+                            </select>
+                            <c:if test="${mode != 'edit'}"><input type="hidden" name="status" value="${u.status}"></c:if>
+                            </div>
+                        </div>
 
-                    <button type="submit">Save</button>
+                        <!-- Action Buttons -->
+                        <div class="flex items-center justify-end gap-3 pt-6 border-t border-outline-variant/30">
+                        <c:if test="${mode != 'edit'}">
+                            <a href="user-list" class="px-6 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-sm hover:bg-surface-container-low transition-colors">
+                                Back to List
+                            </a>
+                            <a href="edit-user?id=${u.userId}&mode=edit" class="px-6 py-2.5 rounded-lg bg-primary text-on-primary font-bold text-sm shadow-sm hover:bg-[#3a6347] transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">edit</span> Edit Profile
+                            </a>
+                        </c:if>
 
-                    <a href="user-detail?id=${u.userId}"><button type="button">Cancel</button></a>
-                </c:if>
-            </table>
-        </form>
+                        <c:if test="${mode == 'edit'}">
+                            <a href="user-detail?id=${u.userId}" class="px-6 py-2.5 rounded-lg border border-outline-variant text-on-surface font-semibold text-sm hover:bg-surface-container-low transition-colors">
+                                Cancel
+                            </a>
+                            <button type="submit" class="px-6 py-2.5 rounded-lg bg-primary text-on-primary font-bold text-sm shadow-sm hover:bg-[#3a6347] transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">save</span> Save Changes
+                            </button>
+                        </c:if>
+                    </div>
+
+                </form>
+            </div>
+        </main>
 
     </body>
 </html>

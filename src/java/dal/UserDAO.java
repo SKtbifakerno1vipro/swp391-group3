@@ -287,6 +287,16 @@ public class UserDAO extends DBContext {
         }
     }
 
+    public void banUser(int userId, String status) {
+        String sql = "update [user] set account_status= ? where user_id= ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+        }
+    }
+
     public boolean updateUser(User user) {
         try {
 
@@ -379,4 +389,3 @@ public class UserDAO extends DBContext {
     }
 
 }
-
