@@ -19,15 +19,22 @@
                 </tr>
                 <tr>
                     <td>Full Name:</td>
-                    <td><input type="text" name="fullName" value="${u.fullName}" ${mode=='edit' ? '' : 'readonly'}></td>
+                    <td><input type="text" name="fullName" value="${u.fullName}" ${mode=='edit' ? '' : 'readonly'}
+                               minlength="4" maxlength="50"
+                               ></td>
                 </tr>
                 <tr>
                     <td>Email:</td>
-                    <td><input type="text" name="email" value="${u.email}" readonly></td>
+                    <td><input type="text" name="email" value="${u.email}" readonly
+                               minlength="4" maxlength="50" 
+                               ></td>
                 </tr>
                 <tr>
                     <td>Phone:</td>
-                    <td><input type="text" name="phone" value="${u.phone}" ${mode=='edit' ? '' : 'readonly'}></td>
+                    <td><input type="text" name="phone" value="${u.phone}" ${mode=='edit' ? '' : 'readonly'}
+                               pattern="^0[0-9]{9}$"
+                               title="Số điện thoại phải bắt đầu bằng số 0 và có đúng 10 chữ số."
+                               ></td>
                 </tr>
                 <tr>
                     <td>Gender:</td>
