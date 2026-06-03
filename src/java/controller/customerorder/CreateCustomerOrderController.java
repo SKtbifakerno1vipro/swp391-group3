@@ -9,7 +9,6 @@ import service.CustomerOrderService;
 import service.CustomerService;
 import service.ProductService;
 
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -34,7 +33,7 @@ public class CreateCustomerOrderController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
-        
+
         if (currentUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -52,18 +51,29 @@ public class CreateCustomerOrderController extends HttpServlet {
         }
 
         try {
-            List<Product> products = productService.getAllProducts();
+            String pageParam = request.getParameter("productPage");
+            int productPage = 1;
+            if (pageParam != null && !pageParam.isBlank()) {
+                productPage = Integer.parseInt(pageParam);
+            }
+            int totalProducts = productService.countProduct(null, null, "ACTIVE");
+            int totalProductPages = productService.calculateTotalPage(totalProducts);
+            productPage = productService.nomalizePage(productPage, totalProductPages);
+            List<Product> products = productService.searchProduct(null, null, "ACTIVE", totalProducts, productPage,
+                    totalProductPages);
             request.setAttribute("products", products);
-
+            request.setAttribute("currentProductPage", productPage);
+            request.setAttribute("totalProductPages", totalProductPages);
+            
             if (customerId != -1) {
                 CustomerDTO customerDto = customerService.getCustomerDTOByCusId(customerId);
                 request.setAttribute("customer", customerDto);
-                
+
                 if (customerDto != null) {
                     // Fetch signed contracts for this customer
                     List<model.CustomerContract> contracts = customerOrderService.getSignedContractsByCustomerId(customerId);
                     request.setAttribute("contracts", contracts);
-                    
+
                     if (contracts.isEmpty()) {
                         request.setAttribute("error", "No signed contracts found for this customer. A signed contract is required to create an order.");
                     }
@@ -79,7 +89,7 @@ public class CreateCustomerOrderController extends HttpServlet {
                 List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
                 request.setAttribute("customers", customers);
             }
-            
+
             request.getRequestDispatcher("/views/customer-order/create.jsp").forward(request, response);
 
         } catch (Exception e) {
@@ -93,7 +103,7 @@ public class CreateCustomerOrderController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
-        
+
         if (currentUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -149,8 +159,8 @@ public class CreateCustomerOrderController extends HttpServlet {
                         if (p != null) {
                             CustomerOrderDetail detail = new CustomerOrderDetail();
                             detail.setProductId(pid);
-                            detail.setQuantity(quantity);                      
-                            detail.setCostPrice(p.getCostPrice()); 
+                            detail.setQuantity(quantity);
+                            detail.setCostPrice(p.getCostPrice());
                             detail.setSellingPrice(p.getSellingPrice());
                             details.add(detail);
                         }
