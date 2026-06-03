@@ -29,8 +29,8 @@ public class ProductService {
         return productDAO.searchProduct(searchText, categoryId, status);
     }
 
-    public List<Product> searchProduct(String searchText, Integer categoryId, String status, int pageSize, int totalRow, int page, int totalPage) {
-        return productDAO.searchProduct(searchText, categoryId, status, pageSize, totalRow, page, totalPage);
+    public List<Product> searchProduct(String searchText, Integer categoryId, String status, int totalRow, int page, int totalPage) {
+        return productDAO.searchProduct(searchText, categoryId, status, totalRow, page, totalPage);
     }
 
     public List<Category> getAllCategory() {
@@ -53,12 +53,11 @@ public class ProductService {
         return productDAO.countProduct(searchText, categoryId, status);
     }
 
-    public int calculateTotalPage(int totalRow, int pageSize) {
-        
-        if (pageSize <= 0) {
+    public int calculateTotalPage(int totalRow) {
+        if (totalRow < productDAO.PAGE_SIZE) {
             return 1;
         }
-        return (int) Math.ceil((double) totalRow / pageSize);
+        return (int) Math.ceil((double) totalRow / productDAO.PAGE_SIZE);
     }
     
     public int nomalizePage(int page, int totalPage){
