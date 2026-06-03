@@ -7,8 +7,9 @@ import java.util.Properties;
 
 public class EmailUtils {
 
-    private static final String HOSTNAME = "smtp-relay.brevo.com";
-    private static final String PORT = "587"; 
+    // Đổi cấu hình Host và Port sang của Gmail
+    private static final String HOSTNAME = "smtp.gmail.com";
+    private static final String PORT = "587"; // Cổng TLS của Gmail
     
     // Helper method to load email configuration from properties file
     private static Properties loadEmailProperties() {
@@ -30,34 +31,40 @@ public class EmailUtils {
         // Read credentials from local properties file
         Properties config = loadEmailProperties();
         final String loginUser = config.getProperty("mail.smtp.user");
-        final String smtpKey = config.getProperty("mail.smtp.key");
+        final String smtpKey = config.getProperty("mail.smtp.key"); // Đối với Gmail, đây chính là App Password
+        final String senderEmail = config.getProperty("mail.sender.email");
+        final String senderName = config.getProperty("mail.sender.name");
 
         if (loginUser == null || smtpKey == null) {
             System.out.println("[WARNING] Email credentials are empty. Cannot send email!");
             return false;
         }
 
-        // Configure SMTP connection properties for Brevo
+        // Configure SMTP connection properties for Gmail
         Properties props = new Properties();
         props.put("mail.smtp.host", HOSTNAME);
         props.put("mail.smtp.port", PORT);
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true"); // Force TLS encryption
+        props.put("mail.smtp.starttls.enable", "true"); // Bắt buộc dùng TLS đối với Gmail cổng 587
+        
+        // Hai cấu hình dưới đây giúp tăng tính ổn định, tránh các lỗi bắt tay SSL/TLS với server Google
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2"); 
+        props.put("mail.smtp.starttls.required", "true");
 
-        // Authenticate session with Brevo Server
+        // Authenticate session with Gmail Server
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(loginUser, smtpKey);
             }
         });
-
+        session.setDebug(true);
         try {
             MimeMessage msg = new MimeMessage(session);
             msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
             
-            // Sender email must match your registered Brevo account email
-            msg.setFrom(new InternetAddress(loginUser, "SWP391 System Notification"));
+            // Đối với Gmail, senderEmail bắt buộc phải trùng khớp với loginUser (Email cá nhân của bạn)
+            msg.setFrom(new InternetAddress(senderEmail, senderName));
             
             msg.setSubject(subject, "UTF-8");
             msg.setContent(content, "text/html; charset=UTF-8"); // Supports HTML tags for rich layout

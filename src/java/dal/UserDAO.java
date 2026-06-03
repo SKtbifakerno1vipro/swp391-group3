@@ -204,7 +204,7 @@ public class UserDAO extends DBContext {
     }
     return false;
 }
-    
+    // da tao hash passsword
     public int createUserFullParameter(User user, Connection conn) {
   
     String sql = "INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, "
@@ -216,7 +216,7 @@ public class UserDAO extends DBContext {
         // 1. user_name
         stm.setString(1, user.getUserName());
 
-        // 2. password_hash (Đã thêm lại ở đây)
+        // 2. password_hash 
         stm.setString(2, BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
 
         // 3. email

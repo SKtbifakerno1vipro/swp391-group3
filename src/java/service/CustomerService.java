@@ -167,9 +167,20 @@ public class CustomerService {
             
             if (isCustomerInserted) {
                 // Đạt điều kiện: Cả 2 bước đều THÀNH CÔNG -> Chốt lưu xuống DB
-                conn.commit(); 
-                
-                
+                String emailSubject = "Chào mừng thành viên mới - Hệ thống SWP391";
+                String emailBody = "<h3>Xin chào bạn,</h3>"
+                                 + "<p>Tài khoản khách hàng của bạn trên hệ thống đã được khởi tạo thành công!</p>"
+                                 + "<p>Vui lòng đăng nhập hệ thống để trải nghiệm dịch vụ của chúng tôi.</p>"
+                                 + "<h3>" + pass + "</h3>"
+                                 + "<br/><p>Trân trọng,</p><p>Đội ngũ hỗ trợ kỹ thuật.</p>";
+
+                // Trigger email sending in background
+                boolean isSent = EmailUtils.sendEmail(user.getEmail(), emailSubject, emailBody);
+                if (!isSent) {
+                    conn.rollback();
+                    return "Error when send email to customer";
+                }
+                conn.commit(); // gui xong email moi tao
             } else {
                 // Bước 3 lỗi -> Rollback để xóa luôn tài khoản User vừa tạo ở Bước 1
                 System.out.println("Lỗi: Tạo Customer thất bại! Tiến hành khôi phục dữ liệu.");
