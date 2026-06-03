@@ -56,7 +56,7 @@ public class CreateCustomerOrderController extends HttpServlet {
             request.setAttribute("products", products);
 
             if (customerId != -1) {
-                CustomerDTO customerDto = customerService.getCustomerDTOByCustomerId(customerId);
+                CustomerDTO customerDto = customerService.getCustomerDTOByCusId(customerId);
                 request.setAttribute("customer", customerDto);
                 
                 if (customerDto != null) {

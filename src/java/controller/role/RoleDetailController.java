@@ -32,8 +32,17 @@ public class RoleDetailController extends HttpServlet {
             int roleId = Integer.parseInt(roleIdParam);
             Role role = roleService.getRoleDetail(roleId);
 
-            if (role != null) {
+            if (role != null) { 
+                request.setAttribute("permissionList", roleService.getAllPermissions());
+                Set<Integer> selectedPermissionIds = new HashSet<>();
+                if (role.getPermissions() != null) {
+                    for (Permission p : role.getPermissions()) {
+                        selectedPermissionIds.add(p.getPermissionId());
+                    }
+                }
                 request.setAttribute("role", role);
+                request.setAttribute("selectedPermissionIds", selectedPermissionIds);
+                
                 request.getRequestDispatcher("/views/role/role-detail.jsp").forward(request, response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/role-list");
@@ -52,10 +61,27 @@ public class RoleDetailController extends HttpServlet {
             int roleId = Integer.parseInt(request.getParameter("roleId"));
             String roleName = request.getParameter("roleName");
             
+            String[] permissionIdValues = request.getParameterValues("permissionIds");
+            List<Integer> permissionIds = new ArrayList<>();
+            
+            if (permissionIdValues != null) {
+                for (String val : permissionIdValues) {
+                    permissionIds.add(Integer.parseInt(val));
+                }
+            }
             // Validate
             if (roleName == null || roleName.trim().isEmpty()) {
                 Role role = roleService.getRoleDetail(roleId);
                 request.setAttribute("role", role);
+                request.setAttribute("permissionList", roleService.getAllPermissions());
+                
+                Set<Integer> selectedPermissionIds = new HashSet<>();
+                if (role.getPermissions() != null) {
+                     for (Permission p : role.getPermissions()) {
+                        selectedPermissionIds.add(p.getPermissionId());
+                     }
+                }
+                request.setAttribute("selectedPermissionIds", selectedPermissionIds);
                 request.setAttribute("error", "Tên role không được để trống!");
                 request.getRequestDispatcher("/views/role/role-detail.jsp").forward(request, response);
                 return;
@@ -65,7 +91,9 @@ public class RoleDetailController extends HttpServlet {
             Role role = new Role();
             role.setRoleId(roleId);
             role.setRoleName(roleName.trim());
+            
             roleService.updateRole(role);
+            roleService.updateRolePermissions(roleId, permissionIds);
             
             // Redirect về view mode
             response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");

@@ -53,6 +53,7 @@
                         <c:when test="${empty users}">
                             <tr>
                                 <td colspan="8">No users found.</td>
+
                             </tr>
                         </c:when>
                         <c:otherwise>
@@ -86,10 +87,8 @@
 
                 <c:forEach begin="1" end="${endPage}" var="i">
 
-     
                     <c:set var="pageUrl" value="user-list?page=${i}&keyword=${keyword}&roleId=${roleId}&status=${status}" />
 
- 
                     <option value="${pageUrl}" ${currentPage == i ? 'selected' : ''}>
                         Page: ${i} 
                     </option>

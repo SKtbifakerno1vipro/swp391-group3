@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import model.User;
+import model.*;
+import java.sql.Connection;
 
 public class CustomerService {
     private final CustomerDAO customerDAO = new CustomerDAO();
@@ -86,7 +87,7 @@ public class CustomerService {
     }
     // new 
     public CustomerDTO getCustomerDTOByCusId(int customerId) {
-    // 
+
     Customer c = customerDAO.getCustomerByCusId(customerId);
     if (c == null) {
         return null;
@@ -134,16 +135,61 @@ public class CustomerService {
         return userUpdated && customerUpdated;
     }
 
-    public Customer createCustomerDTO(User u, Customer c) {
-        String isDuplicate = isDuplicateCusFields(u.getUserName(), u.getPhone(), u.getEmail(), c.getTaxCode());
-        if (isDuplicate.contentEquals("SUCCESS")) {
-            return customerDAO.createCustomer(u, c);
+    public String createCustomerDTO(User user, Customer customer) {
+        
+        String validate = isDuplicateCusFields(user.getUserName(), user.getPhone(), user.getEmail(), customer.getTaxCode());
+        if (!validate.contentEquals("SUCCESS")) {
+            return validate;
         }
-        return null;
+        
+        Connection conn = userService.getConnection(); 
+        
+        try {
+            //tat che do tu dong luu cua database sql
+            conn.setAutoCommit(false);
+
+            // Bước 1: Tạo tài khoản User trước
+            int generatedUserId = userService.createUserFullParameter(user,conn);
+            
+            if (generatedUserId == -1) {
+                System.out.println("Cannot create user account");
+                conn.rollback(); // huy bo neu loi
+                return null;
+            }
+
+            customer.setUserId(generatedUserId);
+
+            // Bước 3: Tạo Customer sau
+            boolean isCustomerInserted = customerDAO.insertCustomer(customer,conn);
+            
+            if (isCustomerInserted) {
+                // Đạt điều kiện: Cả 2 bước đều THÀNH CÔNG -> Chốt lưu xuống DB
+                conn.commit(); 
+            } else {
+                // Bước 3 lỗi -> Rollback để xóa luôn tài khoản User vừa tạo ở Bước 1
+                System.out.println("Lỗi: Tạo Customer thất bại! Tiến hành khôi phục dữ liệu.");
+                conn.rollback(); 
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                if (conn != null) conn.rollback(); // Dính exception là hủy hết
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                if (conn != null) conn.setAutoCommit(true); // Trả lại trạng thái ban đầu cho Connection
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null; 
     }
 
     public boolean updateCustomer(Customer customer) {
-        return customerDAO.updateCustomer(customer);
+        return customerDAO.updateCustomerDynamic(customer);
     }
     
     public String getLastError() {
@@ -151,9 +197,6 @@ public class CustomerService {
     }
     public Customer getCustomerByUserId(int userId) {
         return customerDAO.getCustomerByCusId(userId);
-    }
-    public CustomerDTO getCustomerDTOByCustomerId(int id) {
-        return customerDAO.getCustomerDTOByCustomerId(id);
     }
     public List<User> getAllSalesExecutiveUsers() {
 
