@@ -159,7 +159,7 @@
             <div class="nav-links">
                 <a href="${pageContext.request.contextPath}/customer/list">Customer List</a>
                 <a href="#">DashBoard</a>
-                <a href="${pageContext.request.contextPath}/customer/password?hasPass=1">Change password</a>
+                <a href="${pageContext.request.contextPath}/customer/password?hasPass=1?id=?">Change password</a>
             </div>
 
             <h2>Edit Customer</h2>

@@ -179,7 +179,7 @@ public class UserDAO extends DBContext {
         return list;
     }
     
-   public boolean updatePassword(int userId, String newPasswordPlaintext) {
+    public boolean updatePassword(int userId, String newPasswordPlaintext) {
        
     String hashedNewPassword = BCrypt.hashpw(newPasswordPlaintext, BCrypt.gensalt());
     
@@ -204,7 +204,7 @@ public class UserDAO extends DBContext {
     }
     return false;
 }
-    // da tao hash passsword
+    // da co hash passsword
     public int createUserFullParameter(User user, Connection conn) {
   
     String sql = "INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, "
@@ -267,6 +267,7 @@ public class UserDAO extends DBContext {
         }
         return -1;
     }
+    
     public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer roleId) {
         List<User> list = new ArrayList<>();
 
@@ -427,8 +428,9 @@ public class UserDAO extends DBContext {
     public User loginTester(String username, String password) {
         String sql = "SELECT * FROM [user] WHERE user_name = ? AND password_hash =?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, "admin_01");
-            ps.setString(2, "123");
+            //ps.setString(1, "admin_01");
+            ps.setString(1, "vip_nguyen");
+            ps.setString(2, "rnNSCQIP");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
 

@@ -9,24 +9,26 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import dto.*;
+import service.CustomerService;
+import service.RoleService;
+import service.UserService;
 
 @WebServlet("/customer/password")
 public class PasswordController extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-
+    
+    private final CustomerService customerService = new CustomerService();
+    private final UserService userService = new UserService();
+    private final RoleService roleService = new RoleService();
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        
-        // Kiểm tra xem user đã đăng nhập chưa (ví dụ qua Session)
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            // Nếu chưa đăng nhập, đá về trang login
-            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
-            return;
-        }
+            
+        String id = request.getParameter("id");
+        String hasPass = request.getParameter("hasPass");
 
-        // Nếu đã đăng nhập, forward sang trang JSP
+        
         request.getRequestDispatcher("/views/customer/change_pass.jsp").forward(request, response);
     }
 
