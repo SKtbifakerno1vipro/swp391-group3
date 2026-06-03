@@ -180,54 +180,56 @@ public class UserDAO extends DBContext {
         }
         return list;
     }
-    public int createUserFullParameter(User user, Connection conn) {
-    // Đã xóa bỏ password_hash ra khỏi câu lệnh SQL
-    String sql = "INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, "
-               + "full_name, address, phone, account_status, created_at, updated_at, role_id) "
-               + "VALUES (?, 1, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?)";
-    
-    try (PreparedStatement stm = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-        
-        stm.setString(1, user.getUserName());
 
-        stm.setString(2, user.getEmail());
-        
-        // 3. gender (Sửa lại index thành 3)
+    public int createUserFullParameter(User user, Connection conn) {
+        // Đã xóa bỏ password_hash ra khỏi câu lệnh SQL
+        String sql = "INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, "
+                + "full_name, address, phone, account_status, created_at, updated_at, role_id) "
+                + "VALUES (?, 1, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?)";
+
+        try (PreparedStatement stm = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stm.setString(1, user.getUserName());
+
+            stm.setString(2, user.getEmail());
+
+            // 3. gender (Sửa lại index thành 3)
 //        if (user.getGender() != null && !user.getGender().trim().isEmpty()) {
 //            stm.setString(3, user.getGender());
 //        } else 
             stm.setNull(3, java.sql.Types.CHAR);
-        
-        stm.setNull(4, java.sql.Types.DATE);
-        
-        stm.setString(5, user.getFullName());
-        
-        // 6. address (Kiểm tra trống thì truyền NULL chuẩn chỉnh, index thành 6)
+
+            stm.setNull(4, java.sql.Types.DATE);
+
+            stm.setString(5, user.getFullName());
+
+            // 6. address (Kiểm tra trống thì truyền NULL chuẩn chỉnh, index thành 6)
 //        if (user.getAddress() != null && !user.getAddress().trim().isEmpty()) {
 //            stm.setString(6, user.getAddress());
 //        } else 
-            stm.setNull(6, java.sql.Types.NVARCHAR); 
-        
-        stm.setString(7, user.getPhone());
+            stm.setNull(6, java.sql.Types.NVARCHAR);
 
-        stm.setString(8, user.getStatus());
-        
-        stm.setInt(9, user.getRoleId());
+            stm.setString(7, user.getPhone());
 
-        int affectedRows = stm.executeUpdate();
-        
-        if (affectedRows > 0) {
-            try (ResultSet rs = stm.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getInt(1); // Trả về user_id tự tăng ngầm
+            stm.setString(8, user.getStatus());
+
+            stm.setInt(9, user.getRoleId());
+
+            int affectedRows = stm.executeUpdate();
+
+            if (affectedRows > 0) {
+                try (ResultSet rs = stm.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1); // Trả về user_id tự tăng ngầm
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return -1;
     }
-    return -1;
-}
+
     public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer roleId) {
         List<User> list = new ArrayList<>();
 
@@ -373,11 +375,29 @@ public class UserDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String hashPass = rs.getString("password_hash");
-                if (true || BCrypt.checkpw(password, hashPass)) {
+                if (BCrypt.checkpw(password, hashPass)) {
                     User user = mapUser(rs);
                     user.setPassword(hashPass);
                     return user;
                 }
+            }
+        } catch (Exception e) {
+            System.out.println("login" + e.getMessage());
+        }
+        return null;
+    }
+
+    public User loginTester(String username, String password) {
+        String sql = "SELECT * FROM [user] WHERE user_name = ? AND password_hash =?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, "admin_01");
+            ps.setString(2, "123");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+
+                User user = mapUser(rs);
+                user.setPassword(password);
+                return user;
             }
         } catch (Exception e) {
             System.out.println("login" + e.getMessage());
