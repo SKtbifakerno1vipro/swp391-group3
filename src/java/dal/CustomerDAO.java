@@ -114,7 +114,6 @@ public class CustomerDAO extends DBContext {
     sql.append(" WHERE user_id = ?");
     parameters.add(customer.getUserId()); // Add user_id to the end of the parameters list
 
-    // 5. Execute the dynamic query using PreparedStatement
     try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
         
         // Loop to dynamically bind parameters to corresponding "?" markers
@@ -205,14 +204,13 @@ public class CustomerDAO extends DBContext {
         }
 
         // 4. Đuôi phân trang cố định
-        sql += "ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        sql += "ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"; //DESC
 
         int offset = (page - 1) * pageSize;
 
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             int index = 1;
 
-            // 5. Gán giá trị động cho cụm OR (1 từ khóa searchName được gán lặp lại cho 4 dấu chấm hỏi)
             if (hasSearch) {
                 String searchPattern = "%" + searchName.trim() + "%";
                 stm.setString(index++, searchPattern); // u.full_name
@@ -221,7 +219,7 @@ public class CustomerDAO extends DBContext {
                 stm.setString(index++, searchPattern); // u.email
             }
 
-            // 6. Gán giá trị cho customer_type
+            // 6. customer_type
             if (type != null && !type.isBlank()) {
                 stm.setString(index++, type.trim());
             }
@@ -232,7 +230,7 @@ public class CustomerDAO extends DBContext {
 
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                list.add(mapCustomer(rs)); // Trả về Customer thô, map bằng hàm nội bộ sẵn có của bạn
+                list.add(mapCustomer(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class EmailUtils {
+    //thư viện Jakarta Mail API để kết nối với Server SMTP của Google (Gmail) và gửi email đi dưới dạng mã HTML
 
     // Đổi cấu hình Host và Port sang của Gmail
     private static final String HOSTNAME = "smtp.gmail.com";
@@ -26,7 +27,7 @@ public class EmailUtils {
         }
         return props;
     }
-
+    
     public static boolean sendEmail(String toEmail, String subject, String content) {
         // Read credentials from local properties file
         Properties config = loadEmailProperties();
@@ -40,18 +41,18 @@ public class EmailUtils {
             return false;
         }
 
-        // Configure SMTP connection properties for Gmail
+        // Configure SMTP connection properties for Gmail // setting SMTP cho gate gmail
         Properties props = new Properties();
         props.put("mail.smtp.host", HOSTNAME);
         props.put("mail.smtp.port", PORT);
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true"); // Bắt buộc dùng TLS đối với Gmail cổng 587
         
-        // Hai cấu hình dưới đây giúp tăng tính ổn định, tránh các lỗi bắt tay SSL/TLS với server Google
+        // tránh lỗi bắt tay SSL/TLS với server Google
         props.put("mail.smtp.ssl.protocols", "TLSv1.2"); 
         props.put("mail.smtp.starttls.required", "true");
 
-        // Authenticate session with Gmail Server
+        // Authenticate session with Gmail Server // kiem tra danh tinh khi connect voi gmail
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {

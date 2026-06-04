@@ -187,7 +187,7 @@
                 </div>
             </c:if>
 
-            <%-- Form nhập liệu --%>
+            <%-- Form create nhập liệu --%>
             <form action="${pageContext.request.contextPath}/customer/create" method="post">
                 <div class="form-group">
                     <label for="username">Username</label>
@@ -231,7 +231,7 @@
                 <div class="form-group">
                     <label for="companyName">Company Name</label>
                     <input type="text" id="companyName" name="companyName" class="form-control" required>
-                </div> <%-- Đã fix lỗi thiếu thẻ đóng </div> ở file cũ của bạn --%>
+                </div>
                 
                 <div class="form-group">
                     <label for="customerType">Customer Type</label>

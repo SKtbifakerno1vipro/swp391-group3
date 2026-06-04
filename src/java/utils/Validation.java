@@ -44,13 +44,12 @@ public class Validation {
             return "Username không được để trống!";
         }
         
-        // Cắt khoảng trắng thừa ở 2 đầu trước khi kiểm tra length
         String trimmedUsername = username.trim();
         
         if (trimmedUsername.length() > 15) {
             return "Username chỉ được phép tối đa 15 kí tự!";
         }
-        // ^[a-zA-Z0-9_]+$ : Chỉ chấp nhận chữ cái không dấu, số, và dấu gạch dưới. 
+
         if (!trimmedUsername.matches("^[a-zA-Z0-9_]+$")) {
             return "Username chỉ được chứa chữ không dấu, số và dấu gạch dưới!";
         }

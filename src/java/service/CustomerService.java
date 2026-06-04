@@ -54,7 +54,7 @@ public class CustomerService {
         
         if (totalRecords == 0) return 1;
         
-        // Công thức tính tổng số trang chuẩn (Làm tròn lên)
+        // tinh tong so trang lam tron len
         return (int) Math.ceil((double) totalRecords / pageSize);
     }
     // new
@@ -151,7 +151,6 @@ public class CustomerService {
             //tat che do tu dong luu cua database sql
             conn.setAutoCommit(false);
 
-            // Bước 1: Tạo tài khoản User trước
             int generatedUserId = userService.createUserFullParameter(user,conn);
             
             if (generatedUserId == -1) {
@@ -162,19 +161,17 @@ public class CustomerService {
 
             customer.setUserId(generatedUserId);
 
-            // Bước 3: Tạo Customer sau
             boolean isCustomerInserted = customerDAO.insertCustomer(customer,conn);
             
             if (isCustomerInserted) {
-                // Đạt điều kiện: Cả 2 bước đều THÀNH CÔNG -> Chốt lưu xuống DB
+
                 String emailSubject = "Chào mừng thành viên mới - Hệ thống SWP391";
-                String emailBody = "<h3>Xin chào bạn,</h3>"
+                String emailBody = "<h3>Xin chào bạn," + user.getUserName() +"</h3>"
                                  + "<p>Tài khoản khách hàng của bạn trên hệ thống đã được khởi tạo thành công!</p>"
                                  + "<p>Vui lòng đăng nhập hệ thống để trải nghiệm dịch vụ của chúng tôi.</p>"
                                  + "<h3>" + pass + "</h3>"
                                  + "<br/><p>Trân trọng,</p><p>Đội ngũ hỗ trợ kỹ thuật.</p>";
 
-                // Trigger email sending in background
                 boolean isSent = EmailUtils.sendEmail(user.getEmail(), emailSubject, emailBody);
                 if (!isSent) {
                     conn.rollback();
