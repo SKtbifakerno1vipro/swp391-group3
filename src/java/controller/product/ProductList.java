@@ -12,10 +12,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 import model.Category;
-import model.Product;
 import service.ProductService;
 
 /**
@@ -71,7 +69,6 @@ public class ProductList extends HttpServlet {
         List<Category> categories = pService.getAllCategory();
         String status = request.getParameter("status");
         String searchText = request.getParameter("searchText");
-        String pageSizeRaw = request.getParameter("pageSize");
         String pageRaw = request.getParameter("page");
         String totalPageRaw = request.getParameter("totalPage");
         Category c = new Category();
@@ -79,7 +76,6 @@ public class ProductList extends HttpServlet {
         c.setCategoryName("All Category");
         categories.add(0, c);
         int categoryId = (request.getParameter("categoryId") == null || request.getParameter("categoryId").isEmpty()) ? 0 : Integer.parseInt(request.getParameter("categoryId"));
-        int pageSize = (pageSizeRaw == null || pageSizeRaw.isEmpty()) ? 5 : Integer.parseInt(pageSizeRaw);
         int page = (pageRaw == null || pageRaw.isEmpty()) ? 1 : Integer.parseInt(pageRaw);
         int totalPage = (totalPageRaw == null || totalPageRaw.isEmpty()) ? 1 : Integer.parseInt(totalPageRaw);
         
@@ -88,13 +84,12 @@ public class ProductList extends HttpServlet {
             
         request.setAttribute("status", status);
         int totalRow = pService.countProduct(searchText, categoryId, status);
-        totalPage = pService.calculateTotalPage(totalRow, pageSize);
+        totalPage = pService.calculateTotalPage(totalRow);
         page = pService.nomalizePage(page, totalPage);
-        request.setAttribute("products", pService.searchProduct(searchText, categoryId, status, pageSize, totalRow, page, totalPage));
+        request.setAttribute("products", pService.searchProduct(searchText, categoryId, status, totalRow, page, totalPage));
         request.setAttribute("totalPage", totalPage);
         request.setAttribute("page", page);
         request.setAttribute("totalRow", totalRow);
-        request.setAttribute("pageSize", pageSize);
         request.setAttribute("categories", categories);
         request.getRequestDispatcher("/views/product/list.jsp").forward(request, response);
     }

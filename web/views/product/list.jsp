@@ -42,7 +42,6 @@
                     </table>
                                    
                                 <input type="hidden" name="page" value="${page}">
-                                <input type="hidden" name="pageSize" value="${pageSize}">
                                 <input type="hidden" name="totalRow" value="${totalRow}">
                                 <input type="hidden" name="totalPage" value="${totalPage}">
                 </form>
@@ -87,15 +86,7 @@
                 </div>
                 <div>
                     
-                    <div>Show 
-                        <select onchange="window.location.href='${pageContext.request.contextPath}/product-list?pageSize='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&status=${status}&page=${page}'" >
-                            <c:forEach var="p" begin="5" step="5" end="${totalRow}">
-                                <option value="${p}" ${pageSize == p ? 'selected' : ''}>${p}</option>
-                            </c:forEach>
-                        </select>
-
-                        in ${totalRow}
-                        <br>
+                    <div>
                         Page
                     <select  onchange="window.location.href='${pageContext.request.contextPath}/product-list?page='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&status=${status}&pageSize=${pageSize}'">
                         <c:forEach var="i" begin="1" end="${totalPage}">

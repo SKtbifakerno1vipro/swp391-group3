@@ -9,7 +9,7 @@ import model.Category;
 import model.Product;
 
 public class ProductDAO extends DBContext {
-
+    public final int PAGE_SIZE = 10;
     public List<Product> getAllProducts() {
         List<Product> list = new ArrayList<>();
         String sql = "select * from product p join category c on p.category_id = c.category_id WHERE product_status = 'ACTIVE'";
@@ -146,7 +146,7 @@ public class ProductDAO extends DBContext {
         return list;
     }
 
-    public List<Product> searchProduct(String searchText, Integer categoryId, String status, int pageSize, int totalRow, int page, int totalPage) {
+    public List<Product> searchProduct(String searchText, Integer categoryId, String status, int totalRow, int page, int totalPage) {
         List<Product> list = new ArrayList<>();
         try {
             String sql = """
@@ -162,7 +162,7 @@ public class ProductDAO extends DBContext {
                 sql += " and p.product_status = ?";
             }
             
-            if ((page > 0 && page <= totalPage) && pageSize > 0 && totalRow > 0) {
+            if ((page > 0 && page <= totalPage)  && totalRow > 0) {
                 sql += """
                    \n order by product_id
                    offset ? rows
@@ -181,10 +181,10 @@ public class ProductDAO extends DBContext {
                 ps.setString(index++, status);
             }
 
-            if ((page > 0 && page <= totalPage) && pageSize > 0 && totalRow > 0) {
+            if ((page > 0 && page <= totalPage)  && totalRow > 0) {
 
-                ps.setInt(index++, (int) ((page - 1) * pageSize));
-                ps.setInt(index++, pageSize);
+                ps.setInt(index++, (int) ((page - 1) * PAGE_SIZE));
+                ps.setInt(index++, PAGE_SIZE);
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
