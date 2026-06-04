@@ -61,11 +61,6 @@ public class ProductList extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
         List<Category> categories = pService.getAllCategory();
         String status = request.getParameter("status");
         String searchText = request.getParameter("searchText");
