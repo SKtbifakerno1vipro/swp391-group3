@@ -25,8 +25,9 @@ import utils.Validation;
  */
 @WebServlet(name = "CreateProduct", urlPatterns = {"/create-product"})
 public class CreateProduct extends HttpServlet {
+
     private final ProductService pService = new ProductService();
-    private final Validation validation = new Validation();
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -70,7 +71,7 @@ public class CreateProduct extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        
+
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();
         List<String> statusList = pService.getProductStatus();
@@ -93,7 +94,7 @@ public class CreateProduct extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        User u = (User)session.getAttribute("user");
+        User u = (User) session.getAttribute("user");
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();
         List<String> statusList = pService.getProductStatus();
@@ -105,63 +106,53 @@ public class CreateProduct extends HttpServlet {
         String status = request.getParameter("status");
         String qRaw = request.getParameter("quantity");
         String cRaw = request.getParameter("categoryId");
-        
+
         String error = null;
         Product p = new Product();
-        if (name == null || name.trim().isEmpty()
-                || des == null || des.trim().isEmpty()) {
-            error = "Please fill data all";
+        if (error == null) {
+            error = Validation.validateCompanyName(name);
         }
         if (error == null) {
-            error = validation.validatePrice(costRaw);
+            error = Validation.validatePrice(costRaw);
         }
         if (error == null) {
-            error = validation.validatePrice(sellRaw);
+            error = Validation.validatePrice(sellRaw);
         }
         if (error == null) {
-            error = validation.validateQuantity(qRaw);
+            error = Validation.validateQuantity(qRaw);
         }
         if (error == null) {
-            try {
-                double cost = Double.parseDouble(costRaw);
-                double sell = Double.parseDouble(sellRaw);
-                int q = Integer.parseInt(qRaw);
-                int categoryId = Integer.parseInt(cRaw);
-                p.setCostPrice(cost);
-                p.setSellingPrice(sell);
-                p.setQuantityAvailable(q);
-                p.setUpdatedBy(u.getUserId());
-                p.setCategoryId(categoryId);
-                p.setProductName(name);
-                p.setDescription(des);
-                p.setUnit(unit);
-                p.setProductStatus(status);
-                boolean create = pService.createProduct(p);
-                if (create) {
-                    response.sendRedirect(request.getContextPath() + "/product-list");
-                    return;
-                } else {
-                    error = "Create Product Failed";
-
-                }
-            } catch (NumberFormatException e) {
-                error = "Please check number format";
+            p.setCostPrice(Double.parseDouble(costRaw));
+            p.setSellingPrice(Double.parseDouble(sellRaw));
+            p.setQuantityAvailable(Integer.parseInt(qRaw));
+            p.setUpdatedBy(u.getUserId());
+            p.setCategoryId(Integer.parseInt(cRaw));
+            p.setProductName(name);
+            p.setDescription(des);
+            p.setUnit(unit);
+            p.setProductStatus(status);
+            boolean create = pService.createProduct(p);
+            if (create) {
+                response.sendRedirect(request.getContextPath() + "/product-list");
+            } else {
+                error = "Create Product Failed";
             }
 
+        } else {
+            request.setAttribute("units", units);
+            request.setAttribute("categories", categories);
+            request.setAttribute("statusList", statusList);
+            request.setAttribute("name", name);
+            request.setAttribute("cost", costRaw);
+            request.setAttribute("sell", sellRaw);
+            request.setAttribute("description", des);
+            request.setAttribute("unit", unit);
+            request.setAttribute("status", status);
+            request.setAttribute("quantity", qRaw);
+            request.setAttribute("categoryId", cRaw);
+            request.setAttribute("error", error);
+            request.getRequestDispatcher("/views/product/create.jsp").forward(request, response);
         }
-        request.setAttribute("units", units);
-        request.setAttribute("categories", categories);
-        request.setAttribute("statusList", statusList);
-        request.setAttribute("name", name);
-        request.setAttribute("cost", costRaw);
-        request.setAttribute("sell", sellRaw);
-        request.setAttribute("description", des);
-        request.setAttribute("unit", unit);
-        request.setAttribute("status", status);
-        request.setAttribute("quantity", qRaw);
-        request.setAttribute("categoryId", cRaw);
-        request.setAttribute("error", error);
-        request.getRequestDispatcher("/views/product/create.jsp").forward(request, response);
 
     }
 

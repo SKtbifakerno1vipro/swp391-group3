@@ -17,6 +17,7 @@ import model.Category;
 import model.Product;
 import model.User;
 import service.ProductService;
+import utils.Validation;
 
 /**
  *
@@ -24,7 +25,9 @@ import service.ProductService;
  */
 @WebServlet(name = "EditProduct", urlPatterns = {"/edit-product"})
 public class EditProduct extends HttpServlet {
+
     private final ProductService pService = new ProductService();
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -68,8 +71,8 @@ public class EditProduct extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        User u = (User)session.getAttribute("user");
-        
+        User u = (User) session.getAttribute("user");
+
         String productId = request.getParameter("id");
         int id = Integer.parseInt(productId);
         String action = request.getParameter("action");
@@ -105,7 +108,7 @@ public class EditProduct extends HttpServlet {
         }
         String productId = request.getParameter("id");
         int id = Integer.parseInt(productId);
-        
+
         Product p = pService.getProductById(Integer.parseInt(productId));
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();
@@ -119,57 +122,56 @@ public class EditProduct extends HttpServlet {
         String status = request.getParameter("status");
         String qRaw = request.getParameter("quantity");
         String cRaw = request.getParameter("categoryId");
-        User u = (User)session.getAttribute("user");
-        request.setAttribute("units", units);
-        request.setAttribute("categories", categories);
-        request.setAttribute("statusList", statusList);
-        request.setAttribute("name", name);
-        request.setAttribute("cost", costRaw);
-        request.setAttribute("sell", sellRaw);
-        request.setAttribute("description", des);
-        request.setAttribute("unit", unit);
-        request.setAttribute("status", status);
-        request.setAttribute("quantity", qRaw);
-        request.setAttribute("categoryId", cRaw);
-        request.setAttribute("update_by", updateBy);
-        request.setAttribute("product", p);
+        User u = (User) session.getAttribute("user");
+
         String error = null;
         Product p1 = new Product();
-        if (name == null || name.trim().isEmpty()
-                || des == null || des.trim().isEmpty()) {
-            error = "Please fill data all";
+        if (error == null) {
+            error = Validation.validateCompanyName(name);
         }
         if (error == null) {
-            try {
-                double cost = Double.parseDouble(costRaw);
-                double sell = Double.parseDouble(sellRaw);
-                int q = Integer.parseInt(qRaw);
-                int categoryId = Integer.parseInt(cRaw);
-                p1.setCostPrice(cost);
-                p1.setSellingPrice(sell);
-                p1.setQuantityAvailable(q);
-                p1.setUpdatedBy(u.getUserId());
-                p1.setCategoryId(categoryId);
-                p1.setProductName(name);
-                p1.setDescription(des);
-                p1.setUnit(unit);
-                p1.setProductStatus(status);
-                p1.setProductId(id);
-                boolean update = pService.updateProduct(p1);
-                if (update) {
-                    response.sendRedirect(request.getContextPath() + "/product-detail?id="+id);
-                    return;
-                } else {
-                    error = "Update Product Failed";
-
-                }
-            } catch (NumberFormatException e) {
-                error = "Please check number format";
-            }
-
+            error = Validation.validatePrice(costRaw);
         }
-        request.getRequestDispatcher("/views/product/detail.jsp").forward(request, response);
-
+        if (error == null) {
+            error = Validation.validatePrice(sellRaw);
+        }
+        if (error == null) {
+            error = Validation.validateQuantity(qRaw);
+        }
+        if (error == null) {
+            p1.setCostPrice(Double.parseDouble(costRaw));
+            p1.setSellingPrice(Double.parseDouble(sellRaw));
+            p1.setQuantityAvailable(Integer.parseInt(qRaw));
+            p1.setUpdatedBy(u.getUserId());
+            p1.setCategoryId(Integer.parseInt(cRaw));
+            p1.setProductName(name);
+            p1.setDescription(des);
+            p1.setUnit(unit);
+            p1.setProductStatus(status);
+            p1.setProductId(id);
+            boolean update = pService.updateProduct(p1);
+            if (update) {
+                response.sendRedirect(request.getContextPath() + "/product-detail?id=" + id);
+            } else {
+                error = "Update Product Failed";
+            }
+        } else {
+            request.setAttribute("units", units);
+            request.setAttribute("error", error);
+            request.setAttribute("categories", categories);
+            request.setAttribute("statusList", statusList);
+            request.setAttribute("name", name);
+            request.setAttribute("cost", costRaw);
+            request.setAttribute("sell", sellRaw);
+            request.setAttribute("description", des);
+            request.setAttribute("unit", unit);
+            request.setAttribute("status", status);
+            request.setAttribute("quantity", qRaw);
+            request.setAttribute("categoryId", cRaw);
+            request.setAttribute("update_by", updateBy);
+            request.setAttribute("product", p);
+            request.getRequestDispatcher("/views/product/detail.jsp").forward(request, response);
+        }
     }
 
     /**
