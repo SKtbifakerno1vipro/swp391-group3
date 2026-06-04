@@ -92,8 +92,8 @@ public class Validation {
             return "Company Name không được để trống!";
         }
         String trimmed = companyName.trim();
-        if (trimmed.length() > 100) {
-            return "Company Name tối đa chỉ được 100 kí tự!";
+        if (trimmed.length() > 200) {
+            return "Company Name tối đa chỉ được 200 kí tự!";
         }
         return null; // Hợp lệ
     }
