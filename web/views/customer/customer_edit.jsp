@@ -159,6 +159,7 @@
             <div class="nav-links">
                 <a href="${pageContext.request.contextPath}/customer/list">Customer List</a>
                 <a href="#">DashBoard</a>
+
             </div>
 
             <h2>Edit Customer</h2>
@@ -194,11 +195,6 @@
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" class="form-control" value="${cusDTO.user.userName}" readonly>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" placeholder="Leave blank to keep current">
                 </div>
 
                 <div class="form-group">

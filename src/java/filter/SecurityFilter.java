@@ -26,13 +26,13 @@ public class SecurityFilter implements Filter {
     private final Set<String> warehouseUrls = new HashSet<>();
     private final Set<String> officierAdminUrls = new HashSet<>();
     private final Set<String> customerUrls = new HashSet<>();
-  
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // global
         publicUrls.add("/login");
         publicUrls.add("/logout");
-        
+
         // System admin
         sysAdminUrls.add("/user-list");
         sysAdminUrls.add("/user-detail");

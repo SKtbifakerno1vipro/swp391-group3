@@ -72,7 +72,6 @@ public class EditCustomerController extends HttpServlet {
             int userId = Integer.parseInt(userIdStr);
 
             String userName = request.getParameter("username");
-            String password = request.getParameter("password");
             String email = request.getParameter("email");
             String fullName = request.getParameter("fullname");
             String phone = request.getParameter("phone");
@@ -86,9 +85,6 @@ public class EditCustomerController extends HttpServlet {
             User u = new User();
             u.setUserId(userId);
             u.setUserName(userName);
-            if (password != null && !password.isBlank()) {
-                u.setPassword(password);
-            }
             u.setEmail(email);
             u.setFullName(fullName);
             u.setPhone(phone);

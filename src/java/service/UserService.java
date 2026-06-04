@@ -5,6 +5,7 @@ import dto.UserRoleDTO;
 import java.util.List;
 import model.User;
 import java.sql.Connection;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
 
@@ -76,6 +77,22 @@ public class UserService {
 
     public Connection getConnection() {
         return userDAO.getConnection(); // Lấy biến connection kế thừa từ DBContext
+    }
+    
+    public String changePassword(int userId, String currentPassword, String newPassword) throws Exception {
+        
+        User u = getUserByIdFullParameter(userId);
+
+        if (!BCrypt.checkpw(newPassword, u.getPassword())) {
+            return "Mật khẩu hiện tại không chính xác!";
+        }
+
+        // 3. Thực hiện cập nhật mật khẩu mới vào DB
+        boolean isUpdateSuccess = userDAO.updatePassword(userId, newPassword);
+        if (!isUpdateSuccess) {
+            return "Đã xảy ra lỗi hệ thống khi cập nhật dữ liệu. Vui lòng thử lại sau!";
+        }
+        return null;
     }
     // end - Xhieu
 

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import model.*;
 import java.sql.Connection;
+import utils.*;
 
 public class CustomerService {
     private final CustomerDAO customerDAO = new CustomerDAO();
@@ -30,7 +31,6 @@ public class CustomerService {
         if (customerList == null || customerList.isEmpty()) {
             return dtoList; 
         }
-
         List<User> userList = userService.getAllUsersReturnUser();
         Map<Integer, User> userMap = new HashMap<>();
         if (userList != null) {
@@ -54,7 +54,7 @@ public class CustomerService {
         
         if (totalRecords == 0) return 1;
         
-        // Công thức tính tổng số trang chuẩn (Làm tròn lên)
+        // tinh tong so trang lam tron len
         return (int) Math.ceil((double) totalRecords / pageSize);
     }
     // new
@@ -131,7 +131,7 @@ public class CustomerService {
     
     public boolean updateCustomerDTO(User u, Customer c) {
         boolean userUpdated = userService.updateUser(u);
-        boolean customerUpdated = updateCustomer(c);
+        boolean customerUpdated = customerDAO.updateCustomerDynamic(c);
         return userUpdated && customerUpdated;
     }
 
@@ -142,13 +142,15 @@ public class CustomerService {
             return validate;
         }
         
+        String pass = PasswordUtils.generateRandomPassword();
+        user.setPassword(pass);
+        
         Connection conn = userService.getConnection(); 
         
         try {
             //tat che do tu dong luu cua database sql
             conn.setAutoCommit(false);
 
-            // Bước 1: Tạo tài khoản User trước
             int generatedUserId = userService.createUserFullParameter(user,conn);
             
             if (generatedUserId == -1) {
@@ -159,12 +161,23 @@ public class CustomerService {
 
             customer.setUserId(generatedUserId);
 
-            // Bước 3: Tạo Customer sau
             boolean isCustomerInserted = customerDAO.insertCustomer(customer,conn);
             
             if (isCustomerInserted) {
-                // Đạt điều kiện: Cả 2 bước đều THÀNH CÔNG -> Chốt lưu xuống DB
-                conn.commit(); 
+
+                String emailSubject = "Chào mừng thành viên mới - Hệ thống SWP391";
+                String emailBody = "<h3>Xin chào bạn," + user.getUserName() +"</h3>"
+                                 + "<p>Tài khoản khách hàng của bạn trên hệ thống đã được khởi tạo thành công!</p>"
+                                 + "<p>Vui lòng đăng nhập hệ thống để trải nghiệm dịch vụ của chúng tôi.</p>"
+                                 + "<h3>" + pass + "</h3>"
+                                 + "<br/><p>Trân trọng,</p><p>Đội ngũ hỗ trợ kỹ thuật.</p>";
+
+                boolean isSent = EmailUtils.sendEmail(user.getEmail(), emailSubject, emailBody);
+                if (!isSent) {
+                    conn.rollback();
+                    return "Error when send email to customer";
+                }
+                conn.commit(); // gui xong email moi tao
             } else {
                 // Bước 3 lỗi -> Rollback để xóa luôn tài khoản User vừa tạo ở Bước 1
                 System.out.println("Lỗi: Tạo Customer thất bại! Tiến hành khôi phục dữ liệu.");
@@ -186,10 +199,6 @@ public class CustomerService {
             }
         }
         return null; 
-    }
-
-    public boolean updateCustomer(Customer customer) {
-        return customerDAO.updateCustomerDynamic(customer);
     }
     
     public String getLastError() {

@@ -80,14 +80,11 @@ public class CustomerDAO extends DBContext {
         System.out.println("Error: Invalid user_id provided for the update condition!");
         return false;
     }
-
-    // Initialize StringBuilder with the base UPDATE statement
+    
     StringBuilder sql = new StringBuilder("UPDATE [customer] SET ");
     
-    // List to store parameter values in the exact order of appearance of "?"
     List<Object> parameters = new ArrayList<>();
 
-    // 2. Dynamically check each field; only append to SQL if data is present
     if (customer.getTaxCode() != null && !customer.getTaxCode().trim().isEmpty()) {
         sql.append("tax_code = ?, ");
         parameters.add(customer.getTaxCode());
@@ -103,7 +100,6 @@ public class CustomerDAO extends DBContext {
         parameters.add(customer.getCompanyName());
     }
 
-    // Handle assigned_to_user_id (which can legally accept NULL in DB)
     if (customer.getAssignedToUserId() != null) {
         sql.append("assigned_to_user_id = ? ");
         parameters.add(customer.getAssignedToUserId());
@@ -115,11 +111,9 @@ public class CustomerDAO extends DBContext {
         return false;
     }
 
-    // 4. Append the WHERE clause using user_id as requested
     sql.append(" WHERE user_id = ?");
     parameters.add(customer.getUserId()); // Add user_id to the end of the parameters list
 
-    // 5. Execute the dynamic query using PreparedStatement
     try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
         
         // Loop to dynamically bind parameters to corresponding "?" markers
@@ -200,26 +194,23 @@ public class CustomerDAO extends DBContext {
                    + "LEFT JOIN [user] u ON c.user_id = u.user_id "
                    + "WHERE 1=1 "; 
 
-        // 2. Xử lý cụm tìm kiếm chung (Gộp bằng toán tử OR và bọc trong ngoặc đơn để không phá vỡ logic các điều kiện khác)
         boolean hasSearch = (searchName != null && !searchName.isBlank());
         if (hasSearch) {
             sql += "AND (u.full_name LIKE ? OR u.phone LIKE ? OR c.tax_code LIKE ? OR u.email LIKE ?) ";
         }
 
-        // 3. Điều kiện loại khách hàng (Bắt buộc thỏa mãn đồng thời nên dùng AND bên ngoài)
         if (type != null && !type.isBlank()) {
             sql += "AND c.customer_type = ? ";
         }
 
         // 4. Đuôi phân trang cố định
-        sql += "ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        sql += "ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"; //DESC
 
         int offset = (page - 1) * pageSize;
 
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             int index = 1;
 
-            // 5. Gán giá trị động cho cụm OR (1 từ khóa searchName được gán lặp lại cho 4 dấu chấm hỏi)
             if (hasSearch) {
                 String searchPattern = "%" + searchName.trim() + "%";
                 stm.setString(index++, searchPattern); // u.full_name
@@ -228,7 +219,7 @@ public class CustomerDAO extends DBContext {
                 stm.setString(index++, searchPattern); // u.email
             }
 
-            // 6. Gán giá trị cho customer_type
+            // 6. customer_type
             if (type != null && !type.isBlank()) {
                 stm.setString(index++, type.trim());
             }
@@ -239,7 +230,7 @@ public class CustomerDAO extends DBContext {
 
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                list.add(mapCustomer(rs)); // Trả về Customer thô, map bằng hàm nội bộ sẵn có của bạn
+                list.add(mapCustomer(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
