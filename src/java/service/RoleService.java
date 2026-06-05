@@ -6,6 +6,7 @@ import model.Permission;
 import model.Role;
 
 public class RoleService {
+
     private final RoleDAO roleDAO = new RoleDAO();
 
     public List<Role> getAllRoles() {
@@ -35,6 +36,7 @@ public class RoleService {
     public void updateRolePermissions(int roleId, List<Integer> permissionIds) {
         roleDAO.updateRolePermissions(roleId, permissionIds);
     }
+
     // begin - Xhieu - contact me wwhen remove
     public Integer getRoleIdByName(String roleName) {
         if (roleName == null || roleName.isBlank()) {
@@ -42,10 +44,18 @@ public class RoleService {
         }
         return roleDAO.getRoleIdByName(roleName.trim());
     }
+
     // end - Xhieu
-    public boolean isRoleNameExists(String roleName){
+    public boolean isRoleNameExists(String roleName) {
         return roleDAO.isRoleNameExists(roleName);
     }
 
-}
+    public boolean deleteRole(int roleId) {
+        return roleDAO.softDeleteRole(roleId);
+    }
 
+    public boolean restoreRole(int roleId) {
+        return roleDAO.restoreRole(roleId);
+    }
+
+}
