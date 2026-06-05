@@ -9,7 +9,7 @@ import model.Customer;
 import model.User;
 import dto.CustomerOrderDTO;
 import java.sql.Timestamp;
-import model.CustomerContract;
+import model.CustomerContract; 
 
 public class CustomerOrderDAO extends DBContext {
 
@@ -25,6 +25,7 @@ public class CustomerOrderDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
+                
             }
         } catch (Exception e) {
             e.printStackTrace();

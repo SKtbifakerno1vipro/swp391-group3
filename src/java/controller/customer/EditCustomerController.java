@@ -26,7 +26,7 @@ public class EditCustomerController extends HttpServlet {
 
         if (customerIdStr == null || customerIdStr.isBlank()) {
             request.setAttribute("error", "Edit failed");
-            request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
             return;
         }
 
@@ -47,7 +47,7 @@ public class EditCustomerController extends HttpServlet {
             request.setAttribute("error", "Edit failed");
             request.setAttribute("errorDetail", ex.getMessage());
         }
-        request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class EditCustomerController extends HttpServlet {
 
         if (customerIdStr == null || customerIdStr.isBlank() || userIdStr == null || userIdStr.isBlank()) {
             request.setAttribute("error", "Update failed: missing IDs");
-            request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
             return;
         }
         
@@ -72,7 +72,6 @@ public class EditCustomerController extends HttpServlet {
             int userId = Integer.parseInt(userIdStr);
 
             String userName = request.getParameter("username");
-            String password = request.getParameter("password");
             String email = request.getParameter("email");
             String fullName = request.getParameter("fullname");
             String phone = request.getParameter("phone");
@@ -86,9 +85,6 @@ public class EditCustomerController extends HttpServlet {
             User u = new User();
             u.setUserId(userId);
             u.setUserName(userName);
-            if (password != null && !password.isBlank()) {
-                u.setPassword(password);
-            }
             u.setEmail(email);
             u.setFullName(fullName);
             u.setPhone(phone);
@@ -121,6 +117,6 @@ public class EditCustomerController extends HttpServlet {
             request.setAttribute("error", "Update failed");
             request.setAttribute("errorDetail", ex.getMessage());
         }
-        request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
 }

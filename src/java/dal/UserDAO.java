@@ -29,8 +29,6 @@ public class UserDAO extends DBContext {
         }
         return u;
     }
-
-
     /*
     created by phu
      */
@@ -94,6 +92,9 @@ public class UserDAO extends DBContext {
         return searchUsers(0, null, null, 1, 10);
     }
 
+    /*
+    created by vu trong phu
+    */
     public int getTotalUsers(int roleId, String status, String keyword) {
         String sql = "select count(*) from [user] u where 1=1 ";
         if (roleId > 0) {
@@ -122,7 +123,7 @@ public class UserDAO extends DBContext {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1); // return total of column
+                    return rs.getInt(1); // return total of row
                 }
 
             }
@@ -133,7 +134,7 @@ public class UserDAO extends DBContext {
         return 0;
     }
 
-    // begin - Xhieu - contact me wwhen remove
+// begin - Xhieu - contact me wwhen remove
     public User getUserByIdFullParameter(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -180,54 +181,96 @@ public class UserDAO extends DBContext {
         }
         return list;
     }
+    
+    public boolean updatePassword(int userId, String newPasswordPlaintext) {
+    String hashedNewPassword = BCrypt.hashpw(newPasswordPlaintext, BCrypt.gensalt());
+    
+    String sql = "UPDATE [user] SET password_hash = ?, updated_at = GETDATE() WHERE user_id = ?";
+    
+    try (java.sql.Connection conn = new DBContext().getConnection();
+         java.sql.PreparedStatement stm = conn.prepareStatement(sql)) {
+        
+        stm.setString(1, hashedNewPassword);
+        stm.setInt(2, userId);
+        
+        int rowsUpdated = stm.executeUpdate();
+        if (rowsUpdated > 0) {
+            System.out.println("[INFO] Password updated successfully for user ID: " + userId);
+            return true;
+        } else {
+            System.out.println("[WARNING] No user found with ID: " + userId + " to update password.");
+        }
+    } catch (Exception e) {
+        System.out.println("[SEVERE] Error while updating password for user ID: " + userId + ". Message: " + e.getMessage());
+        e.printStackTrace();
+    }
+    return false;
+}
+   
+    // da co hash passsword
     public int createUserFullParameter(User user, Connection conn) {
-    // Đã xóa bỏ password_hash ra khỏi câu lệnh SQL
+  
     String sql = "INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, "
                + "full_name, address, phone, account_status, created_at, updated_at, role_id) "
-               + "VALUES (?, 1, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?)";
+               + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?)";
     
     try (PreparedStatement stm = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
         
+        // 1. user_name
         stm.setString(1, user.getUserName());
 
-        stm.setString(2, user.getEmail());
+        // 2. password_hash 
+        stm.setString(2, BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+
+        // 3. email
+        stm.setString(3, user.getEmail());
         
-        // 3. gender (Sửa lại index thành 3)
+        // 4. gender 
 //        if (user.getGender() != null && !user.getGender().trim().isEmpty()) {
 //            stm.setString(3, user.getGender());
 //        } else 
-            stm.setNull(3, java.sql.Types.CHAR);
+            stm.setNull(4, java.sql.Types.CHAR);
         
-        stm.setNull(4, java.sql.Types.DATE);
+        // 5. date_of_birth
+        stm.setNull(5, java.sql.Types.DATE);
         
-        stm.setString(5, user.getFullName());
+        // 6. full_name
+        stm.setString(6, user.getFullName());
         
-        // 6. address (Kiểm tra trống thì truyền NULL chuẩn chỉnh, index thành 6)
+        // 7. address 
 //        if (user.getAddress() != null && !user.getAddress().trim().isEmpty()) {
 //            stm.setString(6, user.getAddress());
 //        } else 
-            stm.setNull(6, java.sql.Types.NVARCHAR); 
+            stm.setNull(7, java.sql.Types.NVARCHAR); 
         
-        stm.setString(7, user.getPhone());
+        // 8. phone
+        stm.setString(8, user.getPhone());
 
-        stm.setString(8, user.getStatus());
+        // 9. account_status
+        stm.setString(9, user.getStatus());
         
-        stm.setInt(9, user.getRoleId());
+        // 10. role_id
+        stm.setInt(10, user.getRoleId());
 
-        int affectedRows = stm.executeUpdate();
-        
-        if (affectedRows > 0) {
-            try (ResultSet rs = stm.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getInt(1); // Trả về user_id tự tăng ngầm
+            stm.setString(8, user.getStatus());
+
+            stm.setInt(9, user.getRoleId());
+
+            int affectedRows = stm.executeUpdate();
+
+            if (affectedRows > 0) {
+                try (ResultSet rs = stm.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1); // Trả về user_id tự tăng ngầm
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return -1;
     }
-    return -1;
-}
+    
     public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer roleId) {
         List<User> list = new ArrayList<>();
 
@@ -280,9 +323,12 @@ public class UserDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
-    }
-    /// end - Xhieu
+    }  
+/// end - Xhieu
 
+    /*
+    created by vu trong phu
+    */
     public User getUserById(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -300,13 +346,6 @@ public class UserDAO extends DBContext {
                 u.setPhone(rs.getString("phone"));
                 u.setStatus(rs.getString("account_status"));
                 u.setRoleId(rs.getInt("role_id"));
-//                if (rs.getTimestamp("create_at") != null) {
-//                    u.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
-//                }
-//                if (rs.getTimestamp("update_at") != null) {
-//                    u.setUpdateAt(rs.getTimestamp("update_at").toLocalDateTime());
-//                }
-
                 return u;
             }
         } catch (Exception e) {
@@ -336,6 +375,16 @@ public class UserDAO extends DBContext {
         }
     }
 
+    public void banUser(int userId, String status) {
+        String sql = "update [user] set account_status= ? where user_id= ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+        }
+    }
+
     public boolean updateUser(User user) {
         try {
 
@@ -356,6 +405,9 @@ public class UserDAO extends DBContext {
         return false;
     }
 
+    /*
+    created by vu trong phu
+    */
     public User login(String username, String password) {
         String sql = "SELECT * FROM [user] WHERE user_name = ? AND account_status = 'ACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -374,7 +426,29 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
+    /*
+    created by vu trong phu
+    */
+    public User loginTester(String username, String password) {
+        String sql = "SELECT * FROM [user] WHERE user_name = ? AND password_hash =?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, "admin_01");
+            ps.setString(2, "123");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
 
+                User user = mapUser(rs);
+                user.setPassword(password);
+                return user;
+            }
+        } catch (Exception e) {
+            System.out.println("login" + e.getMessage());
+        }
+        return null;
+    }
+    /*
+    created by vu trong phu
+    */
     public boolean isUsernameDuplicate(String username, int userId) {
         String sql = "SELECT 1 FROM [user] WHERE user_name = ? AND user_id != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -390,7 +464,9 @@ public class UserDAO extends DBContext {
         }
         return false;
     }
-
+    /*
+    created by vu trong phu
+    */
     public boolean isEmailDuplicate(String email, int userId) {
         String sql = "SELECT 1 FROM [user] WHERE email = ? AND user_id != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -406,12 +482,9 @@ public class UserDAO extends DBContext {
         return false;
     }
 
-    /**
-     *
-     * @param phone
-     * @param userId
-     * @return
-     */
+    /*
+    created by vu trong phu
+    */
     public boolean isPhoneDuplicate(String phone, int userId) {
         String sql = "SELECT 1 FROM [user] WHERE phone = ? AND user_id != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -428,4 +501,3 @@ public class UserDAO extends DBContext {
     }
 
 }
-
