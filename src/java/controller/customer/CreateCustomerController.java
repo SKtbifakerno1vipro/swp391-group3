@@ -24,7 +24,7 @@ public class CreateCustomerController extends HttpServlet {
         request.setAttribute("customerRoleId", roleService.getRoleIdByName("Customer"));
         request.setAttribute("listTypeCus", customerService.getCusTypeList());
         request.setAttribute("users", customerService.getAllSalesExecutiveUsers());
-        request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class CreateCustomerController extends HttpServlet {
 
         if (errorMsg != null) {
             request.setAttribute("error", errorMsg);    
-            request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
             return;
         }
 
@@ -99,6 +99,6 @@ public class CreateCustomerController extends HttpServlet {
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Create failed");
         }
-        request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
 }

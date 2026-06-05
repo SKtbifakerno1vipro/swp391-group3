@@ -12,7 +12,7 @@ public class PasswordUtils {
     // Sử dụng SecureRandom thay vì Random thông thường để tăng tính bảo mật mã hóa
     private static final SecureRandom random = new SecureRandom();
 
-    public static String generateRandomPassword() {
+    public static String generateRandomText() {
         StringBuilder sb = new StringBuilder(8);
         for (int i = 0; i < 8; i++) {
             int randomIndex = random.nextInt(ALPHA_NUMERIC.length());
@@ -20,7 +20,7 @@ public class PasswordUtils {
             sb.append(randomChar);
         }
         
-        System.out.println("[INFO] Generated raw random password successfully.");
+        System.out.println("[INFO] Generated raw random text successfully.");
         return sb.toString();
     }
 }

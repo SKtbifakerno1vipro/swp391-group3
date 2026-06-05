@@ -134,7 +134,7 @@ public class UserDAO extends DBContext {
         return 0;
     }
 
-    // begin - Xhieu - contact me wwhen remove
+// begin - Xhieu - contact me wwhen remove
     public User getUserByIdFullParameter(int id) {
         String sql = "SELECT * FROM [user] WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -183,7 +183,6 @@ public class UserDAO extends DBContext {
     }
     
     public boolean updatePassword(int userId, String newPasswordPlaintext) {
-       
     String hashedNewPassword = BCrypt.hashpw(newPasswordPlaintext, BCrypt.gensalt());
     
     String sql = "UPDATE [user] SET password_hash = ?, updated_at = GETDATE() WHERE user_id = ?";
@@ -207,6 +206,7 @@ public class UserDAO extends DBContext {
     }
     return false;
 }
+   
     // da co hash passsword
     public int createUserFullParameter(User user, Connection conn) {
   
@@ -323,8 +323,8 @@ public class UserDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
-    }
-    /// end - Xhieu
+    }  
+/// end - Xhieu
 
     /*
     created by vu trong phu

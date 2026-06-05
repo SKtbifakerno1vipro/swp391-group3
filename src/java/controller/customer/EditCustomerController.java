@@ -26,7 +26,7 @@ public class EditCustomerController extends HttpServlet {
 
         if (customerIdStr == null || customerIdStr.isBlank()) {
             request.setAttribute("error", "Edit failed");
-            request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
             return;
         }
 
@@ -47,7 +47,7 @@ public class EditCustomerController extends HttpServlet {
             request.setAttribute("error", "Edit failed");
             request.setAttribute("errorDetail", ex.getMessage());
         }
-        request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class EditCustomerController extends HttpServlet {
 
         if (customerIdStr == null || customerIdStr.isBlank() || userIdStr == null || userIdStr.isBlank()) {
             request.setAttribute("error", "Update failed: missing IDs");
-            request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
             return;
         }
         
@@ -117,6 +117,6 @@ public class EditCustomerController extends HttpServlet {
             request.setAttribute("error", "Update failed");
             request.setAttribute("errorDetail", ex.getMessage());
         }
-        request.getRequestDispatcher("/views/customer/customer_edit.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
 }

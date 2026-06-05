@@ -537,6 +537,10 @@ GO
 select * from [user]
 select * from [customer]
 
+UPDATE [user]
+SET phone = '0981234567'
+WHERE user_id = 24;
+
 -- Bước 1: Xóa dữ liệu trong bảng customer trước
 DELETE FROM [customer] 
 WHERE user_id = 55;
@@ -544,3 +548,7 @@ WHERE user_id = 55;
 -- Bước 2: Xóa dữ liệu trong bảng user sau
 DELETE FROM [user] 
 WHERE user_id = 55;
+
+UPDATE [user]
+set role_id = 1 from [user]
+where user_id = 56
