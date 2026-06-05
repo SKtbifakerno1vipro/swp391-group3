@@ -62,7 +62,24 @@ public class UserService {
     public User getUserByIdFullParameter(int id) {
         return userDAO.getUserByIdFullParameter(id);
     }
+    
+    // password
+    public User checkCorrectEmailAndPhone(String phone, String email) {
+        List<User> uList = userDAO.searchUserFieldsByOR(null, null, email.trim(), null);
 
+        if (uList == null || uList.isEmpty()) {
+            System.out.println(" ko tim thay usser bang email");
+            return null;
+        }
+
+        User u = uList.get(0);
+
+        if (u.getPhone() != null && u.getPhone().trim().contentEquals(phone.trim())) {
+            return u;
+        }
+        System.out.println(" tim thay user nhưng ko khop sdt");
+        return null;
+    }    
     public List<User> getAllUsersReturnUser() {
         return userDAO.getAllUsersReturnUser();
     }
@@ -82,11 +99,11 @@ public class UserService {
     public String changePassword(int userId, String currentPassword, String newPassword) throws Exception {
         
         User u = getUserByIdFullParameter(userId);
-
-        if (!BCrypt.checkpw(newPassword, u.getPassword())) {
-            return "Mật khẩu hiện tại không chính xác!";
+        if (currentPassword != null) { // ko co pass la quen mat khau
+            if (!BCrypt.checkpw(currentPassword, u.getPassword())) {          
+                return "Mật khẩu hiện tại không chính xác!";
+            }
         }
-
         // 3. Thực hiện cập nhật mật khẩu mới vào DB
         boolean isUpdateSuccess = userDAO.updatePassword(userId, newPassword);
         if (!isUpdateSuccess) {

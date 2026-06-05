@@ -142,7 +142,7 @@ public class CustomerService {
             return validate;
         }
         
-        String pass = PasswordUtils.generateRandomPassword();
+        String pass = PasswordUtils.generateRandomText();
         user.setPassword(pass);
         
         Connection conn = userService.getConnection(); 

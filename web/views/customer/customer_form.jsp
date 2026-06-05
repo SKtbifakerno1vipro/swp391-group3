@@ -1,9 +1,3 @@
-<%-- 
-    Document   : CreateCustomer
-    Created on : May 21, 2026
-    Author     : ADMIN
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
@@ -11,13 +5,17 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Create Customer</title>
+        
+        <%-- Tự động đổi Tiêu đề trang tùy theo hành động --%>
+        <c:set var="isEdit" value="${not empty cusDTO}" />
+        <title><c:choose><c:when test="${isEdit}">Edit Customer - Terra Enterprise</c:when>
+                <c:otherwise>Create Customer</c:otherwise></c:choose></title>
+        
         <link href="https://fonts.googleapis.com" rel="preconnect">
         <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
         <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
         
         <style>
-            /* Nhái lại font chữ và màu nền cơ bản của trang List */
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 background-color: #f8f9fa;
@@ -36,7 +34,7 @@
                 border: 1px solid #dee2e6;
             }
 
-            h1 {
+            h1, h2 {
                 font-size: 24px;
                 font-weight: 700;
                 margin-top: 0;
@@ -57,7 +55,6 @@
                 margin-right: 15px;
             }
 
-            /* Hộp thông báo lỗi / thành công */
             .alert {
                 padding: 12px 15px;
                 margin-bottom: 20px;
@@ -75,7 +72,6 @@
                 border: 1px solid #f5c2c7;
             }
 
-            /* Định dạng lưới Form nhập liệu giống trang quản lý */
             .form-group {
                 margin-bottom: 18px;
             }
@@ -87,7 +83,6 @@
                 font-size: 14px;
             }
 
-            /* Sửa lại ô Input và Select giống hệt bộ lọc trang List */
             .form-control {
                 width: 100%;
                 padding: 6px 10px;
@@ -106,6 +101,13 @@
                 outline: 0;
             }
 
+            /* CSS đặc trị cho các trường khóa khi ở chế độ Edit */
+            .form-control[readonly] {
+                background-color: #e9ecef;
+                opacity: 1;
+                cursor: not-allowed;
+            }
+
             span.role-badge {
                 display: inline-block;
                 padding: 4px 8px;
@@ -117,7 +119,6 @@
                 border: 1px solid #ced4da;
             }
 
-            /* Tổ hợp nút bấm chuẩn màu sắc trang List */
             .btn-group {
                 margin-top: 25px;
                 display: flex;
@@ -127,7 +128,7 @@
 
             .btn-submit {
                 color: #fff;
-                background-color: #007bff; /* Màu xanh nút Tìm kiếm */
+                background-color: #007bff;
                 border-color: #007bff;
                 display: inline-block;
                 font-weight: 400;
@@ -146,7 +147,7 @@
 
             .btn-cancel {
                 color: #fff;
-                background-color: #6c757d; /* Màu xám nút Xóa bộ lọc */
+                background-color: #6c757d;
                 border-color: #6c757d;
                 display: inline-block;
                 font-weight: 400;
@@ -172,11 +173,22 @@
                 <a href="${pageContext.request.contextPath}/dashboard">DashBoard</a>
             </div>
 
-            <h1>Create Customer</h1>
+            <c:choose>
+                <c:when test="${isEdit}">
+                    <h2>Edit Customer</h2>
+                </c:when>
+                <c:otherwise>
+                    <h1>Create Customer</h1>
+                </c:otherwise>
+            </c:choose>
             
-            <%-- Thông báo kết quả --%>
             <c:if test="${not empty success}">
-                <div class="alert alert-success">Create successful</div>
+                <div class="alert alert-success">
+                    <c:choose>
+                        <c:when test="${isEdit}">${success}</c:when>
+                        <c:otherwise>Create successful</c:otherwise>
+                    </c:choose>
+                </div>
             </c:if>
             <c:if test="${not empty error}">
                 <div class="alert alert-danger">
@@ -187,74 +199,121 @@
                 </div>
             </c:if>
 
-            <%-- Form create nhập liệu --%>
-            <form action="${pageContext.request.contextPath}/customer/create" method="post">
+            <form action="${pageContext.request.contextPath}/customer/${isEdit ? 'edit' : 'create'}" method="post">
+                
+                <%-- Nếu là EDIT thì mới sinh ra 2 thẻ hidden ID này --%>
+                <c:if test="${isEdit}">
+                    <input type="hidden" name="customerId" value="${cusDTO.customer.customerId}" />
+                    <input type="hidden" name="userId" value="${cusDTO.customer.userId}" />
+
+                    <%-- Hiển thị Customer ID và User ID (Chỉ Edit mới thấy) --%>
+                    <div class="form-group">
+                        <label>Customer ID</label>
+                        <input type="text" class="form-control" value="${cusDTO.customer.customerId}" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="text" class="form-control" value="${cusDTO.customer.userId}" readonly>
+                    </div>
+                </c:if>
+
+                <%-- Username: Edit readonly  Create thì để trống cho nhập --%>
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" class="form-control" required>
+                    <input type="text" id="username" name="username" class="form-control" 
+                           value="${isEdit ? cusDTO.user.userName : ''}" ${isEdit ? 'readonly' : ''} required>
                 </div>
                 
+                <%-- Email: Edit thì readonly và điền dữ liệu, Create thì để trống cho nhập --%>
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-control" required>
+                    <input type="email" id="email" name="email" class="form-control" 
+                           value="${isEdit ? cusDTO.user.email : ''}" ${isEdit ? 'readonly' : ''} required>
                 </div>
                 
+                <%-- Full Name --%>
                 <div class="form-group">
                     <label for="fullname">Full Name</label>
-                    <input type="text" id="fullname" name="fullname" class="form-control">
+                    <input type="text" id="fullname" name="fullname" class="form-control" 
+                           value="${isEdit ? cusDTO.user.fullName : ''}">
                 </div>
                 
+                <%-- Phone --%>
                 <div class="form-group">
                     <label for="phone">Phone</label>
-                    <input type="text" id="phone" name="phone" class="form-control">
+                    <input type="text" id="phone" name="phone" class="form-control" 
+                           value="${isEdit ? cusDTO.user.phone : ''}">
                 </div>
                 
+                <%-- Status: Tự động Selected nếu trùng khớp trạng thái cũ khi Edit --%>
                 <div class="form-group">
                     <label for="status">Status</label>
                     <select id="status" name="status" class="form-control">
-                        <option value="ACTIVE">ACTIVE</option>
-                        <option value="INACTIVE">INACTIVE</option>
+                        <option value="ACTIVE" ${isEdit && cusDTO.user.status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
+                        <option value="INACTIVE" ${isEdit && cusDTO.user.status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label>Role</label>
-                    <input type="hidden" name="roleId" value="${customerRoleId}">
-                    <span class="role-badge">Customer</span>
+                    <c:choose>
+                        <c:when test="${isEdit}">
+                            <c:forEach var="role" items="${roles}">
+                                <c:if test="${role.roleId == cusDTO.user.roleId}">
+                                    <input type="text" class="form-control" value="${role.roleName}" readonly>
+                                    <input type="hidden" name="roleId" value="${role.roleId}">
+                                </c:if>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <input type="hidden" name="roleId" value="${customerRoleId}">
+                            <span class="role-badge">Customer</span>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
                 
+                <%-- Tax Code --%>
                 <div class="form-group">
                     <label for="taxCode">Tax Code</label>
-                    <input type="text" id="taxCode" name="taxCode" class="form-control" required>
+                    <input type="text" id="taxCode" name="taxCode" class="form-control" 
+                           value="${isEdit ? cusDTO.customer.taxCode : ''}" required>
                 </div>
                 
+                <%-- Company Name --%>
                 <div class="form-group">
                     <label for="companyName">Company Name</label>
-                    <input type="text" id="companyName" name="companyName" class="form-control" required>
+                    <input type="text" id="companyName" name="companyName" class="form-control" 
+                           value="${isEdit ? cusDTO.customer.companyName : ''}" required>
                 </div>
                 
+                <%-- Customer Type: Xử lý selected động dựa vào biến type --%>
                 <div class="form-group">
                     <label for="customerType">Customer Type</label>
-                    <select id="customerType" name="customerType" class="form-control"> 
+                    <select id="customerType" name="customerType" class="form-control" ${isEdit ? 'required' : ''}> 
                         <option value="">-- Select Type --</option>
                         <c:forEach var="type" items="${listTypeCus}">
-                            <option value="${type}">${type}</option>
+                            <option value="${type}" ${isEdit && cusDTO.customer.customerType == type ? 'selected' : ''}>${type}</option>
                         </c:forEach>
                     </select>
                 </div>
                 
+                <%-- Assigned To: Xử lý selected động dựa vào userId --%>
                 <div class="form-group">
                     <label for="assignedToUserId">Assigned To</label>
                     <select id="assignedToUserId" name="assignedToUserId" class="form-control">
                         <option value="">-- None --</option>
                         <c:forEach var="u" items="${users}">
-                            <option value="${u.userId}">${u.fullName} (${u.userName})</option>
+                            <option value="${u.userId}" ${isEdit && cusDTO.customer.assignedToUserId == u.userId ? 'selected' : ''}>
+                                ${u.fullName} (${u.userName})
+                            </option>
                         </c:forEach>
                     </select>
                 </div>
                 
+                <%-- Nút bấm thay tên chữ hiển thị linh hoạt --%>
                 <div class="btn-group">
-                    <button type="submit" class="btn-submit">Create</button>
+                    <button type="submit" class="btn-submit">${isEdit ? 'Save changes' : 'Create'}</button>
                     <a href="${pageContext.request.contextPath}/customer/list" class="btn-cancel">Cancel</a>
                 </div>
             </form>
