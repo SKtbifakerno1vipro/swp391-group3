@@ -535,6 +535,8 @@ GO
 
 
 select * from [user]
+select * from [product]
+select * from [category]
 select * from [customer]
 
 UPDATE [user]
@@ -552,3 +554,29 @@ WHERE user_id = 55;
 UPDATE [user]
 set role_id = 1 from [user]
 where user_id = 56
+
+INSERT INTO product
+(product_name, cost_price, selling_price, description, unit, product_status,
+ reorder_level, quantity_available, updated_by, category_id)
+VALUES
+(N'Xi măng Hà Tiên PCB40', 75000, 89000, N'Xi măng xây dựng dân dụng', N'Bao', 'ACTIVE', 20, 120, 1, 1),
+(N'Xi măng Nghi Sơn', 73000, 87000, N'Xi măng chất lượng cao', N'Bao', 'ACTIVE', 20, 95, 1, 1),
+(N'Gạch đỏ đặc', 1200, 1500, N'Gạch xây tường chịu lực', N'Viên', 'ACTIVE', 500, 10000, 1, 1),
+(N'Gạch ống 4 lỗ', 1000, 1300, N'Gạch xây công trình dân dụng', N'Viên', 'ACTIVE', 500, 8500, 1, 1),
+(N'Cát xây tô', 180000, 220000, N'Cát mịn dùng để tô tường', N'M3', 'ACTIVE', 10, 60, 1, 1),
+(N'Cát bê tông', 220000, 270000, N'Cát vàng đổ bê tông', N'M3', 'ACTIVE', 10, 45, 1, 1),
+(N'Đá 1x2', 320000, 390000, N'Đá xây dựng tiêu chuẩn', N'M3', 'ACTIVE', 10, 70, 1, 1),
+(N'Đá mi sàng', 280000, 340000, N'Đá nhỏ dùng san lấp', N'M3', 'ACTIVE', 10, 55, 1, 1),
+(N'Sắt thép Việt Nhật D10', 14500, 17200, N'Thép cây D10', N'Kg', 'ACTIVE', 100, 2500, 1, 1),
+(N'Sắt thép Hòa Phát D12', 15200, 18000, N'Thép cây D12', N'Kg', 'ACTIVE', 100, 3200, 1, 1),
+
+(N'Ống nhựa PVC Phi 21', 18000, 23000, N'Ống cấp nước PVC', N'Mét', 'ACTIVE', 50, 700, 1, 2),
+(N'Ống nhựa PVC Phi 34', 35000, 42000, N'Ống dẫn nước dân dụng', N'Mét', 'ACTIVE', 50, 450, 1, 2),
+(N'Sơn Dulux 5L', 520000, 650000, N'Sơn nội thất cao cấp', N'Thùng', 'ACTIVE', 10, 35, 1, 2),
+(N'Sơn Jotun 5L', 490000, 620000, N'Sơn chống thấm', N'Thùng', 'ACTIVE', 10, 28, 1, 2),
+(N'Keo dán gạch Weber', 85000, 105000, N'Keo dán gạch chuyên dụng', N'Bao', 'ACTIVE', 20, 180, 1, 2),
+(N'Bột trét tường Joton', 95000, 118000, N'Bột bả nội ngoại thất', N'Bao', 'ACTIVE', 20, 140, 1, 2),
+(N'Tôn lạnh Hoa Sen 0.45mm', 95000, 118000, N'Tôn lợp mái chống nóng', N'Mét', 'ACTIVE', 30, 350, 1, 2),
+(N'Tôn màu Đông Á 0.4mm', 88000, 110000, N'Tôn lợp công trình dân dụng', N'Mét', 'ACTIVE', 30, 420, 1, 2),
+(N'Dây điện Cadivi 2.5mm', 12500, 15800, N'Dây điện dân dụng', N'Mét', 'ACTIVE', 100, 1200, 1, 2),
+(N'Dây điện Cadivi 4.0mm', 19500, 23800, N'Dây điện tải lớn', N'Mét', 'ACTIVE', 100, 900, 1, 2);
