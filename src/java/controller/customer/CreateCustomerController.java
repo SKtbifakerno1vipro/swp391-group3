@@ -24,7 +24,7 @@ public class CreateCustomerController extends HttpServlet {
         request.setAttribute("customerRoleId", roleService.getRoleIdByName("Customer"));
         request.setAttribute("listTypeCus", customerService.getCusTypeList());
         request.setAttribute("users", customerService.getAllSalesExecutiveUsers());
-        request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
 
     @Override
@@ -49,9 +49,9 @@ public class CreateCustomerController extends HttpServlet {
         String errorMsg = null;
 
         if ((errorMsg = Validation.validateUsername(userName)) != null) {
-            // Gặp lỗi dừng luôn, không check các trường phía sau nữa
+
         } else if ((errorMsg = Validation.validateEmail(email)) != null) {
-            // Cấu trúc else-if giúp tối giản code và bắt lỗi theo thứ tự từ trên xuống
+
         } else if ((errorMsg = Validation.validateFullName(fullName)) != null) {
             
         } else if ((errorMsg = Validation.validatePhone(phone)) != null) {
@@ -62,11 +62,10 @@ public class CreateCustomerController extends HttpServlet {
             
         }
 
-        // BIỆN PHÁP TẬP TRUNG: Nếu có bất kỳ lỗi nào ở trên, nạp data 1 lần duy nhất rồi forward
         if (errorMsg != null) {
-            request.setAttribute("error", errorMsg); // Gửi mã lỗi chi tiết của trường bị sai về JSP            
-            request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
-            return; // Chặn đứng không cho xuống phần lưu DB
+            request.setAttribute("error", errorMsg);    
+            request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
+            return;
         }
 
         try {
@@ -92,7 +91,7 @@ public class CreateCustomerController extends HttpServlet {
 
             String msg = customerService.createCustomerDTO(u, c);
 
-            if (msg == null || msg.trim().isBlank()) {
+            if (msg == null || msg.trim().isEmpty()) {
                 request.setAttribute("success", true);
             } else {
                 request.setAttribute("error", "Create failed."+ msg + (customerService.getLastError() != null ? customerService.getLastError() : "Unknown error"));
@@ -100,6 +99,6 @@ public class CreateCustomerController extends HttpServlet {
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Create failed");
         }
-        request.getRequestDispatcher("/views/customer/customer_create.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
 }

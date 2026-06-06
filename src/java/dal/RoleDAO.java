@@ -14,7 +14,7 @@ public class RoleDAO extends DBContext {
     public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {
-            String sql = "select role_id, role_name, created_at, updated_at from role";
+            String sql = "SELECT role_id, role_name, created_at, updated_at, status FROM role ORDER BY role_id";
             stm = connection.prepareStatement(sql);
             rs = stm.executeQuery();
             while (rs.next()) {
@@ -23,6 +23,7 @@ public class RoleDAO extends DBContext {
                 role.setRoleName(rs.getString("role_name"));
                 role.setCreateAt(rs.getTimestamp("created_at"));
                 role.setUpdateAt(rs.getTimestamp("updated_at"));
+                role.setStatus(rs.getString("status"));
                 roles.add(role);
             }
         } catch (Exception e) {
@@ -32,28 +33,28 @@ public class RoleDAO extends DBContext {
         return roles;
     }
 
-        public int createRole(String roleName) {
-            String sql = "INSERT INTO role (role_name) VALUES (?)";
-    
-            try {
-                java.sql.PreparedStatement st = connection.prepareStatement(sql,java.sql.Statement.RETURN_GENERATED_KEYS);
-        
-                st.setString(1, roleName);
-                int affectedRows = st.executeUpdate();
-        
-                if (affectedRows > 0) {
-                    java.sql.ResultSet rs = st.getGeneratedKeys();
-                    if (rs.next()) {
-                        return rs.getInt(1);
-                    }
-                }       
-            } catch (java.sql.SQLException e) {
-                System.out.println("RoleDAO createRole error:");
-                e.printStackTrace();
+    public int createRole(String roleName) {
+        String sql = "INSERT INTO role (role_name) VALUES (?)";
+
+        try {
+            java.sql.PreparedStatement st = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+
+            st.setString(1, roleName);
+            int affectedRows = st.executeUpdate();
+
+            if (affectedRows > 0) {
+                java.sql.ResultSet rs = st.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
-    
-            return -1;
-}
+        } catch (java.sql.SQLException e) {
+            System.out.println("RoleDAO createRole error:");
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
 
     public model.Role getRoleById(int id) {
         String sql = "SELECT * FROM role WHERE role_id = ?";
@@ -99,18 +100,18 @@ public class RoleDAO extends DBContext {
             java.sql.PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, id);
             java.sql.ResultSet rs = st.executeQuery();
-            
-            while (rs.next()){
-                if (role == null){
+
+            while (rs.next()) {
+                if (role == null) {
                     role = new model.Role();
                     role.setRoleId(rs.getInt("role_id"));
                     role.setRoleName(rs.getString("role_name"));
                     role.setCreateAt(rs.getTimestamp("created_at"));
                     role.setUpdateAt(rs.getTimestamp("updated_at"));
-                    
+
                 }
                 int permissionId = rs.getInt("permission_id");
-                if (permissionId >0){
+                if (permissionId > 0) {
                     model.Permission p = new model.Permission();
                     p.setPermissionId(permissionId);
                     p.setPermissionName(rs.getString("permission_name"));
@@ -145,13 +146,12 @@ public class RoleDAO extends DBContext {
     public void updateRolePermissions(int roleId, java.util.List<Integer> permissionIds) {
         try {
             connection.setAutoCommit(false);
-            // XÃ³a permissions cÅ©
+
             String sqlDelete = "DELETE FROM role_permission WHERE role_id = ?";
             java.sql.PreparedStatement stDel = connection.prepareStatement(sqlDelete);
             stDel.setInt(1, roleId);
             stDel.executeUpdate();
-            
-            // ThÃªm permissions má»›i
+
             if (permissionIds != null && !permissionIds.isEmpty()) {
                 String sqlInsert = "INSERT INTO role_permission (role_id, permission_id) VALUES (?, ?)";
                 java.sql.PreparedStatement stIns = connection.prepareStatement(sqlInsert);
@@ -168,48 +168,49 @@ public class RoleDAO extends DBContext {
             System.out.println("RoleDAO updateRolePermissions error: " + e.getMessage());
         }
     }
+
     // begin - Xhieu - contact me wwhen remove
     public Integer getRoleIdByName(String roleName) {
-    String sql = "SELECT role_id FROM role WHERE role_name = ?";
-    
-    try (PreparedStatement stm1 = connection.prepareStatement(sql)) {
-        stm1.setString(1, roleName); 
-        try (ResultSet rs1 = stm1.executeQuery()) {
-            if (rs1.next()) {
-                return rs1.getInt("role_id");
+        String sql = "SELECT role_id FROM role WHERE role_name = ?";
+
+        try (PreparedStatement stm1 = connection.prepareStatement(sql)) {
+            stm1.setString(1, roleName);
+            try (ResultSet rs1 = stm1.executeQuery()) {
+                if (rs1.next()) {
+                    return rs1.getInt("role_id");
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return null; // TrÃ¡ÂºÂ£ vÃ¡Â»Â null nÃ¡ÂºÂ¿u khÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y role tÃ†Â°Ã†Â¡ng Ã¡Â»Â©ng
     }
-    return null; // Trả về null nếu không tìm thấy role tương ứng
-}
     // end - Xhieu
-    
-    public boolean isRoleNameExists(String roleName){
+
+    public boolean isRoleNameExists(String roleName) {
         String sql = "SELECT COUNT(*) FROM role WHERE role_name = ?";
         try {
             java.sql.PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, roleName);
             java.sql.ResultSet rs = st.executeQuery();
-            if (rs.next()){
-                return rs.getInt(1)>0;
-                
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+
             }
         } catch (java.sql.SQLException e) {
             System.out.println("RoleDao isRoleNameExists error: " + e.getMessage());
         }
-        return false;       
+        return false;
     }
-    
+
     public int countUsersByRoleId(int roleId) {
         String sql = "SELECT COUNT(*) FROM [user] WHERE role_id = ?";
-    
+
         try {
             java.sql.PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, roleId);
             java.sql.ResultSet rs = st.executeQuery();
-        
+
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -217,42 +218,33 @@ public class RoleDAO extends DBContext {
             System.out.println("RoleDAO countUsersByRoleId error:");
             e.printStackTrace();
         }
-    
+
         return 0;
     }
-    
-    public boolean deleteRole(int roleId) {
+
+    public boolean softDeleteRole(int roleId) {
+        String sql = "UPDATE role SET status='Inactive' WHERE role_id = ?";
         try {
-            connection.setAutoCommit(false);
-        
-        // Bước 1: Xóa permissions của role
-            String sqlDeletePermissions = "DELETE FROM role_permission WHERE role_id = ?";
-            java.sql.PreparedStatement stPerm = connection.prepareStatement(sqlDeletePermissions);
-            stPerm.setInt(1, roleId);
-            stPerm.executeUpdate();
-        
-        // Bước 2: Xóa role
-            String sqlDeleteRole = "DELETE FROM role WHERE role_id = ?";
-            java.sql.PreparedStatement stRole = connection.prepareStatement(sqlDeleteRole);
-            stRole.setInt(1, roleId);
-            int rowsAffected = stRole.executeUpdate();
-        
-            connection.commit();
-            connection.setAutoCommit(true);
-        
-            return rowsAffected > 0;
-        
-        } catch (java.sql.SQLException e) {
-            System.out.println("RoleDAO deleteRole error:");
+            java.sql.PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, roleId);
+            return st.executeUpdate() > 0; 
+
+        } catch (Exception e) {
             e.printStackTrace();
-        
-            try {
-                connection.rollback();
-            } catch (java.sql.SQLException ex) {
-                ex.printStackTrace();
-            }
         }
-    
+        return false;
+    }
+
+    public boolean restoreRole(int roleId) {
+        String sql = "UPDATE role SET status='Active' WHERE role_id = ?";
+        try {
+            java.sql.PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, roleId);
+            return st.executeUpdate() > 0; 
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 }

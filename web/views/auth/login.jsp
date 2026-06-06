@@ -79,7 +79,7 @@
                         Remember me
                     </label>
 
-                    <a href="javascript:void(0)">
+                    <a href="${pageContext.request.contextPath}/user/password/forgot">
                         Forgot password?
                     </a>
                 </div>
