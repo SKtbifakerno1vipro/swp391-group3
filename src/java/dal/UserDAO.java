@@ -415,9 +415,9 @@ public class UserDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String hashPass = rs.getString("password_hash");
-                if (true || BCrypt.checkpw(password, hashPass)) {
+                if (BCrypt.checkpw(password, hashPass)) {
                     User user = mapUser(rs);
-                    user.setPassword(hashPass);
+              //      user.setPassword(hashPass);
                     return user;
                 }
             }

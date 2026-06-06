@@ -1,4 +1,5 @@
 package controller.customer;
+
 import service.CustomerService;
 import java.io.IOException;
 import java.util.List;
@@ -14,7 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 public class CustomerListController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
-    private static final int PAGE_SIZE = 10;
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -22,10 +23,10 @@ public class CustomerListController extends HttpServlet {
         String searchName = request.getParameter("searchName");
         String type = request.getParameter("type");
         String pageRaw = request.getParameter("page");
-        
+
         int page = 1;       // Trang mặc định nếu người dùng mới vào lần đầu
-        int pageSize = 10;  // Hiển thị cố định 10 dòng trên 1 trang
-        
+        int pageSize = 2;  // Hiển thị cố định 10 dòng trên 1 trang
+
         if (pageRaw != null && !pageRaw.isBlank()) {
             try {
                 page = Integer.parseInt(pageRaw);
@@ -42,7 +43,7 @@ public class CustomerListController extends HttpServlet {
         request.setAttribute("customers", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
-        
+
         // Bắt buộc giữ lại các từ khóa tìm kiếm để đẩy ngược lại các ô input/select ngoài giao diện JSP
         request.setAttribute("searchName", searchName);
         request.setAttribute("type", type);
@@ -56,9 +57,3 @@ public class CustomerListController extends HttpServlet {
         doGet(request, response);
     }
 }
-
-
-
-
-
-
