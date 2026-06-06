@@ -30,7 +30,7 @@ public class SecurityFilter implements Filter {
 // 3. Manager (Role 2): Quản lý danh mục, sản phẩm và phê duyệt
     private final String[] MANAGE_PAGE = {
         "product-list", "product-detail", "create-product", "edit-product",
-        "category-list", "dashboard"
+        "category/", "dashboard"
     };
 
 // 4. Sale (Role 4): Quản lý khách hàng, báo giá và đơn hàng
