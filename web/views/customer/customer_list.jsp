@@ -43,15 +43,16 @@
                                placeholder="Nhập tên, SĐT, email hoặc MST..." style="padding: 5px; width: 250px;"/>
                     </td>
 
-                    <td style="border: none; padding: 5px 10px;">
-                        <label>Loại khách hàng:</label><br/>
-                        <select name="type" style="padding: 5px; width: 150px;">
+                    <td style="border: none; padding: 5px 10px; vertical-align: bottom;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Loại khách hàng: </label>
+                        <select name="type" style="padding: 5px; width: 150px; box-sizing: border-box;"> 
                             <option value="">-- Tất cả --</option>
-                            <option value="B2B" ${type == 'B2B' ? 'selected' : ''}>B2B (Doanh nghiệp)</option>
-                            <option value="B2C" ${type == 'B2C' ? 'selected' : ''}>B2C (Cá nhân)</option>
+                            <c:forEach var="typeCus" items="${listTypeCus}">
+                                <option value="${typeCus}" ${type eq typeCus ? 'selected' : ''}>${typeCus}</option>
+                            </c:forEach>
                         </select>
                     </td>
-
+                    
                     <td style="border: none; padding: 5px 10px; vertical-align: bottom;">
                         <button type="submit" style="padding: 6px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Tìm kiếm</button>
                         <a href="${pageContext.request.contextPath}/customer/list" style="padding: 6px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; margin-left: 5px;">Xóa bộ lọc</a>
