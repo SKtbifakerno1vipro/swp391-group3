@@ -97,6 +97,7 @@ CREATE TABLE customer (
 );
 GO
 
+
 -- 8. Quotation
 CREATE TABLE quotation (
     quotation_id INT IDENTITY(1,1) PRIMARY KEY,
