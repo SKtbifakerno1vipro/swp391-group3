@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import service.CategoryService;
 
-@WebServlet(name = "CreateCategoryController", urlPatterns = {"/create-category"})
+@WebServlet(name = "CreateCategoryController", urlPatterns = {"/category/create"})
 public class CreateCategoryController extends HttpServlet {
 
     private final CategoryService categoryService = new CategoryService();
@@ -43,7 +43,7 @@ public class CreateCategoryController extends HttpServlet {
 
         int newCategoryId = categoryService.createCategory(categoryName);
         if (newCategoryId > 0) {
-            response.sendRedirect(request.getContextPath() + "/category-list?status=add_success");
+            response.sendRedirect(request.getContextPath() + "/category/list?status=add_success");
         } else {
             request.setAttribute("error", "Lỗi khi thêm danh mục vào database!");
             request.setAttribute("categoryName", categoryName);

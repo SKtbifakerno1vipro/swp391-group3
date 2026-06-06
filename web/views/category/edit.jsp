@@ -13,7 +13,7 @@
         <div style="color: red; margin-bottom: 10px;">${error}</div>
     </c:if>
 
-    <form action="${pageContext.request.contextPath}/edit-category" method="POST">
+    <form action="${pageContext.request.contextPath}/category/edit" method="POST">
         <input type="hidden" name="categoryId" value="${category.categoryId}">
 
         <div style="margin-bottom: 10px;">
@@ -26,7 +26,7 @@
         </div>
 
         <button type="submit">Cập nhật</button>
-        <a href="${pageContext.request.contextPath}/category-list">Hủy</a>
+        <a href="${pageContext.request.contextPath}/category/list">Hủy</a>
     </form>
 </body>
 </html>

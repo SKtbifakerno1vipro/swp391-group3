@@ -13,7 +13,7 @@
         <div style="color: red; margin-bottom: 10px;">${error}</div>
     </c:if>
 
-    <form action="${pageContext.request.contextPath}/create-category" method="POST">
+    <form action="${pageContext.request.contextPath}/category/create" method="POST">
         <div style="margin-bottom: 10px;">
             <label for="categoryName">Tên danh mục:</label><br/>
             <input type="text"
@@ -25,7 +25,7 @@
         </div>
 
         <button type="submit">Thêm mới</button>
-        <a href="${pageContext.request.contextPath}/category-list">Hủy</a>
+        <a href="${pageContext.request.contextPath}/category/list">Hủy</a>
     </form>
 </body>
 </html>
