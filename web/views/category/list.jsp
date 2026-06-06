@@ -34,7 +34,7 @@
     </c:if>
 
     <div style="margin-bottom: 15px;">
-        <a href="${pageContext.request.contextPath}/create-category">Thêm danh mục</a> |
+        <a href="${pageContext.request.contextPath}/category/create">Thêm danh mục</a> |
         <a href="${pageContext.request.contextPath}/product-list">Product</a> |
         <a href="${pageContext.request.contextPath}/dashboard">Dashboard</a>
     </div>
@@ -59,8 +59,8 @@
                     <td>${category.categoryId}</td>
                     <td>${category.categoryName}</td>
                     <td>
-                        <a href="${pageContext.request.contextPath}/edit-category?categoryId=${category.categoryId}">Sửa</a>
-                        <a href="${pageContext.request.contextPath}/delete-category?categoryId=${category.categoryId}"
+                        <a href="${pageContext.request.contextPath}/category/edit?categoryId=${category.categoryId}">Sửa</a>
+                        <a href="${pageContext.request.contextPath}/category/delete?categoryId=${category.categoryId}"
                            onclick="return confirm('Bạn có chắc muốn xóa danh mục này?');">Xóa</a>
                     </td>
                 </tr>

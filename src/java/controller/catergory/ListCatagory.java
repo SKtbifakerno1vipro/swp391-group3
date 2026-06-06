@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import service.CategoryService;
 
-@WebServlet(name = "ListCatagory", urlPatterns = {"/category-list"})
+@WebServlet(name = "ListCatagory", urlPatterns = {"/category/list"})
 public class ListCatagory extends HttpServlet {
 
     private final CategoryService categoryService = new CategoryService();
