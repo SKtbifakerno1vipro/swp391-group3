@@ -10,18 +10,18 @@ public class Role {
     private String roleName;
     private Timestamp createAt;
     private Timestamp updateAt;
-    private String status;
-    private List<Permission> permissions = new ArrayList<>();
+    
+    private List<RolePermission> permissions = new ArrayList<>();
 
     public Role() {
     }
 
-    public Role(int roleId, String roleName, Timestamp createAt, Timestamp updateAt, String status) {
+    public Role(int roleId, String roleName, Timestamp createAt, Timestamp updateAt) {
         this.roleId = roleId;
         this.roleName = roleName;
         this.createAt = createAt;
         this.updateAt = updateAt;
-        this.status = status;
+        
     }
 
     public int getRoleId() {
@@ -56,19 +56,12 @@ public class Role {
         this.updateAt = updateAt;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public List<Permission> getPermissions() {
+    public List<RolePermission> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<Permission> permissions) {
+    public void setPermissions(List<RolePermission> permissions) {
         this.permissions = permissions;
     }
 

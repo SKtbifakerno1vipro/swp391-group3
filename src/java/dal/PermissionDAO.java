@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import model.Permission;
+import model.RolePermission;
 
 public class PermissionDAO extends DBContext {
 
-    public List<Permission> getAllPermissions() {
-        List<Permission> permissions = new ArrayList<>();
+    public List<RolePermission> getAllPermissions() {
+        List<RolePermission> permissions = new ArrayList<>();
 
         String sql = """
                      SELECT permission_id, permission_name, create_at, update_at
@@ -26,7 +26,7 @@ public class PermissionDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Permission permission = new Permission();
+                RolePermission permission = new RolePermission();
 
                 permission.setPermissionId(rs.getInt("permission_id"));
                 permission.setPermissionName(rs.getString("permission_name"));

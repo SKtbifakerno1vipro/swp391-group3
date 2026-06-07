@@ -1,7 +1,7 @@
 package controller.role;
 
 import service.RoleService;
-import model.Permission;
+import model.RolePermission;
 import model.Role;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -30,11 +30,11 @@ public class EditRolePermissionsController extends HttpServlet {
 
         int roleId = Integer.parseInt(roleIdParam);
         Role role = roleService.getRoleDetail(roleId);
-        List<Permission> permissionList = roleService.getAllPermissions();
+        List<RolePermission> permissionList = roleService.getAllPermissions();
 
         Set<Integer> selectedPermissionIds = new HashSet<>();
         if (role != null && role.getPermissions() != null) {
-            for (Permission p : role.getPermissions()) {
+            for (RolePermission p : role.getPermissions()) {
                 selectedPermissionIds.add(p.getPermissionId());
             }
         }

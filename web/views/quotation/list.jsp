@@ -4,11 +4,27 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Pơ Bread - Role Management</title>
+        <title>Pơ Bread</title>
     </head>
     <body>
         <h1>Quotation List</h1>
-        <table border="1" cellpadding=7 cellspacing="0">
+        <form action="quotation-list" method="GET">
+            Customer Name:
+            <input type="text" name="search" value="${searchText}" placeholder="Enter customer name">
+            
+            Status:
+            <select name="status">
+                <option value="">-- Status --</option>
+                <option value="DRAFT" ${status == 'DRAFT' ? 'selected' : ''}>DRAFT</option> 
+                <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>PENDING</option>
+                <option value="ACCEPTED" ${status == 'ACCEPTED' ? 'selected' : ''}>ACCEPTED</option>
+                <option value="REJECTED" ${status == 'REJECTED' ? 'selected' : ''}>REJECTED</option>
+            </select>
+            <button type="submit">Search</button>
+            <a href="quotation-list"><button type="button">Reset</button></a>
+        </form>
+        
+        <table border="1" cellpadding="7" cellspacing="0" style="margin-top: 20px; width: 100%;">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -21,11 +37,14 @@
                 </tr>
             </thead>
             <tbody>
+                <%-- Nếu danh sách rỗng thì hiện thông báo --%>
                 <c:if test="${empty quotationList}">
                     <tr>
-                        <td colspan="7">No roles found.</td>
+                        <td colspan="7" style="text-align: center;">No quotations found.</td>
                     </tr>
                 </c:if>
+                
+                <%-- Vòng lặp hiển thị từng báo giá --%>
                 <c:forEach items="${quotationList}" var="quotation">
                     <tr>
                         <td>${quotation.quotationId}</td>
@@ -41,7 +60,5 @@
                 </c:forEach>
             </tbody>
         </table>
-
-
     </body>
 </html>
