@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+    <servlet>
+        <servlet-name>QuotationListController</servlet-name>
+        <servlet-class>controller.Quotation.QuotationListController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>QuotationListController</servlet-name>
+        <url-pattern>/quotation-list</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>views/auth/login.jsp</welcome-file>
     </welcome-file-list>

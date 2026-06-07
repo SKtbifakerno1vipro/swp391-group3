@@ -45,6 +45,7 @@ public class CustomerListController extends HttpServlet {
         
         // Bắt buộc giữ lại các từ khóa tìm kiếm để đẩy ngược lại các ô input/select ngoài giao diện JSP
         request.setAttribute("searchName", searchName);
+        request.setAttribute("listTypeCus", customerService.getCusTypeList());
         request.setAttribute("type", type);
 
         request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
