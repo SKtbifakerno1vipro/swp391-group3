@@ -30,10 +30,11 @@
                                         <option value="${c.categoryId}" ${c.categoryId == categoryId ? 'selected' : ''}>${c.categoryName}</option>
                                     </c:forEach>
                                 </select>
-                                |Status
-                                <select name="status">
-                                    <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Active</option>
-                                    <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>Inactive</option>
+                                |Price
+                                <select name="sort">
+                                    <option value="default" ${sort == 'default' ? 'selected' : ''}>Default</option>
+                                    <option value="increase" ${sort == 'increase' ? 'selected' : ''}>Increase</option>
+                                    <option value="decrease" ${sort == 'decrease' ? 'selected' : ''}>Decrease</option>
                                 </select>
                             </td>
                         
@@ -78,7 +79,9 @@
                                 <td>${p.categoryName}</td>
                                 <td>${p.productStatus}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/product-detail?id=${p.productId}">View</a>
+                                    <a href="${pageContext.request.contextPath}/product-detail?id=${p.productId}">View</a> |
+                                    <a href="${pageContext.request.contextPath}/product-delete?id=${p.productId}">Delete</a>
+                                    <br> <c:if test="${errorDelete != null || empty errorDelete}"> ${errorDelete}</c:if>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -88,7 +91,7 @@
                     
                     <div>
                         Page
-                    <select  onchange="window.location.href='${pageContext.request.contextPath}/product-list?page='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&status=${status}&pageSize=${pageSize}'">
+                    <select  onchange="window.location.href='${pageContext.request.contextPath}/product-list?page='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}'">
                         <c:forEach var="i" begin="1" end="${totalPage}">
                             <option value="${i}" ${page == i ? 'selected' : ''}>${i}</option>
                         </c:forEach>

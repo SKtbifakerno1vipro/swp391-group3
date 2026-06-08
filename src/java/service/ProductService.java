@@ -25,12 +25,12 @@ public class ProductService {
         return productDAO.updateProduct(product);
     }
 
-    public List<Product> searchProduct(String searchText, Integer categoryId, String status) {
-        return productDAO.searchProduct(searchText, categoryId, status);
+    public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status) {
+        return productDAO.searchProduct(searchText, categoryId, sort, status);
     }
 
-    public List<Product> searchProduct(String searchText, Integer categoryId, String status, int totalRow, int page, int totalPage, int pageSize) {
-        return productDAO.searchProduct(searchText, categoryId, status, totalRow, page, totalPage, pageSize);
+    public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status, int totalRow, int page, int totalPage, int pageSize) {
+    return productDAO.searchProduct(searchText, categoryId, sort, status, totalRow, page, totalPage, pageSize);
     }
 
     public List<Category> getAllCategory() {
@@ -45,6 +45,9 @@ public class ProductService {
         return productDAO.getProductStatus();
     }
 
+    public boolean deleteProduct(int productId){
+        return productDAO.deleteProduct(productId);
+    }
     public String getUpdateByWithProductId(int id) {
         return productDAO.getUpdateByWithProductId(id);
     }

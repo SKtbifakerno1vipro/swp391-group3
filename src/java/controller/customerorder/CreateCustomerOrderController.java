@@ -1,6 +1,6 @@
 package controller.customerorder;
 
-import controller.product.ProductList;
+
 import dto.CustomerDTO;
 import model.CustomerOrder;
 import model.CustomerOrderDetail;
@@ -66,8 +66,8 @@ public class CreateCustomerOrderController extends HttpServlet {
             int totalProductPages = productService.calculateTotalPage(totalProducts, PAGE_SIZE);
             productPage = productService.nomalizePage(productPage, totalProductPages);
             // Lấy danh sách sản phẩm cho trang hiện tại
-            List<Product> products = productService.searchProduct(null, null, "ACTIVE", totalProducts, productPage,
-                    totalProductPages, PAGE_SIZE);
+            List<Product> products = productService.searchProduct(null, null, null, "ACTIVE", totalProducts, productPage,
+                    totalProductPages, PAGE_SIZE); //update by nguyenkien
             request.setAttribute("products", products);
             request.setAttribute("currentProductPage", productPage);
             request.setAttribute("totalProductPages", totalProductPages);

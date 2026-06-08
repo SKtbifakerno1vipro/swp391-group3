@@ -108,11 +108,11 @@ public class ProductDAO extends DBContext {
         }
     }
 
-    public List<Product> searchProduct(String searchText, Integer categoryId, String status) {
+    public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status) {
         List<Product> list = new ArrayList<>();
         try {
             String sql = """
-                         select * from product p join category c on p.category_id = c.category_id WHERE 1 = 1
+                         select * from product p join category c on p.category_id = c.category_id WHERE 1 = 1 and p.product_status = 'ACTIVE'
                          """;
             if (searchText != null && !searchText.trim().isEmpty()) {
                 sql += " and product_name LIKE ?";
@@ -123,6 +123,17 @@ public class ProductDAO extends DBContext {
             if (status != null && !status.trim().isEmpty()) {
                 sql += " and p.product_status = ?";
             }
+            if (sort != null && !sort.trim().isEmpty()) {
+                if(sort.equals("increase"))
+                sql += " \n order by p.selling_price";
+                else if(sort.equals("decrease")){
+                    sql += " \n order by p.selling_price desc";
+                } else if(sort.equals("default")){
+                    sql += " \n order by p.product_id";
+                } 
+            } else {
+                sql += " \n order by p.product_id";
+            }
 
             PreparedStatement ps = connection.prepareStatement(sql);
             int index = 1;
@@ -132,9 +143,11 @@ public class ProductDAO extends DBContext {
             if (categoryId != null && categoryId != 0) {
                 ps.setInt(index++, categoryId);
             }
-            if (status != null && !status.trim().isEmpty()) {
+            
+             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(index++, status);
             }
+            
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Product p = mapResultSetToProduct(rs);
@@ -146,7 +159,31 @@ public class ProductDAO extends DBContext {
         return list;
     }
 
-    public List<Product> searchProduct(String searchText, Integer categoryId, String status, int totalRow, int page, int totalPage, int pageSize) {
+    public boolean deleteProduct(int productId){
+        Product found = getProductById(productId);
+        if (found == null) {
+            return false;
+        } 
+        try {
+            String sql = """
+                         update product
+                         set product_status = 'INACTIVE'
+                         where product_id = ? and product_status = 'ACTIVE'
+                         """;
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, productId);
+            ps.executeUpdate();
+            Product p = getProductById(productId);
+            if (p.getProductStatus().equals("INACTIVE")) {
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println("deleteProduct: "+e.getMessage());
+        }
+        return false;
+    }
+    
+    public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status, int totalRow, int page, int totalPage, int pageSize) {
         List<Product> list = new ArrayList<>();
         try {
             String sql = """
@@ -162,10 +199,21 @@ public class ProductDAO extends DBContext {
                 sql += " and p.product_status = ?";
             }
             
+            if (sort != null && !sort.trim().isEmpty()) {
+                if (sort.equals("increase")) {
+                    sql += " \n order by p.selling_price";
+                } else if (sort.equals("decrease")) {
+                    sql += " \n order by p.selling_price desc";
+                } else if (sort.equals("default")) {
+                    sql += " \n order by p.product_id";
+                }
+            } else {
+                sql += " \n order by p.product_id";
+            }
+
             if ((page > 0 && page <= totalPage)  && totalRow > 0) {
                 sql += """
-                   \n order by product_id
-                   offset ? rows
+                   \n offset ? rows
                    fetch next ? rows only
                    """;
             }
