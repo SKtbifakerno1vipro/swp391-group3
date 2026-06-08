@@ -24,10 +24,12 @@ public class CustomerService {
     }
     // new
     
-    public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String type, int page, int pageSize) {
+    public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String searchSdt, String searchEmail, String searchMst,
+            String typeCus, int page, int pageSize) {
+        
         List<CustomerDTO> dtoList = new ArrayList<>();
 
-        List<Customer> customerList = customerDAO.searchAndPaginateCustomers(searchName, type, page, pageSize);
+        List<Customer> customerList = customerDAO.searchAndPaginateCustomers(searchName,searchSdt,searchEmail,searchMst, typeCus, page, pageSize);
         if (customerList == null || customerList.isEmpty()) {
             return dtoList; 
         }
@@ -48,9 +50,10 @@ public class CustomerService {
         return dtoList;
     }
     // new 
-    public int getTotalPages(String searchName, String type, int pageSize) {
+    public int getTotalPages(String searchName, String searchSdt, String searchEmail, String searchMst,
+            String typeCus, int pageSize) {
         // Gọi hàm đếm tổng số dòng thỏa mãn điều kiện lọc dưới DAO
-        int totalRecords = customerDAO.getTotalCustomersCount(searchName, type);
+        int totalRecords = customerDAO.getTotalCustomersCount(searchName, searchSdt, searchEmail, searchMst, typeCus);
         
         if (totalRecords == 0) return 1;
         

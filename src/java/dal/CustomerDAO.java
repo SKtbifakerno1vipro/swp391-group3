@@ -184,90 +184,147 @@ public class CustomerDAO extends DBContext {
         return error;
     }
     
-    public List<Customer> searchAndPaginateCustomers(String searchName, String type, int page, int pageSize) {
-        List<Customer> list = new ArrayList<>();
+    public List<Customer> searchAndPaginateCustomers(String searchName, String searchSdt, String searchEmail, String searchMst,
+            String typeCus, int page, int pageSize) {
+    List<Customer> list = new ArrayList<>();
 
-        // 1. Dùng LEFT JOIN để kéo dữ liệu từ bảng [user] sang so khớp
-        String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id "
-                   + ", u.created_at, u.updated_at "
-                   + "FROM customer c "
-                   + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                   + "WHERE 1=1 "; 
+    // 1. Khởi tạo câu lệnh SQL cơ bản
+    StringBuilder sql = new StringBuilder(
+        "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, " +
+        "u.created_at, u.updated_at " +
+        "FROM customer c " +
+        "LEFT JOIN [user] u ON c.user_id = u.user_id " +
+        "WHERE 1=1 "
+    );
 
-        boolean hasSearch = (searchName != null && !searchName.isBlank());
-        if (hasSearch) {
-            sql += "AND (u.full_name LIKE ? OR u.phone LIKE ? OR c.tax_code LIKE ? OR u.email LIKE ?) ";
+    // 2. Kiểm tra điều kiện và build SQL động
+    boolean hasName = (searchName != null && !searchName.isBlank());
+    boolean hasSdt = (searchSdt != null && !searchSdt.isBlank());
+    boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
+    boolean hasMst = (searchMst != null && !searchMst.isBlank());
+    boolean hasType = (typeCus != null && !typeCus.isBlank());
+
+    if (hasName) {
+        sql.append("AND u.full_name LIKE ? ");
+    }
+    if (hasSdt) {
+        sql.append("AND u.phone LIKE ? ");
+    }
+    if (hasEmail) {
+        sql.append("AND u.email LIKE ? ");
+    }
+    if (hasMst) {
+        sql.append("AND c.tax_code LIKE ? ");
+    }
+    if (hasType) {
+        sql.append("AND c.customer_type = ? ");
+    }
+
+    // 3. Đuôi phân trang cố định
+    sql.append("ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+    int offset = (page - 1) * pageSize;
+
+    try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+        int index = 1;
+
+        // 4. Gán giá trị vào PreparedStatement theo đúng thứ tự đã build ở trên
+        if (hasName) {
+            stm.setString(index++, "%" + searchName.trim() + "%");
+        }
+        if (hasSdt) {
+            stm.setString(index++, "%" + searchSdt.trim() + "%");
+        }
+        if (hasEmail) {
+            stm.setString(index++, "%" + searchEmail.trim() + "%");
+        }
+        if (hasMst) {
+            stm.setString(index++, "%" + searchMst.trim() + "%");
+        }
+        if (hasType) {
+            stm.setString(index++, typeCus.trim());
         }
 
-        if (type != null && !type.isBlank()) {
-            sql += "AND c.customer_type = ? ";
-        }
+        // 5. Gán tham số phân trang luôn ở cuối cùng
+        stm.setInt(index++, offset);
+        stm.setInt(index++, pageSize);
 
-        // 4. Đuôi phân trang cố định
-        sql += "ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"; //DESC
-
-        int offset = (page - 1) * pageSize;
-
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            int index = 1;
-
-            if (hasSearch) {
-                String searchPattern = "%" + searchName.trim() + "%";
-                stm.setString(index++, searchPattern); // u.full_name
-                stm.setString(index++, searchPattern); // u.phone
-                stm.setString(index++, searchPattern); // c.tax_code
-                stm.setString(index++, searchPattern); // u.email
-            }
-
-            // 6. customer_type
-            if (type != null && !type.isBlank()) {
-                stm.setString(index++, type.trim());
-            }
-
-            // 7. Gán tham số phân trang
-            stm.setInt(index++, offset);
-            stm.setInt(index++, pageSize);
-
-            ResultSet rs = stm.executeQuery();
+        // 6. Thực thi truy vấn
+        try (ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
                 list.add(mapCustomer(rs));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            error = "searchAndPaginateCustomers: " + e.getMessage();
         }
-        return list;
+    } catch (Exception e) {
+        e.printStackTrace();
+        error = "searchAndPaginateCustomers: " + e.getMessage();
     }
+    return list;
+}
     
-    public int getTotalCustomersCount(String searchName, String type) {
-        String sql = "SELECT COUNT(*) FROM customer c LEFT JOIN [user] u ON c.user_id = u.user_id WHERE 1=1 ";
+    public int getTotalCustomersCount(String searchName, String searchSdt, String searchEmail, String searchMst,
+            String typeCus) {
 
-        boolean hasSearch = (searchName != null && !searchName.isBlank());
-        if (hasSearch) {
-            sql += "AND (u.full_name LIKE ? OR u.phone LIKE ? OR c.tax_code LIKE ? OR u.email LIKE ?) ";
-        }
-        if (type != null && !type.isBlank()) {
-            sql += "AND c.customer_type = ? ";
-        }
+    // 1. Khởi tạo câu lệnh SQL cơ bản
+    StringBuilder sql = new StringBuilder(
+        "SELECT COUNT(*) "+
+        "FROM customer c " +
+        "LEFT JOIN [user] u ON c.user_id = u.user_id " +
+        "WHERE 1=1 "
+    );
 
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            int index = 1;
-            if (hasSearch) {
-                String searchPattern = "%" + searchName.trim() + "%";
-                stm.setString(index++, searchPattern);
-                stm.setString(index++, searchPattern);
-                stm.setString(index++, searchPattern);
-                stm.setString(index++, searchPattern);
+    // 2. Kiểm tra điều kiện và build SQL động
+    boolean hasName = (searchName != null && !searchName.isBlank());
+    boolean hasSdt = (searchSdt != null && !searchSdt.isBlank());
+    boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
+    boolean hasMst = (searchMst != null && !searchMst.isBlank());
+    boolean hasType = (typeCus != null && !typeCus.isBlank());
+
+    if (hasName) {
+        sql.append("AND u.full_name LIKE ? ");
+    }
+    if (hasSdt) {
+        sql.append("AND u.phone LIKE ? ");
+    }
+    if (hasEmail) {
+        sql.append("AND u.email LIKE ? ");
+    }
+    if (hasMst) {
+        sql.append("AND c.tax_code LIKE ? ");
+    }
+    if (hasType) {
+        sql.append("AND c.customer_type = ? ");
+    }
+
+    try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+        int index = 1;
+
+        // 4. Gán giá trị vào PreparedStatement theo đúng thứ tự đã build ở trên
+        if (hasName) {
+            stm.setString(index++, "%" + searchName.trim() + "%");
+        }
+        if (hasSdt) {
+            stm.setString(index++, "%" + searchSdt.trim() + "%");
+        }
+        if (hasEmail) {
+            stm.setString(index++, "%" + searchEmail.trim() + "%");
+        }
+        if (hasMst) {
+            stm.setString(index++, "%" + searchMst.trim() + "%");
+        }
+        if (hasType) {
+            stm.setString(index++, typeCus.trim());
+        }
+        // 6. Thực thi truy vấn
+        try (ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                return rs.getInt(1);
             }
-            if (type != null && !type.isBlank()) {
-                stm.setString(index++, type.trim());
-            }
-
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return 0;
+    } catch (Exception e) {
+        e.printStackTrace();
+        error = "searchAndPaginateCustomers_Total: " + e.getMessage();
+    }
+    return 0;
     }
 }

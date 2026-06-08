@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import dto.CustomerDTO;
+import utils.*;
 
 import jakarta.servlet.annotation.WebServlet;
 
@@ -24,7 +25,7 @@ public class CustomerListController extends HttpServlet {
         String searchEmail = request.getParameter("searchEmail");
         String searchMst = request.getParameter("searchMst");
         
-        String type = request.getParameter("type");
+        String typeCus = request.getParameter("type");
         String pageRaw = request.getParameter("page");
         
         int page = 1;       // Trang mặc định nếu người dùng mới vào lần đầu
@@ -36,10 +37,10 @@ public class CustomerListController extends HttpServlet {
                 page = 1;
             }
         }
-
+        
         // 2. Gọi Service xử lý gộp Lọc + Phân trang
-        List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, type, page, PAGE_SIZE);
-        int totalPages = customerService.getTotalPages(searchName, type, PAGE_SIZE);
+        List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, searchSdt, searchEmail, searchMst, typeCus, page, PAGE_SIZE);
+        int totalPages = customerService.getTotalPages(searchName, searchSdt, searchEmail, searchMst, typeCus, PAGE_SIZE);
 
         // 3. Đẩy dữ liệu ra trang JSP hiển thị
         request.setAttribute("customers", list);
@@ -53,7 +54,7 @@ public class CustomerListController extends HttpServlet {
         request.setAttribute("searchMst", searchMst);
         
         request.setAttribute("listTypeCus", customerService.getCusTypeList());
-        request.setAttribute("type", type);
+        request.setAttribute("type", typeCus);
 
         request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
     }
