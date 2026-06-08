@@ -46,6 +46,7 @@
                         <th>Status</th>
                         <th>Role</th>
                         <th>Action</th>
+                        <th>Toggle</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -68,6 +69,18 @@
                                     <td>${u.roleName}</td>
                                     <td>
                                         <a href="${pageContext.request.contextPath}/user-detail?id=${u.userId}">View</a>
+                                    </td>
+                                    <td>
+                                        <form action="${pageContext.request.contextPath}/user-list" method="POST" style="display:inline;">
+                                            <input type="hidden" name="userId" value="${u.userId}" />
+                                            <input type="hidden" name="status" value="${u.status}" />
+                                            <button type="submit">
+                                                <c:choose>
+                                                    <c:when test="${u.status == 'ACTIVE'}">Ban</c:when>
+                                                    <c:otherwise>Unban</c:otherwise>
+                                                </c:choose>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             </c:forEach>
