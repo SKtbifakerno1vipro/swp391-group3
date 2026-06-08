@@ -28,8 +28,8 @@ public class EditUserController extends HttpServlet {
                     return;
                 }
                 request.setAttribute("u", u);
-                RoleDAO roleDAO = new RoleDAO();
-                request.setAttribute("roles", roleDAO.getAllRoles());
+
+                request.setAttribute("roles", roleService.getAllRoles());
 
                 request.setAttribute("mode", "edit");
                 request.getRequestDispatcher("/views/user/detail.jsp").forward(request, response);
