@@ -78,48 +78,50 @@
         </div>
 
 
-        <%-- Cấu hình hiển thị --%>
-        <c:set var="windowSize" value="4" />   
-        <c:set var="start" value="${currentPage - windowSize > 1 ? currentPage - windowSize : 1}" />
-        <c:set var="end" value="${currentPage + windowSize < endPage ? currentPage + windowSize : endPage}" />
+        <c:if test="${endPage >0}">
+            <%-- cấu hình hiển thị --%>
+            <c:set var="windowSize" value="2" />   
+            <c:set var="start" value="${currentPage - windowSize > 1 ? currentPage - windowSize : 1}" />
+            <c:set var="end" value="${currentPage + windowSize < endPage ? currentPage + windowSize : endPage}" />
 
-        <div class="d-flex justify-content-center my-3">
-            <div class="btn-group border shadow-sm">
+            <div class="d-flex justify-content-center my-3">
+                <div class="btn-group border shadow-sm">
 
-                <!-- Đầu & Trước -->
-                <a href="user-list?page=1&keyword=${keyword}&roleId=${roleId}&status=${status}" 
-                   class="btn btn-outline-secondary ${currentPage == 1 ? 'disabled' : ''}">&lt;&lt;</a>
+                    <!-- Đầu & Trước (<<) -->
+                    <a href="user-list?page=1&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                       class="btn btn-outline-secondary ${currentPage == 1 ? 'disabled' : ''}">&lt;&lt;</a>
 
-                <a href="user-list?page=${currentPage - 1}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
-                   class="btn btn-outline-secondary ${currentPage == 1 ? 'disabled' : ''}">&lt;</a>
+                    <a href="user-list?page=${currentPage - 1}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                       class="btn btn-outline-secondary ${currentPage == 1 ? 'disabled' : ''}">&lt;</a>
 
-                <!-- Dấu ... đầu -->
-                <c:if test="${start > 1}">
-                    <span class="btn btn-outline-secondary disabled">...</span>
-                </c:if>
+                    <!-- Dấu ... đầu -->
+                    <c:if test="${start > 1}">
+                        <span class="btn btn-outline-secondary disabled">...</span>
+                    </c:if>
 
-                <!-- Các số trang -->
-                <c:forEach begin="${start}" end="${end}" var="i">
-                    <a href="user-list?page=${i}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
-                       class="btn ${currentPage == i ? 'btn-primary' : 'btn-outline-secondary'}">
-                        ${i}
-                    </a>
-                </c:forEach>
+                    <!-- Các số trang -->
+                    <c:forEach begin="${start}" end="${end}" var="i">
+                        <a href="user-list?page=${i}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                           class="btn ${currentPage == i ? 'btn-primary' : 'btn-outline-secondary'}">
+                            ${i}
+                        </a>
+                    </c:forEach>
 
-                <!-- Dấu ... cuối -->
-                <c:if test="${end < endPage}">
-                    <span class="btn btn-outline-secondary disabled">...</span>
-                </c:if>
+                    <!-- Dấu ... cuối -->
+                    <c:if test="${end < endPage}">
+                        <span class="btn btn-outline-secondary disabled">...</span>
+                    </c:if>
 
-                <!-- Sau & Cuối -->
-                <a href="user-list?page=${currentPage + 1}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
-                   class="btn btn-outline-secondary ${currentPage == endPage ? 'disabled' : ''}">&gt;</a>
+                    <!-- Sau & Cuối (>>) -->
+                    <a href="user-list?page=${currentPage + 1}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                       class="btn btn-outline-secondary ${currentPage == endPage ? 'disabled' : ''}">&gt;</a>
 
-                <a href="user-list?page=${endPage}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
-                   class="btn btn-outline-secondary ${currentPage == endPage ? 'disabled' : ''}">&gt;&gt;</a>
+                    <a href="user-list?page=${endPage}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                       class="btn btn-outline-secondary ${currentPage == endPage ? 'disabled' : ''}">&gt;&gt;</a>
 
+                </div>
             </div>
-        </div>
+        </c:if>
 
     </body>
 </html>
