@@ -25,7 +25,10 @@ public class SecurityFilter implements Filter {
     private final String[] ADMIN_PAGE = {
         "user-list", "user-detail", "create-user", "edit-user",
         "role-list", "role-detail", "create-role", "edit-role-permissions",
-        "dashboard","quotation-list"};
+        "dashboard","quotation-list",
+        "customer"
+    
+    };
 
 // 3. Manager (Role 2): Quản lý danh mục, sản phẩm và phê duyệt
     private final String[] MANAGE_PAGE = {

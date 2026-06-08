@@ -20,11 +20,14 @@ public class CustomerListController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String searchName = request.getParameter("searchName");
+        String searchSdt = request.getParameter("searchSdt");
+        String searchEmail = request.getParameter("searchEmail");
+        String searchMst = request.getParameter("searchMst");
+        
         String type = request.getParameter("type");
         String pageRaw = request.getParameter("page");
         
         int page = 1;       // Trang mặc định nếu người dùng mới vào lần đầu
-        int pageSize = 10;  // Hiển thị cố định 10 dòng trên 1 trang
         
         if (pageRaw != null && !pageRaw.isBlank()) {
             try {
@@ -35,8 +38,8 @@ public class CustomerListController extends HttpServlet {
         }
 
         // 2. Gọi Service xử lý gộp Lọc + Phân trang
-        List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, type, page, pageSize);
-        int totalPages = customerService.getTotalPages(searchName, type, pageSize);
+        List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, type, page, PAGE_SIZE);
+        int totalPages = customerService.getTotalPages(searchName, type, PAGE_SIZE);
 
         // 3. Đẩy dữ liệu ra trang JSP hiển thị
         request.setAttribute("customers", list);
@@ -45,6 +48,10 @@ public class CustomerListController extends HttpServlet {
         
         // Bắt buộc giữ lại các từ khóa tìm kiếm để đẩy ngược lại các ô input/select ngoài giao diện JSP
         request.setAttribute("searchName", searchName);
+        request.setAttribute("searchSdt", searchSdt);
+        request.setAttribute("searchEmail", searchEmail);
+        request.setAttribute("searchMst", searchMst);
+        
         request.setAttribute("listTypeCus", customerService.getCusTypeList());
         request.setAttribute("type", type);
 

@@ -40,7 +40,13 @@
                     <td style="border: none; padding: 5px 10px;">
                         <label>Tìm kiếm:</label><br/>
                         <input type="text" name="searchName" value="${searchName}" 
-                               placeholder="Nhập tên, SĐT, email hoặc MST..." style="padding: 5px; width: 250px;"/>
+                               placeholder="Nhập tên..." style="padding: 5px; width: 250px;"/>
+                        <input type="text" name="searchSdt" value="${searchSdt}" 
+                               placeholder="Nhập SĐT..." style="padding: 5px; width: 250px;"/>
+                        <input type="text" name="searchEmail" value="${searchEmail}" 
+                               placeholder="Nhập email..." style="padding: 5px; width: 250px;"/>
+                        <input type="text" name="searchMst" value="${searchMst}" 
+                               placeholder="Nhập mã số thuế..." style="padding: 5px; width: 250px;"/>
                     </td>
 
                     <td style="border: none; padding: 5px 10px; vertical-align: bottom;">
@@ -71,8 +77,8 @@
                     <th>Số điện thoại</th>
                     <th>Mã số thuế</th>
                     <th>Trạng thái</th>
-                    <th>Created At</th>
-                    <th>Updated At</th>
+                    <th>Tạo lúc</th>
+                    <th>Cập nhật gần nhất</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -95,7 +101,7 @@
                         <td>${cust.customer.createdAt}</td>
                         <td>${cust.customer.updatedAt}</td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/customer/edit?id=${cust.customer.customerId}">Edit</a> | 
+                            <a href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customer.customerId}">Detail</a> | 
                             <a href="${pageContext.request.contextPath}/customer-order-list?id=${cust.customer.customerId}">Orders</a>
                         </td>
                     </tr>
