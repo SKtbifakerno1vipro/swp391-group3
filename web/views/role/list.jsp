@@ -18,7 +18,7 @@
                     <th>Created At</th>
                     <th>Updated At</th>
                     <th>Actions</th>
-                    <th>Status</th>
+                   
                 </tr>
             </thead>
             <tbody>
@@ -39,18 +39,8 @@
                         <td>
                             <a href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}">View</a>
                             <a href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}">Permissions</a>
-                                <c:if test= "${role.status eq 'Active'}">
-                                    <a href="${pageContext.request.contextPath}/role-list?deleteId=${role.roleId}">Delete</a>
-
-                                </c:if>
-
-                                <c:if test= "${role.status eq 'Inactive'}">
-                                    <a href="${pageContext.request.contextPath}/role-list?restoreId=${role.roleId}">Restore</a>
-
-                                </c:if>
-                           
                         </td>
-                        <td>${role.status} </td>  
+                        
 
                     </tr>
                 </c:forEach>

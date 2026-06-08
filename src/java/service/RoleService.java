@@ -2,7 +2,7 @@ package service;
 
 import dal.RoleDAO;
 import java.util.List;
-import model.Permission;
+import model.RolePermission;
 import model.Role;
 
 public class RoleService {
@@ -21,7 +21,7 @@ public class RoleService {
         return roleDAO.getRoleDetail(roleId);
     }
 
-    public List<Permission> getAllPermissions() {
+    public List<RolePermission> getAllPermissions() {
         return roleDAO.getAllPermissions();
     }
 
@@ -49,13 +49,4 @@ public class RoleService {
     public boolean isRoleNameExists(String roleName) {
         return roleDAO.isRoleNameExists(roleName);
     }
-
-    public boolean deleteRole(int roleId) {
-        return roleDAO.softDeleteRole(roleId);
-    }
-
-    public boolean restoreRole(int roleId) {
-        return roleDAO.restoreRole(roleId);
-    }
-
 }

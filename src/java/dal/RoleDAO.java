@@ -8,22 +8,19 @@ import model.Role;
 
 public class RoleDAO extends DBContext {
 
-    PreparedStatement stm;
-    ResultSet rs;
-
     public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {
-            String sql = "SELECT role_id, role_name, created_at, updated_at, status FROM role ORDER BY role_id";
-            stm = connection.prepareStatement(sql);
-            rs = stm.executeQuery();
+            String sql = "SELECT role_id, role_name, created_at, updated_at FROM role ORDER BY role_id";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
             while (rs.next()) {
                 Role role = new Role();
                 role.setRoleId(rs.getInt("role_id"));
                 role.setRoleName(rs.getString("role_name"));
                 role.setCreateAt(rs.getTimestamp("created_at"));
                 role.setUpdateAt(rs.getTimestamp("updated_at"));
-                role.setStatus(rs.getString("status"));
+                
                 roles.add(role);
             }
         } catch (Exception e) {
@@ -112,7 +109,7 @@ public class RoleDAO extends DBContext {
                 }
                 int permissionId = rs.getInt("permission_id");
                 if (permissionId > 0) {
-                    model.Permission p = new model.Permission();
+                    model.RolePermission p = new model.RolePermission();
                     p.setPermissionId(permissionId);
                     p.setPermissionName(rs.getString("permission_name"));
                     role.getPermissions().add(p);
@@ -125,14 +122,14 @@ public class RoleDAO extends DBContext {
         return role;
     }
 
-    public java.util.List<model.Permission> getAllPermissions() {
-        java.util.List<model.Permission> list = new java.util.ArrayList<>();
+    public java.util.List<model.RolePermission> getAllPermissions() {
+        java.util.List<model.RolePermission> list = new java.util.ArrayList<>();
         String sql = "SELECT * FROM permission";
         try {
             java.sql.PreparedStatement st = connection.prepareStatement(sql);
             java.sql.ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                model.Permission p = new model.Permission();
+                model.RolePermission p = new model.RolePermission();
                 p.setPermissionId(rs.getInt("permission_id"));
                 p.setPermissionName(rs.getString("permission_name"));
                 list.add(p);
@@ -183,7 +180,7 @@ public class RoleDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null; // TrÃ¡ÂºÂ£ vÃ¡Â»Â null nÃ¡ÂºÂ¿u khÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y role tÃ†Â°Ã†Â¡ng Ã¡Â»Â©ng
+        return null; 
     }
     // end - Xhieu
 
@@ -220,32 +217,6 @@ public class RoleDAO extends DBContext {
         }
 
         return 0;
-    }
-
-    public boolean softDeleteRole(int roleId) {
-        String sql = "UPDATE role SET status='Inactive' WHERE role_id = ?";
-        try {
-            java.sql.PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, roleId);
-            return st.executeUpdate() > 0; 
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean restoreRole(int roleId) {
-        String sql = "UPDATE role SET status='Active' WHERE role_id = ?";
-        try {
-            java.sql.PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, roleId);
-            return st.executeUpdate() > 0; 
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 }
 

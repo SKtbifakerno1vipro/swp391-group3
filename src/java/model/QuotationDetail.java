@@ -6,10 +6,14 @@ public class QuotationDetail {
 
     private int quotationDetailId;
     private int quotationId;
+    private int productId;
     private Integer quantity;
     private BigDecimal sellingPrice;
     private BigDecimal discountPercent;
     private BigDecimal taxPercent;
+    
+    // Field hien thi
+    private String productName;
     private BigDecimal amount;
 
     public QuotationDetail() {
@@ -29,6 +33,14 @@ public class QuotationDetail {
 
     public void setQuotationId(int quotationId) {
         this.quotationId = quotationId;
+    }
+
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 
     public Integer getQuantity() {
@@ -61,6 +73,14 @@ public class QuotationDetail {
 
     public void setTaxPercent(BigDecimal taxPercent) {
         this.taxPercent = taxPercent;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public BigDecimal getAmount() {

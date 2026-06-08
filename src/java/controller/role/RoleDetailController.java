@@ -1,6 +1,6 @@
 package controller.role;
 
-import model.Permission;
+import model.RolePermission;
 import model.Role;
 import service.RoleService;
 import jakarta.servlet.ServletException;
@@ -36,7 +36,7 @@ public class RoleDetailController extends HttpServlet {
                 request.setAttribute("permissionList", roleService.getAllPermissions());
                 Set<Integer> selectedPermissionIds = new HashSet<>();
                 if (role.getPermissions() != null) {
-                    for (Permission p : role.getPermissions()) {
+                    for (RolePermission p : role.getPermissions()) {
                         selectedPermissionIds.add(p.getPermissionId());
                     }
                 }
@@ -76,7 +76,7 @@ public class RoleDetailController extends HttpServlet {
 
                 Set<Integer> selectedPermissionIds = new HashSet<>();
                 if (role.getPermissions() != null) {
-                    for (Permission p : role.getPermissions()) {
+                    for (RolePermission p : role.getPermissions()) {
                         selectedPermissionIds.add(p.getPermissionId());
                     }
                 }
