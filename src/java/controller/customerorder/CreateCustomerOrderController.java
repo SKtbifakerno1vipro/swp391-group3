@@ -1,5 +1,6 @@
 package controller.customerorder;
 
+import controller.product.ProductList;
 import dto.CustomerDTO;
 import model.CustomerOrder;
 import model.CustomerOrderDetail;
@@ -27,7 +28,9 @@ public class CreateCustomerOrderController extends HttpServlet {
     private final CustomerOrderService customerOrderService = new CustomerOrderService();
     private final CustomerService customerService = new CustomerService();
     private final ProductService productService = new ProductService();
-
+    //nguyenkien - begin
+    private final int PAGE_SIZE = 10;
+    //nguyenkien - end
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -60,11 +63,11 @@ public class CreateCustomerOrderController extends HttpServlet {
             }
             // Đếm tổng số sản phẩm đang hoạt động (ACTIVE) để tính tổng số trang
             int totalProducts = productService.countProduct(null, null, "ACTIVE");
-            int totalProductPages = productService.calculateTotalPage(totalProducts);
+            int totalProductPages = productService.calculateTotalPage(totalProducts, PAGE_SIZE);
             productPage = productService.nomalizePage(productPage, totalProductPages);
             // Lấy danh sách sản phẩm cho trang hiện tại
             List<Product> products = productService.searchProduct(null, null, "ACTIVE", totalProducts, productPage,
-                    totalProductPages);
+                    totalProductPages, PAGE_SIZE);
             request.setAttribute("products", products);
             request.setAttribute("currentProductPage", productPage);
             request.setAttribute("totalProductPages", totalProductPages);

@@ -23,6 +23,7 @@ import service.ProductService;
 @WebServlet(name = "ProductList", urlPatterns = {"/product-list"})
 public class ProductList extends HttpServlet {
     private ProductService pService = new ProductService();
+    private final int PAGE_SIZE = 10;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -79,9 +80,9 @@ public class ProductList extends HttpServlet {
             
         request.setAttribute("status", status);
         int totalRow = pService.countProduct(searchText, categoryId, status);
-        totalPage = pService.calculateTotalPage(totalRow);
+        totalPage = pService.calculateTotalPage(totalRow, PAGE_SIZE);
         page = pService.nomalizePage(page, totalPage);
-        request.setAttribute("products", pService.searchProduct(searchText, categoryId, status, totalRow, page, totalPage));
+        request.setAttribute("products", pService.searchProduct(searchText, categoryId, status, totalRow, page, totalPage, PAGE_SIZE));
         request.setAttribute("totalPage", totalPage);
         request.setAttribute("page", page);
         request.setAttribute("totalRow", totalRow);
