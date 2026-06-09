@@ -54,7 +54,7 @@ public class CustomerOrderService {
     
     // -xoa thi nho bao xhieu 
     
-    public int getTotalOrdersCount(int cusId) {
+    public int getTotalOrdersCountByCusId(int cusId) {
         if (cusId <= 0) {
             return 0;
         }
@@ -67,6 +67,10 @@ public class CustomerOrderService {
         }
 
         return customerOrderDAO.getTotalOrdersCountByCusId(cusId);
+    }
+    public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
+        // Chuyển tiếp (forward) tham số và xử lý logic xuống tầng DAO
+        return customerOrderDAO.getListCustomerOrderDTOByCusId(cusId);
     }
     // end
 }

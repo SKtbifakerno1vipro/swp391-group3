@@ -294,23 +294,49 @@ public class CustomerOrderDAO extends DBContext {
     } 
     // Xhieu - begin, xoa nho bao toi
     public int getTotalOrdersCountByCusId(int cusId) {
-    String sql = "SELECT COUNT(*) FROM customer_order co "
+        String sql = "SELECT COUNT(*) FROM customer_order co "
+                   + "JOIN customer c ON co.customer_id = c.customer_id "
+                   + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                   + "WHERE c.customer_id = ? "; 
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, cusId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
+    List<CustomerOrderDTO> list = new ArrayList<>();
+    
+    // Đổi điều kiện WHERE từ lọc theo mã đơn hàng sang lọc theo mã khách hàng (customer_id)
+    String sql = "SELECT co.*, c.tax_code, u.full_name "
+               + "FROM customer_order co "
                + "JOIN customer c ON co.customer_id = c.customer_id "
                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-               + "WHERE c.customer_id = ? "; 
+               + "WHERE co.customer_id = ? "
+               + "ORDER BY co.created_at DESC"; // Sắp xếp đơn hàng mới nhất lên đầu
 
     try (PreparedStatement ps = connection.prepareStatement(sql)) {
         ps.setInt(1, cusId);
         
         try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
+            // Thay đổi từ "if (rs.next())" thành "while (rs.next())" để duyệt qua toàn bộ danh sách đơn hàng
+            while (rs.next()) {
+                list.add(mapResultSetToDTO(rs));
             }
         }
     } catch (Exception e) {
         e.printStackTrace();
     }
-    return 0;
+    return list;
 }
     // Xhieu - end
 }

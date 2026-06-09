@@ -212,10 +212,10 @@ public class CustomerService {
     }
     public List<User> getAllSalesExecutiveUsers() {
 
-        int salesExecutiveRoleId = roleService.getRoleIdByName("Sales Executive");
+        int salesExecutiveRoleId = roleService.getRoleIdByName("Sales Staff");
         
-        if (salesExecutiveRoleId == 0) {
-            salesExecutiveRoleId = 2; // Sales Executive trong DB 
+        if (salesExecutiveRoleId < 0) {
+            salesExecutiveRoleId = 4; // mac dinh
         }
 
         return userService.searchUserFieldsByOR(null, null, null, salesExecutiveRoleId);

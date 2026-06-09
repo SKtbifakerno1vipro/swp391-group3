@@ -98,11 +98,10 @@
                         <td>${cust.user.phone}</td>
                         <td>${cust.customer.taxCode}</td>
                         <td><span>${cust.user.status}</span></td>
-                        <td>${cust.customer.createdAt}</td>
-                        <td>${cust.customer.updatedAt}</td>
+                        <td>${cust.user.formattedCreatedAt}</td>
+                        <td>${cust.user.formattedUpdateAt}</td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customer.customerId}">Detail</a> | 
-                            <a href="${pageContext.request.contextPath}/customer-order-list?id=${cust.customer.customerId}">Orders</a>
+                            <a href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customer.customerId}">Detail</a>
                         </td>
                     </tr>
                 </c:forEach>

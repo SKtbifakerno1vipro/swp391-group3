@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class User {
@@ -124,5 +125,19 @@ public class User {
 
     public void setUpdateAt(LocalDateTime updateAt) {
         this.updateAt = updateAt;
+    }
+    public String getFormattedCreatedAt() {
+        if (this.createAt != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.createAt.format(formatter);
+        }
+        return "";
+    }
+    public String getFormattedUpdateAt() {
+        if (this.updateAt != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.updateAt.format(formatter);
+        }
+        return "";
     }
 }

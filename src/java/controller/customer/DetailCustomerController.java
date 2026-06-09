@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import dto.*;
+import java.util.List;
 import service.*;
 /**
  *
@@ -24,6 +25,7 @@ public class DetailCustomerController extends HttpServlet {
     private final RoleService roleService = new service.RoleService();
     private final UserService userService = new UserService();
     private final CustomerOrderService customerOrderService = new CustomerOrderService();
+    private final QuotationService quotationService = new QuotationService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,7 +33,10 @@ public class DetailCustomerController extends HttpServlet {
         HttpSession session = request.getSession(false);
         int id_cus = Integer.parseInt(request.getParameter("id_cus"));
         CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(id_cus);
-        int totalOrdersCus = customerOrderService.getTotalOrdersCount(id_cus);
+        List<CustomerOrderDTO> listOrdersCus = customerOrderService.getListCustomerOrderDTOByCusId(id_cus);
+        int totalOrdersCus = customerOrderService.getTotalOrdersCountByCusId(id_cus);
+        
+        request.setAttribute("listOrders", listOrdersCus);
         request.setAttribute("totalOrdersCus", totalOrdersCus);
         request.setAttribute("cusDTO", cusDTO);
         request.getRequestDispatcher("/views/customer/customer_detail.jsp").forward(request, response);

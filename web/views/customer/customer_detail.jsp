@@ -344,10 +344,6 @@
                                 </c:when>
                                 <c:otherwise><span class="text-muted" style="font-weight: 400;">Unassigned</span></c:otherwise>
                             </c:choose>
-                            
-                            <c:if test="${sessionScope.user.roleId == 2}">
-                                <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customer.customerId}" style="font-size: 12px; margin-left: 10px; font-weight: 400;">[Re-assign]</a>
-                            </c:if>
                         </div>
                     </div>
                 </div>
@@ -376,19 +372,7 @@
                             <c:choose>
                                 <c:when test="${not empty listQuotations}">
                                     <c:forEach var="q" items="${listQuotations}">
-                                        <tr>
-                                            <td>#${q.quotationId}</td>
-                                            <td>${q.quotationDate}</td>
-                                            <td><span class="badge" style="background-color: #e3f2fd; color: #0d47a1;">${q.quotationStatus}</span></td>
-                                            <td>User ID: ${q.createdBy}</td>
-                                            <td>
-                                                <a href="${pageContext.request.contextPath}/quotation/detail?id=${q.quotationId}" class="btn-action-sm">View Details</a>
-                                                <%-- Nếu Báo giá được ACCEPTED và vai trò là Admin Officer (Role 5), cho phép nhấn nút Tạo Hợp đồng luôn tại đây --%>
-                                                <c:if test="${q.quotationStatus == 'ACCEPTED' && sessionScope.user.roleId == 5}">
-                                                    <a href="${pageContext.request.contextPath}/contract/generate?quotationId=${q.quotationId}" class="btn-action-sm" style="background-color: #28a745; margin-left: 5px;">Generate Contract</a>
-                                                </c:if>
-                                            </td>
-                                        </tr>
+                                        <!-- chua co -->
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
@@ -414,17 +398,7 @@
                             <c:choose>
                                 <c:when test="${not empty listContracts}">
                                     <c:forEach var="c" items="${listContracts}">
-                                        <tr>
-                                            <td><strong>${c.contractNumber}</strong></td>
-                                            <td>${c.contractVersion}</td>
-                                            <td><span class="badge" style="background-color: #fff3cd; color: #856404;">${c.contractStatus}</span></td>
-                                            <td>${c.signedAt != null ? c.signedAt : 'Awaiting signatures'}</td>
-                                            <td>
-                                                <c:if test="${not empty c.contractFileUrl}">
-                                                    <a href="${pageContext.request.contextPath}${c.contractFileUrl}" target="_blank" class="btn-action-sm" style="background-color: #6c757d;">Open PDF File</a>
-                                                </c:if>
-                                            </td>
-                                        </tr>
+                                        <!-- chua co -->
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
@@ -450,10 +424,10 @@
                                 <c:when test="${not empty listOrders}">
                                     <c:forEach var="o" items="${listOrders}">
                                         <tr>
-                                            <td>#${o.customerOrderId}</td>
-                                            <td>${o.createdAt}</td>
-                                            <td><span class="badge" style="background-color: #e2e3e5; color: #383d41;">${o.orderStatus}</span></td>
-                                            <td>User ID: ${o.createdBy}</td>
+                                            <td>#${o.customerOrder.customerOrderId}</td>
+                                            <td>${o.customerOrder.createdAt}</td>
+                                            <td><span class="badge" style="background-color: #e2e3e5; color: #383d41;">${o.customerOrder.orderStatus}</span></td>
+                                            <td>User ID: ${o.customerOrder.createdBy}</td>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
@@ -479,17 +453,7 @@
                         <tbody>
                             <c:choose>
                                 <c:when test="${not empty listBillings}">
-                                    <c:forEach var="b" items="${listBillings}">
-                                        <tr>
-                                            <td>${b.invoiceNo}</td>
-                                            <td>${b.issueDate}</td>
-                                            <td class="text-right" style="font-weight: 600;">
-                                                <fmt:formatNumber value="${b.amount}" type="currency" currencySymbol="" maxFractionDigits="0"/> VND
-                                            </td>
-                                            <td>${b.paymentType}</td>
-                                            <td><span class="badge badge-active">${b.paymentStatus}</span></td>
-                                        </tr>
-                                    </c:forEach>
+                                    <!-- chua co -->
                                 </c:when>
                                 <c:otherwise>
                                     <tr><td colspan="5" class="no-data">No financial statements or payments found.</td></tr>
