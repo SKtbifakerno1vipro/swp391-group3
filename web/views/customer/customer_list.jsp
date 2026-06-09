@@ -129,7 +129,7 @@
                 <%-- Nút Quay lại (<): Nối kèm tham số tìm kiếm cũ --%>
                 <c:choose>
                     <c:when test="${currentPage > 1}">
-                        <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}&searchName=${searchName}&type=${type}">&lt;</a>
+                        <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">&lt;</a>
                     </c:when>
                     <c:otherwise>
                         <span style="color: #999; border: 1px solid #ddd; padding: 5px 10px;">&lt;</span>
@@ -143,7 +143,7 @@
                             <strong>${i}</strong>
                         </c:when>
                         <c:otherwise>
-                            <a href="${pageContext.request.contextPath}/customer/list?page=${i}&searchName=${searchName}&type=${type}">${i}</a>
+                            <a href="${pageContext.request.contextPath}/customer/list?page=${i}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">${i}</a>
                         </c:otherwise>
                     </c:choose>
                 </c:forEach>
@@ -151,7 +151,7 @@
                 <%-- Nút Tiếp theo (>): Nối kèm tham số tìm kiếm cũ --%>
                 <c:choose>
                     <c:when test="${currentPage < totalPages}">
-                        <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}&searchName=${searchName}&type=${type}">&gt;</a>
+                        <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">&gt;</a>
                     </c:when>
                     <c:otherwise>
                         <span style="color: #999; border: 1px solid #ddd; padding: 5px 10px;">&gt;</span>

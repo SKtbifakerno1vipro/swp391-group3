@@ -390,3 +390,140 @@ INSERT INTO stock_transaction (product_id, transaction_type, quantity_in, quanti
 (1, 'INITIAL_STOCK', 500, 0, GETDATE()),
 (2, 'INITIAL_STOCK', 1000, 0, GETDATE());
 GO
+
+
+USE SWP_Sales_Process;
+GO
+
+-- ==========================================================
+-- BƯỚC ĐỆM: CHÈN THÊM DỮ LIỆU ĐỂ TRÁNH LỖI KHÓA NGOẠI (FOREIGN KEY)
+-- ==========================================================
+
+-- 1. Thêm 2 tài khoản User cho khách hàng 4 và 5
+INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, full_name, address, phone, account_status, role_id) VALUES 
+('khachhang_04', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'khach4@gmail.com', 'F', '1993-04-04', N'Hoàng Thị Bốn', N'4 Trần Đại Nghĩa, Hà Nội', '0981000004', 'ACTIVE', 3),
+('khachhang_05', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'khach5@gmail.com', 'M', '1994-05-05', N'Vũ Văn Năm', N'5 Chùa Bộc, Hà Nội', '0981000005', 'ACTIVE', 3);
+
+-- 2. Thêm hồ sơ cho Customer 4 và 5 (Bây giờ hệ thống sẽ có đủ customer_id từ 1 đến 5)
+INSERT INTO customer (tax_code, customer_type, company_name, user_id, assigned_to_user_id) VALUES 
+('0390000004', 'B2C', N'Tiệm Bánh Ngọt Homie', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_04'), (SELECT user_id FROM [user] WHERE user_name = 'sale_01')),
+('0390000005', 'B2B', N'Nhà Hàng Tiệc Cưới Golden', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_05'), (SELECT user_id FROM [user] WHERE user_name = 'sale_02'));
+
+-- 3. Thêm 1 sản phẩm mẫu ID = 5 để khớp với customer_order_detail
+INSERT INTO product (product_name, cost_price, selling_price, description, unit, product_status, reorder_level, quantity_available, updated_by, category_id) VALUES 
+(N'Hộp Phô Mai Tươi', 25000, 38000, N'Phô mai tươi làm bánh kem', N'Hộp', 'ACTIVE', 20, 150, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 3);
+
+-- 4. Thêm 3 báo giá bổ sung cho khớp quy trình tạo hợp đồng
+INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) VALUES 
+(3, GETDATE(), 'ACCEPTED', (SELECT user_id FROM [user] WHERE user_name = 'sale_02')),
+(4, GETDATE(), 'ACCEPTED', (SELECT user_id FROM [user] WHERE user_name = 'sale_01')),
+(5, GETDATE(), 'ACCEPTED', (SELECT user_id FROM [user] WHERE user_name = 'sale_02'));
+
+-- 5. Thêm 3 hợp đồng mẫu (Để hệ thống có đủ customer_contract_id từ 1 đến 5)
+INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, contract_version, created_by) VALUES 
+(3, 3, 'HD-2026-003', '/uploads/HD-003.pdf', 'ACTIVE', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+(4, 4, 'HD-2026-004', '/uploads/HD-004.pdf', 'ACTIVE', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+(5, 5, 'HD-2026-005', '/uploads/HD-005.pdf', 'ACTIVE', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+GO
+
+
+USE SWP_Sales_Process;
+GO
+
+-- Xóa dữ liệu rác cũ nếu có trong 2 bảng này để làm sạch
+DELETE FROM customer_order_detail;
+DELETE FROM customer_order;
+GO
+
+-- ==========================================================
+-- SỬ DỤNG VÒNG LẶP ĐỂ CHÈN ĐỘNG 30 ĐƠN HÀNG KHÔNG LO LỖI ID
+-- ==========================================================
+DECLARE @Loop INT = 1;
+DECLARE @RandomCustomerID INT;
+DECLARE @RandomContractID INT;
+DECLARE @RandomUserID INT;
+DECLARE @RandomProductID INT;
+DECLARE @NewOrderID INT;
+DECLARE @Status VARCHAR(20);
+
+WHILE @Loop <= 30
+BEGIN
+    -- 1. Lấy ngẫu nhiên 1 customer_id và customer_contract_id thuộc về customer đó
+    SELECT TOP 1 @RandomCustomerID = customer_id 
+    FROM customer ORDER BY NEWID();
+
+    -- Tìm hợp đồng của khách hàng đó, nếu khách chưa có hợp đồng thì lấy đại 1 hợp đồng bất kỳ có sẵn
+    SELECT TOP 1 @RandomContractID = customer_contract_id 
+    FROM customer_contract 
+    WHERE customer_id = @RandomCustomerID;
+
+    IF @RandomContractID IS NULL
+    BEGIN
+        SELECT TOP 1 @RandomContractID = customer_contract_id FROM customer_contract ORDER BY NEWID();
+    END
+
+    -- 2. Lấy ngẫu nhiên 1 nhân viên tạo đơn (Role Admin/Manager/Sale...)
+    SELECT TOP 1 @RandomUserID = user_id FROM [user] WHERE role_id IN (1, 2, 4, 5) ORDER BY NEWID();
+
+    -- 3. Gán trạng thái ngẫu nhiên
+    SET @Status = CASE WHEN @Loop % 4 = 0 THEN 'Completed'
+                       WHEN @Loop % 4 = 1 THEN 'Processing'
+                       WHEN @Loop % 4 = 2 THEN 'Pending'
+                       ELSE 'Cancelled' END;
+
+    -- 4. Chèn vào bảng customer_order
+    INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by, created_at)
+    VALUES (
+        @RandomCustomerID, 
+        @RandomContractID, 
+        @Status, 
+        @RandomUserID, 
+        DATEADD(MINUTE, -@Loop * 30, GETDATE())
+    );
+
+    -- Lấy ID của đơn hàng vừa chèn để dùng cho bảng chi tiết
+    SET @NewOrderID = SCOPE_IDENTITY();
+
+    -- 5. Chèn từ 1 đến 2 sản phẩm chi tiết cho đơn hàng này
+    DECLARE @ProdLoop INT = 1;
+    DECLARE @NumOfProducts INT = CASE WHEN @Loop % 3 = 0 THEN 2 ELSE 1 END;
+
+    WHILE @ProdLoop <= @NumOfProducts
+    BEGIN
+        -- Lấy ngẫu nhiên 1 sản phẩm thực tế đang có trong bảng product
+        SELECT TOP 1 
+            @RandomProductID = product_id,
+            @RandomUserID = updated_by -- Tạm mượn biến để đỡ tạo nhiều, thực tế lấy cost/selling price
+        FROM product 
+        WHERE product_id NOT IN (
+            -- Tránh trùng sản phẩm trong cùng 1 đơn hàng
+            SELECT product_id FROM customer_order_detail WHERE customer_order_id = @NewOrderID
+        )
+        ORDER BY NEWID();
+
+        -- Nếu tìm thấy sản phẩm hợp lệ thì chèn vào chi tiết
+        IF @RandomProductID IS NOT NULL
+        BEGIN
+            INSERT INTO customer_order_detail (customer_order_id, product_id, quantity, cost_price, selling_price)
+            SELECT 
+                @NewOrderID, 
+                product_id, 
+                (CASE WHEN @Loop % 2 = 0 THEN 2 ELSE 5 END), -- Số lượng ngẫu nhiên 2 hoặc 5
+                cost_price, 
+                selling_price
+            FROM product 
+            WHERE product_id = @RandomProductID;
+        END
+
+        SET @ProdLoop = @ProdLoop + 1;
+    END
+
+    SET @Loop = @Loop + 1;
+END;
+GO
+
+-- Kiểm tra lại xem đã đủ 30 dòng chưa
+SELECT 'Tổng số đơn hàng' AS [Bảng], COUNT(*) AS [Số lượng] FROM customer_order
+UNION ALL
+SELECT 'Tổng số chi tiết đơn' AS [Bảng], COUNT(*) AS [Số lượng] FROM customer_order_detail;
+GO

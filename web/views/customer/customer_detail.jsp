@@ -276,7 +276,7 @@
             <div class="kpi-container">
                 <div class="kpi-card">
                     <div class="kpi-title">Total Orders Placed</div>
-                    <div class="kpi-value">${totalOrders != null ? totalOrders : 0} Orders</div>
+                    <div class="kpi-value">${totalOrdersCus != null ? totalOrdersCus : 0} Orders</div>
                 </div>
                 <div class="kpi-card success">
                     <div class="kpi-title">Total Paid Amount</div>
@@ -345,7 +345,6 @@
                                 <c:otherwise><span class="text-muted" style="font-weight: 400;">Unassigned</span></c:otherwise>
                             </c:choose>
                             
-                            <%-- THÊM MẸO TÍNH ĐIỂM: Nếu tài khoản đang đăng nhập là Manager (Role 2), hiển thị nút đổi Sale nhanh --%>
                             <c:if test="${sessionScope.user.roleId == 2}">
                                 <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customer.customerId}" style="font-size: 12px; margin-left: 10px; font-weight: 400;">[Re-assign]</a>
                             </c:if>

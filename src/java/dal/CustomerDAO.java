@@ -71,7 +71,7 @@ public class CustomerDAO extends DBContext {
             e.printStackTrace();
             error = "getCustomerIdByTaxCode: " + e.getMessage();
         }
-        return null; // Trả về null nếu không tìm thấy khách hàng nào khớp với mã số thuế này
+        return null;
     }
 
     public boolean updateCustomerDynamic(Customer customer) {

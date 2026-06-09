@@ -291,5 +291,26 @@ public class CustomerOrderDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
+    } 
+    // Xhieu - begin, xoa nho bao toi
+    public int getTotalOrdersCountByCusId(int cusId) {
+    String sql = "SELECT COUNT(*) FROM customer_order co "
+               + "JOIN customer c ON co.customer_id = c.customer_id "
+               + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+               + "WHERE c.customer_id = ? "; 
+
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, cusId);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    return 0;
+}
+    // Xhieu - end
 }
