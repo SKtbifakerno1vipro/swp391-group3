@@ -80,7 +80,7 @@
                                 <td>${p.productStatus}</td>
                                 <td>
                                     <a href="${pageContext.request.contextPath}/product-detail?id=${p.productId}">View</a> |
-                                    <a href="${pageContext.request.contextPath}/product-delete?id=${p.productId}">Delete</a>
+                                    <a href="${pageContext.request.contextPath}/product-list?id=${p.productId}&delete=true&page=${page}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Delete</a>
                                     <br> <c:if test="${errorDelete != null || empty errorDelete}"> ${errorDelete}</c:if>
                                 </td>
                             </tr>
