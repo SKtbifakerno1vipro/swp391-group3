@@ -30,7 +30,7 @@ public class UserListController extends HttpServlet {
             }
         }
 
-        int pageSize = 10; // defaut 10 user one page
+        int pageSize = 2; // defaut 10 user one page
         int pageIndex = 1; //default is page one
 
         String page = request.getParameter("page");

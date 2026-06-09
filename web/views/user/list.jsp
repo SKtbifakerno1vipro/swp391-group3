@@ -91,7 +91,7 @@
         </div>
 
 
-        <c:if test="${endPage >0}">
+        <c:if test="${endPage >1}">
             <%-- cấu hình hiển thị --%>
             <c:set var="windowSize" value="2" />   
             <c:set var="start" value="${currentPage - windowSize > 1 ? currentPage - windowSize : 1}" />
@@ -126,9 +126,10 @@
                     </c:if>
 
                     <!-- Sau & Cuối (>>) -->
-                    <a href="user-list?page=${currentPage + 1}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
-                       class="btn btn-outline-secondary ${currentPage == endPage ? 'disabled' : ''}">&gt;</a>
-
+                    <c:if test="${currentPage <endPage}">
+                        <a href="user-list?page=${currentPage + 1}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                           class="btn btn-outline-secondary ${currentPage == endPage ? 'disabled' : ''}">&gt;</a>
+                    </c:if>
                     <a href="user-list?page=${endPage}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
                        class="btn btn-outline-secondary ${currentPage == endPage ? 'disabled' : ''}">&gt;&gt;</a>
 
