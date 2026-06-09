@@ -22,8 +22,10 @@ import service.ProductService;
  */
 @WebServlet(name = "ProductList", urlPatterns = {"/product-list"})
 public class ProductList extends HttpServlet {
+
     private ProductService pService = new ProductService();
     private final int PAGE_SIZE = 10;
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -63,10 +65,12 @@ public class ProductList extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Category> categories = pService.getAllCategory();
+        String id = request.getParameter("id");
         String sort = request.getParameter("sort");
         String searchText = request.getParameter("searchText");
         String pageRaw = request.getParameter("page");
         String totalPageRaw = request.getParameter("totalPage");
+        String delete = request.getParameter("delete");
         Category c = new Category();
         c.setCategoryId(0);
         c.setCategoryName("All Category");
@@ -74,20 +78,29 @@ public class ProductList extends HttpServlet {
         int categoryId = (request.getParameter("categoryId") == null || request.getParameter("categoryId").isEmpty()) ? 0 : Integer.parseInt(request.getParameter("categoryId"));
         int page = (pageRaw == null || pageRaw.isEmpty()) ? 1 : Integer.parseInt(pageRaw);
         int totalPage = (totalPageRaw == null || totalPageRaw.isEmpty()) ? 1 : Integer.parseInt(totalPageRaw);
-        
-        request.setAttribute("categoryId", categoryId);
-        request.setAttribute("searchText", searchText);
-            
-        request.setAttribute("sort", sort);
         int totalRow = pService.countProduct(searchText, categoryId, "ACTIVE");
         totalPage = pService.calculateTotalPage(totalRow, PAGE_SIZE);
         page = pService.nomalizePage(page, totalPage);
+        if (delete != null && !delete.isEmpty()) {
+            if (id != null && !id.trim().isEmpty()) {
+                try {
+                    int productId = Integer.parseInt(id);
+                    pService.deleteProduct(productId);
+                } catch (NumberFormatException e) {
+                    request.setAttribute("errorDelete", "Can not delete product");
+                }
+            }
+        }
+        request.setAttribute("categoryId", categoryId);
+        request.setAttribute("searchText", searchText);
+        request.setAttribute("sort", sort);
         request.setAttribute("products", pService.searchProduct(searchText, categoryId, sort, "ACTIVE", totalRow, page, totalPage, PAGE_SIZE));
         request.setAttribute("totalPage", totalPage);
         request.setAttribute("page", page);
         request.setAttribute("totalRow", totalRow);
         request.setAttribute("categories", categories);
         request.getRequestDispatcher("/views/product/list.jsp").forward(request, response);
+
     }
 
     /**
