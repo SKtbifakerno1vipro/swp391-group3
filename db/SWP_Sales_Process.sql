@@ -527,3 +527,14 @@ SELECT 'Tổng số đơn hàng' AS [Bảng], COUNT(*) AS [Số lượng] FROM c
 UNION ALL
 SELECT 'Tổng số chi tiết đơn' AS [Bảng], COUNT(*) AS [Số lượng] FROM customer_order_detail;
 GO
+
+select * from [user]
+select * from [Customer]
+UPDATE customer
+SET customer_type = 'LOYAL CUSTOMER'
+WHERE customer_type = 'B2B';
+GO
+
+USE SWP_Sales_Process;
+GO
+

@@ -209,7 +209,8 @@ public class UserDAO extends DBContext {
    
     // da co hash passsword
     public int createUserFullParameter(User user, Connection conn) {
-  
+        System.out.println(user.toString()
+  );
     String sql = "INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, "
                + "full_name, address, phone, account_status, created_at, updated_at, role_id) "
                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?)";
@@ -249,12 +250,8 @@ public class UserDAO extends DBContext {
         // 9. account_status
         stm.setString(9, user.getStatus());
         
-        // 10. role_id
+        // 12. role_id
         stm.setInt(10, user.getRoleId());
-
-            stm.setString(8, user.getStatus());
-
-            stm.setInt(9, user.getRoleId());
 
             int affectedRows = stm.executeUpdate();
 

@@ -140,4 +140,21 @@ public class User {
         }
         return "";
     }
+    
+    @Override
+    public String toString() {
+    return "User{" +
+            "userId=" + userId +
+            ", userName='" + userName + '\'' +
+            ", password='" + password + '\'' +
+            ", email='" + email + '\'' +
+            ", gender='" + gender + '\'' +
+            ", dateBirth=" + dateBirth +
+            ", fullName='" + fullName + '\'' +
+            ", address='" + address + '\'' +
+            ", phone='" + phone + '\'' +
+            ", status='" + status + '\'' +
+            ", roleId=" + roleId +
+            '}';
+}
 }
