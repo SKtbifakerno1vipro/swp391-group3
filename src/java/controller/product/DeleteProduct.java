@@ -70,7 +70,6 @@ public class DeleteProduct extends HttpServlet {
                 if (productService.deleteProduct(productId)) {
                     response.sendRedirect(request.getContextPath() + "/product-list");
                 } else {
-                    
                     request.getRequestDispatcher("/views/product/list.jsp").forward(request, response);
                 }
             } catch (NumberFormatException e) {

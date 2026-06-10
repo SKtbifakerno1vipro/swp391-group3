@@ -16,7 +16,7 @@
     <body>
         <div>
             <h1>Products</h1>
-            
+            <c:if test="${errorDelete != null || empty errorDelete}"> ${errorDelete}</c:if>
             <div><form action="${pageContext.request.contextPath}/product-list" method="get">
                     <table>
                         <tr>
@@ -79,9 +79,9 @@
                                 <td>${p.categoryName}</td>
                                 <td>${p.productStatus}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/product-detail?id=${p.productId}">View</a> |
+                                    <a href="${pageContext.request.contextPath}/edit-product?id=${p.productId}&action=detail">View</a> |
                                     <a href="${pageContext.request.contextPath}/product-list?id=${p.productId}&delete=true&page=${page}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Delete</a>
-                                    <br> <c:if test="${errorDelete != null || empty errorDelete}"> ${errorDelete}</c:if>
+                                    
                                 </td>
                             </tr>
                         </c:forEach>
