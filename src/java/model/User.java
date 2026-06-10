@@ -127,6 +127,39 @@ public class User {
         this.updateAt = updateAt;
     }
 
+    // Xhieu - xoa nho bao toi
+    public String getFormattedCreatedAt() {
+        if (this.createAt != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.createAt.format(formatter);
+        }
+        return "";
+    }
+    public String getFormattedUpdateAt() {
+        if (this.updateAt != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.updateAt.format(formatter);
+        }
+        return "";
+    }
+    
+    @Override
+    public String toString() {
+    return "User{" +
+            "userId=" + userId +
+            ", userName='" + userName + '\'' +
+            ", password='" + password + '\'' +
+            ", email='" + email + '\'' +
+            ", gender='" + gender + '\'' +
+            ", dateBirth=" + dateBirth +
+            ", fullName='" + fullName + '\'' +
+            ", address='" + address + '\'' +
+            ", phone='" + phone + '\'' +
+            ", status='" + status + '\'' +
+            ", roleId=" + roleId +
+            '}';
+    }
+    // Xhieu - end
     public String getCreateTimeString() {
         if (this.getCreateAt() == null) {
             return "N/A";

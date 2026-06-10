@@ -8,7 +8,6 @@ import java.util.Properties;
 public class EmailUtils {
     //thư viện Jakarta Mail API để kết nối với Server SMTP của Google (Gmail) và gửi email đi dưới dạng mã HTML
 
-    // Đổi cấu hình Host và Port sang của Gmail
     private static final String HOSTNAME = "smtp.gmail.com";
     private static final String PORT = "587"; // Cổng TLS của Gmail
     
@@ -52,7 +51,7 @@ public class EmailUtils {
         props.put("mail.smtp.ssl.protocols", "TLSv1.2"); 
         props.put("mail.smtp.starttls.required", "true");
 
-        // Authenticate session with Gmail Server // kiem tra danh tinh khi connect voi gmail
+        // kiem tra danh tinh khi connect voi gmail
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {

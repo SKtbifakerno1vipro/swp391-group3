@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
+import java.util.Arrays;
+import java.util.Map;
 import model.*;
 import service.*;
 import utils.*;
@@ -30,6 +32,7 @@ public class CreateCustomerController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         request.setCharacterEncoding("UTF-8");
         String userName = request.getParameter("username");
         String email = request.getParameter("email");
@@ -101,4 +104,14 @@ public class CreateCustomerController extends HttpServlet {
         }
         request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
+    
+    
+//        System.out.println("--- DANH SÁCH PARAMETERS (LAMBDA) ---");
+//
+//        Map<String, String[]> paramMap = request.getParameterMap();
+//        paramMap.forEach((key, values) -> {
+//            System.out.println(key + " : " + Arrays.toString(values));
+//        });
+//
+//        System.out.println("-------------------------------------");
 }

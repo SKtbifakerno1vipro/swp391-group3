@@ -24,10 +24,12 @@ public class CustomerService {
     }
     // new
     
-    public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String type, int page, int pageSize) {
+    public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String searchSdt, String searchEmail, String searchMst,
+            String typeCus, int page, int pageSize) {
+        
         List<CustomerDTO> dtoList = new ArrayList<>();
 
-        List<Customer> customerList = customerDAO.searchAndPaginateCustomers(searchName, type, page, pageSize);
+        List<Customer> customerList = customerDAO.searchAndPaginateCustomers(searchName,searchSdt,searchEmail,searchMst, typeCus, page, pageSize);
         if (customerList == null || customerList.isEmpty()) {
             return dtoList; 
         }
@@ -48,9 +50,10 @@ public class CustomerService {
         return dtoList;
     }
     // new 
-    public int getTotalPages(String searchName, String type, int pageSize) {
+    public int getTotalPages(String searchName, String searchSdt, String searchEmail, String searchMst,
+            String typeCus, int pageSize) {
         // Gọi hàm đếm tổng số dòng thỏa mãn điều kiện lọc dưới DAO
-        int totalRecords = customerDAO.getTotalCustomersCount(searchName, type);
+        int totalRecords = customerDAO.getTotalCustomersCount(searchName, searchSdt, searchEmail, searchMst, typeCus);
         
         if (totalRecords == 0) return 1;
         
@@ -204,15 +207,15 @@ public class CustomerService {
     public String getLastError() {
         return customerDAO.getLastError();
     }
-    public Customer getCustomerByUserId(int userId) {
+    public Customer getCustomerByCusId(int userId) {
         return customerDAO.getCustomerByCusId(userId);
     }
     public List<User> getAllSalesExecutiveUsers() {
 
-        int salesExecutiveRoleId = roleService.getRoleIdByName("Sales Executive");
+        int salesExecutiveRoleId = roleService.getRoleIdByName("Sales Staff");
         
-        if (salesExecutiveRoleId == 0) {
-            salesExecutiveRoleId = 2; // Sales Executive trong DB 
+        if (salesExecutiveRoleId < 0) {
+            salesExecutiveRoleId = 4; // mac dinh
         }
 
         return userService.searchUserFieldsByOR(null, null, null, salesExecutiveRoleId);
