@@ -98,8 +98,8 @@
                         <td>${cust.user.phone}</td>
                         <td>${cust.customer.taxCode}</td>
                         <td><span>${cust.user.status}</span></td>
-                        <td>${cust.user.formattedCreatedAt}</td>
-                        <td>${cust.user.formattedUpdateAt}</td>
+                        <td>${cust.user.createTimeString}</td>
+                        <td>${cust.user.updateTimeString}</td>
                         <td>
                             <a href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customer.customerId}">Detail</a>
                         </td>
