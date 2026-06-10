@@ -11,17 +11,13 @@ public class UserService {
 
     private final UserDAO userDAO = new UserDAO();
 
-    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword, int offset, int pageIndex) {
+    public List<UserRoleDTO> searchUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail, int pageIndex, int pageSize) {
         //logic
-        return userDAO.searchUsers(roleId, status, keyword, offset, pageIndex);
+        return userDAO.searchUsers(roleId, status, searchName, searchPhone, searchEmail, pageIndex, pageSize);
     }
 
-    public List<UserRoleDTO> getAllUsers() {
-        return userDAO.getAllUsers();
-    }
-
-    public int getTotalUsers(int roleId, String status, String keyword) {
-        return userDAO.getTotalUsers(roleId, status, keyword);
+    public int getTotalUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail) {
+        return userDAO.getTotalUsers( roleId,  status,  searchName,  searchPhone,  searchEmail);
     }
 
     public User getUserById(int id) {
@@ -29,6 +25,7 @@ public class UserService {
     }
 
     public boolean createUser(User user) {
+        user.setStatus("ACTIVE");
         return userDAO.createUser(user);
     }
 
@@ -62,7 +59,7 @@ public class UserService {
     public User getUserByIdFullParameter(int id) {
         return userDAO.getUserByIdFullParameter(id);
     }
-    
+
     // password
     public User checkCorrectEmailAndPhone(String phone, String email) {
         List<User> uList = userDAO.searchUserFieldsByOR(null, null, email.trim(), null);
@@ -79,7 +76,8 @@ public class UserService {
         }
         System.out.println(" tim thay user nhưng ko khop sdt");
         return null;
-    }    
+    }
+
     public List<User> getAllUsersReturnUser() {
         return userDAO.getAllUsersReturnUser();
     }
@@ -95,12 +93,12 @@ public class UserService {
     public Connection getConnection() {
         return userDAO.getConnection(); // Lấy biến connection kế thừa từ DBContext
     }
-    
+
     public String changePassword(int userId, String currentPassword, String newPassword) throws Exception {
-        
+
         User u = getUserByIdFullParameter(userId);
         if (currentPassword != null) { // ko co pass la quen mat khau
-            if (!BCrypt.checkpw(currentPassword, u.getPassword())) {          
+            if (!BCrypt.checkpw(currentPassword, u.getPassword())) {
                 return "Mật khẩu hiện tại không chính xác!";
             }
         }

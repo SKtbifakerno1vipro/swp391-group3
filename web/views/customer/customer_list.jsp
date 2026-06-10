@@ -40,7 +40,13 @@
                     <td style="border: none; padding: 5px 10px;">
                         <label>Tìm kiếm:</label><br/>
                         <input type="text" name="searchName" value="${searchName}" 
-                               placeholder="Nhập tên, SĐT, email hoặc MST..." style="padding: 5px; width: 250px;"/>
+                               placeholder="Nhập tên..." style="padding: 5px; width: 250px;"/>
+                        <input type="text" name="searchSdt" value="${searchSdt}" 
+                               placeholder="Nhập SĐT..." style="padding: 5px; width: 250px;"/>
+                        <input type="text" name="searchEmail" value="${searchEmail}" 
+                               placeholder="Nhập email..." style="padding: 5px; width: 250px;"/>
+                        <input type="text" name="searchMst" value="${searchMst}" 
+                               placeholder="Nhập mã số thuế..." style="padding: 5px; width: 250px;"/>
                     </td>
 
                     <td style="border: none; padding: 5px 10px; vertical-align: bottom;">
@@ -71,8 +77,8 @@
                     <th>Số điện thoại</th>
                     <th>Mã số thuế</th>
                     <th>Trạng thái</th>
-                    <th>Created At</th>
-                    <th>Updated At</th>
+                    <th>Tạo lúc</th>
+                    <th>Cập nhật gần nhất</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -92,11 +98,10 @@
                         <td>${cust.user.phone}</td>
                         <td>${cust.customer.taxCode}</td>
                         <td><span>${cust.user.status}</span></td>
-                        <td>${cust.customer.createdAt}</td>
-                        <td>${cust.customer.updatedAt}</td>
+                        <td>${cust.user.createTimeString}</td>
+                        <td>${cust.user.updateTimeString}</td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/customer/edit?id=${cust.customer.customerId}">Edit</a> | 
-                            <a href="${pageContext.request.contextPath}/customer-order-list?id=${cust.customer.customerId}">Orders</a>
+                            <a href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customer.customerId}">Detail</a>
                         </td>
                     </tr>
                 </c:forEach>
@@ -120,32 +125,32 @@
                     <c:set var="startPage" value="${endPage - 4 < 1 ? 1 : endPage - 4}" />
                 </c:if>
 
-                <%-- Nút Quay lại (<): Nối kèm tham số tìm kiếm cũ --%>
+                <%-- Nút Quay lại (<) --%>
                 <c:choose>
                     <c:when test="${currentPage > 1}">
-                        <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}&searchName=${searchName}&type=${type}">&lt;</a>
+                        <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">&lt;</a>
                     </c:when>
                     <c:otherwise>
                         <span style="color: #999; border: 1px solid #ddd; padding: 5px 10px;">&lt;</span>
                     </c:otherwise>
                 </c:choose>
 
-                <%-- Vòng lặp hiển thị các số trang: Nối kèm tham số tìm kiếm cũ --%>
+                <%-- Vòng lặp hiển thị các số trang: --%>
                 <c:forEach var="i" begin="${startPage}" end="${endPage}">
                     <c:choose>
                         <c:when test="${i == currentPage}">
                             <strong>${i}</strong>
                         </c:when>
                         <c:otherwise>
-                            <a href="${pageContext.request.contextPath}/customer/list?page=${i}&searchName=${searchName}&type=${type}">${i}</a>
+                            <a href="${pageContext.request.contextPath}/customer/list?page=${i}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">${i}</a>
                         </c:otherwise>
                     </c:choose>
                 </c:forEach>
 
-                <%-- Nút Tiếp theo (>): Nối kèm tham số tìm kiếm cũ --%>
+                <%-- Nút Tiếp theo (>) --%>
                 <c:choose>
                     <c:when test="${currentPage < totalPages}">
-                        <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}&searchName=${searchName}&type=${type}">&gt;</a>
+                        <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">&gt;</a>
                     </c:when>
                     <c:otherwise>
                         <span style="color: #999; border: 1px solid #ddd; padding: 5px 10px;">&gt;</span>

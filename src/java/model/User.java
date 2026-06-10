@@ -19,8 +19,26 @@ public class User {
     private LocalDateTime updateAt;
     private Date dateBirth;
     private String address;
+    private int createdBy;
+    private int updatedBy;
 
     public User() {
+    }
+
+    public int getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(int createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public int getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(int updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
     public Date getDateBirth() {

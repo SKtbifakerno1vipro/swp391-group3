@@ -4,10 +4,13 @@ import dal.CustomerOrderDAO;
 import dto.CustomerOrderDTO;
 import java.util.List;
 import model.CustomerContract;
+import service.*;
+import model.*;
 
 public class CustomerOrderService {
 
     private final CustomerOrderDAO customerOrderDAO = new CustomerOrderDAO();
+    private final CustomerService customerService = new CustomerService();
 
     public List<CustomerOrderDTO> getAllCustomerOrders() {
         return customerOrderDAO.getAllCustomerOrders();
@@ -28,7 +31,7 @@ public class CustomerOrderService {
     public List<CustomerContract> getSignedContractsByCustomerId(int customerId) {
         return customerOrderDAO.getContractsByCustomerId(customerId);
     }
-
+    
     public List<CustomerOrderDTO> findbyNameOrTaxcode(String keyword) {
         return customerOrderDAO.getAllCustomerOrdersByName(keyword);
     }
@@ -48,4 +51,26 @@ public class CustomerOrderService {
     public List<CustomerOrderDTO> searchOrdersByPage(String kw, int p, int s) {
         return customerOrderDAO.searchOrdersWithPaging(kw, p, s);
     }
+    
+    // -xoa thi nho bao xhieu 
+    
+    public int getTotalOrdersCountByCusId(int cusId) {
+        if (cusId <= 0) {
+            return 0;
+        }
+
+        // validate xem co khach hang ko
+        Customer customer = customerService.getCustomerByCusId(cusId);
+
+        if (customer == null) {
+            return 0;
+        }
+
+        return customerOrderDAO.getTotalOrdersCountByCusId(cusId);
+    }
+    public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
+        // Chuyển tiếp (forward) tham số và xử lý logic xuống tầng DAO
+        return customerOrderDAO.getListCustomerOrderDTOByCusId(cusId);
+    }
+    // end
 }

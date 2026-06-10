@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import dto.CustomerDTO;
+import utils.*;
 
 import jakarta.servlet.annotation.WebServlet;
 
@@ -15,18 +16,21 @@ import jakarta.servlet.annotation.WebServlet;
 public class CustomerListController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
+    private static final int PAGE_SIZE = 2;
 
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String searchName = request.getParameter("searchName");
-        String type = request.getParameter("type");
+        String searchSdt = request.getParameter("searchSdt");
+        String searchEmail = request.getParameter("searchEmail");
+        String searchMst = request.getParameter("searchMst");
+        
+        String typeCus = request.getParameter("type");
         String pageRaw = request.getParameter("page");
-
-        int page = 1;       // Trang mặc định nếu người dùng mới vào lần đầu
-        int pageSize = 2;  // Hiển thị cố định 10 dòng trên 1 trang
-
+        
+        int page = 1;       // Trang mặc định khi mới vào lần đầu
         if (pageRaw != null && !pageRaw.isBlank()) {
             try {
                 page = Integer.parseInt(pageRaw);
@@ -35,19 +39,58 @@ public class CustomerListController extends HttpServlet {
             }
         }
 
-        // 2. Gọi Service xử lý gộp Lọc + Phân trang
-        List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, type, page, pageSize);
-        int totalPages = customerService.getTotalPages(searchName, type, pageSize);
+        // validate + format / max 150 ki tu
+        String error =
+                Validation.validateInputSearch(searchName, 150);
 
-        // 3. Đẩy dữ liệu ra trang JSP hiển thị
+        if (error == null)
+            error = Validation.validateInputSearch(searchSdt, 20);
+
+        if (error == null)
+            error = Validation.validateInputSearch(searchEmail, 150);
+
+        if (error == null)
+            error = Validation.validateInputSearch(searchMst, 20);
+
+        if (error != null) {
+            request.setAttribute("error", error);
+            request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
+            return;
+        }
+
+        // format bo khoang trang
+        if (searchName != null) {
+            searchName = searchName.trim().replaceAll("\\s+", " ");
+        }
+
+        if (searchSdt != null) {
+            searchSdt = searchSdt.trim().replaceAll("\\s+", " ");
+        }
+
+        if (searchEmail != null) {
+            searchEmail = searchEmail.trim().replaceAll("\\s+", " ");
+        }
+
+        if (searchMst != null) {
+            searchMst = searchMst.trim().replaceAll("\\s+", " ");
+        }
+
+        // loc va phan trang
+        List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, searchSdt, searchEmail,
+                searchMst, typeCus, page, PAGE_SIZE);
+        int totalPages = customerService.getTotalPages(searchName, searchSdt, searchEmail, searchMst, typeCus, PAGE_SIZE);
+
         request.setAttribute("customers", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
 
-        // Bắt buộc giữ lại các từ khóa tìm kiếm để đẩy ngược lại các ô input/select ngoài giao diện JSP
         request.setAttribute("searchName", searchName);
+        request.setAttribute("searchSdt", searchSdt);
+        request.setAttribute("searchEmail", searchEmail);
+        request.setAttribute("searchMst", searchMst);
+        
         request.setAttribute("listTypeCus", customerService.getCusTypeList());
-        request.setAttribute("type", type);
+        request.setAttribute("type", typeCus);
 
         request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
     }

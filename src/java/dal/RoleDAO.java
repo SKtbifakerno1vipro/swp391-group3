@@ -167,7 +167,7 @@ public class RoleDAO extends DBContext {
     }
 
     // begin - Xhieu - contact me wwhen remove
-    public Integer getRoleIdByName(String roleName) {
+    public int getRoleIdByName(String roleName) {
         String sql = "SELECT role_id FROM role WHERE role_name = ?";
 
         try (PreparedStatement stm1 = connection.prepareStatement(sql)) {
@@ -180,7 +180,7 @@ public class RoleDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null; 
+        return 0; 
     }
     // end - Xhieu
 

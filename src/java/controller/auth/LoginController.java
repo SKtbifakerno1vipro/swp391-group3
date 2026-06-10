@@ -32,8 +32,8 @@ public class LoginController extends HttpServlet {
         String password = request.getParameter("password");
 
         User user = userService.login(username, password);
-
         if (user != null) {
+            
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
             response.sendRedirect(request.getContextPath() + "/dashboard");

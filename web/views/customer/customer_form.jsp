@@ -218,14 +218,12 @@
                     </div>
                 </c:if>
 
-                <%-- Username: Edit readonly  Create thì để trống cho nhập --%>
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" class="form-control" 
                            value="${isEdit ? cusDTO.user.userName : ''}" ${isEdit ? 'readonly' : ''} required>
                 </div>
                 
-                <%-- Email: Edit thì readonly và điền dữ liệu, Create thì để trống cho nhập --%>
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" class="form-control" 
@@ -246,7 +244,7 @@
                            value="${isEdit ? cusDTO.user.phone : ''}">
                 </div>
                 
-                <%-- Status: Tự động Selected nếu trùng khớp trạng thái cũ khi Edit --%>
+                <%-- Status --%>
                 <div class="form-group">
                     <label for="status">Status</label>
                     <select id="status" name="status" class="form-control">
@@ -287,7 +285,7 @@
                            value="${isEdit ? cusDTO.customer.companyName : ''}" required>
                 </div>
                 
-                <%-- Customer Type: Xử lý selected động dựa vào biến type --%>
+                <%-- Customer Type--%>
                 <div class="form-group">
                     <label for="customerType">Customer Type</label>
                     <select id="customerType" name="customerType" class="form-control" ${isEdit ? 'required' : ''}> 
@@ -298,7 +296,7 @@
                     </select>
                 </div>
                 
-                <%-- Assigned To: Xử lý selected động dựa vào userId --%>
+                <%-- Assigned To--%>
                 <div class="form-group">
                     <label for="assignedToUserId">Assigned To</label>
                     <select id="assignedToUserId" name="assignedToUserId" class="form-control">
@@ -311,7 +309,7 @@
                     </select>
                 </div>
                 
-                <%-- Nút bấm thay tên chữ hiển thị linh hoạt --%>
+                <%-- --%>
                 <div class="btn-group">
                     <button type="submit" class="btn-submit">${isEdit ? 'Save changes' : 'Create'}</button>
                     <a href="${pageContext.request.contextPath}/customer/list" class="btn-cancel">Cancel</a>
