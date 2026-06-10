@@ -50,8 +50,12 @@ CREATE TABLE [user] (
     account_status VARCHAR(20),
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
+    created_by INT NULL,
+    updated_by INT NULL,
     role_id INT NOT NULL,
-    FOREIGN KEY (role_id) REFERENCES role(role_id)
+    FOREIGN KEY (role_id) REFERENCES role(role_id),
+    FOREIGN KEY (created_by) REFERENCES [user](user_id),
+    FOREIGN KEY (updated_by) REFERENCES [user](user_id)
 );
 GO
 
