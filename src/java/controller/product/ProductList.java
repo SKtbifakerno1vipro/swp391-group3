@@ -91,7 +91,7 @@ public class ProductList extends HttpServlet {
         request.setAttribute("totalRow", totalRow);
         request.setAttribute("categories", categories);
         request.getRequestDispatcher("/views/product/list.jsp").forward(request, response);
-
+        
     }
 
     /**
