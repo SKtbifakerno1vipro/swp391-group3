@@ -203,9 +203,16 @@ public class CustomerDAO extends DBContext {
     boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
     boolean hasMst = (searchMst != null && !searchMst.isBlank());
     boolean hasType = (typeCus != null && !typeCus.isBlank());
-
+    
     if (hasName) {
         sql.append("AND u.full_name LIKE ? ");
+        String strList[] = searchName.split("\\s+");
+        String last ="";
+        for (String string : strList) {
+            last += string;
+            last += " ";
+        }
+        searchName = last;
     }
     if (hasSdt) {
         sql.append("AND u.phone LIKE ? ");

@@ -2,6 +2,15 @@ package utils;
 
 public class Validation {
 
+    public static String validateInputSearch(String str, int max) {
+        if (str == null || str.isBlank()) {
+            return null; // cho phép bỏ trống
+        }
+        if (str.length() > max) {
+            return "Must be at most " + max + " characters long";
+        }
+        return null;
+    }
     public static String validateEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             return "Email không được để trống!";

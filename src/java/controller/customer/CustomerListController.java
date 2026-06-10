@@ -15,7 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 public class CustomerListController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
-    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_SIZE = 2;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -28,7 +28,7 @@ public class CustomerListController extends HttpServlet {
         String typeCus = request.getParameter("type");
         String pageRaw = request.getParameter("page");
         
-        int page = 1;       // Trang mặc định nếu người dùng mới vào lần đầu
+        int page = 1;       // Trang mặc định khi mới vào lần đầu
         
         if (pageRaw != null && !pageRaw.isBlank()) {
             try {
@@ -37,17 +37,52 @@ public class CustomerListController extends HttpServlet {
                 page = 1;
             }
         }
-        
-        // 2. Gọi Service xử lý gộp Lọc + Phân trang
-        List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, searchSdt, searchEmail, searchMst, typeCus, page, PAGE_SIZE);
+
+        // validate + format / max 150 ki tu
+        String error =
+                Validation.validateInputSearch(searchName, 150);
+
+        if (error == null)
+            error = Validation.validateInputSearch(searchSdt, 20);
+
+        if (error == null)
+            error = Validation.validateInputSearch(searchEmail, 150);
+
+        if (error == null)
+            error = Validation.validateInputSearch(searchMst, 20);
+
+        if (error != null) {
+            request.setAttribute("error", error);
+            request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
+            return;
+        }
+
+        // format bo khoang trang
+        if (searchName != null) {
+            searchName = searchName.trim().replaceAll("\\s+", " ");
+        }
+
+        if (searchSdt != null) {
+            searchSdt = searchSdt.trim().replaceAll("\\s+", " ");
+        }
+
+        if (searchEmail != null) {
+            searchEmail = searchEmail.trim().replaceAll("\\s+", " ");
+        }
+
+        if (searchMst != null) {
+            searchMst = searchMst.trim().replaceAll("\\s+", " ");
+        }
+
+        // loc va phan trang
+        List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, searchSdt, searchEmail,
+                searchMst, typeCus, page, PAGE_SIZE);
         int totalPages = customerService.getTotalPages(searchName, searchSdt, searchEmail, searchMst, typeCus, PAGE_SIZE);
 
-        // 3. Đẩy dữ liệu ra trang JSP hiển thị
         request.setAttribute("customers", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
-        
-        // Bắt buộc giữ lại các từ khóa tìm kiếm để đẩy ngược lại các ô input/select ngoài giao diện JSP
+
         request.setAttribute("searchName", searchName);
         request.setAttribute("searchSdt", searchSdt);
         request.setAttribute("searchEmail", searchEmail);

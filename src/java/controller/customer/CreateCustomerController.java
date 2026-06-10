@@ -32,14 +32,7 @@ public class CreateCustomerController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("--- DANH SÁCH PARAMETERS (LAMBDA) ---");
 
-        Map<String, String[]> paramMap = request.getParameterMap();
-        paramMap.forEach((key, values) -> {
-            System.out.println(key + " : " + Arrays.toString(values));
-        });
-
-        System.out.println("-------------------------------------");
         request.setCharacterEncoding("UTF-8");
         String userName = request.getParameter("username");
         String email = request.getParameter("email");
@@ -111,4 +104,14 @@ public class CreateCustomerController extends HttpServlet {
         }
         request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
+    
+    
+//        System.out.println("--- DANH SÁCH PARAMETERS (LAMBDA) ---");
+//
+//        Map<String, String[]> paramMap = request.getParameterMap();
+//        paramMap.forEach((key, values) -> {
+//            System.out.println(key + " : " + Arrays.toString(values));
+//        });
+//
+//        System.out.println("-------------------------------------");
 }

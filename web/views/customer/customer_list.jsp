@@ -125,7 +125,7 @@
                     <c:set var="startPage" value="${endPage - 4 < 1 ? 1 : endPage - 4}" />
                 </c:if>
 
-                <%-- Nút Quay lại (<): Nối kèm tham số tìm kiếm cũ --%>
+                <%-- Nút Quay lại (<) --%>
                 <c:choose>
                     <c:when test="${currentPage > 1}">
                         <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">&lt;</a>
@@ -135,7 +135,7 @@
                     </c:otherwise>
                 </c:choose>
 
-                <%-- Vòng lặp hiển thị các số trang: Nối kèm tham số tìm kiếm cũ --%>
+                <%-- Vòng lặp hiển thị các số trang: --%>
                 <c:forEach var="i" begin="${startPage}" end="${endPage}">
                     <c:choose>
                         <c:when test="${i == currentPage}">
@@ -147,7 +147,7 @@
                     </c:choose>
                 </c:forEach>
 
-                <%-- Nút Tiếp theo (>): Nối kèm tham số tìm kiếm cũ --%>
+                <%-- Nút Tiếp theo (>) --%>
                 <c:choose>
                     <c:when test="${currentPage < totalPages}">
                         <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">&gt;</a>
