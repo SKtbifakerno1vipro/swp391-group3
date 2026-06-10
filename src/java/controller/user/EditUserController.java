@@ -2,7 +2,6 @@ package controller.user;
 
 import service.*;
 import utils.Validation;
-import dal.RoleDAO;
 import model.User;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -10,6 +9,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet(name = "EditUserController", urlPatterns = {"/edit-user"})
 public class EditUserController extends HttpServlet {
@@ -112,7 +112,18 @@ public class EditUserController extends HttpServlet {
             request.getRequestDispatcher(targetJSP).forward(request, response);
             return;
         }
+// Lấy Admin đang đăng nhập từ Session
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
 
+        if (isEdit) {
+            // Nếu là sửa: Chỉ cập nhật người sửa cuối
+            u.setUpdatedBy(currentUser.getUserId());
+        } else {
+            // Nếu là tạo mới: Cả người tạo và người sửa đầu tiên đều là Admin này
+            u.setCreatedBy(currentUser.getUserId());
+            u.setUpdatedBy(currentUser.getUserId());
+        }
         // 4. Lưu vào Database
         boolean success = isEdit ? userService.updateUser(u) : userService.createUser(u);
 

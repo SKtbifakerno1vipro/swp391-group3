@@ -10,8 +10,7 @@
     <body>
 
         <h1>User List</h1>
-        <p>Số lượng users: ${users.size()}</p>
-        <!-- Form tìm kiếm cải tiến -->
+
         <form method="get" action="${pageContext.request.contextPath}/user-list">
             <div style="margin-bottom: 10px;">
                 <input type="text" name="searchName" placeholder="Search by Name..." value="${searchName}">
