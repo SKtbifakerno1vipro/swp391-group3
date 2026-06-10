@@ -46,6 +46,7 @@
                         <th>Status</th>
                         <th>Role</th>
                         <th>Action</th>
+                        <th>Toggle</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,6 +70,18 @@
                                     <td>
                                         <a href="${pageContext.request.contextPath}/user-detail?id=${u.userId}">View</a>
                                     </td>
+                                    <td>
+                                        <form action="${pageContext.request.contextPath}/user-list" method="POST" style="display:inline;">
+                                            <input type="hidden" name="userId" value="${u.userId}" />
+                                            <input type="hidden" name="status" value="${u.status}" />
+                                            <button type="submit">
+                                                <c:choose>
+                                                    <c:when test="${u.status == 'ACTIVE'}">Ban</c:when>
+                                                    <c:otherwise>Unban</c:otherwise>
+                                                </c:choose>
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
                             </c:forEach>
                         </c:otherwise>
@@ -78,25 +91,51 @@
         </div>
 
 
-        <div class="d-flex align-items-center justify-content-end my-3">
-            <span class="me-2">Chuyển đến trang: </span>
+        <c:if test="${endPage >1}">
+            <%-- cấu hình hiển thị --%>
+            <c:set var="windowSize" value="2" />   
+            <c:set var="start" value="${currentPage - windowSize > 1 ? currentPage - windowSize : 1}" />
+            <c:set var="end" value="${currentPage + windowSize < endPage ? currentPage + windowSize : endPage}" />
 
+            <div class="d-flex justify-content-center my-3">
+                <div class="btn-group border shadow-sm">
 
-            <select class="form-select w-auto" onchange="window.location.href = this.value">
+                    <!-- Đầu & Trước (<<) -->
+                    <a href="user-list?page=1&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                       class="btn btn-outline-secondary ${currentPage == 1 ? 'disabled' : ''}">&lt;&lt;</a>
 
+                    <a href="user-list?page=${currentPage - 1}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                       class="btn btn-outline-secondary ${currentPage == 1 ? 'disabled' : ''}">&lt;</a>
 
-                <c:forEach begin="1" end="${endPage}" var="i">
+                    <!-- Dấu ... đầu -->
+                    <c:if test="${start > 1}">
+                        <span class="btn btn-outline-secondary disabled">...</span>
+                    </c:if>
 
-                    <c:set var="pageUrl" value="user-list?page=${i}&keyword=${keyword}&roleId=${roleId}&status=${status}" />
+                    <!-- Các số trang -->
+                    <c:forEach begin="${start}" end="${end}" var="i">
+                        <a href="user-list?page=${i}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                           class="btn ${currentPage == i ? 'btn-primary' : 'btn-outline-secondary'}">
+                            ${i}
+                        </a>
+                    </c:forEach>
 
-                    <option value="${pageUrl}" ${currentPage == i ? 'selected' : ''}>
-                        Page: ${i} 
-                    </option>
+                    <!-- Dấu ... cuối -->
+                    <c:if test="${end < endPage}">
+                        <span class="btn btn-outline-secondary disabled">...</span>
+                    </c:if>
 
-                </c:forEach>
+                    <!-- Sau & Cuối (>>) -->
+                    <c:if test="${currentPage <endPage}">
+                        <a href="user-list?page=${currentPage + 1}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                           class="btn btn-outline-secondary ${currentPage == endPage ? 'disabled' : ''}">&gt;</a>
+                    </c:if>
+                    <a href="user-list?page=${endPage}&keyword=${keyword}&roleId=${roleId}&status=${status}" 
+                       class="btn btn-outline-secondary ${currentPage == endPage ? 'disabled' : ''}">&gt;&gt;</a>
 
-            </select>
-        </div>
+                </div>
+            </div>
+        </c:if>
 
     </body>
 </html>

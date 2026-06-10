@@ -11,20 +11,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import java.util.List;
-import model.Category;
 import service.ProductService;
 
 /**
  *
  * @author ADMIN
  */
-@WebServlet(name = "ProductList", urlPatterns = {"/product-list"})
-public class ProductList extends HttpServlet {
+@WebServlet(name = "DeleteProduct", urlPatterns = {"/product-delete"})
+public class DeleteProduct extends HttpServlet {
 
-    private ProductService pService = new ProductService();
-    private final int PAGE_SIZE = 10;
+    private ProductService productService = new ProductService();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -43,10 +39,10 @@ public class ProductList extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ProductList</title>");
+            out.println("<title>Servlet DeleteProduct</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ProductList at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet DeleteProduct at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -64,43 +60,24 @@ public class ProductList extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Category> categories = pService.getAllCategory();
         String id = request.getParameter("id");
-        String sort = request.getParameter("sort");
-        String searchText = request.getParameter("searchText");
         String pageRaw = request.getParameter("page");
-        String totalPageRaw = request.getParameter("totalPage");
-        String delete = request.getParameter("delete");
-        Category c = new Category();
-        c.setCategoryId(0);
-        c.setCategoryName("All Category");
-        categories.add(0, c);
-        int categoryId = (request.getParameter("categoryId") == null || request.getParameter("categoryId").isEmpty()) ? 0 : Integer.parseInt(request.getParameter("categoryId"));
         int page = (pageRaw == null || pageRaw.isEmpty()) ? 1 : Integer.parseInt(pageRaw);
-        int totalPage = (totalPageRaw == null || totalPageRaw.isEmpty()) ? 1 : Integer.parseInt(totalPageRaw);
-        int totalRow = pService.countProduct(searchText, categoryId, "ACTIVE");
-        totalPage = pService.calculateTotalPage(totalRow, PAGE_SIZE);
-        page = pService.nomalizePage(page, totalPage);
-        if (delete != null && !delete.isEmpty()) {
-            if (id != null && !id.trim().isEmpty()) {
-                try {
-                    int productId = Integer.parseInt(id);
-                    pService.deleteProduct(productId);
-                } catch (NumberFormatException e) {
-                    request.setAttribute("errorDelete", "Can not delete product");
+        
+        if (id != null && !id.trim().isEmpty()) {
+            try {
+                int productId = Integer.parseInt(id);
+                if (productService.deleteProduct(productId)) {
+                    response.sendRedirect(request.getContextPath() + "/product-list");
+                } else {
+                    
+                    request.getRequestDispatcher("/views/product/list.jsp").forward(request, response);
                 }
+            } catch (NumberFormatException e) {
+                
             }
-        }
-        request.setAttribute("categoryId", categoryId);
-        request.setAttribute("searchText", searchText);
-        request.setAttribute("sort", sort);
-        request.setAttribute("products", pService.searchProduct(searchText, categoryId, sort, "ACTIVE", totalRow, page, totalPage, PAGE_SIZE));
-        request.setAttribute("totalPage", totalPage);
-        request.setAttribute("page", page);
-        request.setAttribute("totalRow", totalRow);
-        request.setAttribute("categories", categories);
-        request.getRequestDispatcher("/views/product/list.jsp").forward(request, response);
 
+        }
     }
 
     /**
@@ -114,6 +91,7 @@ public class ProductList extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
     }
 
     /**

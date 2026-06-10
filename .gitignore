@@ -43,8 +43,8 @@ nbproject/private/
 # email
 web/WEB-INF/EmailConfig.properties
 
-# intellij
+# intellij          . la file,   / la folder 
 .idea
 .smarttomcat
 .iml
-.out
+/out/

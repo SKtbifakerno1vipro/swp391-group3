@@ -126,6 +126,8 @@ public class User {
     public void setUpdateAt(LocalDateTime updateAt) {
         this.updateAt = updateAt;
     }
+
+    // Xhieu - xoa nho bao toi
     public String getFormattedCreatedAt() {
         if (this.createAt != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
@@ -156,5 +158,21 @@ public class User {
             ", status='" + status + '\'' +
             ", roleId=" + roleId +
             '}';
-}
+    }
+    // Xhieu - end
+    public String getCreateTimeString() {
+        if (this.getCreateAt() == null) {
+            return "N/A";
+        }
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return this.getCreateAt().format(fmt);
+    }
+
+    public String getUpdateTimeString() {
+        if (this.getUpdateAt() == null) {
+            return "N/A";
+        }
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return this.updateAt.format(fmt);
+    }
 }

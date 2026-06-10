@@ -66,6 +66,15 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Created At:</td>
+                    <td>${u.createTimeString}</td> 
+                </tr>
+                <tr>
+                    <td>Updated At:</td>
+                    <td>${u.updateTimeString}</td> 
+                </tr>
+
+                <tr>
                     <td colspan="2">
                         <c:if test="${mode != 'edit'}"><a href="edit-user?id=${u.userId}&mode=edit">Edit</a> <a href="user-list">Back</a></c:if>
                         <c:if test="${mode == 'edit'}"><button type="submit">Save</button> <a href="user-detail?id=${u.userId}">Cancel</a></c:if>

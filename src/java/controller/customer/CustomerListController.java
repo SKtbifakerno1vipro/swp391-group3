@@ -1,4 +1,5 @@
 package controller.customer;
+
 import service.CustomerService;
 import java.io.IOException;
 import java.util.List;
@@ -17,6 +18,7 @@ public class CustomerListController extends HttpServlet {
     private final CustomerService customerService = new CustomerService();
     private static final int PAGE_SIZE = 2;
 
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -29,7 +31,6 @@ public class CustomerListController extends HttpServlet {
         String pageRaw = request.getParameter("page");
         
         int page = 1;       // Trang mặc định khi mới vào lần đầu
-        
         if (pageRaw != null && !pageRaw.isBlank()) {
             try {
                 page = Integer.parseInt(pageRaw);
@@ -100,9 +101,3 @@ public class CustomerListController extends HttpServlet {
         doGet(request, response);
     }
 }
-
-
-
-
-
-
