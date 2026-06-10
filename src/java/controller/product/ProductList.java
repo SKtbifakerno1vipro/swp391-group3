@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Category;
 import service.ProductService;
+import utils.Validation;
 
 /**
  *
@@ -70,7 +71,6 @@ public class ProductList extends HttpServlet {
         String searchText = request.getParameter("searchText");
         String pageRaw = request.getParameter("page");
         String totalPageRaw = request.getParameter("totalPage");
-        String delete = request.getParameter("delete");
         Category c = new Category();
         c.setCategoryId(0);
         c.setCategoryName("All Category");
@@ -81,16 +81,7 @@ public class ProductList extends HttpServlet {
         int totalRow = pService.countProduct(searchText, categoryId, "ACTIVE");
         totalPage = pService.calculateTotalPage(totalRow, PAGE_SIZE);
         page = pService.nomalizePage(page, totalPage);
-        if (delete != null && !delete.isEmpty()) {
-            if (id != null && !id.trim().isEmpty()) {
-                try {
-                    int productId = Integer.parseInt(id);
-                    pService.deleteProduct(productId);
-                } catch (NumberFormatException e) {
-                    request.setAttribute("errorDelete", "Can not delete product");
-                }
-            }
-        }
+        
         request.setAttribute("categoryId", categoryId);
         request.setAttribute("searchText", searchText);
         request.setAttribute("sort", sort);
@@ -114,6 +105,9 @@ public class ProductList extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+         String id = request.getParameter("id");
+         pService.deleteProduct(Integer.parseInt(id));
+         response.sendRedirect(request.getContextPath() + "/product-list");
     }
 
     /**

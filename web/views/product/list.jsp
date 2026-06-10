@@ -80,7 +80,10 @@
                                 <td>${p.productStatus}</td>
                                 <td>
                                     <a href="${pageContext.request.contextPath}/edit-product?id=${p.productId}&action=detail">View</a> |
-                                    <a href="${pageContext.request.contextPath}/product-list?id=${p.productId}&delete=true&page=${page}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Delete</a>
+                                    <form action="product-list" method="post" style="display: inline">
+                                        <input type="submit" value="Delete">
+                                        <input type="hidden" name="id" value="${p.productId}">
+                                    </form>
                                     
                                 </td>
                             </tr>
