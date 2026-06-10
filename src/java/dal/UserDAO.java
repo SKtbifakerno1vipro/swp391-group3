@@ -354,7 +354,9 @@ public class UserDAO extends DBContext {
     }
 
     public boolean createUser(User u) {
-        String sql = "INSERT INTO [user] (user_name, password_hash, email, full_name,gender, phone, account_status, role_id) VALUES (?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO [user] (user_name, password_hash, email, full_name, gender, phone, "
+                + "account_status, role_id, created_by, updated_by, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, u.getUserName());
@@ -366,7 +368,8 @@ public class UserDAO extends DBContext {
             ps.setString(6, u.getPhone());
             ps.setString(7, u.getStatus());
             ps.setInt(8, u.getRoleId());
-
+            ps.setInt(9, u.getCreatedBy());
+            ps.setInt(10, u.getUpdatedBy());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("createUser" + e.getMessage());
@@ -387,7 +390,9 @@ public class UserDAO extends DBContext {
     public boolean updateUser(User user) {
         try {
 
-            String sql = "UPDATE [user] SET full_name = ?, phone = ?, account_status = ?, gender = ?, role_id=? ,  updated_at = GETDATE() WHERE user_id = ?";
+            String sql = "UPDATE [user] SET full_name = ?, phone = ?, account_status = ?, "
+                    + "gender = ?, role_id = ?, updated_by = ?, updated_at = GETDATE() "
+                    + "WHERE user_id = ?";
 
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1, user.getFullName());
@@ -395,7 +400,8 @@ public class UserDAO extends DBContext {
             stm.setString(3, user.getStatus());
             stm.setString(4, user.getGender());
             stm.setInt(5, user.getRoleId());
-            stm.setInt(6, user.getUserId());
+            stm.setInt(6, user.getUpdatedBy());
+            stm.setInt(7, user.getUserId());
 
             return stm.executeUpdate() > 0;
         } catch (Exception e) {
