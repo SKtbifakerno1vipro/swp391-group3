@@ -90,4 +90,5 @@ public class QuotationDetail {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
+
 }

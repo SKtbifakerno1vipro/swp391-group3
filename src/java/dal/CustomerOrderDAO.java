@@ -9,7 +9,6 @@ import model.Customer;
 import model.User;
 import dto.CustomerOrderDTO;
 import java.sql.Timestamp;
-import model.CustomerContract; 
 
 public class CustomerOrderDAO extends DBContext {
 
@@ -25,7 +24,7 @@ public class CustomerOrderDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
-                
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -177,25 +176,6 @@ public class CustomerOrderDAO extends DBContext {
         return dto;
     }
 
-    public List<CustomerContract> getContractsByCustomerId(int customerId) {
-        List<CustomerContract> list = new ArrayList<>();
-        String sql = "SELECT * FROM customer_contract WHERE customer_id = ? AND contract_status = 'SIGNED'";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, customerId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                CustomerContract cc = new CustomerContract();
-                cc.setContractId(rs.getInt("customer_contract_id"));
-                cc.setContractNumber(rs.getString("contract_number"));
-                cc.setStatus(rs.getString("contract_status"));
-                list.add(cc);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
     public List<CustomerOrderDTO> getAllCustomerOrdersByName(String keyword) {
         List<CustomerOrderDTO> list = new ArrayList<>();
         String sql = "SELECT co.*, c.tax_code, u.full_name "
@@ -291,13 +271,14 @@ public class CustomerOrderDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
-    } 
+    }
+
     // Xhieu - begin, xoa nho bao toi
     public int getTotalOrdersCountByCusId(int cusId) {
         String sql = "SELECT COUNT(*) FROM customer_order co "
-                   + "JOIN customer c ON co.customer_id = c.customer_id "
-                   + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                   + "WHERE c.customer_id = ? "; 
+                + "JOIN customer c ON co.customer_id = c.customer_id "
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "WHERE c.customer_id = ? ";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, cusId);
@@ -312,31 +293,31 @@ public class CustomerOrderDAO extends DBContext {
         }
         return 0;
     }
-    
-    public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
-    List<CustomerOrderDTO> list = new ArrayList<>();
-    
-    // Đổi điều kiện WHERE từ lọc theo mã đơn hàng sang lọc theo mã khách hàng (customer_id)
-    String sql = "SELECT co.*, c.tax_code, u.full_name "
-               + "FROM customer_order co "
-               + "JOIN customer c ON co.customer_id = c.customer_id "
-               + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-               + "WHERE co.customer_id = ? "
-               + "ORDER BY co.created_at DESC"; // Sắp xếp đơn hàng mới nhất lên đầu
 
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        ps.setInt(1, cusId);
-        
-        try (ResultSet rs = ps.executeQuery()) {
-            // Thay đổi từ "if (rs.next())" thành "while (rs.next())" để duyệt qua toàn bộ danh sách đơn hàng
-            while (rs.next()) {
-                list.add(mapResultSetToDTO(rs));
+    public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
+        List<CustomerOrderDTO> list = new ArrayList<>();
+
+        // Đổi điều kiện WHERE từ lọc theo mã đơn hàng sang lọc theo mã khách hàng (customer_id)
+        String sql = "SELECT co.*, c.tax_code, u.full_name "
+                + "FROM customer_order co "
+                + "JOIN customer c ON co.customer_id = c.customer_id "
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "WHERE co.customer_id = ? "
+                + "ORDER BY co.created_at DESC"; // Sắp xếp đơn hàng mới nhất lên đầu
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, cusId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                // Thay đổi từ "if (rs.next())" thành "while (rs.next())" để duyệt qua toàn bộ danh sách đơn hàng
+                while (rs.next()) {
+                    list.add(mapResultSetToDTO(rs));
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
     // Xhieu - end
 }

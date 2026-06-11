@@ -146,17 +146,27 @@ CREATE TABLE customer_contract (
     customer_contract_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_id INT NOT NULL,
     quotation_id INT UNIQUE,
-    contract_number NVARCHAR(100),
+    contract_number NVARCHAR(100) unique,
     contract_file_url NVARCHAR(1000),
     contract_status VARCHAR(50) DEFAULT 'DRAFT',
     contract_version NVARCHAR(50) DEFAULT '1.0.0',
+
     effective_date DATETIME,
 	end_date DATETIME,
+	signed_date DATETIME,    
+
+	contract_content NVARCHAR(MAX),
+    storage_type VARCHAR(10) NOT NULL DEFAULT 'TEXT',
+
     created_by INT,
+	updated_by INT,
     created_at DATETIME DEFAULT GETDATE(),
+	updated_at DATETIME DEFAULT GETDATE(),
+
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
     FOREIGN KEY (quotation_id) REFERENCES quotation(quotation_id),
-    FOREIGN KEY (created_by) REFERENCES [user](user_id)
+    FOREIGN KEY (created_by) REFERENCES [user](user_id),
+	FOREIGN KEY (updated_by) REFERENCES [user](user_id)
 );
 GO
 
@@ -179,6 +189,7 @@ CREATE TABLE contract_edit_history (
     from_status VARCHAR(50),
     to_status VARCHAR(50),
 	contract_version VARCHAR(50),
+	note nvarchar(max),
     changed_by INT,
     created_at DATETIME DEFAULT GETDATE(),
 	PRIMARY KEY(history_id),
@@ -194,7 +205,8 @@ CREATE TABLE contract_revision_item (
 	contract_id INT NOT NULL,
     revision_type NVARCHAR(100) NOT NULL,
     revision_detail NVARCHAR(MAX) NOT NULL,
-    FOREIGN KEY (history_id) REFERENCES contract_edit_history(history_id)
+    FOREIGN KEY (history_id) REFERENCES contract_edit_history(history_id),
+	FOREIGN KEY (contract_id) REFERENCES customer_contract(customer_contract_id)
 );
 
 -- 14. Signature
@@ -302,7 +314,7 @@ GO
 
 -- 2. TẠO TÀI KHOẢN NHÂN VIÊN (Pass: 123 - Mã hóa bcrypt mẫu)
 INSERT INTO [user] (user_name, password_hash, email, gender, full_name, phone, account_status, role_id) VALUES 
-('admin_01', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'admin@bakery.com', 'M', N'Trần Quản Trị', '0901000001', 'ACTIVE', 1),
+('admin_01', '123', 'admin@bakery.com', 'M', N'Trần Quản Trị', '0901000001', 'ACTIVE', 1),
 ('manager_01', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'manager@bakery.com', 'F', N'Lê Quản Lý', '0901000002', 'ACTIVE', 2),
 ('sale_01', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'sale1@bakery.com', 'M', N'Nguyễn Sale Một', '0901000003', 'ACTIVE', 4),
 ('sale_02', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'sale2@bakery.com', 'F', N'Phạm Sale Hai', '0901000004', 'ACTIVE', 4),
