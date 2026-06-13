@@ -21,7 +21,7 @@ public class ForgotPassController extends HttpServlet {
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
     
-    // Hiển thị Form khi gọi GET
+    // Hien thi Form khi goi GET
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -29,7 +29,7 @@ public class ForgotPassController extends HttpServlet {
         request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
     }
 
-    // Xử lý dữ liệu Form gửi lên khi gọi POST
+    // Xu ly du lieu Form gui len khi goi POST
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -41,19 +41,19 @@ public class ForgotPassController extends HttpServlet {
         String phone = request.getParameter("phone");
 
         if ("sendOtp".equals(action)) {
-            // ---- LUỒNG 1: BẤM NÚT GỬI MÃ QUA AJAX ----
+            // ---- LUONG 1: BAM NUT GUI MA QUA AJAX ----
 
-            // CẤU HÌNH ĐẦU RA: Trả về chữ thuần (text) chứ không trả về trang HTML
+            // CAU HINH ĐAU RA: Tra ve chu thuan (text) chu khong tra ve trang HTML
             response.setContentType("text/plain");
             response.setCharacterEncoding("UTF-8");
 
             User u = userService.checkCorrectEmailAndPhone(phone, email); 
 
             if (u != null) {
-                // 2. Tạo mã OTP ngẫu nhiên
+                // 2. Tao ma OTP ngau nhien
                 String otpCode = PasswordUtils.generateRandomText();
 
-                // 3. Lưu OTP và Đối tượng User vào Session để kiểm tra lúc sau
+                // 3. Luu OTP va Đoi tuong User vao Session đe kiem tra luc sau
                 session.setAttribute("recoveryOtp", otpCode);
                 session.setAttribute("userAuth", u);
                 session.setMaxInactiveInterval(5 * 60); // Hết hạn sau 5 phút
@@ -73,13 +73,13 @@ public class ForgotPassController extends HttpServlet {
                                  + "<p style='font-size: 12px; color: #888;'>Trân trọng,<br/>Đội ngũ hỗ trợ kỹ thuật SWP391.</p>"
                                  + "</div>";
 
-                // 4. Gửi email chứa mã OTP cho người dùng
+                // 4. Gui email chua ma OTP cho nguoi dung
 //                boolean isSent = EmailUtils.sendEmail(email, emailSubject, emailBody);
 //
 //                if (isSent) {
 //                    response.getWriter().write("SUCCESS");
 //                } else {
-//                    response.getWriter().write("Không thể gửi Email. Vui lòng thử lại!");
+//                    response.getWriter().write("Khong the gui Email. Vui long thu lai!");
 //                }
             } else {
                 response.getWriter().write("Email hoặc Số điện thoại không khớp với hệ thống!");
@@ -87,18 +87,18 @@ public class ForgotPassController extends HttpServlet {
             return; 
 
         } else if ("resetPassword".equals(action)) {
-            // ---- LUỒNG 2: BẤM NÚT CẬP NHẬT MẬT KHẨU ----
+            // ---- LUONG 2: BAM NUT CAP NHAT MAT KHAU ----
             String userOtp = request.getParameter("otpCode");
             
             String sessionOtp = (String) session.getAttribute("recoveryOtp");
             // test
             userOtp = sessionOtp;
             User sessionUser = (User) session.getAttribute("userAuth");
-            // Kiểm tra mã OTP hợp lệ
+            // Kiem tra ma OTP hop le
             if ( (sessionOtp != null && sessionOtp.equals(userOtp) && email.equals(sessionUser.getEmail()))) {
                 
                 String newPass = PasswordUtils.generateRandomText();
-                // Cập nhật mật khẩu mới vào Database dựa vào Email  sessionUser.getUserId()
+                // Cap nhat mat khau moi vao Database dua vao Email  sessionUser.getUserId()
                 try {
                     String isUpdated = userService.changePassword(sessionUser.getUserId(), null, newPass); // Hàm tự viết ở dưới
                     

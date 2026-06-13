@@ -37,7 +37,7 @@
 
         <script>
             function prepareContent() {
-                // Copy nội dung từ div vào input ẩn trước khi submit
+                // Copy noi dung tu div vao input an truoc khi submit
                 document.getElementById('contractContentInput').value = document.getElementById('contract-body').innerHTML;
             }
         </script>

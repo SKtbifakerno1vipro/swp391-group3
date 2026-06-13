@@ -25,13 +25,13 @@ public class ContractListController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 1. LẤY THAM SỐ TÌM KIẾM
+        // 1. LAY THAM SO TIM KIEM
         String contractNumber = request.getParameter("contractNumber");
         String customerName = request.getParameter("customerName");
         String status = request.getParameter("status");
         String storageType = request.getParameter("storageType");
 
-        // 2. VALIDATE PAGE INDEX (Tránh lỗi NumberFormatException)
+        // 2. VALIDATE PAGE INDEX (Tranh loi NumberFormatException)
         int pageIndex = 1;
         try {
             String pageRaw = request.getParameter("page");
@@ -47,18 +47,18 @@ public class ContractListController extends HttpServlet {
 
         int pageSize = 10;
 
-        // 3. THỰC THI DAO (Đúng thứ tự: lấy pageIndex xong mới search)
+        // 3. THUC THI DAO (Đung thu tu: lay pageIndex xong moi search)
         List<Contract> list = dao.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize);
         int totalRecord = dao.getTotalContracts(contractNumber, customerName, status, storageType);
 
-        // Tính toán trang cuối
+        // Tinh toan trang cuoi
         int endPage = (int) Math.ceil((double) totalRecord / pageSize);
-        // Validate lại pageIndex để không vượt quá trang cuối
+        // Validate lai pageIndex đe khong vuot qua trang cuoi
         if (pageIndex > endPage && endPage > 0) {
             pageIndex = endPage;
         }
 
-        // 4. GIỮ TRẠNG THÁI (State Preservation)
+        // 4. GIU TRANG THAI (State Preservation)
         request.setAttribute("list", list);
         request.setAttribute("endPage", endPage);
         request.setAttribute("currentPage", pageIndex);
@@ -67,7 +67,7 @@ public class ContractListController extends HttpServlet {
         request.setAttribute("status", status);
         request.setAttribute("storageType", storageType);
 
-        // 5. CHUYỂN HƯỚNG TỚI VIEW
+        // 5. CHUYEN HUONG TOI VIEW
         request.getRequestDispatcher("views/contract/list.jsp").forward(request, response);
     }
 

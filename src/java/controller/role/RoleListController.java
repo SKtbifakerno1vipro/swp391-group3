@@ -40,13 +40,13 @@ public class RoleListController extends HttpServlet {
         
         int totalRoles = roleService.countRoles();
         int totalPages = (int) Math.ceil((double) totalRoles / pageSize);
-        // Lấy danh sách theo trang
+        // Lay danh sach theo trang
         List<Role> roleList =roleService.getRolesByPage(page, pageSize);
         
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("searchText", searchText);
-        // Gửi danh sách đã phân trang sang JSP
+        // Gui danh sach đa phan trang sang JSP
         request.setAttribute("roleList", roleList); 
         
        

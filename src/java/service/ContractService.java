@@ -9,13 +9,13 @@ public class ContractService {
 
     public String fillTemplate(Quotation q, Customer cust, List<QuotationDetail> details, String template, Properties config) {
         
-        // 1. Thay thế thông tin Khách hàng (Bên B)
+        // 1. Thay the thong tin Khach hang (Ben B)
         template = template.replace("{customer_name}", cust.getCompanyName() != null ? cust.getCompanyName() : "");
-//        template = template.replace("{customer_address}", cust.getAddress() != null ? cust.getAddress() : "");
-//        template = template.replace("{customer_phone}", cust.getPhone() != null ? cust.getPhone() : "");
+//        template = template.replace("{customer_address}", cust.getAddress() != null D cust.getAddress() : "");
+//        template = template.replace("{customer_phone}", cust.getPhone() != null D cust.getPhone() : "");
         template = template.replace("{customer_tax}", cust.getTaxCode() != null ? cust.getTaxCode() : "");
 
-        // 2. Thay thế thông tin Công ty (Bên A) từ config
+        // 2. Thay the thong tin Cong ty (Ben A) tu config
         template = template.replace("{company_name}", config.getProperty("company_name", "CÔNG TY TNHH ABC"));
         template = template.replace("{company_address}", config.getProperty("company_address", ""));
         template = template.replace("{company_phone}", config.getProperty("company_phone", ""));
@@ -23,7 +23,7 @@ public class ContractService {
         template = template.replace("{company_rep}", config.getProperty("company_rep_name", ""));
         template = template.replace("{company_position}", config.getProperty("company_position", "Giám đốc"));
 
-        // 3. Xử lý danh sách sản phẩm {product_list}
+        // 3. Xu ly danh sach san pham {product_list}
         StringBuilder productRows = new StringBuilder();
         int stt = 1;
         for (QuotationDetail item : details) {
@@ -38,7 +38,7 @@ public class ContractService {
         }
         template = template.replace("{product_list}", productRows.toString());
 
-        // 4. Các thông tin khác
+        // 4. Cac thong tin khac
         template = template.replace("{contract_number}", q.getQuotationId() + "/HĐKT"); // Demo số hợp đồng
         template = template.replace("{sign_date}", java.time.LocalDate.now().toString());
         template = template.replace("{total_amount}", String.format("%,.0f", q.getTotalAmount()));

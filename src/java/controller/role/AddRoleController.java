@@ -18,7 +18,7 @@ public class AddRoleController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy danh sách permissions để hiển thị checkbox
+        // Lay danh sach permissions đe hien thi checkbox
         request.setAttribute("permissionList", roleService.getAllPermissions());
         request.getRequestDispatcher("/views/role/add-role.jsp").forward(request, response);
     }
@@ -29,10 +29,10 @@ public class AddRoleController extends HttpServlet {
         try {
             request.setCharacterEncoding("UTF-8");
 
-            // Lấy role name
+            // Lay role name
             String roleName = request.getParameter("roleName");
 
-            // Lấy danh sách permission IDs từ checkbox
+            // Lay danh sach permission IDs tu checkbox
             String[] permissionIdValues = request.getParameterValues("permissionIds");
             List<Integer> permissionIds = new ArrayList<>();
 
@@ -42,7 +42,7 @@ public class AddRoleController extends HttpServlet {
                 }
             }
 
-            // Validate: Kiểm tra rỗng
+            // Validate: Kiem tra rong
             if (roleName == null || roleName.trim().isEmpty()) {
                 request.setAttribute("error", "Vui lòng nhập tên Role!");
                 request.setAttribute("roleName", roleName);
@@ -53,7 +53,7 @@ public class AddRoleController extends HttpServlet {
 
             roleName = roleName.trim();
 
-            // Validate: Kiểm tra trùng tên
+            // Validate: Kiem tra trung ten
             if (roleService.isRoleNameExists(roleName)) {
                 request.setAttribute("error", "Tên Role này đã tồn tại!");
                 request.setAttribute("roleName", roleName);
@@ -62,11 +62,11 @@ public class AddRoleController extends HttpServlet {
                 return;
             }
 
-            // Tạo role mới và lấy ID
+            // Tao role moi va lay ID
             int newRoleId = roleService.createRole(roleName);
 
             if (newRoleId > 0) {
-                // Thêm permissions cho role vừa tạo
+                // Them permissions cho role vua tao
                 if (!permissionIds.isEmpty()) {
                     roleService.updateRolePermissions(newRoleId, permissionIds);
                 }

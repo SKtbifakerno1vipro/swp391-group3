@@ -190,7 +190,7 @@ public class CustomerOrderDAO extends DBContext {
             ps.setString(2, searchPattern);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                // Tái sử dụng hàm mapResultSetToDTO đã có sẵn trong DAO của bạn
+                // Tai su dung ham mapResultSetToDTO đa co san trong DAO cua ban
                 list.add(mapResultSetToDTO(rs));
             }
         } catch (Exception e) {
@@ -297,7 +297,7 @@ public class CustomerOrderDAO extends DBContext {
     public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
         List<CustomerOrderDTO> list = new ArrayList<>();
 
-        // Đổi điều kiện WHERE từ lọc theo mã đơn hàng sang lọc theo mã khách hàng (customer_id)
+        // Đoi đieu kien WHERE tu loc theo ma đon hang sang loc theo ma khach hang (customer_id)
         String sql = "SELECT co.*, c.tax_code, u.full_name "
                 + "FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
@@ -309,7 +309,7 @@ public class CustomerOrderDAO extends DBContext {
             ps.setInt(1, cusId);
 
             try (ResultSet rs = ps.executeQuery()) {
-                // Thay đổi từ "if (rs.next())" thành "while (rs.next())" để duyệt qua toàn bộ danh sách đơn hàng
+                // Thay đoi tu "if (rs.next())" thanh "while (rs.next())" đe duyet qua toan bo danh sach đon hang
                 while (rs.next()) {
                     list.add(mapResultSetToDTO(rs));
                 }

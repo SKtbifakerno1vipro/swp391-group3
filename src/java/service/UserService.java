@@ -34,13 +34,7 @@ public class UserService {
     }
 
     public User login(String username, String password) {
-        User user = userDAO.login(username, password);
-
-        if (user == null) {
-            user = userDAO.loginTester(username, password);
-        }
-
-        return user;
+        return userDAO.login(username, password);
     }
 
     public boolean isEmailDuplicate(String email, int userId) {
@@ -102,7 +96,7 @@ public class UserService {
                 return "Mật khẩu hiện tại không chính xác!";
             }
         }
-        // 3. Thực hiện cập nhật mật khẩu mới vào DB
+        // 3. Thuc hien cap nhat mat khau moi vao DB
         boolean isUpdateSuccess = userDAO.updatePassword(userId, newPassword);
         if (!isUpdateSuccess) {
             return "Đã xảy ra lỗi hệ thống khi cập nhật dữ liệu. Vui lòng thử lại sau!";

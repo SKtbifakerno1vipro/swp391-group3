@@ -23,7 +23,7 @@ public class EditUserController extends HttpServlet {
         String idStr = request.getParameter("id");
         request.setAttribute("roles", roleService.getAllRoles());
 
-        // Nếu có ID -> Chế độ EDIT -> vào detail.jsp
+        // Neu co ID -> Che đo EDIT -> vao detail.jsp
         if (idStr != null && !idStr.trim().isEmpty()) {
             try {
                 User u = userService.getUserById(Integer.parseInt(idStr));
@@ -57,7 +57,7 @@ public class EditUserController extends HttpServlet {
             u.setUserId(Integer.parseInt(idStr));
         }
 
-        // 1. Lấy dữ liệu chung
+        // 1. Lay du lieu chung
         u.setUserName(request.getParameter("userName"));
         u.setEmail(request.getParameter("email"));
         u.setFullName(request.getParameter("fullName"));
@@ -93,7 +93,7 @@ public class EditUserController extends HttpServlet {
             }
         }
 
-        // Nếu là Create thì check thêm mật khẩu
+        // Neu la Create thi check them mat khau
         String password = request.getParameter("password");
         if (!isEdit && error == null) {
             if (password == null || password.trim().isEmpty()) {
@@ -103,7 +103,7 @@ public class EditUserController extends HttpServlet {
             }
         }
 
-        // 3. Xử lý lỗi (Trả về đúng trang tương ứng)
+        // 3. Xu ly loi (Tra ve đung trang tuong ung)
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("u", u);
@@ -112,19 +112,19 @@ public class EditUserController extends HttpServlet {
             request.getRequestDispatcher(targetJSP).forward(request, response);
             return;
         }
-// Lấy Admin đang đăng nhập từ Session
+// Lay Admin đang đang nhap tu Session
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
 
         if (isEdit) {
-            // Nếu là sửa: Chỉ cập nhật người sửa cuối
+            // Neu la sua: Chi cap nhat nguoi sua cuoi
             u.setUpdatedBy(currentUser.getUserId());
         } else {
-            // Nếu là tạo mới: Cả người tạo và người sửa đầu tiên đều là Admin này
+            // Neu la tao moi: Ca nguoi tao va nguoi sua đau tien đeu la Admin nay
             u.setCreatedBy(currentUser.getUserId());
             u.setUpdatedBy(currentUser.getUserId());
         }
-        // 4. Lưu vào Database
+        // 4. Luu vao Database
         boolean success = isEdit ? userService.updateUser(u) : userService.createUser(u);
 
         if (success) {

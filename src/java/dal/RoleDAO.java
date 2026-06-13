@@ -87,9 +87,9 @@ public class RoleDAO extends DBContext {
 
     public model.Role getRoleDetail(int id) {
         model.Role role = null;
-        //join 1: dùng để lấy danh sách các permission được gán cho role.
-        //join 2: dùng để lấy tên permission từ bảng permission.
-        //dùng left join để ngay cả chưa có quyền vẫn lấy ra được
+        //join 1: dung đe lay danh sach cac permission đuoc gan cho role.
+        //join 2: dung đe lay ten permission tu bang permission.
+        //dung left join đe ngay ca chua co quyen van lay ra đuoc
         String sql = """
                      SELECT r.role_id, r.role_name, r.created_at, r.updated_at,p.permission_id, p.permission_name
                      FROM role r
@@ -146,7 +146,7 @@ public class RoleDAO extends DBContext {
 
     public void updateRolePermissions(int roleId, java.util.List<Integer> permissionIds) {
         try {
-            //chưa lưu ngay vào dtb
+            //chua luu ngay vao dtb
             connection.setAutoCommit(false);
 
             String sqlDelete = "DELETE FROM role_permission WHERE role_id = ?";

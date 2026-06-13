@@ -266,7 +266,7 @@
                     <span style="color: #6c757d; font-size: 14px;">ID: ${cusDTO.customer.customerId} | User ID: ${cusDTO.customer.userId}</span>
                 </div>
                 <div>
-                    <%-- THÊM BẢO VỆ NGHIỆP VỤ: Nếu là Sale Staff thì cho phép bấm nút tạo báo giá nhanh cho riêng khách này --%>
+                    <%-- THEM BAO VE NGHIEP VU: Neu la Sale Staff thi cho phep bam nut tao bao gia nhanh cho rieng khach nay --%>
                     <c:if test="${sessionScope.user.roleId == 4}">
                         <a href="${pageContext.request.contextPath}/quotation/create?customerId=${cusDTO.customer.customerId}" class="btn-edit" style="background-color: #28a745;">+ Quick Quotation</a>
                     </c:if>
@@ -472,19 +472,19 @@
 
         <script>
             function switchTab(event, tabId) {
-                // 1. Ẩn toàn bộ nội dung của các tab đang hiển thị
+                // 1. An toan bo noi dung cua cac tab đang hien thi
                 const tabContents = document.getElementsByClassName("tab-content");
                 for (let i = 0; i < tabContents.length; i++) {
                     tabContents[i].classList.remove("active");
                 }
 
-                // 2. Gỡ bỏ trạng thái active của các nút tab menu cũ
+                // 2. Go bo trang thai active cua cac nut tab menu cu
                 const tabItems = document.getElementsByClassName("tab-item");
                 for (let i = 0; i < tabItems.length; i++) {
                     tabItems[i].classList.remove("active");
                 }
 
-                // 3. Hiển thị nội dung của tab được click và bật trạng thái active cho nút tương ứng
+                // 3. Hien thi noi dung cua tab đuoc click va bat trang thai active cho nut tuong ung
                 document.getElementById(tabId).classList.add("active");
                 event.currentTarget.classList.add("active");
             }

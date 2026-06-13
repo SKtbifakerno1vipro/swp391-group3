@@ -18,32 +18,39 @@ import java.util.List;
 @WebFilter(filterName = "SecurityFilter", urlPatterns = {"/*"})
 public class SecurityFilter implements Filter {
 
-    // Danh sách các trang ai cũng vào được (không cần đăng nhập)
     private static final List<String> PUBLIC_URLS = List.of(
-            "/login", "/logout", "/register", "/forgot-password", "/reset-password"
+            "/login",
+            "/logout",
+            "/register",
+            "/forgot-password",
+            "/reset-password",
+            "/user/password/forgot"
+    );
+
+    private static final List<String> AUTHENTICATED_URLS = List.of(
+            "/dashboard",
+            "/profile",
+            "/user/password/change"
     );
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
         String path = req.getServletPath();
 
-        // 1. Cho phép các file tĩnh (CSS, JS, Hình ảnh) đi qua
-        if (path.contains(".") && !path.endsWith(".jsp")) {
+        if (isStaticResource(path)) {
             chain.doFilter(request, response);
             return;
         }
 
-        // 2. Cho phép các trang Public đi qua
         if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // 3. Kiểm tra đăng nhập
         HttpSession session = req.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
@@ -52,31 +59,44 @@ public class SecurityFilter implements Filter {
             return;
         }
 
-        // 4. Kiểm tra quyền qua Database
-        int roleId = user.getRoleId();
-        
-        // Trang Dashboard, Profile, Change Password mặc định cho phép khi đã đăng nhập
-        if (path.equals("/dashboard") || path.equals("/profile") || path.equals("/change-password")) {
+        if (AUTHENTICATED_URLS.contains(path)) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Lấy danh sách URL được phép từ Database
-        PermissionDAO pDao = new PermissionDAO();
-        List<String> allowedUrls = pDao.getPermissionsByRoleId(roleId);
+        PermissionDAO permissionDAO = new PermissionDAO();
+        List<String> allowedUrls = permissionDAO.getPermissionsByRoleId(user.getRoleId());
 
-        // Kiểm tra quyền
         if (allowedUrls.contains(path)) {
             chain.doFilter(request, response);
         } else {
-            // CÁCH 2: Nếu không có quyền, quay về Dashboard
             res.sendRedirect(req.getContextPath() + "/dashboard");
         }
     }
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
+    private boolean isStaticResource(String path) {
+        return path.startsWith("/assets/")
+                || path.startsWith("/css/")
+                || path.startsWith("/js/")
+                || path.startsWith("/images/")
+                || path.startsWith("/fonts/")
+                || path.endsWith(".css")
+                || path.endsWith(".js")
+                || path.endsWith(".png")
+                || path.endsWith(".jpg")
+                || path.endsWith(".jpeg")
+                || path.endsWith(".gif")
+                || path.endsWith(".svg")
+                || path.endsWith(".ico")
+                || path.endsWith(".woff")
+                || path.endsWith(".woff2");
+    }
 
     @Override
-    public void destroy() {}
+    public void init(FilterConfig filterConfig) throws ServletException {
+    }
+
+    @Override
+    public void destroy() {
+    }
 }

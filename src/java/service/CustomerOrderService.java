@@ -67,7 +67,7 @@ public class CustomerOrderService {
         return customerOrderDAO.getTotalOrdersCountByCusId(cusId);
     }
     public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
-        // Chuyển tiếp (forward) tham số và xử lý logic xuống tầng DAO
+        // Chuyen tiep (forward) tham so va xu ly logic xuong tang DAO
         return customerOrderDAO.getListCustomerOrderDTOByCusId(cusId);
     }
     // end

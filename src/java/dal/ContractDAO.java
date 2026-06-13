@@ -40,13 +40,13 @@ public class ContractDAO extends DBContext {
 
     public List<Contract> searchContracts(String contractNumber, String customerName, String status, String storageType, int pageIndex, int pageSize) {
         List<Contract> list = new ArrayList<>();
-        // 1. SQL: Lấy các trường hành chính và thông tin khách hàng
+        // 1. SQL: Lay cac truong hanh chinh va thong tin khach hang
         String sql = "SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type, "
                 + "c.effective_date, c.end_date, c.created_at, cust.company_name "
                 + "FROM customer_contract c LEFT JOIN customer cust ON c.customer_id = cust.customer_id "
                 + "WHERE 1=1 ";
 
-        // Logic lọc động (4 Filters)
+        // Logic loc đong (4 Filters)
         if (contractNumber != null && !contractNumber.trim().isEmpty()) {
             sql += " AND c.contract_number LIKE ? ";
         }
@@ -88,7 +88,7 @@ public class ContractDAO extends DBContext {
                 c.setStorageType(rs.getString("storage_type"));
                 c.setCustomerName(rs.getString("company_name"));
 
-                // 2. Mapping ngày tháng chính xác (L3 Optimized)
+                // 2. Mapping ngay thang chinh xac (L3 Optimized)
                 if (rs.getTimestamp("effective_date") != null) {
                     c.setEffectiveDate(rs.getTimestamp("effective_date").toLocalDateTime());
                 }
@@ -97,7 +97,7 @@ public class ContractDAO extends DBContext {
                     c.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
                 }
 
-                // Đảm bảo lấy đúng ngày tạo (created_at)
+                // Đam bao lay đung ngay tao (created_at)
                 if (rs.getTimestamp("created_at") != null) {
                     c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 }
@@ -110,7 +110,7 @@ public class ContractDAO extends DBContext {
         return list;
     }
 
-    // Hàm bổ trợ để đếm tổng số bản ghi (phục vụ phân trang)
+    // Ham bo tro đe đem tong so ban ghi (phuc vu phan trang)
     public int getTotalContracts(String contractNumber, String customerName, String status, String storageType) {
         String sql = "SELECT COUNT(*) FROM customer_contract c "
                 + "LEFT JOIN customer cust ON c.customer_id = cust.customer_id "
@@ -172,7 +172,7 @@ public class ContractDAO extends DBContext {
                     c.setContractStatus(rs.getString("contract_status"));
                     c.setContractVersion(rs.getString("contract_version"));
 
-                    // Xử lý các trường thời gian (LocalDateTime)
+                    // Xu ly cac truong thoi gian (LocalDateTime)
                     if (rs.getTimestamp("effective_date") != null) {
                         c.setEffectiveDate(rs.getTimestamp("effective_date").toLocalDateTime());
                     }
@@ -189,7 +189,7 @@ public class ContractDAO extends DBContext {
                         c.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
                     }
 
-                    // Các trường nội dung quan trọng
+                    // Cac truong noi dung quan trong
                     c.setContractContent(rs.getString("contract_content"));
                     c.setStorageType(rs.getString("storage_type"));
                     c.setCreatedBy(rs.getInt("created_by"));
@@ -219,17 +219,17 @@ public class ContractDAO extends DBContext {
                 + "WHERE customer_contract_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            // Nội dung chính
+            // Noi dung chinh
             ps.setString(1, c.getContractContent());
             ps.setString(2, c.getContractStatus());
             ps.setString(3, c.getContractVersion());
 
-            // Xử lý các trường thời gian an toàn (Null safety)
+            // Xu ly cac truong thoi gian an toan (Null safety)
             ps.setTimestamp(4, c.getEffectiveDate() != null ? Timestamp.valueOf(c.getEffectiveDate()) : null);
             ps.setTimestamp(5, c.getEndDate() != null ? Timestamp.valueOf(c.getEndDate()) : null);
             ps.setTimestamp(6, c.getSignDate() != null ? Timestamp.valueOf(c.getSignDate()) : null);
 
-            // Thông tin người sửa & Điều kiện WHERE
+            // Thong tin nguoi sua & Đieu kien WHERE
             ps.setInt(7, c.getUpdatedBy());
             ps.setInt(8, c.getContractId());
 

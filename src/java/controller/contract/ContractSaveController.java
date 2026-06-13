@@ -26,7 +26,7 @@ public class ContractSaveController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Khi người dùng muốn “sửa” hợp đồng đã tồn tại → chuyển tới form edit
+        // Khi nguoi dung muon “sua” hop đong đa ton tai → chuyen toi form edit
         String id = request.getParameter("id");
         if (id != null && !id.isEmpty()) {
             int contractId = Integer.parseInt(id);
@@ -35,7 +35,7 @@ public class ContractSaveController extends HttpServlet {
             request.getRequestDispatcher("views/contract/form.jsp")
                    .forward(request, response);
         } else {
-            // không có id → chuyển về danh sách
+            // khong co id → chuyen ve danh sach
             response.sendRedirect("contract-list");
         }
     }
@@ -44,14 +44,14 @@ public class ContractSaveController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         /*
-         *  Đầu vào:  quotationId (được truyền từ form “Tạo hợp đồng”)
-         *  Quy trình:
-         *  1. Lấy Quotation, Customer và chi tiết sản phẩm.
-         *  2. Đọc file config.properties (các thông tin Bên A).
-         *  3. Đọc template HTML.
-         *  4. Gán dữ liệu → html cuối cùng.
-         *  5. Lưu vào bảng customer_contract.
-         *  6. Chuyển về chi tiết hoặc danh sách.
+         *  Đau vao:  quotationId (đuoc truyen tu form “Tao hop đong”)
+         *  Quy trinh:
+         *  1. Lay Quotation, Customer va chi tiet san pham.
+         *  2. Đoc file config.properties (cac thong tin Ben A).
+         *  3. Đoc template HTML.
+         *  4. Gan du lieu → html cuoi cung.
+         *  5. Luu vao bang customer_contract.
+         *  6. Chuyen ve chi tiet hoac danh sach.
          */
 
         request.setCharacterEncoding("UTF-8");
@@ -62,12 +62,12 @@ public class ContractSaveController extends HttpServlet {
         }
         int quotationId = Integer.parseInt(quotationIdStr);
 
-        // 1. Lấy dữ liệu liên quan
+        // 1. Lay du lieu lien quan
         Quotation quotation = quotationDAO.getQuotationById(quotationId);
         Customer customer = customerDAO.getCustomerByCusId(quotation.getCustomerId());
         List<QuotationDetail> details = null;
 
-        // 2. Đọc file config.properties (đặt trong WEB-INF)
+        // 2. Đoc file config.properties (đat trong WEB-INF)
         Properties config = new Properties();
         try (InputStream is = getServletContext()
                 .getResourceAsStream("/WEB-INF/config.properties")) {
@@ -76,16 +76,16 @@ public class ContractSaveController extends HttpServlet {
             }
         }
 
-        // 3. Đọc template HTML
+        // 3. Đoc template HTML
         String templatePath = getServletContext()
                 .getRealPath("/WEB-INF/views/contract/ContractTemplate.html");
         String template = new String(Files.readAllBytes(Paths.get(templatePath)), "UTF-8");
 
-        // 4. Tạo nội dung hợp đồng
+        // 4. Tao noi dung hop đong
         String contractHtml = contractService.fillTemplate(
                 quotation, customer, details, template, config);
 
-        // 5. Tạo đối tượng Contract và lưu vào DB
+        // 5. Tao đoi tuong Contract va luu vao DB
         Contract contract = new Contract();
         contract.setCustomerId(customer.getCustomerId());
         contract.setQuotationId(quotationId);
@@ -94,11 +94,11 @@ public class ContractSaveController extends HttpServlet {
         contract.setStorageType("TEXT");
         contract.setContractContent(contractHtml);
         contract.setCreatedBy( /* ID người hiện tại, ví dụ lấy từ session */ 1 );
-        // các trường ngày, version … nếu cần có thể set ở đây
+        // cac truong ngay, version … neu can co the set o đay
 
         int contractId = contractDAO.insert(contract); // trả về PK mới tạo
 
-        // 6. Chuyển hướng tới chi tiết hợp đồng (hoặc danh sách)
+        // 6. Chuyen huong toi chi tiet hop đong (hoac danh sach)
         if (contractId > 0) {
             response.sendRedirect("contract-detail?id=" + contractId);
         } else {

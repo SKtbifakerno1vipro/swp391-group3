@@ -4,12 +4,12 @@ import java.security.SecureRandom;
 
 public class PasswordUtils {
 
-    // Chuỗi ký tự dùng để sinh mật khẩu ngẫu nhiên
+    // Chuoi ky tu dung đe sinh mat khau ngau nhien
     private static final String ALPHA_NUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                               + "abcdefghijklmnopqrstuvwxyz"
                                               + "0123456789";
     
-    // Sử dụng SecureRandom thay vì Random thông thường để tăng tính bảo mật mã hóa
+    // Su dung SecureRandom thay vi Random thong thuong đe tang tinh bao mat ma hoa
     private static final SecureRandom random = new SecureRandom();
 
     public static String generateRandomText() {
