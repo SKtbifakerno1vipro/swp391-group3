@@ -11,7 +11,7 @@
         <form action="quotation-list" method="GET">
             Customer Name:
             <input type="text" name="search" value="${searchText}" placeholder="Enter customer name">
-            
+
             Status:
             <select name="status">
                 <option value="">-- Status --</option>
@@ -23,7 +23,7 @@
             <button type="submit">Search</button>
             <a href="quotation-list"><button type="button">Reset</button></a>
         </form>
-        
+
         <table border="1" cellpadding="7" cellspacing="0" style="margin-top: 20px; width: 100%;">
             <thead>
                 <tr>
@@ -43,7 +43,7 @@
                         <td colspan="7" style="text-align: center;">No quotations found.</td>
                     </tr>
                 </c:if>
-                
+
                 <%-- Vòng lặp hiển thị từng báo giá --%>
                 <c:forEach items="${quotationList}" var="quotation">
                     <tr>
@@ -55,6 +55,15 @@
                         <td>${quotation.createdAt}</td>
                         <td>
                             <a href="quotation-detail?id=${quotation.quotationId}">view</a>
+                        </td>
+                        <td>
+                            <a href="quotation-detail?id=${quotation.quotationId}">view</a>
+
+                            <%-- Chỉ hiện nút Tạo hợp đồng nếu trạng thái là ACCEPTED --%>
+                            <c:if test="${quotation.quotationStatus == 'ACCEPTED'}">
+                                | <a href="contract-save?quotationId=${quotation.quotationId}" 
+                                     style="color: green; font-weight: bold;">Tạo Hợp đồng</a>
+                            </c:if>
                         </td>
                     </tr>
                 </c:forEach>

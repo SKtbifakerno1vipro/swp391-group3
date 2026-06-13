@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet(urlPatterns = {"/contract-save"})   // URL sẽ gọi tới servlet này
+@WebServlet(urlPatterns = {"/contract-save"})   
 public class ContractSaveController extends HttpServlet {
 
     private final ContractDAO contractDAO = new ContractDAO();
