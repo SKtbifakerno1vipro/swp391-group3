@@ -51,7 +51,6 @@ public class AddRoleController extends HttpServlet {
                 return;
             }
 
-            // Chuẩn hóa
             roleName = roleName.trim();
 
             // Validate: Kiểm tra trùng tên

@@ -390,3 +390,76 @@ INSERT INTO stock_transaction (product_id, transaction_type, quantity_in, quanti
 (1, 'INITIAL_STOCK', 500, 0, GETDATE()),
 (2, 'INITIAL_STOCK', 1000, 0, GETDATE());
 GO
+
+
+--phân quyền trang
+
+-- 1. Đảm bảo cấu trúc bảng chuẩn
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('permission') AND name = 'url_pattern')
+BEGIN
+    ALTER TABLE permission ADD url_pattern NVARCHAR(255);
+END
+GO
+
+-- 2. Đảm bảo có Role "Sales Executive" để tránh lỗi NullPointerException ở trang Customer
+IF NOT EXISTS (SELECT 1 FROM role WHERE role_name = 'Sales Executive')
+BEGIN
+    INSERT INTO role (role_name) VALUES ('Sales Executive');
+END
+GO
+
+-- 3. Xóa dữ liệu cũ để nạp lại bản chuẩn khớp 100% với Code Java hiện tại
+DELETE FROM role_permission;
+DELETE FROM permission;
+DBCC CHECKIDENT ('permission', RESEED, 0);
+GO
+
+-- 4. Nạp danh sách Permission (Dựa chính xác trên @WebServlet trong code của bạn)
+INSERT INTO permission (permission_name, url_pattern) VALUES 
+('View Dashboard', '/dashboard'),
+('Change Password', '/user/password/change'),
+
+-- Nhóm Category (Sửa từ dấu - sang dấu / để khớp code Java)
+('Create Category', '/category/create'),
+('Edit Category', '/category/edit'),
+('Delete Category', '/category/delete'),
+
+-- Nhóm Customer (Sửa từ dấu - sang dấu / để khớp code Java)
+('View Customer List', '/customer/list'),
+('Create Customer', '/customer/create'),
+('Edit Customer', '/customer/edit'),
+
+-- Nhóm User Management
+('View User List', '/user-list'),
+('View User Detail', '/user-detail'),
+('Create User', '/create-user'),
+('Edit User', '/edit-user'),
+
+-- Nhóm Role Management
+('View Role List', '/role-list'),
+('View Role Detail', '/role-detail'),
+('Add Role', '/add-role'),
+('Edit Role Permissions', '/edit-role-permissions'),
+
+-- Nhóm Order & Invoice
+('View Order List', '/customer-order-list'),
+('View Order Detail', '/customer-order-detail'),
+('Create Order', '/create-customer-order'),
+('Issue Invoice', '/Invoice'), -- Lưu ý chữ I viết hoa theo code Java
+
+-- Nhóm Quotation & Product
+('View Quotation List', '/quotation-list'),
+('Create Quotation', '/create-quotation'),
+('View Product List', '/product-list'),
+('Edit Product', '/product-edit');
+GO
+
+-- 5. CẤP TOÀN BỘ QUYỀN TRÊN CHO ADMIN (ROLE 1)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 1, permission_id FROM permission;
+GO
+
+-- 6. Kiểm tra lại kết quả
+SELECT p.permission_id, p.permission_name, p.url_pattern 
+FROM permission p
+ORDER BY p.permission_id;

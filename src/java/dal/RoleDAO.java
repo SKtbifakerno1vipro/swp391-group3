@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import model.Quotation;
 import model.Role;
 
 public class RoleDAO extends DBContext {
@@ -20,7 +21,7 @@ public class RoleDAO extends DBContext {
                 role.setRoleName(rs.getString("role_name"));
                 role.setCreateAt(rs.getTimestamp("created_at"));
                 role.setUpdateAt(rs.getTimestamp("updated_at"));
-                
+
                 roles.add(role);
             }
         } catch (Exception e) {
@@ -86,6 +87,9 @@ public class RoleDAO extends DBContext {
 
     public model.Role getRoleDetail(int id) {
         model.Role role = null;
+        //join 1: dùng để lấy danh sách các permission được gán cho role.
+        //join 2: dùng để lấy tên permission từ bảng permission.
+        //dùng left join để ngay cả chưa có quyền vẫn lấy ra được
         String sql = """
                      SELECT r.role_id, r.role_name, r.created_at, r.updated_at,p.permission_id, p.permission_name
                      FROM role r
@@ -142,6 +146,7 @@ public class RoleDAO extends DBContext {
 
     public void updateRolePermissions(int roleId, java.util.List<Integer> permissionIds) {
         try {
+            //chưa lưu ngay vào dtb
             connection.setAutoCommit(false);
 
             String sqlDelete = "DELETE FROM role_permission WHERE role_id = ?";
@@ -180,7 +185,7 @@ public class RoleDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null; 
+        return null;
     }
     // end - Xhieu
 
@@ -200,23 +205,87 @@ public class RoleDAO extends DBContext {
         return false;
     }
 
-    public int countUsersByRoleId(int roleId) {
-        String sql = "SELECT COUNT(*) FROM [user] WHERE role_id = ?";
+    public List<Role> searchRole(String searchText) {
+        List<Role> list = new ArrayList<>();
+        String sql = "SELECT role_id, role_name, created_at, updated_at FROM role "
+                + "WHERE 1=1 "; // Có dấu cách ở cuối
+
+        if (searchText != null && !searchText.trim().isEmpty()) {
+            sql += "AND role_name LIKE ?";
+        }
+        sql += " ORDER BY role.created_at DESC";
 
         try {
-            java.sql.PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, roleId);
-            java.sql.ResultSet rs = st.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1);
+            PreparedStatement ps = connection.prepareStatement(sql);
+            if (searchText != null && !searchText.trim().isEmpty()) {
+                ps.setString(1, "%" + searchText.trim() + "%");
             }
-        } catch (java.sql.SQLException e) {
-            System.out.println("RoleDAO countUsersByRoleId error:");
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Role role = new Role();
+                // lay toan bo cac cot de hien thi len bang
+                role.setRoleId(rs.getInt("role_id"));
+                role.setRoleName(rs.getString("role_name"));
+                role.setCreateAt(rs.getTimestamp("created_at"));
+                role.setUpdateAt(rs.getTimestamp("updated_at"));
+
+                list.add(role);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Role> getrolesByPage(int page, int pageSize) {
+        List<Role> list = new ArrayList<>();
+
+        String sql = """
+             SELECT role_id, role_name, created_at, updated_at 
+             FROM role 
+             ORDER BY role_id 
+             OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+             """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            int offset = (page - 1) * pageSize;
+
+            ps.setInt(1, offset);
+            ps.setInt(2, pageSize);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Role role = new Role();
+                role.setRoleId(rs.getInt("role_id"));
+                role.setRoleName(rs.getString("role_name"));
+                role.setCreateAt(rs.getTimestamp("created_at"));
+                role.setUpdateAt(rs.getTimestamp("updated_at"));
+
+                list.add(role);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
+        return list;
+    }
+    
+    public int countRoles(){
+        String sql ="SELECT COUNT(*) FROM role";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()){
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
-}
 
+}
