@@ -92,7 +92,7 @@
                 </div>
                 <div>
                     <c:set var="numLinksTwoSide" value="2"></c:set>
-                    <c:set var="start" value="${page - numLinksTwoSide > 1 ? page : 1}"></c:set>
+                    <c:set var="start" value="${page - numLinksTwoSide > 1 ? page - numLinksTwoSide : 1}"></c:set>
                     <c:set var="end" value="${page + numLinksTwoSide > totalPage ? totalPage : page + numLinksTwoSide}"></c:set>
                         <table border="1">
                             <tr>
