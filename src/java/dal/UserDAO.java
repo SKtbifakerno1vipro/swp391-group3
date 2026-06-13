@@ -27,29 +27,35 @@ public class UserDAO extends DBContext {
         if (rs.getTimestamp("updated_at") != null) {
             u.setUpdateAt(rs.getTimestamp("updated_at").toLocalDateTime());
         }
+        u.setCreatedBy(rs.getInt("created_by"));
+        u.setUpdatedBy(rs.getInt("updated_by"));
         return u;
     }
 
     /*
     created by phu
      */
-    public List<UserRoleDTO> searchUsers(int roleId, String status, String keyword, int pageIndex, int pageSize) {
+    public List<UserRoleDTO> searchUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail, int pageIndex, int pageSize) {
         List<UserRoleDTO> list = new ArrayList<>();
-        String sql = "select * from [user] u "
-                + "join dbo.role r  on u.role_id= r.role_id where 1=1";
+        // Tìm dòng này trong UserDAO.java
+        String sql = "SELECT u.*, r.role_name FROM [user] u LEFT JOIN dbo.role r ON u.role_id = r.role_id WHERE 1=1";
         if (roleId > 0) {
-            sql += " and u.role_id= ?";
+            sql += " AND u.role_id = ?";
         }
         if (status != null && !status.isEmpty()) {
-            sql += " and u.account_status= ?";
+            sql += " AND u.account_status = ?";
+        }
+        if (searchName != null && !searchName.trim().isEmpty()) {
+            sql += " AND u.full_name LIKE ?";
+        }
+        if (searchPhone != null && !searchPhone.trim().isEmpty()) {
+            sql += " AND u.phone LIKE ?";
+        }
+        if (searchEmail != null && !searchEmail.trim().isEmpty()) {
+            sql += " AND u.email LIKE ?";
         }
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql += " AND (u.full_name LIKE ? OR u.phone LIKE ?)";
-        }
-
-        //paging querry
-        sql += " ORDER BY u.user_id asc OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        sql += " ORDER BY u.user_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
@@ -59,14 +65,16 @@ public class UserDAO extends DBContext {
             if (status != null && !status.isEmpty()) {
                 ps.setString(index++, status);
             }
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                String searchPattern = "%" + keyword.trim() + "%";
-                ps.setString(index++, searchPattern);
-                ps.setString(index++, searchPattern);
+            if (searchName != null && !searchName.trim().isEmpty()) {
+                ps.setString(index++, "%" + searchName.trim() + "%");
             }
-
-            int offset = (pageIndex - 1) * pageSize;
-            ps.setInt(index++, offset);
+            if (searchPhone != null && !searchPhone.trim().isEmpty()) {
+                ps.setString(index++, "%" + searchPhone.trim() + "%");
+            }
+            if (searchEmail != null && !searchEmail.trim().isEmpty()) {
+                ps.setString(index++, "%" + searchEmail.trim() + "%");
+            }
+            ps.setInt(index++, (pageIndex - 1) * pageSize);
             ps.setInt(index++, pageSize);
 
             ResultSet rs = ps.executeQuery();
@@ -81,56 +89,61 @@ public class UserDAO extends DBContext {
                 u.setRoleId(rs.getInt("role_id"));
                 u.setRoleName(rs.getString("role_name"));
                 list.add(u);
-
             }
         } catch (Exception e) {
-            System.out.println("searchUser" + e.getMessage());
+            System.out.println("searchUsers: " + e.getMessage());
         }
         return list;
-    }
-
-    public List<UserRoleDTO> getAllUsers() {
-        return searchUsers(0, null, null, 1, 10);
     }
 
     /*
     created by vu trong phu
      */
-    public int getTotalUsers(int roleId, String status, String keyword) {
-        String sql = "select count(*) from [user] u where 1=1 ";
+    public int getTotalUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail) {
+        String sql = "SELECT count(*) FROM [user] u WHERE 1=1 ";
+
         if (roleId > 0) {
-            sql += "and u.role_id=?";
+            sql += " AND u.role_id = ?";
         }
         if (status != null && !status.trim().isEmpty()) {
-            sql += "and u.account_status= ?";
+            sql += " AND u.account_status = ?";
         }
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql += " and (u.full_name like ? or u.phone like ?)";
+        if (searchName != null && !searchName.trim().isEmpty()) {
+            sql += " AND u.full_name LIKE ?";
+        }
+        if (searchPhone != null && !searchPhone.trim().isEmpty()) {
+            sql += " AND u.phone LIKE ?";
+        }
+        if (searchEmail != null && !searchEmail.trim().isEmpty()) {
+            sql += " AND u.email LIKE ?";
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
+
             if (roleId > 0) {
                 ps.setInt(index++, roleId);
             }
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(index++, status);
             }
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                String searchPattern = "%" + keyword.trim() + "%";
-                ps.setString(index++, searchPattern);
-                ps.setString(index++, searchPattern);
+            if (searchName != null && !searchName.trim().isEmpty()) {
+                ps.setString(index++, "%" + searchName.trim() + "%");
+            }
+            if (searchPhone != null && !searchPhone.trim().isEmpty()) {
+                ps.setString(index++, "%" + searchPhone.trim() + "%");
+            }
+            if (searchEmail != null && !searchEmail.trim().isEmpty()) {
+                ps.setString(index++, "%" + searchEmail.trim() + "%");
             }
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1); // return total of row
+                    return rs.getInt(1);
                 }
-
             }
-
         } catch (Exception e) {
-            System.out.println("Error getTotalUsers: " + e.getMessage());
+            System.out.println("getTotalUsers: " + e.getMessage());
         }
         return 0;
     }
@@ -209,7 +222,6 @@ public class UserDAO extends DBContext {
 
     // da co hash passsword
     public int createUserFullParameter(User user, Connection conn) {
-
         String sql = "INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, "
                 + "full_name, address, phone, account_status, created_at, updated_at, role_id) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?)";
@@ -249,12 +261,8 @@ public class UserDAO extends DBContext {
             // 9. account_status
             stm.setString(9, user.getStatus());
 
-            // 10. role_id
+            // 12. role_id
             stm.setInt(10, user.getRoleId());
-
-            stm.setString(8, user.getStatus());
-
-            stm.setInt(9, user.getRoleId());
 
             int affectedRows = stm.executeUpdate();
 
@@ -346,7 +354,9 @@ public class UserDAO extends DBContext {
     }
 
     public boolean createUser(User u) {
-        String sql = "INSERT INTO [user] (user_name, password_hash, email, full_name,gender, phone, account_status, role_id) VALUES (?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO [user] (user_name, password_hash, email, full_name, gender, phone, "
+                + "account_status, role_id, created_by, updated_by, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, u.getUserName());
@@ -358,7 +368,8 @@ public class UserDAO extends DBContext {
             ps.setString(6, u.getPhone());
             ps.setString(7, u.getStatus());
             ps.setInt(8, u.getRoleId());
-
+            ps.setInt(9, u.getCreatedBy());
+            ps.setInt(10, u.getUpdatedBy());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("createUser" + e.getMessage());
@@ -379,7 +390,9 @@ public class UserDAO extends DBContext {
     public boolean updateUser(User user) {
         try {
 
-            String sql = "UPDATE [user] SET full_name = ?, phone = ?, account_status = ?, gender = ?, role_id=? ,  updated_at = GETDATE() WHERE user_id = ?";
+            String sql = "UPDATE [user] SET full_name = ?, phone = ?, account_status = ?, "
+                    + "gender = ?, role_id = ?, updated_by = ?, updated_at = GETDATE() "
+                    + "WHERE user_id = ?";
 
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1, user.getFullName());
@@ -387,7 +400,8 @@ public class UserDAO extends DBContext {
             stm.setString(3, user.getStatus());
             stm.setString(4, user.getGender());
             stm.setInt(5, user.getRoleId());
-            stm.setInt(6, user.getUserId());
+            stm.setInt(6, user.getUpdatedBy());
+            stm.setInt(7, user.getUserId());
 
             return stm.executeUpdate() > 0;
         } catch (Exception e) {

@@ -1,5 +1,6 @@
 package controller.customerorder;
 
+
 import dto.CustomerDTO;
 import model.CustomerOrder;
 import model.CustomerOrderDetail;
@@ -27,7 +28,9 @@ public class CreateCustomerOrderController extends HttpServlet {
     private final CustomerOrderService customerOrderService = new CustomerOrderService();
     private final CustomerService customerService = new CustomerService();
     private final ProductService productService = new ProductService();
-
+    //nguyenkien - begin
+    private final int PAGE_SIZE = 10;
+    //nguyenkien - end
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -60,42 +63,42 @@ public class CreateCustomerOrderController extends HttpServlet {
             }
             // Đếm tổng số sản phẩm đang hoạt động (ACTIVE) để tính tổng số trang
             int totalProducts = productService.countProduct(null, null, "ACTIVE");
-            int totalProductPages = productService.calculateTotalPage(totalProducts);
+            int totalProductPages = productService.calculateTotalPage(totalProducts, PAGE_SIZE);
             productPage = productService.nomalizePage(productPage, totalProductPages);
             // Lấy danh sách sản phẩm cho trang hiện tại
-            List<Product> products = productService.searchProduct(null, null, "ACTIVE", totalProducts, productPage,
-                    totalProductPages);
+            List<Product> products = productService.searchProduct(null, null, null, "ACTIVE", totalProducts, productPage,
+                    totalProductPages, PAGE_SIZE); //update by nguyenkien
             request.setAttribute("products", products);
             request.setAttribute("currentProductPage", productPage);
             request.setAttribute("totalProductPages", totalProductPages);
 
-            if (customerId != -1) {
-                CustomerDTO customerDto = customerService.getCustomerDTOByCusId(customerId);
-                request.setAttribute("customer", customerDto);
-
-                if (customerDto != null) {
-                    // Chỉ lấy những hợp đồng đã ký (SIGNED) của khách hàng này
-                    List<model.CustomerContract> contracts = customerOrderService.getSignedContractsByCustomerId(customerId);
-                    request.setAttribute("contracts", contracts);
-
-                    if (contracts.isEmpty()) {
-                        request.setAttribute("error", "No signed contracts found for this customer. A signed contract is required to create an order.");
-                        request.setAttribute("error", "No signed contracts found...");
-                        // Thông báo nếu chưa có hợp đồng ký kết
-                    }
-                } else {
-                    request.setAttribute("error", "Customer not found.");
-                    // Reset customerId if not found to show customer list
-                    customerId = -1;
-                    // Nếu chưa chọn khách hàng, lấy toàn bộ danh sách khách hàng để người dùng chọn trong dropdown
-                    List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
-                    request.setAttribute("customers", customers);
-                }
-            } else {
-                // If no customerId provided, show customer list for Admin/Staff to choose
-                List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
-                request.setAttribute("customers", customers);
-            }
+//            if (customerId != -1) {
+//                CustomerDTO customerDto = customerService.getCustomerDTOByCusId(customerId);
+//                request.setAttribute("customer", customerDto);
+//
+//                if (customerDto != null) {
+//                    // Chỉ lấy những hợp đồng đã ký (SIGNED) của khách hàng này
+//                    List<model.CustomerContract> contracts = customerOrderService.getSignedContractsByCustomerId(customerId);
+//                    request.setAttribute("contracts", contracts);
+//
+//                    if (contracts.isEmpty()) {
+//                        request.setAttribute("error", "No signed contracts found for this customer. A signed contract is required to create an order.");
+//                        request.setAttribute("error", "No signed contracts found...");
+//                        // Thông báo nếu chưa có hợp đồng ký kết
+//                    }
+//                } else {
+//                    request.setAttribute("error", "Customer not found.");
+//                    // Reset customerId if not found to show customer list
+//                    customerId = -1;
+//                    // Nếu chưa chọn khách hàng, lấy toàn bộ danh sách khách hàng để người dùng chọn trong dropdown
+//                    List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
+//                    request.setAttribute("customers", customers);
+//                }
+//            } else {
+//                // If no customerId provided, show customer list for Admin/Staff to choose
+//                List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
+//                request.setAttribute("customers", customers);
+//            }
 
             request.getRequestDispatcher("/views/customer-order/create.jsp").forward(request, response);
 

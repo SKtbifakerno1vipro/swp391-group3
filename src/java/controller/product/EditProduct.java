@@ -66,20 +66,15 @@ public class EditProduct extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-        User u = (User) session.getAttribute("user");
-
         String productId = request.getParameter("id");
         int id = Integer.parseInt(productId);
         String action = request.getParameter("action");
-        Product p = pService.getProductById(Integer.parseInt(productId));
+        Product p = pService.getProductById(id);
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();
         String updateBy = pService.getUpdateByWithProductId(id);
+        
+        
         List<String> statusList = pService.getProductStatus();
         request.setAttribute("units", units);
         request.setAttribute("categories", categories);
@@ -102,14 +97,11 @@ public class EditProduct extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
+        
         String productId = request.getParameter("id");
         int id = Integer.parseInt(productId);
 
-        Product p = pService.getProductById(Integer.parseInt(productId));
+        Product p = pService.getProductById(id);
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();
         List<String> statusList = pService.getProductStatus();
@@ -151,13 +143,14 @@ public class EditProduct extends HttpServlet {
             p1.setProductId(id);
             boolean update = pService.updateProduct(p1);
             if (update) {
-                response.sendRedirect(request.getContextPath() + "/product-detail?id=" + id);
+                response.sendRedirect(request.getContextPath() + "/edit-product?id=" + id+"&action=detail");
             } else {
                 error = "Update Product Failed";
             }
         } else {
             request.setAttribute("units", units);
             request.setAttribute("error", error);
+            request.setAttribute("action", "");
             request.setAttribute("categories", categories);
             request.setAttribute("statusList", statusList);
             request.setAttribute("name", name);

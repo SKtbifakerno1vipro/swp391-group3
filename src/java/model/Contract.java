@@ -1,13 +1,52 @@
-
-
 package model;
 
 import java.time.LocalDateTime;
 
 public class Contract {
-private int contractId,customerId,quotationId;
-private String contractNumber, contractFileUrl,contractStatus;
-private LocalDateTime signAt, createAt;
+
+    private int contractId;
+    private int customerId;
+    private String customerName;
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+    private int quotationId;
+    private String contractNumber;
+    private String contractFileUrl;
+    private String contractStatus;
+    private String contractVersion;
+    private LocalDateTime effectiveDate;
+    private LocalDateTime endDate;
+    private LocalDateTime signDate;
+
+    private String contractContent;
+    private String storageType;
+
+    public String getContractContent() {
+        return contractContent;
+    }
+
+    public void setContractContent(String contractContent) {
+        this.contractContent = contractContent;
+    }
+
+    public String getStorageType() {
+        return storageType;
+    }
+
+    public void setStorageType(String storageType) {
+        this.storageType = storageType;
+    }
+
+    private int createdBy;
+    private int updatedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public int getContractId() {
         return contractId;
@@ -57,20 +96,68 @@ private LocalDateTime signAt, createAt;
         this.contractStatus = contractStatus;
     }
 
-    public LocalDateTime getSignAt() {
-        return signAt;
+    public String getContractVersion() {
+        return contractVersion;
     }
 
-    public void setSignAt(LocalDateTime signAt) {
-        this.signAt = signAt;
+    public void setContractVersion(String contractVersion) {
+        this.contractVersion = contractVersion;
     }
 
-    public LocalDateTime getCreateAt() {
-        return createAt;
+    public LocalDateTime getEffectiveDate() {
+        return effectiveDate;
     }
 
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
+    public void setEffectiveDate(LocalDateTime effectiveDate) {
+        this.effectiveDate = effectiveDate;
+    }
+
+    public LocalDateTime getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDateTime getSignDate() {
+        return signDate;
+    }
+
+    public void setSignDate(LocalDateTime signDate) {
+        this.signDate = signDate;
+    }
+
+    public int getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(int createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public int getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(int updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public Contract() {
