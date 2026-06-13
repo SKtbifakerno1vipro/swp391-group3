@@ -34,7 +34,7 @@ public class CreateCustomerOrderController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy session hiện tại để kiểm tra người dùng đã đăng nhập chưa
+        // Lay session hien tai đe kiem tra nguoi dung đa đang nhap chua
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
 
@@ -42,10 +42,10 @@ public class CreateCustomerOrderController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        // Lấy customerId từ URL (nếu có, ví dụ: ?customerId=5)
+        // Lay customerId tu URL (neu co, vi du: DcustomerId=5)
         String customerIdParam = request.getParameter("customerId");
         int customerId = -1;
-        // Kiểm tra và chuyển đổi customerId từ chuỗi sang số nguyên
+        // Kiem tra va chuyen đoi customerId tu chuoi sang so nguyen
         if (customerIdParam != null && !customerIdParam.isBlank()) {
             try {
                 customerId = Integer.parseInt(customerIdParam);
@@ -55,50 +55,50 @@ public class CreateCustomerOrderController extends HttpServlet {
         }
 
         try {
-            // xử lý phân trang cho danh sách sản phẩm
+            // xu ly phan trang cho danh sach san pham
             String pageParam = request.getParameter("productPage");
             int productPage = 1;
             if (pageParam != null && !pageParam.isBlank()) {
                 productPage = Integer.parseInt(pageParam);
             }
-            // Đếm tổng số sản phẩm đang hoạt động (ACTIVE) để tính tổng số trang
+            // Đem tong so san pham đang hoat đong (ACTIVE) đe tinh tong so trang
             int totalProducts = productService.countProduct(null, null, "ACTIVE");
             int totalProductPages = productService.calculateTotalPage(totalProducts, PAGE_SIZE);
             productPage = productService.nomalizePage(productPage, totalProductPages);
-            // Lấy danh sách sản phẩm cho trang hiện tại
+            // Lay danh sach san pham cho trang hien tai
             List<Product> products = productService.searchProduct(null, null, null, "ACTIVE", totalProducts, productPage,
                     totalProductPages, PAGE_SIZE); //update by nguyenkien
             request.setAttribute("products", products);
             request.setAttribute("currentProductPage", productPage);
             request.setAttribute("totalProductPages", totalProductPages);
 
-            if (customerId != -1) {
-                CustomerDTO customerDto = customerService.getCustomerDTOByCusId(customerId);
-                request.setAttribute("customer", customerDto);
-
-                if (customerDto != null) {
-                    // Chỉ lấy những hợp đồng đã ký (SIGNED) của khách hàng này
-                    List<model.CustomerContract> contracts = customerOrderService.getSignedContractsByCustomerId(customerId);
-                    request.setAttribute("contracts", contracts);
-
-                    if (contracts.isEmpty()) {
-                        request.setAttribute("error", "No signed contracts found for this customer. A signed contract is required to create an order.");
-                        request.setAttribute("error", "No signed contracts found...");
-                        // Thông báo nếu chưa có hợp đồng ký kết
-                    }
-                } else {
-                    request.setAttribute("error", "Customer not found.");
-                    // Reset customerId if not found to show customer list
-                    customerId = -1;
-                    // Nếu chưa chọn khách hàng, lấy toàn bộ danh sách khách hàng để người dùng chọn trong dropdown
-                    List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
-                    request.setAttribute("customers", customers);
-                }
-            } else {
-                // If no customerId provided, show customer list for Admin/Staff to choose
-                List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
-                request.setAttribute("customers", customers);
-            }
+//            if (customerId != -1) {
+//                CustomerDTO customerDto = customerService.getCustomerDTOByCusId(customerId);
+//                request.setAttribute("customer", customerDto);
+//
+//                if (customerDto != null) {
+//                    // Chi lay nhung hop đong đa ky (SIGNED) cua khach hang nay
+//                    List<model.CustomerContract> contracts = customerOrderService.getSignedContractsByCustomerId(customerId);
+//                    request.setAttribute("contracts", contracts);
+//
+//                    if (contracts.isEmpty()) {
+//                        request.setAttribute("error", "No signed contracts found for this customer. A signed contract is required to create an order.");
+//                        request.setAttribute("error", "No signed contracts found...");
+//                        // Thong bao neu chua co hop đong ky ket
+//                    }
+//                } else {
+//                    request.setAttribute("error", "Customer not found.");
+//                    // Reset customerId if not found to show customer list
+//                    customerId = -1;
+//                    // Neu chua chon khach hang, lay toan bo danh sach khach hang đe nguoi dung chon trong dropdown
+//                    List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
+//                    request.setAttribute("customers", customers);
+//                }
+//            } else {
+//                // If no customerId provided, show customer list for Admin/Staff to choose
+//                List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
+//                request.setAttribute("customers", customers);
+//            }
 
             request.getRequestDispatcher("/views/customer-order/create.jsp").forward(request, response);
 
@@ -118,7 +118,7 @@ public class CreateCustomerOrderController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-// Nhận dữ liệu từ form gửi lên
+// Nhan du lieu tu form gui len
         String customerIdStr = request.getParameter("customerId");
         String contractIdStr = request.getParameter("customerContractId");
         String[] productIds = request.getParameterValues("productIds");// Mảng các ID sản phẩm được tích chọn
@@ -146,17 +146,17 @@ public class CreateCustomerOrderController extends HttpServlet {
             return;
         }
 
-        // Lấy giá hiện tại của tất cả sản phẩm để lưu vào chi tiết đơn hàng (chốt giá)
+        // Lay gia hien tai cua tat ca san pham đe luu vao chi tiet đon hang (chot gia)
         List<Product> allProducts = productService.getAllProducts();
         Map<Integer, Product> productMap = allProducts.stream()
                 .collect(Collectors.toMap(Product::getProductId, p -> p));
-// Tạo đối tượng Order chính
+// Tao đoi tuong Order chinh
         CustomerOrder order = new CustomerOrder();
         order.setCustomerId(customerId);
         order.setCustomerContractId(contractId);
         order.setOrderStatus("PENDING");
         order.setCreatedBy(currentUser.getUserId());
-// Tạo danh sách các dòng chi tiết đơn hàng (Product + Quantity + Price)
+// Tao danh sach cac dong chi tiet đon hang (Product + Quantity + Price)
         List<CustomerOrderDetail> details = new ArrayList<>();
         for (String pidStr : productIds) {
             try {
@@ -186,7 +186,7 @@ public class CreateCustomerOrderController extends HttpServlet {
             doGet(request, response);
             return;
         }
-        // Gọi Service để lưu vào DB. Nếu thành công trả về true.
+        // Goi Service đe luu vao DB. Neu thanh cong tra ve true.
 
         boolean success = customerOrderService.createOrder(order, details);
 

@@ -6,7 +6,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-        <%-- Tự động đổi Tiêu đề trang tùy theo hành động --%>
+        <%-- Tu đong đoi Tieu đe trang tuy theo hanh đong --%>
         <c:set var="isEdit" value="${not empty cusDTO}" />
         <title><c:choose><c:when test="${isEdit}">Edit Customer - Terra Enterprise</c:when>
                 <c:otherwise>Create Customer</c:otherwise></c:choose></title>
@@ -201,12 +201,12 @@
 
             <form action="${pageContext.request.contextPath}/customer/${isEdit ? 'edit' : 'create'}" method="post">
                 
-                <%-- Nếu là EDIT thì mới sinh ra 2 thẻ hidden ID này --%>
+                <%-- Neu la EDIT thi moi sinh ra 2 the hidden ID nay --%>
                 <c:if test="${isEdit}">
                     <input type="hidden" name="customerId" value="${cusDTO.customer.customerId}" />
                     <input type="hidden" name="userId" value="${cusDTO.customer.userId}" />
 
-                    <%-- Hiển thị Customer ID và User ID (Chỉ Edit mới thấy) --%>
+                    <%-- Hien thi Customer ID va User ID (Chi Edit moi thay) --%>
                     <div class="form-group">
                         <label>Customer ID</label>
                         <input type="text" class="form-control" value="${cusDTO.customer.customerId}" readonly>

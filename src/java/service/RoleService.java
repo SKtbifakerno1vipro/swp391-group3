@@ -49,4 +49,15 @@ public class RoleService {
     public boolean isRoleNameExists(String roleName) {
         return roleDAO.isRoleNameExists(roleName);
     }
+    
+    public List<Role> searchRoles(String search){
+        return roleDAO.searchRole(search);
+    }
+    public List<Role> getRolesByPage(int page, int pageSize){
+        return roleDAO.getrolesByPage(page, pageSize);
+    }
+    
+    public int countRoles(){
+        return roleDAO.countRoles();
+    }
 }

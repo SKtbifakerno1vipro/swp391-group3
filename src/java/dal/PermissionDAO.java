@@ -1,108 +1,28 @@
 package dal;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import model.RolePermission;
 
 public class PermissionDAO extends DBContext {
 
-    public List<RolePermission> getAllPermissions() {
-        List<RolePermission> permissions = new ArrayList<>();
-
-        String sql = """
-                     SELECT permission_id, permission_name, create_at, update_at
-                     FROM permission
-                     ORDER BY permission_id
-                     """;
-
+    public List<String> getPermissionsByRoleId(int roleId) {
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT p.url_pattern FROM role_permission rp "
+                   + "JOIN permission p ON rp.permission_id = p.permission_id "
+                   + "WHERE rp.role_id = ? AND p.url_pattern IS NOT NULL";
         try {
-            Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, roleId);
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                RolePermission permission = new RolePermission();
-
-                permission.setPermissionId(rs.getInt("permission_id"));
-                permission.setPermissionName(rs.getString("permission_name"));
-                permission.setCreateAt(rs.getTimestamp("create_at"));
-                permission.setUpdateAt(rs.getTimestamp("update_at"));
-
-                permissions.add(permission);
+                list.add(rs.getString("url_pattern"));
             }
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return permissions;
-    }
-
-    public Set<Integer> getPermissionIdsByRoleId(int roleId) {
-        Set<Integer> permissionIds = new HashSet<>();
-
-        String sql = """
-                     SELECT permission_id
-                     FROM role_permission
-                     WHERE role_id = ?
-                     """;
-
-        try {
-            Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-
-            ps.setInt(1, roleId);
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                permissionIds.add(rs.getInt("permission_id"));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return permissionIds;
-    }
-
-    public void updateRolePermissions(int roleId, String[] permissionIds) {
-        String deleteSql = """
-                           DELETE FROM role_permission
-                           WHERE role_id = ?
-                           """;
-
-        String insertSql = """
-                           INSERT INTO role_permission(role_id, permission_id)
-                           VALUES (?, ?)
-                           """;
-
-        try {
-            Connection conn = getConnection();
-
-            PreparedStatement deletePs = conn.prepareStatement(deleteSql);
-            deletePs.setInt(1, roleId);
-            deletePs.executeUpdate();
-
-            if (permissionIds != null) {
-                PreparedStatement insertPs = conn.prepareStatement(insertSql);
-
-                for (String permissionId : permissionIds) {
-                    insertPs.setInt(1, roleId);
-                    insertPs.setInt(2, Integer.parseInt(permissionId));
-                    insertPs.addBatch();
-                }
-
-                insertPs.executeBatch();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return list;
     }
 }

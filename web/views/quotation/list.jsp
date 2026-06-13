@@ -37,14 +37,14 @@
                 </tr>
             </thead>
             <tbody>
-                <%-- Nếu danh sách rỗng thì hiện thông báo --%>
+                <%-- Neu danh sach rong thi hien thong bao --%>
                 <c:if test="${empty quotationList}">
                     <tr>
                         <td colspan="7" style="text-align: center;">No quotations found.</td>
                     </tr>
                 </c:if>
                 
-                <%-- Vòng lặp hiển thị từng báo giá --%>
+                <%-- Vong lap hien thi tung bao gia --%>
                 <c:forEach items="${quotationList}" var="quotation">
                     <tr>
                         <td>${quotation.quotationId}</td>

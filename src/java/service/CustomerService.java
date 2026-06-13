@@ -52,7 +52,7 @@ public class CustomerService {
     // new 
     public int getTotalPages(String searchName, String searchSdt, String searchEmail, String searchMst,
             String typeCus, int pageSize) {
-        // Gọi hàm đếm tổng số dòng thỏa mãn điều kiện lọc dưới DAO
+        // Goi ham đem tong so dong thoa man đieu kien loc duoi DAO
         int totalRecords = customerDAO.getTotalCustomersCount(searchName, searchSdt, searchEmail, searchMst, typeCus);
         
         if (totalRecords == 0) return 1;
@@ -182,7 +182,7 @@ public class CustomerService {
                 }
                 conn.commit(); // gui xong email moi tao
             } else {
-                // Bước 3 lỗi -> Rollback để xóa luôn tài khoản User vừa tạo ở Bước 1
+                // Buoc 3 loi -> Rollback đe xoa luon tai khoan User vua tao o Buoc 1
                 System.out.println("Lỗi: Tạo Customer thất bại! Tiến hành khôi phục dữ liệu.");
                 conn.rollback(); 
             }
@@ -211,11 +211,13 @@ public class CustomerService {
         return customerDAO.getCustomerByCusId(userId);
     }
     public List<User> getAllSalesExecutiveUsers() {
+        Integer salesExecutiveRoleId = roleService.getRoleIdByName("Sales Staff");
 
-        int salesExecutiveRoleId = roleService.getRoleIdByName("Sales Staff");
-        
-        if (salesExecutiveRoleId < 0) {
-            salesExecutiveRoleId = 4; // mac dinh
+        if (salesExecutiveRoleId == null) {
+            salesExecutiveRoleId = roleService.getRoleIdByName("Sale Staff");
+        }
+        if (salesExecutiveRoleId == null) {
+            salesExecutiveRoleId = 4; // default sale staff role in seed data
         }
 
         return userService.searchUserFieldsByOR(null, null, null, salesExecutiveRoleId);

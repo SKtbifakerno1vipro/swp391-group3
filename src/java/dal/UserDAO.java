@@ -37,7 +37,7 @@ public class UserDAO extends DBContext {
      */
     public List<UserRoleDTO> searchUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail, int pageIndex, int pageSize) {
         List<UserRoleDTO> list = new ArrayList<>();
-        // Tìm dòng này trong UserDAO.java
+        // Tim dong nay trong UserDAO.java
         String sql = "SELECT u.*, r.role_name FROM [user] u LEFT JOIN dbo.role r ON u.role_id = r.role_id WHERE 1=1";
         if (roleId > 0) {
             sql += " AND u.role_id = ?";
@@ -419,14 +419,21 @@ public class UserDAO extends DBContext {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                String hashPass = rs.getString("password_hash");
-                if (BCrypt.checkpw(password, hashPass)) {
-                    User user = mapUser(rs);
-                    return user;
+                String storedPassword = rs.getString("password_hash");
+                boolean passwordMatches;
+
+                if (storedPassword != null && storedPassword.startsWith("$2")) {
+                    passwordMatches = BCrypt.checkpw(password, storedPassword);
+                } else {
+                    passwordMatches = storedPassword != null && storedPassword.equals(password);
+                }
+
+                if (passwordMatches) {
+                    return mapUser(rs);
                 }
             }
         } catch (Exception e) {
-            System.out.println("login" + e.getMessage());
+            System.out.println("login: " + e.getMessage());
         }
         return null;
     }
@@ -435,19 +442,18 @@ public class UserDAO extends DBContext {
     created by vu trong phu
      */
     public User loginTester(String username, String password) {
-        String sql = "SELECT * FROM [user] WHERE user_name = ? AND password_hash =?";
+        String sql = "SELECT * FROM [user] WHERE user_name = ? AND password_hash = ? AND account_status = 'ACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, "admin_01");
-            ps.setString(2, "123");
+            ps.setString(1, username);
+            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-
                 User user = mapUser(rs);
                 user.setPassword(password);
                 return user;
             }
         } catch (Exception e) {
-            System.out.println("login" + e.getMessage());
+            System.out.println("loginTester: " + e.getMessage());
         }
         return null;
     }
@@ -461,7 +467,7 @@ public class UserDAO extends DBContext {
             ps.setString(1, username);
             ps.setInt(2, userId);
 
-            // Dùng try-with-resources để đảm bảo ResultSet tự động được đóng
+            // Dung try-with-resources đe đam bao ResultSet tu đong đuoc đong
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next(); // Trả về true nếu bản ghi tồn tại
             }

@@ -31,7 +31,7 @@
         <div class="form-container">
             <h2>${isForgot ? 'Quên Mật Khẩu' : 'Đổi Mật Khẩu'}</h2>
 
-            <%-- Thông báo kết quả --%>
+            <%-- Thong bao ket qua --%>
             <c:if test="${not empty success}">
                 <div class="alert alert-success">${success}</div>
             </c:if>
@@ -44,9 +44,9 @@
                 </div>
             </c:if>
 
-            <%-- Form gửi yêu cầu (Đổi mật khẩu HOẶC Xác nhận mã để đổi mật khẩu mới) --%>
+            <%-- Form gui yeu cau (Đoi mat khau HOAC Xac nhan ma đe đoi mat khau moi) --%>
             <form action="${pageContext.request.contextPath}/user/password/${isForgot ? 'forgot' : 'change'}" method="POST">
-                <%-- Truyền ngầm trạng thái isForgot lên Servlet --%>
+                <%-- Truyen ngam trang thai isForgot len Servlet --%>
                 <input type="hidden" name="isForgot" value="${isForgot}">
 
                 <c:choose>
@@ -55,7 +55,7 @@
                             <label for="email">Email đăng ký:</label>
                             <div class="input-group">
                                 <input type="email" id="email" name="email" value="${email}" required>
-                                <%-- Nút gửi mã OTP --%>
+                                <%-- Nut gui ma OTP --%>
                                 <button type="button" id="btnSendOtp" name="action" onclick="sendOtpAjax()" class="btn-send">Gửi mã</button>
                             </div>
                         </div>
@@ -105,30 +105,30 @@
 </html>
 <script>
 function sendOtpAjax() {
-    // 1. Lấy dữ liệu từ các ô input
+    // 1. Lay du lieu tu cac o input
     const email = document.getElementById("email").value;
     const phone = document.getElementById("phone").value;
     const btn = document.getElementById("btnSendOtp");
 
-    // Kiểm tra nhanh xem người dùng đã nhập đủ chưa
+    // Kiem tra nhanh xem nguoi dung đa nhap đu chua
     if (!email || !phone) {
         alert("Vui lòng nhập đầy đủ Email và Số điện thoại trước khi nhận mã!");
         return;
     }
 
-    // Vô hiệu hóa nút bấm tạm thời để tránh người dùng click liên tục
+    // Vo hieu hoa nut bam tam thoi đe tranh nguoi dung click lien tuc
     btn.disabled = true;
     btn.innerText = "Đang gửi...";
 
-    // 2. Tạo URL và tham số để gửi ngầm lên Servlet
-    // Sử dụng URLSearchParams để đóng gói dữ liệu giống như form submit
+    // 2. Tao URL va tham so đe gui ngam len Servlet
+    // Su dung URLSearchParams đe đong goi du lieu giong nhu form submit
     const params = new URLSearchParams();
     params.append("action", "sendOtp");
     params.append("isForgot", "true");
     params.append("email", email);
     params.append("phone", phone);
 
-    // 3. Tiến hành gọi AJAX bằng Fetch API
+    // 3. Tien hanh goi AJAX bang Fetch API
     fetch("${pageContext.request.contextPath}/user/password/forgot", {
         method: "POST",
         headers: {
@@ -138,11 +138,11 @@ function sendOtpAjax() {
     })
     .then(response => response.text()) // Nhận phản hồi dạng chữ từ Servlet
     .then(data => {
-        // Khôi phục lại trạng thái nút bấm
+        // Khoi phuc lai trang thai nut bam
         btn.disabled = false;
         btn.innerText = "Gửi mã";
 
-        // Xử lý kết quả trả về từ Servlet (ở Bước 3 chúng ta sẽ cấu hình Servlet trả về chữ "OK" hoặc lỗi)
+        // Xu ly ket qua tra ve tu Servlet (o Buoc 3 chung ta se cau hinh Servlet tra ve chu "OK" hoac loi)
         if (data.trim() === "SUCCESS") {
             alert("Mã xác nhận (OTP) đã được gửi tới Email của bạn!");
         } else {

@@ -3,7 +3,7 @@ package service;
 import dal.CustomerOrderDAO;
 import dto.CustomerOrderDTO;
 import java.util.List;
-import model.CustomerContract;
+
 import service.*;
 import model.*;
 
@@ -28,9 +28,7 @@ public class CustomerOrderService {
         return customerOrderDAO.createOrder(order, details);
     }
 
-    public List<CustomerContract> getSignedContractsByCustomerId(int customerId) {
-        return customerOrderDAO.getContractsByCustomerId(customerId);
-    }
+
     
     public List<CustomerOrderDTO> findbyNameOrTaxcode(String keyword) {
         return customerOrderDAO.getAllCustomerOrdersByName(keyword);
@@ -69,7 +67,7 @@ public class CustomerOrderService {
         return customerOrderDAO.getTotalOrdersCountByCusId(cusId);
     }
     public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
-        // Chuyển tiếp (forward) tham số và xử lý logic xuống tầng DAO
+        // Chuyen tiep (forward) tham so va xu ly logic xuong tang DAO
         return customerOrderDAO.getListCustomerOrderDTOByCusId(cusId);
     }
     // end

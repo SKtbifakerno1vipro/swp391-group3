@@ -116,7 +116,7 @@ public class CustomerDAO extends DBContext {
 
     try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
         
-        // Loop to dynamically bind parameters to corresponding "?" markers
+        // Loop to dynamically bind parameters to corresponding "D" markers
         for (int i = 0; i < parameters.size(); i++) {
             Object param = parameters.get(i);
             
@@ -188,7 +188,7 @@ public class CustomerDAO extends DBContext {
             String typeCus, int page, int pageSize) {
     List<Customer> list = new ArrayList<>();
 
-    // 1. Khởi tạo câu lệnh SQL cơ bản
+    // 1. Khoi tao cau lenh SQL co ban
     StringBuilder sql = new StringBuilder(
         "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, " +
         "u.created_at, u.updated_at " +
@@ -197,7 +197,7 @@ public class CustomerDAO extends DBContext {
         "WHERE 1=1 "
     );
 
-    // 2. Kiểm tra điều kiện và build SQL động
+    // 2. Kiem tra đieu kien va build SQL đong
     boolean hasName = (searchName != null && !searchName.isBlank());
     boolean hasSdt = (searchSdt != null && !searchSdt.isBlank());
     boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
@@ -227,7 +227,7 @@ public class CustomerDAO extends DBContext {
         sql.append("AND c.customer_type = ? ");
     }
 
-    // 3. Đuôi phân trang cố định
+    // 3. Đuoi phan trang co đinh
     sql.append("ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
     int offset = (page - 1) * pageSize;
@@ -235,7 +235,7 @@ public class CustomerDAO extends DBContext {
     try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
         int index = 1;
 
-        // 4. Gán giá trị vào PreparedStatement theo đúng thứ tự đã build ở trên
+        // 4. Gan gia tri vao PreparedStatement theo đung thu tu đa build o tren
         if (hasName) {
             stm.setString(index++, "%" + searchName.trim() + "%");
         }
@@ -252,11 +252,11 @@ public class CustomerDAO extends DBContext {
             stm.setString(index++, typeCus.trim());
         }
 
-        // 5. Gán tham số phân trang luôn ở cuối cùng
+        // 5. Gan tham so phan trang luon o cuoi cung
         stm.setInt(index++, offset);
         stm.setInt(index++, pageSize);
 
-        // 6. Thực thi truy vấn
+        // 6. Thuc thi truy van
         try (ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
                 list.add(mapCustomer(rs));
@@ -272,7 +272,7 @@ public class CustomerDAO extends DBContext {
     public int getTotalCustomersCount(String searchName, String searchSdt, String searchEmail, String searchMst,
             String typeCus) {
 
-    // 1. Khởi tạo câu lệnh SQL cơ bản
+    // 1. Khoi tao cau lenh SQL co ban
     StringBuilder sql = new StringBuilder(
         "SELECT COUNT(*) "+
         "FROM customer c " +
@@ -280,7 +280,7 @@ public class CustomerDAO extends DBContext {
         "WHERE 1=1 "
     );
 
-    // 2. Kiểm tra điều kiện và build SQL động
+    // 2. Kiem tra đieu kien va build SQL đong
     boolean hasName = (searchName != null && !searchName.isBlank());
     boolean hasSdt = (searchSdt != null && !searchSdt.isBlank());
     boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
@@ -306,7 +306,7 @@ public class CustomerDAO extends DBContext {
     try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
         int index = 1;
 
-        // 4. Gán giá trị vào PreparedStatement theo đúng thứ tự đã build ở trên
+        // 4. Gan gia tri vao PreparedStatement theo đung thu tu đa build o tren
         if (hasName) {
             stm.setString(index++, "%" + searchName.trim() + "%");
         }
@@ -322,7 +322,7 @@ public class CustomerDAO extends DBContext {
         if (hasType) {
             stm.setString(index++, typeCus.trim());
         }
-        // 6. Thực thi truy vấn
+        // 6. Thuc thi truy van
         try (ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
                 return rs.getInt(1);
