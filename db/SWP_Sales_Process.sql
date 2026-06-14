@@ -448,11 +448,14 @@ INSERT INTO permission (permission_name, url_pattern) VALUES
 ('Create Order', '/create-customer-order'),
 ('Issue Invoice', '/Invoice');
 GO
+INSERT INTO permission (permission_name, url_pattern)
+VALUES ('Create Quotation', '/quotation-create');
 
 -- Admin/System Admin mac dinh co toan quyen de team vua dung DB la dang nhap dung duoc ngay.
 INSERT INTO role_permission (role_id, permission_id)
-SELECT 1, permission_id FROM permission;
-GO
+SELECT 1, permission_id
+FROM permission
+WHERE url_pattern = '/quotation-create';
 
 -- ==========================================================
 -- PHAN DU LIEU MOI TU MAIN

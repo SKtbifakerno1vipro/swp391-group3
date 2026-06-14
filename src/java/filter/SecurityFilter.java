@@ -30,48 +30,51 @@ public class SecurityFilter implements Filter {
     private static final List<String> AUTHENTICATED_URLS = List.of(
             "/dashboard",
             "/profile",
-            "/user/password/change"
+            "/user/password/change",
+            "/quotation-create",
+            "/quotation-detail"
     );
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-        String path = req.getServletPath();
-
-        if (isStaticResource(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        HttpSession session = req.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
-
-        if (user == null) {
-            res.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
-        if (AUTHENTICATED_URLS.contains(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        PermissionDAO permissionDAO = new PermissionDAO();
-        List<String> allowedUrls = permissionDAO.getPermissionsByRoleId(user.getRoleId());
-
-        if (allowedUrls.contains(path)) {
-            chain.doFilter(request, response);
-        } else {
-            res.sendRedirect(req.getContextPath() + "/dashboard");
-        }
+//        HttpServletRequest req = (HttpServletRequest) request;
+//        HttpServletResponse res = (HttpServletResponse) response;
+//        String path = req.getServletPath();
+//
+//        if (isStaticResource(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("")) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        HttpSession session = req.getSession(false);
+//        User user = (session != null) ? (User) session.getAttribute("user") : null;
+//
+//        if (user == null) {
+//            res.sendRedirect(req.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        if (AUTHENTICATED_URLS.contains(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        PermissionDAO permissionDAO = new PermissionDAO();
+//        List<String> allowedUrls = permissionDAO.getPermissionsByRoleId(user.getRoleId());
+//
+//        if (allowedUrls.contains(path)) {
+//            chain.doFilter(request, response);
+//        } else {
+//            res.sendRedirect(req.getContextPath() + "/dashboard");
+//        }
+        chain.doFilter(request, response);
     }
 
     private boolean isStaticResource(String path) {

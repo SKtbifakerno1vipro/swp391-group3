@@ -4,10 +4,11 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Pơ Bread</title>
+        <title>PÆ¡ Bread</title>
     </head>
     <body>
         <h1>Quotation List</h1>
+        <p><a href="${pageContext.request.contextPath}/quotation-create">Create New Quotation</a></p>
         <form action="quotation-list" method="GET">
             Customer Name:
             <input type="text" name="search" value="${searchText}" placeholder="Enter customer name">
