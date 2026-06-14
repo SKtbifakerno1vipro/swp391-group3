@@ -215,7 +215,6 @@ public class QuotationDAO extends DBContext {
      */
     public List<QuotationDetail> getQuotationDetailsByQuotationId(int quotationId) {
         List<QuotationDetail> details = new ArrayList<>();
-
         String sql = "SELECT quotation_detail.quotation_detail_id, "
                 + "quotation_detail.quotation_id, "
                 + "quotation_detail.product_id, "
