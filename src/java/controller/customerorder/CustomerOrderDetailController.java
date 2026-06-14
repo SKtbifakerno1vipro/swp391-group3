@@ -43,4 +43,36 @@ public class CustomerOrderDetailController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/customer-order-list");
         }
     }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
+        String orderIdStr = request.getParameter("orderId");
+        
+        if (orderIdStr == null || orderIdStr.isBlank()) {
+            response.sendRedirect(request.getContextPath() + "/customer-order-list");
+            return;
+        }
+        
+        int orderId = Integer.parseInt(orderIdStr);
+        
+        if ("update_status".equals(action)) {
+            String status = request.getParameter("status");
+            customerOrderService.updateOrderStatus(orderId, status);
+            
+        } else if ("update_quantity".equals(action)) {
+            int detailId = Integer.parseInt(request.getParameter("detailId"));
+            int quantity = Integer.parseInt(request.getParameter("quantity"));
+            
+            if (quantity > 0) {
+                customerOrderService.updateOrderDetailQuantity(detailId, quantity);
+            }
+        } else if ("delete_item".equals(action)) {
+            int detailId = Integer.parseInt(request.getParameter("detailId"));
+            customerOrderService.deleteOrderDetail(detailId);
+        }
+        
+        response.sendRedirect(request.getContextPath() + "/customer-order-detail?id=" + orderId);
+    }
 }
