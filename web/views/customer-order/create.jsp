@@ -132,7 +132,7 @@
                 <select name="customerContractId" id="customerContractId" required>
                     <option value="">-- Choose Contract --</option>
                     <c:forEach var="con" items="${contracts}">
-                        <option value="${con.contractId}">${con.contractNumber} (${con.status})</option>
+                        <option value="${con.contractId}">${con.contractNumber} (${con.contractStatus})</option>
                     </c:forEach>
                 </select>
                 <c:if test="${empty contracts && not empty customer}">
@@ -175,7 +175,7 @@
                     <a href="?customerId=${param.customerId}&productPage=${currentProductPage - 1}">Previous</a>
                 </c:if>
                 <c:forEach begin="1" end="${totalProductPages}" var="i">
-                    <a href="?customerId=${param.customerId}&productPage=${currentProductPage}" 
+                    <a href="?customerId=${param.customerId}&productPage=${i}" 
                        style="margin: 0 5px; ${i == currentProductPage ? 'font-weight:bold; color:red;' : ''}">${i}</a>
                 </c:forEach>
                 

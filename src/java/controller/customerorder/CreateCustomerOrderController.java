@@ -1,6 +1,7 @@
 package controller.customerorder;
 
 
+import dal.ContractDAO;
 import dto.CustomerDTO;
 import model.CustomerOrder;
 import model.CustomerOrderDetail;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 
 @WebServlet(name = "CreateCustomerOrderController", urlPatterns = {"/create-customer-order"})
 public class CreateCustomerOrderController extends HttpServlet {
-
+    private ContractDAO dao = new ContractDAO();
     private final CustomerOrderService customerOrderService = new CustomerOrderService();
     private final CustomerService customerService = new CustomerService();
     private final ProductService productService = new ProductService();
@@ -72,33 +73,27 @@ public class CreateCustomerOrderController extends HttpServlet {
             request.setAttribute("currentProductPage", productPage);
             request.setAttribute("totalProductPages", totalProductPages);
 
-//            if (customerId != -1) {
-//                CustomerDTO customerDto = customerService.getCustomerDTOByCusId(customerId);
-//                request.setAttribute("customer", customerDto);
-//
-//                if (customerDto != null) {
-//                    // Chi lay nhung hop đong đa ky (SIGNED) cua khach hang nay
-//                    List<model.CustomerContract> contracts = customerOrderService.getSignedContractsByCustomerId(customerId);
-//                    request.setAttribute("contracts", contracts);
-//
-//                    if (contracts.isEmpty()) {
-//                        request.setAttribute("error", "No signed contracts found for this customer. A signed contract is required to create an order.");
-//                        request.setAttribute("error", "No signed contracts found...");
-//                        // Thong bao neu chua co hop đong ky ket
-//                    }
-//                } else {
-//                    request.setAttribute("error", "Customer not found.");
-//                    // Reset customerId if not found to show customer list
-//                    customerId = -1;
-//                    // Neu chua chon khach hang, lay toan bo danh sach khach hang đe nguoi dung chon trong dropdown
-//                    List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
-//                    request.setAttribute("customers", customers);
-//                }
-//            } else {
-//                // If no customerId provided, show customer list for Admin/Staff to choose
-//                List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
-//                request.setAttribute("customers", customers);
-//            }
+            if (customerId != -1) {
+                CustomerDTO customerDto = customerService.getCustomerDTOByCusId(customerId);
+                request.setAttribute("customer", customerDto);
+
+                if (customerDto != null) {
+                    // Chỉ lấy những hợp đồng đã ký (SIGNED) của khách hàng này
+                    List<model.Contract> contracts = dao.getSignedContractsByCustomerId(customerId);
+                    request.setAttribute("contracts", contracts);
+                } else {
+                    request.setAttribute("error", "Customer not found.");
+                    // Reset customerId if not found to show customer list
+                    customerId = -1;
+                    // Nếu chưa chọn khách hàng, lấy toàn bộ danh sách khách hàng để người dùng chọn trong dropdown
+                    List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
+                    request.setAttribute("customers", customers);
+                }
+            } else {
+                // If no customerId provided, show customer list for Admin/Staff to choose
+                List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
+                request.setAttribute("customers", customers);
+            }
 
             request.getRequestDispatcher("/views/customer-order/create.jsp").forward(request, response);
 
