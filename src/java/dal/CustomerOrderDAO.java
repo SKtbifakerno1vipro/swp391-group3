@@ -149,6 +149,40 @@ public class CustomerOrderDAO extends DBContext {
             }
         }
     }
+    public boolean updateOrderStatus(int orderId, String status) {
+        String sql = "UPDATE customer_order SET order_status = ? WHERE customer_order_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, orderId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateOrderDetailQuantity(int detailId, int quantity) {
+        String sql = "UPDATE customer_order_detail SET quantity = ? WHERE customer_order_detail_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, detailId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteOrderDetail(int detailId) {
+        String sql = "DELETE FROM customer_order_detail WHERE customer_order_detail_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, detailId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     private CustomerOrderDTO mapResultSetToDTO(ResultSet rs) throws java.sql.SQLException {
         CustomerOrder co = new CustomerOrder();
