@@ -12,16 +12,27 @@
         
 
         <h3>Order Information</h3>
-        <ul>
-            <li><strong>Order ID:</strong> ${order.customerOrder.customerOrderId}</li>
-            <li><strong>Customer Name:</strong> ${order.customerUser.fullName}</li>
-            <li><strong>Tax Code:</strong> ${order.customer.taxCode}</li>
-            <li><strong>Status:</strong> ${order.customerOrder.orderStatus}</li>
-            <li><strong>Created At:</strong> 
-                <fmt:parseDate value="${order.customerOrder.createdAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
-                <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
-            </li>
-        </ul>
+        <form action="${pageContext.request.contextPath}/customer-order-detail" method="POST">
+            <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
+            <input type="hidden" name="action" value="update_status">
+            <ul>
+                <li><strong>Order ID:</strong> ${order.customerOrder.customerOrderId}</li>
+                <li><strong>Customer Name:</strong> ${order.customerUser.fullName}</li>
+                <li><strong>Tax Code:</strong> ${order.customer.taxCode}</li>
+                <li><strong>Status:</strong> 
+                    <select name="status">
+                        <option value="PENDING" ${order.customerOrder.orderStatus == 'PENDING' ? 'selected' : ''}>PENDING</option>
+                        <option value="SHIPPING" ${order.customerOrder.orderStatus == 'SHIPPING' ? 'selected' : ''}>SHIPPING</option>
+                        <option value="COMPLETED" ${order.customerOrder.orderStatus == 'COMPLETED' ? 'selected' : ''}>COMPLETED</option>
+                    </select>
+                    <button type="submit">Update Status</button>
+                </li>
+                <li><strong>Created At:</strong> 
+                    <fmt:parseDate value="${order.customerOrder.createdAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
+                    <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
+                </li>
+            </ul>
+        </form>
 
         <h3>Order Items</h3>
         <table border="1" cellpadding="10" cellspacing="0">
@@ -32,6 +43,7 @@
                     <th>Quantity</th>
                     <th>Unit Price</th>
                     <th>Total</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,14 +54,31 @@
                     <tr>
                         <td>${item.product.productId}</td>
                         <td>${item.product.productName}</td>
-                        <td>${item.detail.quantity} ${item.product.unit}</td>
+                        <td>
+                            <form action="${pageContext.request.contextPath}/customer-order-detail" method="POST" style="display:inline;">
+                                <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
+                                <input type="hidden" name="detailId" value="${item.detail.customerOrderDetailId}">
+                                <input type="hidden" name="action" value="update_quantity">
+                                <input type="number" name="quantity" value="${item.detail.quantity}" min="1" style="width: 60px;">
+                                ${item.product.unit}
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
                         <td><fmt:formatNumber value="${item.detail.sellingPrice}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
                         <td><fmt:formatNumber value="${itemTotal}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                        <td>
+                            <form action="${pageContext.request.contextPath}/customer-order-detail" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
+                                <input type="hidden" name="detailId" value="${item.detail.customerOrderDetailId}">
+                                <input type="hidden" name="action" value="delete_item">
+                                <button type="submit" style="color: red;">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty details}">
                     <tr>
-                        <td colspan="5" style="text-align: center;">No items found in this order.</td>
+                        <td colspan="6" style="text-align: center;">No items found in this order.</td>
                     </tr>
                 </c:if>
             </tbody>
@@ -57,6 +86,7 @@
                 <tr>
                     <th colspan="4" style="text-align: right;">Grand Total:</th>
                     <th><fmt:formatNumber value="${totalOrderAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></th>
+                    <th></th>
                 </tr>
             </tfoot>
         </table>

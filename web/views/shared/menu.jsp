@@ -10,6 +10,7 @@
         <li><a href="${pageContext.request.contextPath}/product-list" style="text-decoration: none; color: #333;">Products</a></li>
         <li><a href="${pageContext.request.contextPath}/category/list" style="text-decoration: none; color: #333;">Categories</a></li>
         <li><a href="${pageContext.request.contextPath}/quotation-list" style="text-decoration: none; color: #333;">Quotations</a></li>
+        <li><a href="${pageContext.request.contextPath}/Signature" style="text-decoration: none; color: #333;">Demo Signature</a></li>
         
         <li style="margin-left: auto;"><a href="${pageContext.request.contextPath}/user/password/change" style="text-decoration: none; color: #0056b3;">Change password</a></li>
         <li><a href="${pageContext.request.contextPath}/logout" style="text-decoration: none; color: #dc3545;">Logout</a></li>

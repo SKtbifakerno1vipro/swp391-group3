@@ -49,6 +49,16 @@ public class CustomerOrderService {
     public List<CustomerOrderDTO> searchOrdersByPage(String kw, int p, int s) {
         return customerOrderDAO.searchOrdersWithPaging(kw, p, s);
     }
+    public boolean updateOrderStatus(int orderId, String status) {
+        return customerOrderDAO.updateOrderStatus(orderId, status);
+    }
+    public boolean updateOrderDetailQuantity(int detailId, int quantity) {
+        return customerOrderDAO.updateOrderDetailQuantity(detailId, quantity);
+    }
+
+    public boolean deleteOrderDetail(int detailId) {
+        return customerOrderDAO.deleteOrderDetail(detailId);
+    }
     
     // -xoa thi nho bao xhieu 
     
@@ -71,4 +81,5 @@ public class CustomerOrderService {
         return customerOrderDAO.getListCustomerOrderDTOByCusId(cusId);
     }
     // end
+    
 }

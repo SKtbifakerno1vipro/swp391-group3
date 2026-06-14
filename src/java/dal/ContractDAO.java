@@ -212,6 +212,24 @@ public class ContractDAO extends DBContext {
         }
         return null;
     }
+    public List<Contract> getSignedContractsByCustomerId(int customerId) {
+        List<Contract> list = new ArrayList<>();
+        String sql = "SELECT * FROM customer_contract WHERE customer_id = ? AND contract_status = 'SIGNED'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Contract cc = new Contract();
+                cc.setContractId(rs.getInt("customer_contract_id"));
+                cc.setContractNumber(rs.getString("contract_number"));
+                cc.setContractStatus(rs.getString("contract_status"));
+                list.add(cc);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
     // UPDATE
     public boolean update(Contract c) {
