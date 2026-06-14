@@ -30,7 +30,9 @@ public class SecurityFilter implements Filter {
     private static final List<String> AUTHENTICATED_URLS = List.of(
             "/dashboard",
             "/profile",
-            "/user/password/change"
+            "/user/password/change",
+            "/quotation-create",
+            "/quotation-detail"
     );
 
     @Override
