@@ -10,12 +10,15 @@ import model.*;
 import dto.*;
 
 public class ContractDAO extends DBContext {
+// CREATE
 
-    // CREATE
     public int insert(Contract c) {
         String sql = "INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_status, contract_content, storage_type, created_by, created_at, updated_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+        // Sử dụng Statement.RETURN_GENERATED_KEYS để lấy ID tự tăng
+        try (PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+
             ps.setInt(1, c.getCustomerId());
             ps.setInt(2, c.getQuotationId());
             ps.setString(3, c.getContractNumber());
@@ -25,17 +28,22 @@ public class ContractDAO extends DBContext {
             ps.setInt(7, c.getCreatedBy());
 
             int affectedRows = ps.executeUpdate();
+
             if (affectedRows > 0) {
+                // Lấy ID vừa sinh ra
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        return generatedKeys.getInt(1); // Trả về ID vừa được sinh ra (identity)
+                        return generatedKeys.getInt(1); // Trả về ID hợp lệ
                     }
                 }
             }
         } catch (Exception e) {
-            System.out.println("ContractDAO insert error: " + e.getMessage());
+            // Ghi log lỗi để dễ debug
+            System.err.println("ContractDAO insert error: " + e.getMessage());
+            e.printStackTrace();
         }
-        return -1; // Trả về -1 nếu insert thất bại
+
+        return -1; // Trả về -1 nếu có lỗi hoặc không chèn được
     }
 
     public List<Contract> searchContracts(String contractNumber, String customerName, String status, String storageType, int pageIndex, int pageSize) {

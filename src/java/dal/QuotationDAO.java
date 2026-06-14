@@ -157,4 +157,35 @@ public class QuotationDAO extends DBContext {
         return null;
     }
 
+    public List<model.QuotationDetail> getQuotationDetailsByQuotationId(int quotationId) {
+        List<model.QuotationDetail> list = new ArrayList<>();
+        String sql = "SELECT qd.*, p.product_name "
+                + "FROM dbo.quotation_detail qd "
+                + "JOIN dbo.product p ON qd.product_id = p.product_id "
+                + "WHERE qd.quotation_id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, quotationId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                model.QuotationDetail detail = new model.QuotationDetail();
+                detail.setQuotationDetailId(rs.getInt("quotation_detail_id"));
+                detail.setQuotationId(rs.getInt("quotation_id"));
+                detail.setProductId(rs.getInt("product_id"));
+                detail.setQuantity(rs.getInt("quantity"));
+                detail.setSellingPrice(rs.getBigDecimal("selling_price"));
+                detail.setDiscountPercent(rs.getBigDecimal("discount_percent"));
+                detail.setTaxPercent(rs.getBigDecimal("tax_percent"));
+                detail.setProductName(rs.getString("product_name"));
+
+                // Tính toán amount tạm thời nếu cần (Quantity * SellingPrice)
+                // Hoặc bạn có thể để logic này trong service
+                list.add(detail);
+            }
+        } catch (Exception e) {
+            System.out.println("getQuotationDetailsByQuotationId error: " + e.getMessage());
+        }
+        return list;
+    }
+
 }

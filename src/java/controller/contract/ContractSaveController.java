@@ -14,8 +14,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-@WebServlet(urlPatterns = {"/contract-save"})   
+@WebServlet(urlPatterns = {"/contract-save"})
 public class ContractSaveController extends HttpServlet {
 
     private final ContractDAO contractDAO = new ContractDAO();
@@ -26,85 +27,103 @@ public class ContractSaveController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Khi nguoi dung muon “sua” hop đong đa ton tai → chuyen toi form edit
         String id = request.getParameter("id");
+        String quotationId = request.getParameter("quotationId");
+
         if (id != null && !id.isEmpty()) {
             int contractId = Integer.parseInt(id);
             Contract contract = contractDAO.getContractById(contractId);
             request.setAttribute("contract", contract);
             request.getRequestDispatcher("views/contract/form.jsp")
-                   .forward(request, response);
+                    .forward(request, response);
+        } else if (quotationId != null && !quotationId.isEmpty()) {
+            int qId = Integer.parseInt(quotationId);
+            String templateHtml = generateContractHtml(qId);
+            request.setAttribute("templateContent", templateHtml);
+            request.setAttribute("quotationId", qId);
+            request.getRequestDispatcher("views/contract/form.jsp")
+                    .forward(request, response);
         } else {
-            // khong co id → chuyen ve danh sach
             response.sendRedirect("contract-list");
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        /*
-         *  Đau vao:  quotationId (đuoc truyen tu form “Tao hop đong”)
-         *  Quy trinh:
-         *  1. Lay Quotation, Customer va chi tiet san pham.
-         *  2. Đoc file config.properties (cac thong tin Ben A).
-         *  3. Đoc template HTML.
-         *  4. Gan du lieu → html cuoi cung.
-         *  5. Luu vao bang customer_contract.
-         *  6. Chuyen ve chi tiet hoac danh sach.
-         */
-
-        request.setCharacterEncoding("UTF-8");
-        String quotationIdStr = request.getParameter("quotationId");
-        if (quotationIdStr == null || quotationIdStr.isEmpty()) {
-            response.getWriter().println("Thiếu quotationId");
-            return;
-        }
-        int quotationId = Integer.parseInt(quotationIdStr);
-
-        // 1. Lay du lieu lien quan
+    private String generateContractHtml(int quotationId) throws IOException {
         Quotation quotation = quotationDAO.getQuotationById(quotationId);
         Customer customer = customerDAO.getCustomerByCusId(quotation.getCustomerId());
-        List<QuotationDetail> details = null;
+        List<QuotationDetail> details = quotationDAO.getQuotationDetailsByQuotationId(quotationId);
 
-        // 2. Đoc file config.properties (đat trong WEB-INF)
         Properties config = new Properties();
-        try (InputStream is = getServletContext()
-                .getResourceAsStream("/WEB-INF/config.properties")) {
+        try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/config.properties")) {
             if (is != null) {
                 config.load(is);
             }
         }
 
-        // 3. Đoc template HTML
-        String templatePath = getServletContext()
-                .getRealPath("/WEB-INF/views/contract/ContractTemplate.html");
+        String templatePath = getServletContext().getRealPath("/views/contract/template.jsp");
         String template = new String(Files.readAllBytes(Paths.get(templatePath)), "UTF-8");
 
-        // 4. Tao noi dung hop đong
-        String contractHtml = contractService.fillTemplate(
-                quotation, customer, details, template, config);
+        return contractService.fillTemplate(quotation, customer, details, template, config);
+    }
 
-        // 5. Tao đoi tuong Contract va luu vao DB
-        Contract contract = new Contract();
-        contract.setCustomerId(customer.getCustomerId());
-        contract.setQuotationId(quotationId);
-        contract.setContractNumber("HĐ-" + System.currentTimeMillis()); // demo tự sinh
-        contract.setContractStatus("DRAFT");
-        contract.setStorageType("TEXT");
-        contract.setContractContent(contractHtml);
-        contract.setCreatedBy( /* ID người hiện tại, ví dụ lấy từ session */ 1 );
-        // cac truong ngay, version … neu can co the set o đay
+   @Override
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    request.setCharacterEncoding("UTF-8");
+    HttpSession session = request.getSession();
+    
+    // 1. Lấy User từ Session (An toàn)
+    User user = (User) session.getAttribute("user"); // Giả sử bạn lưu User vào session
+    if (user == null) {
+        response.sendRedirect("login"); // Chưa đăng nhập thì bắt đăng nhập
+        return;
+    }
 
-        int contractId = contractDAO.insert(contract); // trả về PK mới tạo
+    // 2. Lấy dữ liệu từ form
+    String contractIdStr = request.getParameter("contractId");
+    String quotationIdStr = request.getParameter("quotationId");
+    String contractContent = request.getParameter("contractContent");
 
-        // 6. Chuyen huong toi chi tiet hop đong (hoac danh sach)
-        if (contractId > 0) {
+    // 3. Validation cơ bản (Cực kỳ quan trọng)
+    if (contractContent == null || contractContent.trim().isEmpty()) {
+        request.setAttribute("errorMsg", "Nội dung hợp đồng không được để trống!");
+        request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+        return;
+    }
+
+    // 4. Logic Insert hoặc Update
+    if (contractIdStr != null && !contractIdStr.isEmpty()) {
+        // --- UPDATE ---
+        int contractId = Integer.parseInt(contractIdStr);
+        Contract c = contractDAO.getContractById(contractId);
+        c.setContractContent(contractContent);
+        c.setUpdatedBy(user.getUserId());
+        
+        boolean success = contractDAO.update(c);
+        if (success) {
             response.sendRedirect("contract-detail?id=" + contractId);
         } else {
-            request.setAttribute("errorMsg", "Lưu hợp đồng thất bại");
-            request.getRequestDispatcher("views/contract/form.jsp")
-                   .forward(request, response);
+            request.setAttribute("errorMsg", "Cập nhật thất bại!");
+            request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+        }
+    } else {
+        // --- INSERT (Tạo mới) ---
+        int quotationId = Integer.parseInt(quotationIdStr);
+        Contract c = new Contract();
+        c.setCustomerId(Integer.parseInt(request.getParameter("customerId"))); // Bạn cần gửi thêm field này ở form
+        c.setQuotationId(quotationId);
+        c.setContractNumber("HD-" + System.currentTimeMillis()); // Nên đổi thành hàm sinh ID riêng
+        c.setContractStatus("DRAFT");
+        c.setContractContent(contractContent);
+        c.setCreatedBy(user.getUserId());
+
+        int newId = contractDAO.insert(c);
+        if (newId > 0) {
+            response.sendRedirect("contract-detail?id=" + newId);
+        } else {
+            request.setAttribute("errorMsg", "Tạo mới thất bại!");
+            request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
         }
     }
+}
 }
