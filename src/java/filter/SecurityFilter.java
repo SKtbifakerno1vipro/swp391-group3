@@ -140,39 +140,39 @@ public class SecurityFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-        String path = req.getServletPath();
-
-        if (isStaticResource(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        HttpSession session = req.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
-
-        if (user == null) {
-            res.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
-        if (LOGGED_IN_URLS.contains(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (hasPermission(user.getRoleId(), path)) {
-            chain.doFilter(request, response);
-        } else {
-            res.sendRedirect(req.getContextPath() + "/dashboard");
-        }
+        chain.doFilter(request, response);
+//        HttpServletRequest req = (HttpServletRequest) request;
+//        HttpServletResponse res = (HttpServletResponse) response;
+//        String path = req.getServletPath();
+//
+//        if (isStaticResource(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("")) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        HttpSession session = req.getSession(false);
+//        User user = (session != null) ? (User) session.getAttribute("user") : null;
+//
+//        if (user == null) {
+//            res.sendRedirect(req.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        if (LOGGED_IN_URLS.contains(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (hasPermission(user.getRoleId(), path)) {
+//            chain.doFilter(request, response);
+//        } else {
+//            res.sendRedirect(req.getContextPath() + "/dashboard");
+//        }
     }
 
     private boolean hasPermission(int roleId, String path) {
