@@ -156,7 +156,7 @@ CREATE TABLE customer_contract (
 	end_date DATETIME,
 	signed_date DATETIME,    
 
-	contract_content NVARCHAR(MAX),
+	contract_content nvarchar(max),
     storage_type VARCHAR(10) NOT NULL DEFAULT 'TEXT',
 
     created_by INT,

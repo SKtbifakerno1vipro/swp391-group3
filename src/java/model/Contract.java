@@ -15,6 +15,7 @@ public class Contract {
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
+
     private int quotationId;
     private String contractNumber;
     private String contractFileUrl;
@@ -162,5 +163,4 @@ public class Contract {
 
     public Contract() {
     }
-
 }
