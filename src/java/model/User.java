@@ -149,7 +149,7 @@ public class User {
         if (this.getCreateAt() == null) {
             return "N/A";
         }
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         return this.getCreateAt().format(fmt);
     }
 
@@ -157,7 +157,7 @@ public class User {
         if (this.getUpdateAt() == null) {
             return "N/A";
         }
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         return this.updateAt.format(fmt);
     }
 }

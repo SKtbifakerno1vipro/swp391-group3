@@ -104,4 +104,13 @@ public class Quotation {
         this.totalAmount = totalAmount;
     }
 
+    // XHieu-begin - delete contact me
+    public String getFormattedQuotationDate() {
+        if (this.quotationDate != null) {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.quotationDate.format(formatter);
+        }
+        return "";
+    }
+    // Xhieu - end
 }

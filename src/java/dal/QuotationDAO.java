@@ -339,4 +339,41 @@ public class QuotationDAO extends DBContext {
         }
     }
 
+    // XHieu-begin - delete contact me
+    public List<Quotation> getQuotationsByCustomerId(int customerId) {
+        List<Quotation> list = new ArrayList<>();
+        String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
+                + "quotation.quotation_status, quotation.created_by, quotation.created_at, "
+                + "customer.company_name, [user].user_name "
+                + "FROM quotation "
+                + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
+                + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
+                + "WHERE quotation.customer_id = ? "
+                + "ORDER BY quotation.created_at DESC";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, customerId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Quotation quotation = new Quotation();
+                quotation.setQuotationId(rs.getInt("quotation_id"));
+                quotation.setCustomerId(rs.getInt("customer_id"));
+                if (rs.getTimestamp("quotation_date") != null) {
+                    quotation.setQuotationDate(rs.getTimestamp("quotation_date").toLocalDateTime());
+                }
+                quotation.setQuotationStatus(rs.getString("quotation_status"));
+                quotation.setCreatedBy(rs.getInt("created_by"));
+                if (rs.getTimestamp("created_at") != null) {
+                    quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                }
+                quotation.setCustomerName(rs.getString("company_name"));
+                quotation.setCreatedByName(rs.getString("user_name"));
+                list.add(quotation);
+            }
+        } catch (Exception e) {
+            System.out.println("getQuotationsByCustomerId error: " + e.getMessage());
+        }
+        return list;
+    }
+    // Xhieu - end
 }
