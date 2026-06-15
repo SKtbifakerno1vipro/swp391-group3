@@ -163,4 +163,13 @@ public class Contract {
     public Contract() {
     }
 
+    // XHieu-begin - delete contact me
+    public String getFormattedSignDate() {
+        if (this.signDate != null) {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.signDate.format(formatter);
+        }
+        return "N/A";
+    }
+    // Xhieu - end
 }

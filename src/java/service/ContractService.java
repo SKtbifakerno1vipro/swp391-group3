@@ -106,4 +106,12 @@ public class ContractService {
 
         return template;
     }
+
+    // XHieu-begin - delete contact me
+    private final dal.ContractDAO contractDAO = new dal.ContractDAO();
+
+    public List<Contract> getContractsByCustomerId(int customerId) {
+        return contractDAO.getContractsByCustomerId(customerId);
+    }
+    // Xhieu - end
 }

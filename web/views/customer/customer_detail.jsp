@@ -391,11 +391,11 @@
                     <div class="tabs-container">
                         <ul class="tab-menu">
                             <li class="tab-item active" onclick="switchTab(event, 'quotationsTab')">Quotations
-                                (${listQuotations.size() != null ? listQuotations.size() : 0})</li>
+                                (${listQuotationsForCus.size() != null ? listQuotationsForCus.size() : 0})</li>
                             <li class="tab-item" onclick="switchTab(event, 'contractsTab')">Contracts & Signatures
-                                (${listContracts.size() != null ? listContracts.size() : 0})</li>
+                                (${listContractsForCus.size() != null ? listContractsForCus.size() : 0})</li>
                             <li class="tab-item" onclick="switchTab(event, 'ordersTab')">Orders Progress
-                                (${listOrders.size() != null ? listOrders.size() : 0})</li>
+                                (${listOrdersForCus.size() != null ? listOrdersForCus.size() : 0})</li>
                             <li class="tab-item" onclick="switchTab(event, 'billingTab')">Invoices & Payments</li>
                         </ul>
 
@@ -412,9 +412,15 @@
                                 </thead>
                                 <tbody>
                                     <c:choose>
-                                        <c:when test="${not empty listQuotations}">
-                                            <c:forEach var="q" items="${listQuotations}">
-                                                <!-- chua co -->
+                                        <c:when test="${not empty listQuotationsForCus}">
+                                            <c:forEach var="q" items="${listQuotationsForCus}">
+                                                <tr>
+                                                    <td>#${q.quotationId}</td>
+                                                    <td>${q.formattedQuotationDate}</td>
+                                                    <td><span class="badge" style="background-color: #e2e3e5; color: #383d41;">${q.quotationStatus}</span></td>
+                                                    <td>${not empty q.createdByName ? q.createdByName : 'N/A'}</td>
+                                                    <td><a href="${pageContext.request.contextPath}/quotation-detail?id=${q.quotationId}" class="btn-action-sm">View Details</a></td>
+                                                </tr>
                                             </c:forEach>
                                         </c:when>
                                         <c:otherwise>
@@ -441,9 +447,28 @@
                                 </thead>
                                 <tbody>
                                     <c:choose>
-                                        <c:when test="${not empty listContracts}">
-                                            <c:forEach var="c" items="${listContracts}">
-                                                <!-- chua co -->
+                                        <c:when test="${not empty listContractsForCus}">
+                                            <c:forEach var="c" items="${listContractsForCus}">
+                                                <tr>
+                                                    <td>
+                                                        <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">
+                                                            ${c.contractNumber}
+                                                        </a>
+                                                    </td>
+                                                    <td>v${c.contractVersion}</td>
+                                                    <td><span class="badge" style="background-color: #e2e3e5; color: #383d41;">${c.contractStatus}</span></td>
+                                                    <td>${c.formattedSignDate}</td>
+                                                    <td>
+                                                        <c:choose>
+                                                            <c:when test="${not empty c.contractFileUrl}">
+                                                                <a href="${pageContext.request.contextPath}/${c.contractFileUrl}" target="_blank" class="btn-action-sm" style="background-color: #28a745;">Download</a>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span style="color: #6c757d; font-style: italic;">No Document</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                </tr>
                                             </c:forEach>
                                         </c:when>
                                         <c:otherwise>
@@ -468,8 +493,8 @@
                                 </thead>
                                 <tbody>
                                     <c:choose>
-                                        <c:when test="${not empty listOrders}">
-                                            <c:forEach var="o" items="${listOrders}">
+                                        <c:when test="${not empty listOrdersForCus}">
+                                            <c:forEach var="o" items="${listOrdersForCus}">
                                                 <tr>
                                                     <td>#${o.customerOrder.customerOrderId}</td>
                                                     <td>${o.customerOrder.formattedCreatedAt}</td>
