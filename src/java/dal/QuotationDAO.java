@@ -324,4 +324,16 @@ public class QuotationDAO extends DBContext {
 
         return false;
     }
+
+    public void updateStatus(int quotationId, String status) {
+        String sql = "UPDATE quotation SET quotation_status = ? WHERE quotation_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, quotationId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

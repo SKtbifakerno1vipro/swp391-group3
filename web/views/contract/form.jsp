@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>${contract == null ? 'Tạo mới' : 'Chỉnh sửa'} Hợp đồng</title>
+        <title>${contract == null ? 'To mi' : 'Chnh sa'} Hp ng</title>
         <style>
             #contract-body {
                 border: 1px solid #999;
@@ -15,41 +15,46 @@
         </style>
     </head>
     <body>
-        <h2>${contract == null ? 'Tạo Hợp đồng mới' : 'Chỉnh sửa Hợp đồng'}</h2>
+        <c:if test="${not empty errorMsg}">
+            <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;">
+                ${errorMsg}
+            </div>
+        </c:if>
+        <h2>${contract == null ? 'To Hp ng mi' : 'Chnh sa Hp ng'}</h2>
 
-        <!-- Gửi POST tới contract-save -->
+        <!-- Gi POST ti contract-save -->
         <form action="contract-save" method="POST" id="contractForm" onsubmit="prepareContent()">
-            <!-- Dùng cho Update -->
+            <!-- Dng cho Update -->
             <input type="hidden" name="contractId" value="${contract.contractId}">
-            <!-- Dùng cho Create (khi bấm tạo từ Quotation) -->
+            <!-- Dng cho Create (khi bm to t Quotation) -->
             <input type="hidden" name="quotationId" value="${quotationId}">
 
-            <label>Số Hợp đồng:</label>
+            <label>S Hp ng:</label>
             <input type="text" name="contractNumber" value="${contract.contractNumber}" required>
 
             <br><br>
 
-            <label>Nội dung hợp đồng (Có thể chỉnh sửa trực tiếp):</label>
-            <!-- Sử dụng thẻ div với contenteditable="true" để trình duyệt render HTML -->
+            <label>Ni dung hp ng (C th chnh sa trc tip):</label>
+            <!-- S dng th div vi contenteditable="true"  trnh duyt render HTML -->
             <div id="contract-body" 
                  style="border: 1px solid #ccc; padding: 20px; min-height: 500px; background: white; margin-top: 10px;"
                  contenteditable="true">
                 ${not empty contract.contractContent ? contract.contractContent : templateContent}
             </div>
 
-            <!-- Input ẩn quan trọng để gửi HTML về Controller -->
+            <!-- Input n quan trng  gi HTML v Controller -->
             <input type="hidden" name="contractContent" id="contractContentInput">
 
             <br>
-            <!-- Nút lưu cần gọi hàm JS để lấy dữ liệu từ DIV -->
-            <button type="submit" onclick="prepareContent()">Lưu Hợp đồng</button>
+            <!-- Nt lu cn gi hm JS  ly d liu t DIV -->
+            <button type="submit" onclick="prepareContent()">Lu Hp ng</button>
 
 
             <script>
                 function prepareContent() {
-                    // Lấy nội dung từ div đã render HTML
+                    
                     var content = document.getElementById('contract-body').innerHTML;
-                    // Gán vào input ẩn
+                    
                     document.getElementById('contractContentInput').value = content;
                 }
             </script>

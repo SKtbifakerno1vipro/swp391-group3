@@ -23,13 +23,14 @@ public class EditUserController extends HttpServlet {
         String idStr = request.getParameter("id");
         request.setAttribute("roles", roleService.getAllRoles());
 
-        // Neu co ID -> Che đo EDIT -> vao detail.jsp
+
         if (idStr != null && !idStr.trim().isEmpty()) {
             try {
                 User u = userService.getUserById(Integer.parseInt(idStr));
-                if (u != null) {
+                                if (u != null) {
                     request.setAttribute("u", u);
                     request.setAttribute("mode", "edit");
+                    request.setAttribute("userService", userService);
                     request.getRequestDispatcher("/views/user/detail.jsp").forward(request, response);
                 } else {
                     response.sendRedirect("user-list");
@@ -37,7 +38,7 @@ public class EditUserController extends HttpServlet {
             } catch (Exception e) {
                 response.sendRedirect("user-list");
             }
-        } // Không có ID -> Chế độ CREATE -> vào create.jsp
+        } 
         else {
             request.setAttribute("mode", "create");
             request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
@@ -93,8 +94,8 @@ public class EditUserController extends HttpServlet {
             }
         }
 
-        // Neu la Create thi check them mat khau
-        String password = request.getParameter("password");
+
+        String password = "1234"; //defautl password,  if finish email then update final
         if (!isEdit && error == null) {
             if (password == null || password.trim().isEmpty()) {
                 error = "Password is required!";
@@ -103,7 +104,7 @@ public class EditUserController extends HttpServlet {
             }
         }
 
-        // 3. Xu ly loi (Tra ve đung trang tuong ung)
+
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("u", u);
@@ -112,19 +113,19 @@ public class EditUserController extends HttpServlet {
             request.getRequestDispatcher(targetJSP).forward(request, response);
             return;
         }
-// Lay Admin đang đang nhap tu Session
+
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
 
         if (isEdit) {
-            // Neu la sua: Chi cap nhat nguoi sua cuoi
+   
             u.setUpdatedBy(currentUser.getUserId());
         } else {
-            // Neu la tao moi: Ca nguoi tao va nguoi sua đau tien đeu la Admin nay
+
             u.setCreatedBy(currentUser.getUserId());
             u.setUpdatedBy(currentUser.getUserId());
         }
-        // 4. Luu vao Database
+
         boolean success = isEdit ? userService.updateUser(u) : userService.createUser(u);
 
         if (success) {

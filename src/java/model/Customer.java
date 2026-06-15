@@ -80,5 +80,4 @@ public class Customer {
         this.updatedAt = updatedAt;
     }
 
-
 }

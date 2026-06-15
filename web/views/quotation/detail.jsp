@@ -139,8 +139,26 @@
         </tbody>
     </table>
 
-    <br>
+        <br>
+    <div class="actions" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;">
+        <!-- Sale Staff: Accept button when status is DRAFT or PENDING -->
+        <c:if test="${quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING'}">
+            <form action="quotation-detail" method="POST" style="display:inline;">
+                <input type="hidden" name="quotationId" value="${quotation.quotationId}">
+                <input type="hidden" name="action" value="accept">
+                <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">Accept Quotation</button>
+            </form>
+        </c:if>
 
+        <!-- Admin Officer: Generate Draft button when status is ACCEPTED -->
+        <c:if test="${sessionScope.user.roleId == 4 && quotation.quotationStatus == 'ACCEPTED'}">
+            <a href="contract-generate?quotationId=${quotation.quotationId}">
+                <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; cursor: pointer;">Generate Draft Contract</button>
+            </a>
+        </c:if>
+    </div>
+
+    <br>
     <a href="${pageContext.request.contextPath}/quotation-list">Back to List</a>
 
 </body>

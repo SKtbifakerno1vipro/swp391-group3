@@ -93,4 +93,9 @@ public class QuotationService {
 
         return updated;
     }
+
+    public void updateStatus(int quotationId, String status) {
+        quotationDAO.updateStatus(quotationId, status);
+    }
+
 }

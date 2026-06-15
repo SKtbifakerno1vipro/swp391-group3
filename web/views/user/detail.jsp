@@ -1,4 +1,4 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html class="light" lang="en">
@@ -232,11 +232,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border-subtle">
                         <div class="space-y-1">
                             <p class="font-label-sm text-on-surface-variant">Created By</p>
-                            <p class="font-body-md text-on-surface">${u.createdBy}</p>
+                            <p class="font-body-md text-on-surface">${userService.getUsernameById(u.createdBy)}</p>
                         </div>
                         <div class="space-y-1 text-right">
                             <p class="font-label-sm text-on-surface-variant">Last Updated By</p>
-                            <p class="font-body-md text-on-surface">${u.updatedBy}</p>
+                            <p class="font-body-md text-on-surface">${userService.getUsernameById(u.updatedBy)}</p>
                         </div>
                     </div>
 
@@ -253,7 +253,7 @@
         </main>
 
         <footer class="mt-auto flex justify-between items-center px-container-margin py-stack-md w-full bg-surface-main border-t border-border-subtle">
-            <p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 SaleFlow Digitalization System.</p>
+            <p class="font-label-sm text-label-sm text-on-surface-variant"> 2024 SaleFlow Digitalization System.</p>
         </footer>
     </div>
 </body>

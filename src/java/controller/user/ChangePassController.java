@@ -71,24 +71,24 @@ public class ChangePassController extends HttpServlet {
             newPassword == null || newPassword.trim().isEmpty() ||
             confirmPassword == null || confirmPassword.trim().isEmpty()) {
 
-            request.setAttribute("error", "Vui lòng nhập đầy đủ tất cả các trường!");
+            request.setAttribute("error", "Vui lng nhp y  tt c cc trng!");
             request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
             return;
         }
         if (!newPassword.equals(confirmPassword)) {
-            request.setAttribute("error", "Mật khẩu mới và xác nhận mật khẩu không khớp!");
+            request.setAttribute("error", "Mt khu mi v xc nhn mt khu khng khp!");
             request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
             return;
         }
         try {     
             String resultMessage = userService.changePassword(user.getUserId(), currentPassword, newPassword);
             if (resultMessage == null) {
-                request.setAttribute("success", "Đổi mật khẩu thành công!");
+                request.setAttribute("success", "i mt khu thnh cng!");
             } else {
                 request.setAttribute("error", resultMessage);
             }
         } catch (Exception e) {
-            request.setAttribute("error", "Đã xảy ra lỗi khi kết nối cơ sở dữ liệu!");
+            request.setAttribute("error", " xy ra li khi kt ni c s d liu!");
             request.setAttribute("errorDetail", e.getMessage());
         }
 

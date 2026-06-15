@@ -1,5 +1,7 @@
 package service;
 
+
+
 import dal.UserDAO;
 import dto.UserRoleDTO;
 import java.util.List;
@@ -31,6 +33,16 @@ public class UserService {
 
     public boolean updateUser(User user) {
         return userDAO.updateUser(user);
+    }
+
+        public String getUsernameById(int userId) {
+        if (userId <= 0) return "N/A";
+        User u = userDAO.getUserById(userId);
+        return (u != null) ? u.getUserName() : "Khng tm thy";
+    }
+
+    public User findUserByUsername(String username) {
+        return userDAO.findUserByUsername(username);
     }
 
     public User login(String username, String password) {
@@ -68,7 +80,7 @@ public class UserService {
         if (u.getPhone() != null && u.getPhone().trim().contentEquals(phone.trim())) {
             return u;
         }
-        System.out.println(" tim thay user nhưng ko khop sdt");
+        System.out.println(" tim thay user nhng ko khop sdt");
         return null;
     }
 
@@ -85,7 +97,7 @@ public class UserService {
     }
 
     public Connection getConnection() {
-        return userDAO.getConnection(); // Lấy biến connection kế thừa từ DBContext
+        return userDAO.getConnection(); // cleaned comment
     }
 
     public String changePassword(int userId, String currentPassword, String newPassword) throws Exception {
@@ -93,13 +105,13 @@ public class UserService {
         User u = getUserByIdFullParameter(userId);
         if (currentPassword != null) { // ko co pass la quen mat khau
             if (!BCrypt.checkpw(currentPassword, u.getPassword())) {
-                return "Mật khẩu hiện tại không chính xác!";
+                return "Mt khu hin ti khng chnh xc!";
             }
         }
         // 3. Thuc hien cap nhat mat khau moi vao DB
         boolean isUpdateSuccess = userDAO.updatePassword(userId, newPassword);
         if (!isUpdateSuccess) {
-            return "Đã xảy ra lỗi hệ thống khi cập nhật dữ liệu. Vui lòng thử lại sau!";
+            return " xy ra li h thng khi cp nht d liu. Vui lng th li sau!";
         }
         return null;
     }

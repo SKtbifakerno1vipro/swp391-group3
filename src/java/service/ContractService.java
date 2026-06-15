@@ -1,6 +1,7 @@
 package service;
 
 import model.*;
+import dto.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -10,57 +11,52 @@ import java.util.Properties;
 
 public class ContractService {
 
+    public String fillTemplate(Quotation q, CustomerDTO cust, List<QuotationDetail> details,
+            String template, Properties config) {
 
-    public String fillTemplate(Quotation q, Customer cust, List<QuotationDetail> details,
-                               String template, Properties config) {
 
-        // ------------------------------------------------------------------
-        // 1. THÔNG TIN KHÁCH HÀNG (BÊN B)
-        // ------------------------------------------------------------------
         template = template.replace("{customer_name}",
                 cust.getCompanyName() != null ? cust.getCompanyName() : "");
-//        template = template.replace("{customer_address}",
-//                cust.getAddress() != null ? cust.getAddress() : "");
-//        template = template.replace("{customer_phone}",
-//                cust.getPhone() != null ? cust.getPhone() : "");
-//        template = template.replace("{customer_tax}",
-//                cust.getTaxCode() != null ? cust.getTaxCode() : "");
+        template = template.replace("{customer_address}",
+                cust.getAddress() != null ? cust.getAddress() : "");
+        template = template.replace("{customer_phone}",
+                cust.getPhone() != null ? cust.getPhone() : "");
+        template = template.replace("{customer_tax}",
+                cust.getTaxCode() != null ? cust.getTaxCode() : "");
 
-        // ------------------------------------------------------------------
-        // 2. THÔNG TIN CÔNG TY (BÊN A) TỪ FILE config.properties
-        // ------------------------------------------------------------------
+
         template = template.replace("{company_name}",
-                config.getProperty("company_name", "CÔNG TY TNHH SWP"));
+                config.getProperty("company_name", "CNG TY TNHH SWP"));
         template = template.replace("{company_address}",
-                config.getProperty("company_address", "Hà Nội"));
+                config.getProperty("company_address", "H Ni"));
         template = template.replace("{company_phone}",
                 config.getProperty("company_phone", "0123456789"));
         template = template.replace("{company_tax}",
                 config.getProperty("company_tax_code", "0101010101"));
         template = template.replace("{company_rep}",
-                config.getProperty("company_rep_name", "Giám Đốc"));
+                config.getProperty("company_rep_name", "Gim c"));
         template = template.replace("{company_position}",
-                config.getProperty("company_position", "Giám đốc"));
+                config.getProperty("company_position", "Gim c"));
 
         // ------------------------------------------------------------------
-        // 3. TẠO BẢNG SẢN PHẨM {product_list}
+        // cleaned comment
         // ------------------------------------------------------------------
         StringBuilder productRows = new StringBuilder();
         int stt = 1;
-        Locale locale = Locale.US; // Đảm bảo dấu phẩy là phân cách hàng nghìn
+        Locale locale = Locale.US; // cleaned comment
 
         if (details != null && !details.isEmpty()) {
             for (QuotationDetail item : details) {
-                // Tính thành tiền (Quantity * SellingPrice) - dùng BigDecimal để tránh overflow
+                // cleaned comment
                 BigDecimal qty = new BigDecimal(item.getQuantity());
-                BigDecimal price = item.getSellingPrice() != null ?
-                        item.getSellingPrice() : BigDecimal.ZERO;
+                BigDecimal price = item.getSellingPrice() != null
+                        ? item.getSellingPrice() : BigDecimal.ZERO;
                 BigDecimal subtotal = price.multiply(qty);
 
-                // Đơn vị: nếu model có getUnit() thì dùng, ngược lại "Cái"
-                String unit ="";
+                // cleaned comment
+                String unit = "";
 //                        (item.getUnit() != null && !item.getUnit().isEmpty())
-//                        ? item.getUnit() : "Cái";
+// cleaned comment
 
                 productRows.append("<tr>")
                         .append("<td style='text-align:center;'>").append(stt++).append("</td>")
@@ -76,21 +72,21 @@ public class ContractService {
             }
         } else {
             productRows.append("<tr><td colspan='6' style='text-align:center;'>")
-                    .append("Không có sản phẩm nào")
+                    .append("Khng c sn phm no")
                     .append("</td></tr>");
         }
         template = template.replace("{product_list}", productRows.toString());
 
         // ------------------------------------------------------------------
-        // 4. ĐẶT THÔNG TIN NGÀY THÁNG (placeholder ngày)
+        // cleaned comment
         // ------------------------------------------------------------------
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        // {sign_date} : ngày hiện tại
+        // cleaned comment
         template = template.replace("{sign_date}", LocalDate.now().format(fmt));
 
-        // {effective_date} và {end_date}
-        // Nếu quotation có ngày, dùng nó; nếu không, dùng ngày hiện tại
+        // cleaned comment
+        // cleaned comment
         LocalDate effective = (q.getQuotationDate() != null)
                 ? q.getQuotationDate().toLocalDate()
                 : LocalDate.now();
@@ -99,10 +95,10 @@ public class ContractService {
         template = template.replace("{end_date}", effective.plusYears(1).format(fmt));
 
         // ------------------------------------------------------------------
-        // 5. THÔNG TIN KHÁC (số hợp đồng, tổng tiền)
+        // cleaned comment
         // ------------------------------------------------------------------
         template = template.replace("{contract_number}",
-                q.getQuotationId() + "/HĐKT"); // demo: 5/HĐKT
+                q.getQuotationId() + "/HKT"); // cleaned comment
 
         BigDecimal total = q.getTotalAmount() != null ? q.getTotalAmount() : BigDecimal.ZERO;
         template = template.replace("{total_amount}",

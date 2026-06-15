@@ -10,12 +10,15 @@ import model.*;
 import dto.*;
 
 public class ContractDAO extends DBContext {
+// CREATE
 
-    // CREATE
     public int insert(Contract c) {
         String sql = "INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_status, contract_content, storage_type, created_by, created_at, updated_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+        // cleaned comment
+        try (PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+
             ps.setInt(1, c.getCustomerId());
             ps.setInt(2, c.getQuotationId());
             ps.setString(3, c.getContractNumber());
@@ -25,17 +28,22 @@ public class ContractDAO extends DBContext {
             ps.setInt(7, c.getCreatedBy());
 
             int affectedRows = ps.executeUpdate();
+
             if (affectedRows > 0) {
+                // cleaned comment
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        return generatedKeys.getInt(1); // Trả về ID vừa được sinh ra (identity)
+                        return generatedKeys.getInt(1); // cleaned comment
                     }
                 }
             }
         } catch (Exception e) {
-            System.out.println("ContractDAO insert error: " + e.getMessage());
+            // cleaned comment
+            System.err.println("ContractDAO insert error: " + e.getMessage());
+            e.printStackTrace();
         }
-        return -1; // Trả về -1 nếu insert thất bại
+
+        return -1; // cleaned comment
     }
 
     public List<Contract> searchContracts(String contractNumber, String customerName, String status, String storageType, int pageIndex, int pageSize) {
@@ -46,7 +54,7 @@ public class ContractDAO extends DBContext {
                 + "FROM customer_contract c LEFT JOIN customer cust ON c.customer_id = cust.customer_id "
                 + "WHERE 1=1 ";
 
-        // Logic loc đong (4 Filters)
+        // cleaned comment
         if (contractNumber != null && !contractNumber.trim().isEmpty()) {
             sql += " AND c.contract_number LIKE ? ";
         }
@@ -97,7 +105,7 @@ public class ContractDAO extends DBContext {
                     c.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
                 }
 
-                // Đam bao lay đung ngay tao (created_at)
+                // cleaned comment
                 if (rs.getTimestamp("created_at") != null) {
                     c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 }
@@ -110,7 +118,7 @@ public class ContractDAO extends DBContext {
         return list;
     }
 
-    // Ham bo tro đe đem tong so ban ghi (phuc vu phan trang)
+    // cleaned comment
     public int getTotalContracts(String contractNumber, String customerName, String status, String storageType) {
         String sql = "SELECT COUNT(*) FROM customer_contract c "
                 + "LEFT JOIN customer cust ON c.customer_id = cust.customer_id "
@@ -247,12 +255,12 @@ public class ContractDAO extends DBContext {
             ps.setTimestamp(5, c.getEndDate() != null ? Timestamp.valueOf(c.getEndDate()) : null);
             ps.setTimestamp(6, c.getSignDate() != null ? Timestamp.valueOf(c.getSignDate()) : null);
 
-            // Thong tin nguoi sua & Đieu kien WHERE
+            // cleaned comment
             ps.setInt(7, c.getUpdatedBy());
             ps.setInt(8, c.getContractId());
 
             int affectedRows = ps.executeUpdate();
-            return affectedRows > 0; // Trả về true nếu update thành công
+            return affectedRows > 0; // cleaned comment
 
         } catch (Exception e) {
             System.out.println("update contract error: " + e.getMessage());
