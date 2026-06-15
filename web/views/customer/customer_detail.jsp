@@ -305,14 +305,6 @@
                             <span style="color: #6c757d; font-size: 14px;">ID: ${cusDTO.customer.customerId} | User ID:
                                 ${cusDTO.customer.userId}</span>
                         </div>
-                        <div>
-                            <%-- THÊM BẢO VỆ NGHIỆP VỤ: Nếu là Sale Staff thì cho phép bấm nút tạo báo giá nhanh cho
-                                riêng khách này --%>
-                                <c:if test="${sessionScope.user.roleId == 4}">
-                                    <a href="${pageContext.request.contextPath}/quotation/create?customerId=${cusDTO.customer.customerId}"
-                                        class="btn-edit" style="background-color: #28a745;">+ Quick Quotation</a>
-                                </c:if>
-                        </div>
                     </div>
 
                     <div class="kpi-container">

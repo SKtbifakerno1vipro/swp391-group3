@@ -16,7 +16,7 @@ import jakarta.servlet.annotation.WebServlet;
 public class CustomerListController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
-    private static final int PAGE_SIZE = 2;
+    private static final int PAGE_SIZE = 10;
 
 
     @Override
