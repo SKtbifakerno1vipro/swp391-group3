@@ -17,6 +17,7 @@ public class QuotationListController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         String searchText = request.getParameter("search");
+               
         String status = request.getParameter("status");
         
         QuotationService quotationService = new QuotationService();

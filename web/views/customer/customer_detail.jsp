@@ -485,7 +485,7 @@
                                                             style="background-color: #e2e3e5; color: #383d41;">${o.customerOrder.orderStatus}</span>
                                                     </td>
                                                     <td><a
-                                                            href="${pageContext.request.contextPath}/customer-order-detail?id=${o.customerOrder.customerOrderId}">View
+                                                            href="${pageContext.request.contextPath}/order/detail?id=${o.customerOrder.customerOrderId}">View
                                                             Details</a></td>
                                                 </tr>
                                             </c:forEach>

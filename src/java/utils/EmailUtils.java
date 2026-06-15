@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class EmailUtils {
-    //thư viện Jakarta Mail API để kết nối với Server SMTP của Google (Gmail) và gửi email đi dưới dạng mã HTML
+    //thu vien Jakarta Mail API đe ket noi voi Server SMTP cua Google (Gmail) va gui email đi duoi dang ma HTML
 
     private static final String HOSTNAME = "smtp.gmail.com";
     private static final String PORT = "587"; // Cổng TLS của Gmail
@@ -47,7 +47,7 @@ public class EmailUtils {
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true"); // Bắt buộc dùng TLS đối với Gmail cổng 587
         
-        // tránh lỗi bắt tay SSL/TLS với server Google
+        // tranh loi bat tay SSL/TLS voi server Google
         props.put("mail.smtp.ssl.protocols", "TLSv1.2"); 
         props.put("mail.smtp.starttls.required", "true");
 
@@ -63,7 +63,7 @@ public class EmailUtils {
             MimeMessage msg = new MimeMessage(session);
             msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
             
-            // Đối với Gmail, senderEmail bắt buộc phải trùng khớp với loginUser (Email cá nhân của bạn)
+            // Đoi voi Gmail, senderEmail bat buoc phai trung khop voi loginUser (Email ca nhan cua ban)
             msg.setFrom(new InternetAddress(senderEmail, senderName));
             
             msg.setSubject(subject, "UTF-8");

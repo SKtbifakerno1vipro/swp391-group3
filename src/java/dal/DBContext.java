@@ -13,17 +13,10 @@ public class DBContext {
     public DBContext() {
         try {
             Properties props = new Properties();
-
-            // Cách này bắt ClassLoader tự đi tìm file trong thư mục build của cả NetBeans và IntelliJ
-            InputStream input = DBContext.class.getClassLoader().getResourceAsStream("ConnectDB.properties");
-
-            // Phương án dự phòng nếu file bị giữ chặt ở thư mục WEB-INF gốc tùy cấu hình IDE
-            if (input == null) {
-                input = DBContext.class.getClassLoader().getResourceAsStream("/WEB-INF/ConnectDB.properties");
-            }
+            InputStream input = findConfigInputStream();
 
             if (input == null) {
-                throw new java.io.FileNotFoundException("Không tìm thấy file ConnectDB.properties trong Classpath!");
+                throw new java.io.FileNotFoundException("Cannot find ConnectDB.properties");
             }
 
             props.load(input);
@@ -37,6 +30,44 @@ public class DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private InputStream findConfigInputStream() {
+        try {
+            InputStream input = DBContext.class.getClassLoader().getResourceAsStream("ConnectDB.properties");
+            if (input != null) {
+                return input;
+            }
+
+            input = DBContext.class.getClassLoader().getResourceAsStream("WEB-INF/ConnectDB.properties");
+            if (input != null) {
+                return input;
+            }
+
+            File classesDir = new File(DBContext.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            File webInfDir = classesDir.getParentFile();
+            File deployedConfig = new File(webInfDir, "ConnectDB.properties");
+            if (deployedConfig.exists()) {
+                return new FileInputStream(deployedConfig);
+            }
+        } catch (Exception ignored) {
+        }
+
+        File[] fallbackFiles = new File[] {
+            new File("web/WEB-INF/ConnectDB.properties"),
+            new File("build/web/WEB-INF/ConnectDB.properties")
+        };
+
+        for (File file : fallbackFiles) {
+            try {
+                if (file.exists()) {
+                    return new FileInputStream(file);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        return null;
     }
 
     public Connection getConnection() {

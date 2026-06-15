@@ -94,7 +94,7 @@ public class RoleDetailController extends HttpServlet {
             roleService.updateRole(role);
             roleService.updateRolePermissions(roleId, permissionIds);
 
-            // Redirect về view mode
+            // Redirect ve view mode
             response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/role-list");

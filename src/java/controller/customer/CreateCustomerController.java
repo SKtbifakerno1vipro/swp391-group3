@@ -106,7 +106,7 @@ public class CreateCustomerController extends HttpServlet {
     }
     
     
-//        System.out.println("--- DANH SÁCH PARAMETERS (LAMBDA) ---");
+//        System.out.println("--- DANH SACH PARAMETERS (LAMBDA) ---");
 //
 //        Map<String, String[]> paramMap = request.getParameterMap();
 //        paramMap.forEach((key, values) -> {

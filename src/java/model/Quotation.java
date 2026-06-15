@@ -12,7 +12,7 @@ public class Quotation {
     private Integer createdBy;
     private LocalDateTime createdAt;
 
-    // Field phụ để hiển thị
+    // Field phu đe hien thi
     private String customerName;    //hien thi ten khach hang thay vi chi customer_id
     private String createdByName;   //hien thi ten nhan vien bao gia thi vi chi created_by
     private BigDecimal totalAmount; //hien thi tong tien cua bao gia

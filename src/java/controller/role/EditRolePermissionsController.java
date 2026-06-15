@@ -1,3 +1,4 @@
+
 package controller.role;
 
 import service.RoleService;
@@ -28,14 +29,14 @@ public class EditRolePermissionsController extends HttpServlet {
             return;
         }
 
-        int roleId = Integer.parseInt(roleIdParam);
+        int roleId = Integer.parseInt(roleIdParam); // chuyẻn đổi từ string sang dạng int 
         Role role = roleService.getRoleDetail(roleId);
-        List<RolePermission> permissionList = roleService.getAllPermissions();
+        List<RolePermission> permissionList = roleService.getAllPermissions();// lấy toàn bộ danh sách permissions từ service và lưu vào list tên là permission list
 
         Set<Integer> selectedPermissionIds = new HashSet<>();
         if (role != null && role.getPermissions() != null) {
-            for (RolePermission p : role.getPermissions()) {
-                selectedPermissionIds.add(p.getPermissionId());
+            for (RolePermission p : role.getPermissions()) { 
+                selectedPermissionIds.add(p.getPermissionId());// xem ban đầu cái nào đã được tích  bằng cách lấy ID
             }
         }
 

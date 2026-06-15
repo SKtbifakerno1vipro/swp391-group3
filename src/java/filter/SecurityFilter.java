@@ -2,138 +2,230 @@ package filter;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.List;
 import model.User;
-
-import jakarta.servlet.annotation.WebFilter;
 
 @WebFilter(filterName = "SecurityFilter", urlPatterns = {"/*"})
 public class SecurityFilter implements Filter {
 
-    // Khai báo các tập hợp URL để kiểm tra nhanh
-// 1. Công cộng: Ai cũng vào được
-    private final String[] PUBLIC_PAGE = {
-        "login", "logout"};
+    private static final int ROLE_SYSTEM_ADMIN = 1;
+    private static final int ROLE_MANAGER = 2;
+    private static final int ROLE_CUSTOMER = 3;
+    private static final int ROLE_SALE_STAFF = 4;
+    private static final int ROLE_ADMIN_OFFICER = 5;
+    private static final int ROLE_WAREHOUSE_STAFF = 6;
 
-// 2. Admin (Role 1): Quản lý người dùng và phân quyền hệ thống
-    private final String[] ADMIN_PAGE = {
+    private static final List<String> PUBLIC_URLS = List.of(
+            "/login",
+            "/logout",
+            "/register",
+            "/forgot-password",
+            "/reset-password",
+            "/user/password/forgot"
+    );
 
-        "user-list", "user-detail", "create-user", "edit-user",
-        "role-list", "role-detail", "create-role", "edit-role-permissions",
-        "dashboard","quotation-list",
-        "customer"
-    
-    };
+    private static final List<String> LOGGED_IN_URLS = List.of(
+            "/dashboard",
+            "/user/password/change"
+    );
 
+    private static final List<String> SYSTEM_ADMIN_URLS = List.of(
+            "/dashboard",
+            "/user-list",
+            "/user-detail",
+            "/create-user",
+            "/edit-user",
+            "/role-list",
+            "/role-detail",
+            "/add-role",
+            "/edit-role-permissions",
+            "/category/list",
+            "/category/create",
+            "/category/edit",
+            "/category/delete",
+            "/product-list",
+            "/create-product",
+            "/edit-product",
+            "/product-delete",
+            "/customer/list",
+            "/customer/detail",
+            "/customer/create",
+            "/customer/edit",
+            "/quotation-list",
+            "/quotation-create",
+            "/quotation-detail",
+            "/contract-list",
+            "/contract-detail",
+            "/contract-save",
+            "/customer-order-list",
+            "/customer-order-detail",
+            "/create-customer-order",
+            "/Invoice"
+    );
 
-// 3. Manager (Role 2): Quản lý danh mục, sản phẩm và phê duyệt
-    private final String[] MANAGE_PAGE = {
-        "product-list", "product-detail", "create-product", "edit-product",
-        "category/", "dashboard"
-    };
+    private static final List<String> MANAGER_URLS = List.of(
+            "/dashboard",
+            "/user-list",
+            "/user-detail",
+            "/role-list",
+            "/role-detail",
+            "/customer/list",
+            "/customer/detail",
+            "/customer-order-list",
+            "/customer-order-detail",
+            "/product-list",
+            "/category/list",
+            "/quotation-list",
+            "/quotation-detail",
+            "/contract-list",
+            "/contract-detail",
+            "/Invoice"
+    );
 
-// 4. Sale (Role 4): Quản lý khách hàng, báo giá và đơn hàng
-    private final String[] SALE_PAGE = {
-        "customer-list", "customer-detail", "create-customer", "edit-customer",
-        "quotation-list", "create-quotation",
-        "customer-order-list", "customer-order-detail", "create-customer-order"
-    };
+    private static final List<String> CUSTOMER_URLS = List.of(
+            "/dashboard",
+            "/quotation-detail",
+            "/contract-detail"
+    );
 
-// 5. Customer (Role 3): Xem thông tin cá nhân và đơn hàng của chính mình
-    private final String[] CUSTOMER_PAGE = {
-        "customer-order-list", "customer-order-detail"
-    };
+    private static final List<String> SALE_STAFF_URLS = List.of(
+            "/dashboard",
+            "/customer/list",
+            "/customer/detail",
+            "/customer/create",
+            "/customer/edit",
+            "/quotation-list",
+            "/quotation-create",
+            "/quotation-detail",
+            "/contract-list",
+            "/contract-detail",
+            "/customer-order-list",
+            "/customer-order-detail",
+            "/create-customer-order",
+            "/product-list",
+            "/category/list"
+    );
 
-// 6. Officier Admin (Role 5): Các công việc hành chính (bổ sung sau)
-    private final String[] OFFICIER_PAGE = {
-        "dashboard"
-    };
+    private static final List<String> ADMIN_OFFICER_URLS = List.of(
+            "/dashboard",
+            "/contract-list",
+            "/contract-detail",
+            "/contract-save",
+            "/customer-order-list",
+            "/customer-order-detail",
+            "/Invoice"
+    );
 
-// 7. Warehouse (Role 6): Quản lý kho, nhập xuất
-    private final String[] WAREHOUSE_PAGE = {
-        "product-list", "inventory"
-    };
-    
+    private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
+            "/dashboard",
+            "/product-list",
+            "/create-product",
+            "/edit-product",
+            "/product-delete",
+            "/category/list",
+            "/category/create",
+            "/category/edit",
+            "/category/delete"
+    );
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-//        HttpServletRequest req = (HttpServletRequest) request;
-//        HttpServletResponse res = (HttpServletResponse) response;
-//        String url = req.getRequestURI();
-//
-//        // 1. Kiểm tra tài nguyên tĩnh (CSS, JS, Images) - CỰC KỲ QUAN TRỌNG
-//        if (url.contains("/css/") || url.contains("/js/") || url.contains("/images/") || url.contains("/assets/")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        // 2. Kiểm tra trang công cộng
-//        boolean isAllowed = false;
-//        for (String page : PUBLIC_PAGE) {
-//            if (url.contains(page)) {
-//                isAllowed = true;
-//                break;
-//            }
-//        }
-//
-//        // Nếu truy cập trang gốc "/" thì cũng coi là hợp lệ hoặc cho qua để Controller xử lý
-//        if (url.equals(req.getContextPath() + "/") || url.equals(req.getContextPath())) {
-//            isAllowed = true;
-//        }
-//
-//        if (!isAllowed) {
-//            HttpSession session = req.getSession(false);
-//            User user = (session != null) ? (User) session.getAttribute("user") : null;
-//
-//            if (user != null) {
-//                int roleId = user.getRoleId();
-//                String[] allowPages = {};
-//
-//                // Phân loại mảng theo Role
-//                if (roleId == 1) {
-//                    allowPages = ADMIN_PAGE;
-//                } else if (roleId == 2) {
-//                    allowPages = MANAGE_PAGE;
-//                } else if (roleId == 3) {
-//                    allowPages = CUSTOMER_PAGE;
-//                } else if (roleId == 4) {
-//                    allowPages = SALE_PAGE;
-//                } else if (roleId == 5) {
-//                    allowPages = OFFICIER_PAGE;
-//                } else if (roleId == 6) {
-//                    allowPages = WAREHOUSE_PAGE;
-//                }
-//
-//                // FIX LỖI: Kiểm tra URL thực tế có chứa từ khóa trong mảng không
-//                for (String page : allowPages) {
-//                    if (url.contains(page)) {
-//                        isAllowed = true;
-//                        break;
-//                    }
-//                }
-//            } else {
-//                // Nếu chưa đăng nhập mà vào trang cấm -> Đẩy về Login (để tránh loop trang chủ)
-//                res.sendRedirect(req.getContextPath() + "/login");
-//                return;
-//            }
-//        }
-//
-//        // 3. Kết luận
-//        if (isAllowed) {
-//            chain.doFilter(request, response);
-//        } else {
-//            // Đã đăng nhập nhưng không có quyền -> Đẩy về trang báo lỗi hoặc trang chủ kèm thông báo
-//            req.setAttribute("error", "Bạn không có quyền truy cập chức năng này!");
-//            // Chuyển hướng về trang login hoặc một trang "Access Denied" cụ thể
-//            res.sendRedirect(req.getContextPath() + "/login");
-        //}
-        chain.doFilter(request, response);
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        String path = req.getServletPath();
+
+        if (isStaticResource(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        if (LOGGED_IN_URLS.contains(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (hasPermission(user.getRoleId(), path)) {
+            chain.doFilter(request, response);
+        } else {
+            res.sendRedirect(req.getContextPath() + "/dashboard");
+        }
+    }
+
+    private boolean hasPermission(int roleId, String path) {
+        if (roleId == ROLE_SYSTEM_ADMIN) {
+            return SYSTEM_ADMIN_URLS.contains(path);
+        }
+
+        if (roleId == ROLE_MANAGER) {
+            return MANAGER_URLS.contains(path);
+        }
+
+        if (roleId == ROLE_CUSTOMER) {
+            return CUSTOMER_URLS.contains(path);
+        }
+
+        if (roleId == ROLE_SALE_STAFF) {
+            return SALE_STAFF_URLS.contains(path);
+        }
+
+        if (roleId == ROLE_ADMIN_OFFICER) {
+            return ADMIN_OFFICER_URLS.contains(path);
+        }
+
+        if (roleId == ROLE_WAREHOUSE_STAFF) {
+            return WAREHOUSE_STAFF_URLS.contains(path);
+        }
+
+        return false;
+    }
+
+    private boolean isStaticResource(String path) {
+        return path.startsWith("/assets/")
+                || path.startsWith("/css/")
+                || path.startsWith("/js/")
+                || path.startsWith("/images/")
+                || path.startsWith("/fonts/")
+                || path.endsWith(".css")
+                || path.endsWith(".js")
+                || path.endsWith(".png")
+                || path.endsWith(".jpg")
+                || path.endsWith(".jpeg")
+                || path.endsWith(".gif")
+                || path.endsWith(".svg")
+                || path.endsWith(".ico")
+                || path.endsWith(".woff")
+                || path.endsWith(".woff2");
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+    }
+
+    @Override
+    public void destroy() {
     }
 }

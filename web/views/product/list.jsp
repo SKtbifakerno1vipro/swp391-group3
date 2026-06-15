@@ -16,13 +16,13 @@
     <body>
         <div>
             <h1>Products</h1>
-            
+            <c:if test="${errorDelete != null || empty errorDelete}"> ${errorDelete}</c:if>
             <div><form action="${pageContext.request.contextPath}/product-list" method="get">
                     <table>
                         <tr>
                             <td>Product Name</td>
                             <td><input type="text" name="searchText" value="${searchText}"></td>
-                            
+
                             <td colspan="2">
                                 Category
                                 <select name="categoryId">
@@ -37,14 +37,14 @@
                                     <option value="decrease" ${sort == 'decrease' ? 'selected' : ''}>Decrease</option>
                                 </select>
                             </td>
-                        
+
                             <td><input type="submit" value="Search"></td>
                         </tr>
                     </table>
-                                   
-                                <input type="hidden" name="page" value="${page}">
-                                <input type="hidden" name="totalRow" value="${totalRow}">
-                                <input type="hidden" name="totalPage" value="${totalPage}">
+
+                    <input type="hidden" name="page" value="${page}">
+                    <input type="hidden" name="totalRow" value="${totalRow}">
+                    <input type="hidden" name="totalPage" value="${totalPage}">
                 </form>
             </div>
             <div>
@@ -79,24 +79,35 @@
                                 <td>${p.categoryName}</td>
                                 <td>${p.productStatus}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/product-detail?id=${p.productId}">View</a> |
-                                    <a href="${pageContext.request.contextPath}/product-list?id=${p.productId}&delete=true&page=${page}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Delete</a>
-                                    <br> <c:if test="${errorDelete != null || empty errorDelete}"> ${errorDelete}</c:if>
+                                    <a href="${pageContext.request.contextPath}/edit-product?id=${p.productId}&action=detail">View</a> |
+                                    <form action="product-list" method="post" style="display: inline">
+                                        <input type="submit" value="Delete">
+                                        <input type="hidden" name="id" value="${p.productId}">
+                                    </form>
+
                                 </td>
                             </tr>
                         </c:forEach>
                     </table>
                 </div>
                 <div>
-                    
-                    <div>
-                        Page
-                    <select  onchange="window.location.href='${pageContext.request.contextPath}/product-list?page='+this.value +'&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}'">
-                        <c:forEach var="i" begin="1" end="${totalPage}">
-                            <option value="${i}" ${page == i ? 'selected' : ''}>${i}</option>
-                        </c:forEach>
-                    </select>
-                    </div>
+                    <c:set var="numLinksTwoSide" value="2"></c:set>
+                    <c:set var="start" value="${page - numLinksTwoSide > 1 ? page - numLinksTwoSide : 1}"></c:set>
+                    <c:set var="end" value="${page + numLinksTwoSide > totalPage ? totalPage : page + numLinksTwoSide}"></c:set>
+                        <table border="1">
+                            <tr>
+                                <td><a href="${pageContext.request.contextPath}/product-list?page=1&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Begin</a></td>
+                            <c:if test="${page!=1}"><td><a href="${pageContext.request.contextPath}/product-list?page=${page - 1}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Prerious</a></td></c:if>
+                            <c:if test="${start>1}"><td>...</td></c:if>
+                            <c:forEach var="i" begin="${start}" end="${end}">
+                                <td><a href="${pageContext.request.contextPath}/product-list?page=${i}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">${i}</a></td>
+                                </c:forEach>
+                                <c:if test="${end < totalPage}"><td>...</td></c:if>
+                            <c:if test="${page < totalPage}"><td><a href="${pageContext.request.contextPath}/product-list?page=${page + 1}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Next</a> </td></c:if>
+                            <td><a href="${pageContext.request.contextPath}/product-list?page=${totalPage}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">End</a>
+                            </tr>
+                        </table>
+
                 </div>
                 <div><a href="${pageContext.request.contextPath}/dashboard">Back to Dashboard</a></div>
             </div>

@@ -98,8 +98,8 @@
                         <td>${cust.user.phone}</td>
                         <td>${cust.customer.taxCode}</td>
                         <td><span>${cust.user.status}</span></td>
-                        <td>${cust.user.formattedCreatedAt}</td>
-                        <td>${cust.user.formattedUpdateAt}</td>
+                        <td>${cust.user.createTimeString}</td>
+                        <td>${cust.user.updateTimeString}</td>
                         <td>
                             <a href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customer.customerId}">Detail</a>
                         </td>
@@ -114,7 +114,7 @@
         <c:if test="${totalPages > 1}">
             <div class="pagination-container" style="margin-top: 20px; text-align: center;">
                 
-                <%-- Tính toán khoảng hiển thị các nút số trang --%>
+                <%-- Tinh toan khoang hien thi cac nut so trang --%>
                 <c:set var="startPage" value="${currentPage - 2}" />
                 <c:if test="${startPage < 1}">
                     <c:set var="startPage" value="1" />
@@ -125,7 +125,7 @@
                     <c:set var="startPage" value="${endPage - 4 < 1 ? 1 : endPage - 4}" />
                 </c:if>
 
-                <%-- Nút Quay lại (<) --%>
+                <%-- Nut Quay lai (<) --%>
                 <c:choose>
                     <c:when test="${currentPage > 1}">
                         <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">&lt;</a>
@@ -135,7 +135,7 @@
                     </c:otherwise>
                 </c:choose>
 
-                <%-- Vòng lặp hiển thị các số trang: --%>
+                <%-- Vong lap hien thi cac so trang: --%>
                 <c:forEach var="i" begin="${startPage}" end="${endPage}">
                     <c:choose>
                         <c:when test="${i == currentPage}">
@@ -147,7 +147,7 @@
                     </c:choose>
                 </c:forEach>
 
-                <%-- Nút Tiếp theo (>) --%>
+                <%-- Nut Tiep theo (>) --%>
                 <c:choose>
                     <c:when test="${currentPage < totalPages}">
                         <a href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">&gt;</a>

@@ -5,14 +5,14 @@ import java.sql.ResultSet;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
-import model.Customer;
-import model.User;
+import model.*;
+import dto.*;
 import dto.*;
 
 public class CustomerDAO extends DBContext {
-    
+
     String error = "";
-    
+
     private Customer mapCustomer(ResultSet rs) throws Exception {
         Customer c = new Customer();
         c.setCustomerId(rs.getInt("customer_id"));
@@ -21,11 +21,12 @@ public class CustomerDAO extends DBContext {
         c.setCustomerType(rs.getString("customer_type"));
         c.setCompanyName(rs.getString("company_name"));
         c.setAssignedToUserId((Integer) rs.getObject("assigned_to_user_id"));
+
         return c;
     }
 
     public List<Customer> getAllCustomers() {
-        List<Customer> list = new ArrayList<>(); 
+        List<Customer> list = new ArrayList<>();
         String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
                 + "FROM customer";
 
@@ -41,11 +42,15 @@ public class CustomerDAO extends DBContext {
         }
         return list;
     }
-    
+
     public Customer getCustomerByCusId(int id) {
         try {
-            String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
-                    + "FROM customer WHERE customer_id = ?";
+            // Join with user table to get address and phone
+            String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, "
+                    + "u.address, u.phone, u.email "
+                    + "FROM customer c "
+                    + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                    + "WHERE c.customer_id = ?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, id);
             ResultSet rs = stm.executeQuery();
@@ -54,7 +59,6 @@ public class CustomerDAO extends DBContext {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            error = "getCustomerByCustomerId" + e.getMessage();
         }
         return null;
     }
@@ -75,263 +79,292 @@ public class CustomerDAO extends DBContext {
     }
 
     public boolean updateCustomerDynamic(Customer customer) {
-    // 1. Pre-condition check: user_id is mandatory for the WHERE clause
-    if (customer.getUserId() == null || customer.getUserId() <= 0) {
-        System.out.println("Error: Invalid user_id provided for the update condition!");
-        return false;
-    }
-    
-    StringBuilder sql = new StringBuilder("UPDATE [customer] SET ");
-    
-    List<Object> parameters = new ArrayList<>();
-
-    if (customer.getTaxCode() != null && !customer.getTaxCode().trim().isEmpty()) {
-        sql.append("tax_code = ?, ");
-        parameters.add(customer.getTaxCode());
-    }
-
-    if (customer.getCustomerType() != null && !customer.getCustomerType().trim().isEmpty()) {
-        sql.append("customer_type = ?, ");
-        parameters.add(customer.getCustomerType());
-    }
-
-    if (customer.getCompanyName() != null && !customer.getCompanyName().trim().isEmpty()) {
-        sql.append("company_name = ?, ");
-        parameters.add(customer.getCompanyName());
-    }
-
-    if (customer.getAssignedToUserId() != null) {
-        sql.append("assigned_to_user_id = ? ");
-        parameters.add(customer.getAssignedToUserId());
-    }
-
-    // 3. If no fields were appended for update -> Terminate early
-    if (parameters.isEmpty()) {
-        System.out.println("Warning: No fields have changed. Update skipped!");
-        return false;
-    }
-
-    sql.append(" WHERE user_id = ?");
-    parameters.add(customer.getUserId()); // Add user_id to the end of the parameters list
-
-    try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
-        
-        // Loop to dynamically bind parameters to corresponding "?" markers
-        for (int i = 0; i < parameters.size(); i++) {
-            Object param = parameters.get(i);
-            
-            // Map the Java types properly
-            if (param instanceof String) {
-                stm.setString(i + 1, (String) param);
-            } else if (param instanceof Integer) {
-                stm.setInt(i + 1, (Integer) param);
-            } else {
-                stm.setObject(i + 1, param);
-            }
+        // 1. Pre-condition check: user_id is mandatory for the WHERE clause
+        if (customer.getUserId() == null || customer.getUserId() <= 0) {
+            System.out.println("Error: Invalid user_id provided for the update condition!");
+            return false;
         }
-        System.out.println("Thực thi câu lệnh: " + stm);
-        // Execute and return execution status
-        return stm.executeUpdate() > 0;
-    } catch (Exception e) {
-        e.printStackTrace();
-        error = "updateCustomerDynamic error: " + e.getMessage();
+
+        StringBuilder sql = new StringBuilder("UPDATE [customer] SET ");
+
+        List<Object> parameters = new ArrayList<>();
+
+        if (customer.getTaxCode() != null && !customer.getTaxCode().trim().isEmpty()) {
+            sql.append("tax_code = ?, ");
+            parameters.add(customer.getTaxCode());
+        }
+
+        if (customer.getCustomerType() != null && !customer.getCustomerType().trim().isEmpty()) {
+            sql.append("customer_type = ?, ");
+            parameters.add(customer.getCustomerType());
+        }
+
+        if (customer.getCompanyName() != null && !customer.getCompanyName().trim().isEmpty()) {
+            sql.append("company_name = ?, ");
+            parameters.add(customer.getCompanyName());
+        }
+
+        if (customer.getAssignedToUserId() != null) {
+            sql.append("assigned_to_user_id = ? ");
+            parameters.add(customer.getAssignedToUserId());
+        }
+
+        // 3. If no fields were appended for update -> Terminate early
+        if (parameters.isEmpty()) {
+            System.out.println("Warning: No fields have changed. Update skipped!");
+            return false;
+        }
+
+        sql.append(" WHERE user_id = ?");
+        parameters.add(customer.getUserId()); // Add user_id to the end of the parameters list
+
+        try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+
+            // Loop to dynamically bind parameters to corresponding "D" markers
+            for (int i = 0; i < parameters.size(); i++) {
+                Object param = parameters.get(i);
+
+                // Map the Java types properly
+                if (param instanceof String) {
+                    stm.setString(i + 1, (String) param);
+                } else if (param instanceof Integer) {
+                    stm.setInt(i + 1, (Integer) param);
+                } else {
+                    stm.setObject(i + 1, param);
+                }
+            }
+            System.out.println("ThÃ¡Â»Â±c thi cÃƒÂ¢u lÃ¡Â»â€¡nh: " + stm);
+            // Execute and return execution status
+            return stm.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            error = "updateCustomerDynamic error: " + e.getMessage();
+        }
+        return false;
     }
-    return false;
-}
-    
+
     public boolean insertCustomer(Customer customer, Connection conn) {
 
-    String sql = "INSERT INTO [customer] (tax_code, customer_type, company_name, user_id, assigned_to_user_id) "
-               + "VALUES (?, ?, ?, ?, ?)";
-    
-    try (PreparedStatement stm = conn.prepareStatement(sql)) {
-        
-        // 1. tax_code
-        if (customer.getTaxCode() != null && !customer.getTaxCode().trim().isEmpty()) {
-            stm.setString(1, customer.getTaxCode());
-        } else {
-            stm.setNull(1, java.sql.Types.VARCHAR);
+        String sql = "INSERT INTO [customer] (tax_code, customer_type, company_name, user_id, assigned_to_user_id) "
+                + "VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stm = conn.prepareStatement(sql)) {
+
+            // 1. tax_code
+            if (customer.getTaxCode() != null && !customer.getTaxCode().trim().isEmpty()) {
+                stm.setString(1, customer.getTaxCode());
+            } else {
+                stm.setNull(1, java.sql.Types.VARCHAR);
+            }
+
+            // 2. customer_type
+            if (customer.getCustomerType() != null && !customer.getCustomerType().trim().isEmpty()) {
+                stm.setString(2, customer.getCustomerType());
+            } else {
+                stm.setNull(2, java.sql.Types.VARCHAR);
+            }
+            // 3. company_name
+            stm.setString(3, customer.getCompanyName());
+
+            // 4. user_id
+            stm.setInt(4, customer.getUserId());
+
+            // 5. assigned_to_user_id
+            if (customer.getAssignedToUserId() != null) {
+                stm.setInt(5, customer.getAssignedToUserId());
+            } else {
+                stm.setNull(5, java.sql.Types.INTEGER);
+            }
+            return stm.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.error = "insertCustomer: " + e.getMessage();
         }
-        
-        // 2. customer_type
-        if (customer.getCustomerType() != null && !customer.getCustomerType().trim().isEmpty()) {
-            stm.setString(2, customer.getCustomerType());
-        } else {
-            stm.setNull(2, java.sql.Types.VARCHAR);
-        }
-        // 3. company_name
-        stm.setString(3, customer.getCompanyName());
-        
-        // 4. user_id
-        stm.setInt(4, customer.getUserId());
-        
-        // 5. assigned_to_user_id
-        if (customer.getAssignedToUserId() != null) {
-            stm.setInt(5, customer.getAssignedToUserId());
-        } else {
-            stm.setNull(5, java.sql.Types.INTEGER);
-        }
-        return stm.executeUpdate() > 0;
-        
-    } catch (Exception e) {
-        e.printStackTrace();
-        this.error = "insertCustomer: " + e.getMessage();
+        return false;
     }
-    return false;
-}
-    
+
     public String getLastError() {
         return error;
     }
-    
+
     public List<Customer> searchAndPaginateCustomers(String searchName, String searchSdt, String searchEmail, String searchMst,
             String typeCus, int page, int pageSize) {
-    List<Customer> list = new ArrayList<>();
+        List<Customer> list = new ArrayList<>();
 
-    // 1. Khởi tạo câu lệnh SQL cơ bản
-    StringBuilder sql = new StringBuilder(
-        "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, " +
-        "u.created_at, u.updated_at " +
-        "FROM customer c " +
-        "LEFT JOIN [user] u ON c.user_id = u.user_id " +
-        "WHERE 1=1 "
-    );
+        // 1. Khoi tao cau lenh SQL co ban
+        StringBuilder sql = new StringBuilder(
+                "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, "
+                + "u.created_at, u.updated_at "
+                + "FROM customer c "
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "WHERE 1=1 "
+        );
 
-    // 2. Kiểm tra điều kiện và build SQL động
-    boolean hasName = (searchName != null && !searchName.isBlank());
-    boolean hasSdt = (searchSdt != null && !searchSdt.isBlank());
-    boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
-    boolean hasMst = (searchMst != null && !searchMst.isBlank());
-    boolean hasType = (typeCus != null && !typeCus.isBlank());
-    
-    if (hasName) {
-        sql.append("AND u.full_name LIKE ? ");
-        String strList[] = searchName.split("\\s+");
-        String last ="";
-        for (String string : strList) {
-            last += string;
-            last += " ";
-        }
-        searchName = last;
-    }
-    if (hasSdt) {
-        sql.append("AND u.phone LIKE ? ");
-    }
-    if (hasEmail) {
-        sql.append("AND u.email LIKE ? ");
-    }
-    if (hasMst) {
-        sql.append("AND c.tax_code LIKE ? ");
-    }
-    if (hasType) {
-        sql.append("AND c.customer_type = ? ");
-    }
+        // 2. Kiem tra Ã„â€˜ieu kien va build SQL Ã„â€˜ong
+        boolean hasName = (searchName != null && !searchName.isBlank());
+        boolean hasSdt = (searchSdt != null && !searchSdt.isBlank());
+        boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
+        boolean hasMst = (searchMst != null && !searchMst.isBlank());
+        boolean hasType = (typeCus != null && !typeCus.isBlank());
 
-    // 3. Đuôi phân trang cố định
-    sql.append("ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
-
-    int offset = (page - 1) * pageSize;
-
-    try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
-        int index = 1;
-
-        // 4. Gán giá trị vào PreparedStatement theo đúng thứ tự đã build ở trên
         if (hasName) {
-            stm.setString(index++, "%" + searchName.trim() + "%");
+            sql.append("AND u.full_name LIKE ? ");
+            String strList[] = searchName.split("\\s+");
+            String last = "";
+            for (String string : strList) {
+                last += string;
+                last += " ";
+            }
+            searchName = last;
         }
         if (hasSdt) {
-            stm.setString(index++, "%" + searchSdt.trim() + "%");
+            sql.append("AND u.phone LIKE ? ");
         }
         if (hasEmail) {
-            stm.setString(index++, "%" + searchEmail.trim() + "%");
+            sql.append("AND u.email LIKE ? ");
         }
         if (hasMst) {
-            stm.setString(index++, "%" + searchMst.trim() + "%");
+            sql.append("AND c.tax_code LIKE ? ");
         }
         if (hasType) {
-            stm.setString(index++, typeCus.trim());
+            sql.append("AND c.customer_type = ? ");
         }
 
-        // 5. Gán tham số phân trang luôn ở cuối cùng
-        stm.setInt(index++, offset);
-        stm.setInt(index++, pageSize);
+        // 3. Ã„Âuoi phan trang co Ã„â€˜inh
+        sql.append("ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
-        // 6. Thực thi truy vấn
-        try (ResultSet rs = stm.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapCustomer(rs));
+        int offset = (page - 1) * pageSize;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+            int index = 1;
+
+            // 4. Gan gia tri vao PreparedStatement theo Ã„â€˜ung thu tu Ã„â€˜a build o tren
+            if (hasName) {
+                stm.setString(index++, "%" + searchName.trim() + "%");
             }
+            if (hasSdt) {
+                stm.setString(index++, "%" + searchSdt.trim() + "%");
+            }
+            if (hasEmail) {
+                stm.setString(index++, "%" + searchEmail.trim() + "%");
+            }
+            if (hasMst) {
+                stm.setString(index++, "%" + searchMst.trim() + "%");
+            }
+            if (hasType) {
+                stm.setString(index++, typeCus.trim());
+            }
+
+            // 5. Gan tham so phan trang luon o cuoi cung
+            stm.setInt(index++, offset);
+            stm.setInt(index++, pageSize);
+
+            // 6. Thuc thi truy van
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapCustomer(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            error = "searchAndPaginateCustomers: " + e.getMessage();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-        error = "searchAndPaginateCustomers: " + e.getMessage();
+        return list;
     }
-    return list;
-}
-    
+
     public int getTotalCustomersCount(String searchName, String searchSdt, String searchEmail, String searchMst,
             String typeCus) {
 
-    // 1. Khởi tạo câu lệnh SQL cơ bản
-    StringBuilder sql = new StringBuilder(
-        "SELECT COUNT(*) "+
-        "FROM customer c " +
-        "LEFT JOIN [user] u ON c.user_id = u.user_id " +
-        "WHERE 1=1 "
-    );
+        // 1. Khoi tao cau lenh SQL co ban
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) "
+                + "FROM customer c "
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "WHERE 1=1 "
+        );
 
-    // 2. Kiểm tra điều kiện và build SQL động
-    boolean hasName = (searchName != null && !searchName.isBlank());
-    boolean hasSdt = (searchSdt != null && !searchSdt.isBlank());
-    boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
-    boolean hasMst = (searchMst != null && !searchMst.isBlank());
-    boolean hasType = (typeCus != null && !typeCus.isBlank());
+        // 2. Kiem tra Ã„â€˜ieu kien va build SQL Ã„â€˜ong
+        boolean hasName = (searchName != null && !searchName.isBlank());
+        boolean hasSdt = (searchSdt != null && !searchSdt.isBlank());
+        boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
+        boolean hasMst = (searchMst != null && !searchMst.isBlank());
+        boolean hasType = (typeCus != null && !typeCus.isBlank());
 
-    if (hasName) {
-        sql.append("AND u.full_name LIKE ? ");
-    }
-    if (hasSdt) {
-        sql.append("AND u.phone LIKE ? ");
-    }
-    if (hasEmail) {
-        sql.append("AND u.email LIKE ? ");
-    }
-    if (hasMst) {
-        sql.append("AND c.tax_code LIKE ? ");
-    }
-    if (hasType) {
-        sql.append("AND c.customer_type = ? ");
-    }
-
-    try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
-        int index = 1;
-
-        // 4. Gán giá trị vào PreparedStatement theo đúng thứ tự đã build ở trên
         if (hasName) {
-            stm.setString(index++, "%" + searchName.trim() + "%");
+            sql.append("AND u.full_name LIKE ? ");
         }
         if (hasSdt) {
-            stm.setString(index++, "%" + searchSdt.trim() + "%");
+            sql.append("AND u.phone LIKE ? ");
         }
         if (hasEmail) {
-            stm.setString(index++, "%" + searchEmail.trim() + "%");
+            sql.append("AND u.email LIKE ? ");
         }
         if (hasMst) {
-            stm.setString(index++, "%" + searchMst.trim() + "%");
+            sql.append("AND c.tax_code LIKE ? ");
         }
         if (hasType) {
-            stm.setString(index++, typeCus.trim());
+            sql.append("AND c.customer_type = ? ");
         }
-        // 6. Thực thi truy vấn
-        try (ResultSet rs = stm.executeQuery()) {
-            while (rs.next()) {
-                return rs.getInt(1);
+
+        try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+            int index = 1;
+
+            // 4. Gan gia tri vao PreparedStatement theo Ã„â€˜ung thu tu Ã„â€˜a build o tren
+            if (hasName) {
+                stm.setString(index++, "%" + searchName.trim() + "%");
             }
+            if (hasSdt) {
+                stm.setString(index++, "%" + searchSdt.trim() + "%");
+            }
+            if (hasEmail) {
+                stm.setString(index++, "%" + searchEmail.trim() + "%");
+            }
+            if (hasMst) {
+                stm.setString(index++, "%" + searchMst.trim() + "%");
+            }
+            if (hasType) {
+                stm.setString(index++, typeCus.trim());
+            }
+            // 6. Thuc thi truy van
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            error = "searchAndPaginateCustomers_Total: " + e.getMessage();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-        error = "searchAndPaginateCustomers_Total: " + e.getMessage();
+        return 0;
     }
-    return 0;
+
+    public CustomerDTO getCustomerDTOById(int id) {
+        try {
+            String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, "
+                    + "u.address, u.phone, u.email "
+                    + "FROM customer c "
+                    + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                    + "WHERE c.customer_id = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, id);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                CustomerDTO dto = new CustomerDTO();
+                dto.setCustomerId(rs.getInt("customer_id"));
+                dto.setUserId((Integer) rs.getObject("user_id"));
+                dto.setTaxCode(rs.getString("tax_code"));
+                dto.setCustomerType(rs.getString("customer_type"));
+                dto.setCompanyName(rs.getString("company_name"));
+                dto.setAssignedToUserId((Integer) rs.getObject("assigned_to_user_id"));
+                dto.setAddress(rs.getString("address"));
+                dto.setPhone(rs.getString("phone"));
+                dto.setEmail(rs.getString("email"));
+                return dto;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

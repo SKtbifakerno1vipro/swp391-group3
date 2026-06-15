@@ -33,7 +33,7 @@
                     localStorage.setItem('selectedOrderProducts', JSON.stringify(selectedProducts));
                 }
             }
-            // Khi trang load, phục hồi trạng thái các checkbox từ localStorage
+            // Khi trang load, phuc hoi trang thai cac checkbox tu localStorage
             window.onload = function () {
                 for (let pid in selectedProducts) {
                     let checkbox = document.querySelector(`input[name="productIds"][value="${pid}"]`);
@@ -47,9 +47,9 @@
             };
 
             function validateForm() {
-                // Trước khi submit, tạo các hidden input cho toàn bộ sản phẩm trong localStorage
+                // Truoc khi submit, tao cac hidden input cho toan bo san pham trong localStorage
                 const form = document.querySelector('form');
-                // Xóa các input cũ để tránh trùng lặp
+                // Xoa cac input cu đe tranh trung lap
                 const oldHidden = form.querySelectorAll('.hidden-product-data');
                 oldHidden.forEach(el => el.remove());
 
@@ -57,7 +57,7 @@
                 for (let pid in selectedProducts) {
                     let qty = selectedProducts[pid];
                     if (qty > 0) {
-                        // Tạo hidden input cho productId
+                        // Tao hidden input cho productId
                         let inputId = document.createElement('input');
                         inputId.type = 'hidden';
                         inputId.name = 'productIds';
@@ -65,7 +65,7 @@
                         inputId.className = 'hidden-product-data';
                         form.appendChild(inputId);
 
-                        // Tạo hidden input cho quantity (tương ứng name="qty_ID")
+                        // Tao hidden input cho quantity (tuong ung name="qty_ID")
                         let inputQty = document.createElement('input');
                         inputQty.type = 'hidden';
                         inputQty.name = 'qty_' + pid;
@@ -81,7 +81,7 @@
                     return false;
                 }
 
-                // Xóa localStorage sau khi submit thành công (có thể thực hiện ở trang kết quả hoặc tại đây)
+                // Xoa localStorage sau khi submit thanh cong (co the thuc hien o trang ket qua hoac tai đay)
                 // localStorage.removeItem('selectedOrderProducts');
                 return true;
             }
@@ -132,7 +132,7 @@
                 <select name="customerContractId" id="customerContractId" required>
                     <option value="">-- Choose Contract --</option>
                     <c:forEach var="con" items="${contracts}">
-                        <option value="${con.contractId}">${con.contractNumber} (${con.status})</option>
+                        <option value="${con.contractId}">${con.contractNumber} (${con.contractStatus})</option>
                     </c:forEach>
                 </select>
                 <c:if test="${empty contracts && not empty customer}">
@@ -175,7 +175,7 @@
                     <a href="?customerId=${param.customerId}&productPage=${currentProductPage - 1}">Previous</a>
                 </c:if>
                 <c:forEach begin="1" end="${totalProductPages}" var="i">
-                    <a href="?customerId=${param.customerId}&productPage=${currentProductPage}" 
+                    <a href="?customerId=${param.customerId}&productPage=${i}" 
                        style="margin: 0 5px; ${i == currentProductPage ? 'font-weight:bold; color:red;' : ''}">${i}</a>
                 </c:forEach>
                 

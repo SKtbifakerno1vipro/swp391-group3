@@ -20,7 +20,9 @@ public class UserListController extends HttpServlet {
 
         String roleIdString = request.getParameter("roleId");
         String status = request.getParameter("status");
-        String keyword = request.getParameter("keyword");
+        String searchEmail = request.getParameter("searchEmail");
+        String searchPhone = request.getParameter("searchPhone");
+        String searchName = request.getParameter("searchName");
         int roleId = 0;
         if (roleIdString != null && !roleIdString.trim().isEmpty()) {
             try {
@@ -30,21 +32,23 @@ public class UserListController extends HttpServlet {
             }
         }
 
-        int pageSize = 2; // defaut 10 user one page
+        int pageSize = 10; // defaut 10 user one page
         int pageIndex = 1; //default is page one
 
         String page = request.getParameter("page");
         if (page != null) {
             pageIndex = Integer.parseInt(page);
         }
-        int totalRecord = userService.getTotalUsers(roleId, status, keyword);
+        int totalRecord = userService.getTotalUsers(roleId, status, searchName, searchPhone, searchEmail);
         int endPage = (int) Math.ceil((double) totalRecord / pageSize);
 
         request.setAttribute("roleId", roleId);
         request.setAttribute("status", status);
-        request.setAttribute("users", userService.searchUsers(roleId, status, keyword, pageIndex, pageSize));
+        request.setAttribute("users", userService.searchUsers(roleId, status, searchName, searchPhone, searchEmail, pageIndex, pageSize));
         request.setAttribute("roles", roleService.getAllRoles());
-
+        request.setAttribute("searchEmail", searchEmail);
+         request.setAttribute("searchPhone", searchPhone);
+          request.setAttribute("searchName", searchName);
         request.setAttribute("endPage", endPage);
         request.setAttribute("currentPage", pageIndex);
         request.getRequestDispatcher("/views/user/list.jsp").forward(request, response);
@@ -53,13 +57,15 @@ public class UserListController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        int userId = Integer.parseInt(request.getParameter("userId"));
+                int userId = Integer.parseInt(request.getParameter("userId"));
         String currentStatus = request.getParameter("status");
-        boolean isActive = "ACTIVE".equals(currentStatus);
-        if (isActive) { // status is active
+        
+        if ("ACTIVE".equals(currentStatus)) {
             userService.banUser(userId, "INACTIVE");
-        } else {
+        } else if ("BAN".equals(currentStatus)) {
             userService.banUser(userId, "ACTIVE");
+        } else {
+            userService.banUser(userId, currentStatus);
         }
         response.sendRedirect(request.getContextPath() + "/user-list");
 

@@ -73,27 +73,27 @@ public class Validation {
         if (trimmed.length() > 50) {
             return "Full Name tối đa chỉ được 50 kí tự!";
         }
-        // Chấp nhận chữ tiếng Việt có dấu, khoảng trắng. Không chứa số hay ký tự đặc biệt.
+        // Chap nhan chu tieng Viet co dau, khoang trang. Khong chua so hay ky tu đac biet.
         if (trimmed.matches(".*[0-9].*") || trimmed.matches(".*[^a-zA-ZÀ-ỹ\\s].*")) {
             return "Full Name không được chứa số hoặc kí tự đặc biệt!";
         }
         return null; // Hợp lệ
     }
 
-    // 2. Kiểm tra Validate cho Tax Code (Mã số thuế)
+    // 2. Kiem tra Validate cho Tax Code (Ma so thue)
     public static String validateTaxCode(String taxCode) {
         if (taxCode == null || taxCode.trim().isEmpty()) {
             return "Tax Code không được để trống!";
         }
         String trimmed = taxCode.trim();
-        // Mã số thuế VN chuẩn có 2 loại: 10 số (mã doanh nghiệp) hoặc 13 số (mã chi nhánh dạng xxxxxxxxxx-xxx)
+        // Ma so thue VN chuan co 2 loai: 10 so (ma doanh nghiep) hoac 13 so (ma chi nhanh dang xxxxxxxxxx-xxx)
         if (!trimmed.matches("^\\d{10}$") && !trimmed.matches("^\\d{10}-\\d{3}$")) {
             return "Tax Code không đúng định dạng (Phải gồm 10 số hoặc 13 số có dạng XXXXXXXXXX-XXX)!";
         }
         return null; // Hợp lệ
     }
 
-    // 3. Kiểm tra Validate cho Company Name
+    // 3. Kiem tra Validate cho Company Name
     public static String validateCompanyName(String companyName) {
         if (companyName == null || companyName.trim().isEmpty()) {
             return "Company Name không được để trống!";
