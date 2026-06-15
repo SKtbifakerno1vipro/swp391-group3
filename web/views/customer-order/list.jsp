@@ -72,5 +72,6 @@
             </c:if>
         </c:if>
     </div>
+    <div><a href="${pageContext.request.contextPath}/dashboard">Back to Dashboard</a></div>
 </body>
 </html>
