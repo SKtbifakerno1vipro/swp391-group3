@@ -15,6 +15,7 @@ public class Contract {
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
+
     private int quotationId;
     private String contractNumber;
     private String contractFileUrl;
@@ -163,6 +164,7 @@ public class Contract {
     public Contract() {
     }
 
+
     // XHieu-begin - delete contact me
     public String getFormattedSignDate() {
         if (this.signDate != null) {
@@ -171,5 +173,5 @@ public class Contract {
         }
         return "N/A";
     }
-    // Xhieu - end
+
 }

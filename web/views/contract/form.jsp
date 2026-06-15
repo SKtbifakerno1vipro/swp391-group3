@@ -1,9 +1,10 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>${contract == null ? 'To mi' : 'Chnh sa'} Hp ng</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>${contract == null ? 'Create' : 'Edit'} Contract</title>
         <style>
             #contract-body {
                 border: 1px solid #999;
@@ -20,43 +21,43 @@
                 ${errorMsg}
             </div>
         </c:if>
-        <h2>${contract == null ? 'To Hp ng mi' : 'Chnh sa Hp ng'}</h2>
+        <h2>${contract == null ? 'Create Contract' : 'Edit Contract'}</h2>
 
-        <!-- Gi POST ti contract-save -->
+        <!-- Form gửi POST tới contract-save -->
         <form action="contract-save" method="POST" id="contractForm" onsubmit="prepareContent()">
-            <!-- Dng cho Update -->
+            <!-- Dùng cho Update -->
             <input type="hidden" name="contractId" value="${contract.contractId}">
-            <!-- Dng cho Create (khi bm to t Quotation) -->
+            <!-- Dùng cho Create (khi bấm tạo từ Quotation) -->
             <input type="hidden" name="quotationId" value="${quotationId}">
+            <input type="hidden" name="customerId" value="${customerId}">
 
-            <label>S Hp ng:</label>
+            <label>Contract Number:</label>
             <input type="text" name="contractNumber" value="${contract.contractNumber}" required>
 
             <br><br>
 
-            <label>Ni dung hp ng (C th chnh sa trc tip):</label>
-            <!-- S dng th div vi contenteditable="true"  trnh duyt render HTML -->
+            <label>Contract Content (Can edit directly):</label>
+            <!-- Sử dụng thẻ div với contenteditable="true" để trình duyệt render HTML -->
             <div id="contract-body" 
                  style="border: 1px solid #ccc; padding: 20px; min-height: 500px; background: white; margin-top: 10px;"
                  contenteditable="true">
                 ${not empty contract.contractContent ? contract.contractContent : templateContent}
             </div>
 
-            <!-- Input n quan trng  gi HTML v Controller -->
+            <!-- Input ẩn quan trọng để gửi HTML về Controller -->
             <input type="hidden" name="contractContent" id="contractContentInput">
 
             <br>
-            <!-- Nt lu cn gi hm JS  ly d liu t DIV -->
-            <button type="submit" onclick="prepareContent()">Lu Hp ng</button>
-
+            <!-- Nút lưu cần gọi hàm JS để lấy dữ liệu từ DIV -->
+            <button type="submit" onclick="prepareContent()">Save Contract</button>
+            <div><a href="contract-list">Back to contract list</a></div>
 
             <script>
                 function prepareContent() {
-                    
                     var content = document.getElementById('contract-body').innerHTML;
-                    
                     document.getElementById('contractContentInput').value = content;
                 }
             </script>
+        </form>
     </body>
 </html>

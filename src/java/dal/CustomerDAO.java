@@ -25,6 +25,8 @@ public class CustomerDAO extends DBContext {
         return c;
     }
 
+
+
     public List<Customer> getAllCustomers() {
         List<Customer> list = new ArrayList<>();
         String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
