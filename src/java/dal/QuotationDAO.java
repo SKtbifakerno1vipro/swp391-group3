@@ -15,7 +15,7 @@ import model.QuotationDetail;
 public class QuotationDAO extends DBContext {
 
     public List<Quotation> getAllQuotations() {
-        List<Quotation> list = new ArrayList();
+        List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
                 + "quotation.quotation_status, quotation.created_by, quotation.created_at, "
                 + "customer.company_name, [user].user_name "
@@ -159,8 +159,8 @@ public class QuotationDAO extends DBContext {
         }
         return null;
     }
-    
-    public int createQuotation(Quotation quotation){
+
+    public int createQuotation(Quotation quotation) {
         String sql = "INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) "
                 + "VALUES (?, ?, ?, ?)";
         try {
@@ -170,43 +170,44 @@ public class QuotationDAO extends DBContext {
             ps.setTimestamp(2, Timestamp.valueOf((quotation.getQuotationDate())));
             ps.setString(3, quotation.getQuotationStatus());
             ps.setObject(4, quotation.getCreatedBy());
-            
+
             int affectedRows = ps.executeUpdate();
-            if (affectedRows > 0){
+            if (affectedRows > 0) {
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     return rs.getInt(1);
-                    
+
                 }
-                
+
             }
         } catch (Exception e) {
             System.out.println("Create quotation error: " + e.getMessage());
         }
         return -1;
     }
-        
-        public boolean addQuotationDetail(QuotationDetail detail) {
-            String sql = "INSERT INTO quotation_detail (quotation_id, product_id, quantity, selling_price, discount_percent, tax_percent) "
-                    + "VALUES (?, ?, ?, ?, ?, ?)";
-            try {
-                PreparedStatement ps = connection.prepareStatement(sql);
-                
-                // Gan tung gia tri vao tung dau ? theo dung thu tu.
-                ps.setInt(1, detail.getQuotationId());
-                ps.setInt(2, detail.getProductId());
-                ps.setInt(3, detail.getQuantity());
-                ps.setBigDecimal(4, detail.getSellingPrice());
-                ps.setBigDecimal(5, detail.getDiscountPercent());
-                ps.setBigDecimal(6, detail.getTaxPercent());
-                
-                int affectedRows= ps.executeUpdate();
-                return affectedRows > 0;
-            } catch (Exception e) {
-                System.out.println("addQuotationDetail error: " + e.getMessage());
-            }
-            return false;    
+
+    public boolean addQuotationDetail(QuotationDetail detail) {
+        String sql = "INSERT INTO quotation_detail (quotation_id, product_id, quantity, selling_price, discount_percent, tax_percent) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+
+            // Gan tung gia tri vao tung dau ? theo dung thu tu.
+            ps.setInt(1, detail.getQuotationId());
+            ps.setInt(2, detail.getProductId());
+            ps.setInt(3, detail.getQuantity());
+            ps.setBigDecimal(4, detail.getSellingPrice());
+            ps.setBigDecimal(5, detail.getDiscountPercent());
+            ps.setBigDecimal(6, detail.getTaxPercent());
+
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (Exception e) {
+            System.out.println("addQuotationDetail error: " + e.getMessage());
         }
+        return false;
+    }
+
     /*
      * Lay danh sach san pham thuoc ve 1 quotation.
      * Mot quotation co the co nhieu dong quotation_detail.
@@ -270,6 +271,7 @@ public class QuotationDAO extends DBContext {
 
         return details;
     }
+
     /*
      * Cap nhat 1 dong quotation_detail.
      * Dung khi sales sua quantity, price, discount, tax trong trang detail.
@@ -302,6 +304,7 @@ public class QuotationDAO extends DBContext {
 
         return false;
     }
+
     /*
      * Them 1 dong lich su cho quotation.
      * Dung khi tao moi hoac cap nhat quotation detail.
