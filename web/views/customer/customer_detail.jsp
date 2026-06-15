@@ -310,7 +310,7 @@
                     <div class="kpi-container">
                         <div class="kpi-card">
                             <div class="kpi-title">Total Orders Placed</div>
-                            <div class="kpi-value">${totalOrdersCus != null ? totalOrdersCus : 0} Orders</div>
+                            <div class="kpi-value">${listOrdersForCus.size() != null ? listOrdersForCus.size() : 0} Orders</div>
                         </div>
                         <div class="kpi-card success">
                             <div class="kpi-title">Total Paid Amount</div>
@@ -502,7 +502,7 @@
                                                             style="background-color: #e2e3e5; color: #383d41;">${o.customerOrder.orderStatus}</span>
                                                     </td>
                                                     <td><a
-                                                            href="${pageContext.request.contextPath}/order/detail?id=${o.customerOrder.customerOrderId}">View
+                                                            href="${pageContext.request.contextPath}/order/detail?id=${o.customerOrder.customerOrderId}" class="btn-action-sm">View
                                                             Details</a></td>
                                                 </tr>
                                             </c:forEach>

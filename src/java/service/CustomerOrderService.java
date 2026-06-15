@@ -60,22 +60,7 @@ public class CustomerOrderService {
         return customerOrderDAO.deleteOrderDetail(detailId);
     }
     
-    // -xoa thi nho bao xhieu 
-    
-    public int getTotalOrdersCountByCusId(int cusId) {
-        if (cusId <= 0) {
-            return 0;
-        }
-
-        // validate xem co khach hang ko
-        Customer customer = customerService.getCustomerByCusId(cusId);
-
-        if (customer == null) {
-            return 0;
-        }
-
-        return customerOrderDAO.getTotalOrdersCountByCusId(cusId);
-    }
+    // -xoa thi nho bao xhieu
     public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
         // Chuyen tiep (forward) tham so va xu ly logic xuong tang DAO
         return customerOrderDAO.getListCustomerOrderDTOByCusId(cusId);

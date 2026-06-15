@@ -8,8 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import dal.*;
 
 public class ContractService {
+        private final ContractDAO contractDAO = new ContractDAO();
 
     public String fillTemplate(Quotation q, CustomerDTO cust, List<QuotationDetail> details,
             String template, Properties config) {
@@ -108,7 +110,6 @@ public class ContractService {
     }
 
     // XHieu-begin - delete contact me
-    private final dal.ContractDAO contractDAO = new dal.ContractDAO();
 
     public List<Contract> getContractsByCustomerId(int customerId) {
         return contractDAO.getContractsByCustomerId(customerId);

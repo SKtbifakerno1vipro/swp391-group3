@@ -36,12 +36,10 @@ public class DetailCustomerController extends HttpServlet {
         int id_cus = Integer.parseInt(request.getParameter("id_cus"));
         CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(id_cus);
         List<CustomerOrderDTO> listOrdersCus = customerOrderService.getListCustomerOrderDTOByCusId(id_cus);
-        int totalOrdersCus = customerOrderService.getTotalOrdersCountByCusId(id_cus);
         List<Quotation> listQuotationsForCus = quotationService.getQuotationsByCustomerId(id_cus);
         List<Contract> listContractsForCus = contractService.getContractsByCustomerId(id_cus);
         
-        request.setAttribute("listOrders", listOrdersCus);
-        request.setAttribute("totalOrdersCus", totalOrdersCus);
+        request.setAttribute("listOrdersForCus", listOrdersCus);
         request.setAttribute("listQuotationsForCus", listQuotationsForCus);
         request.setAttribute("listContractsForCus", listContractsForCus);
         request.setAttribute("cusDTO", cusDTO);
