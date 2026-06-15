@@ -16,10 +16,8 @@ import model.*;
 
 @WebServlet("/user/password/forgot")
 public class ForgotPassController extends HttpServlet {
-    
-    private final CustomerService customerService = new CustomerService();
+
     private final UserService userService = new UserService();
-    private final RoleService roleService = new RoleService();
     
     // Hien thi Form khi goi GET
     @Override

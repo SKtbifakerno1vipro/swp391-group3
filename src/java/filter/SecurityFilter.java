@@ -28,7 +28,6 @@ public class SecurityFilter implements Filter {
             "/login",
             "/logout",
             "/register",
-            "/forgot-password",
             "/reset-password",
             "/user/password/forgot"
     );
@@ -143,6 +142,11 @@ public class SecurityFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+        
+        // Fix character encoding/font issues for all requests and responses
+        req.setCharacterEncoding("UTF-8");
+        res.setCharacterEncoding("UTF-8");
+        
         String path = req.getServletPath();
 
         if (isStaticResource(path)) {
