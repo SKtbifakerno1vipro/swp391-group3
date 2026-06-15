@@ -47,13 +47,13 @@ public class ContractListController extends HttpServlet {
 
         int pageSize = 10;
 
-        // 3. THUC THI DAO (Đung thu tu: lay pageIndex xong moi search)
+        // cleaned comment
         List<Contract> list = dao.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize);
         int totalRecord = dao.getTotalContracts(contractNumber, customerName, status, storageType);
 
         // Tinh toan trang cuoi
         int endPage = (int) Math.ceil((double) totalRecord / pageSize);
-        // Validate lai pageIndex đe khong vuot qua trang cuoi
+        // cleaned comment
         if (pageIndex > endPage && endPage > 0) {
             pageIndex = endPage;
         }

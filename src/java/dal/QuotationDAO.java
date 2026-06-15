@@ -56,14 +56,14 @@ public class QuotationDAO extends DBContext {
                 + "FROM quotation "
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
                 + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
-                + "WHERE 1=1 "; // CÃƒÆ’Ã‚Â³ dÃƒÂ¡Ã‚ÂºÃ‚Â¥u cÃƒÆ’Ã‚Â¡ch ÃƒÂ¡Ã‚Â»Ã…Â¸ cuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœi
+                + "WHERE 1=1 "; // cleaned comment
 
         if (searchText != null && !searchText.trim().isEmpty()) {
-            sql += " AND customer.company_name LIKE ? "; // ThÃƒÆ’Ã‚Âªm dÃƒÂ¡Ã‚ÂºÃ‚Â¥u cÃƒÆ’Ã‚Â¡ch
+            sql += " AND customer.company_name LIKE ? "; // cleaned comment
         }
 
         if (status != null && !status.trim().isEmpty()) {
-            sql += " AND quotation.quotation_status = ? "; // ThÃƒÆ’Ã‚Âªm dÃƒÂ¡Ã‚ÂºÃ‚Â¥u cÃƒÆ’Ã‚Â¡ch
+            sql += " AND quotation.quotation_status = ? "; // cleaned comment
         }
         sql += " ORDER BY quotation.created_at DESC";
 
@@ -72,10 +72,10 @@ public class QuotationDAO extends DBContext {
             int paramIndex = 1;
 
             if (searchText != null && !searchText.trim().isEmpty()) {
-                ps.setString(paramIndex++, "%" + searchText + "%"); // DÃƒÆ’Ã‚Â¹ng ++ Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ tÃƒâ€žÃ†â€™ng vÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ trÃƒÆ’Ã‚Â­
+                ps.setString(paramIndex++, "%" + searchText + "%"); // cleaned comment
             }
             if (status != null && !status.trim().isEmpty()) {
-                ps.setString(paramIndex++, status); // DÃƒÆ’Ã‚Â¹ng ++ Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ tÃƒâ€žÃ†â€™ng vÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ trÃƒÆ’Ã‚Â­
+                ps.setString(paramIndex++, status); // cleaned comment
             }
 
             ResultSet rs = ps.executeQuery();
@@ -165,7 +165,7 @@ public class QuotationDAO extends DBContext {
         String sql = "INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) "
                 + "VALUES (?, ?, ?, ?)";
         try {
-            //RETURN_GENERATED_KEYS giÃƒÆ’Ã‚Âºp lÃƒÂ¡Ã‚ÂºÃ‚Â¥y ID vÃƒÂ¡Ã‚Â»Ã‚Â«a Ãƒâ€žÃ¢â‚¬ËœÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£c database tÃƒÂ¡Ã‚Â»Ã‚Â± sinh.
+            //RETURN_GENERATED_KEYS giÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºp lÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¥y ID vÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â»ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â«a ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¹Ã…â€œÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â»ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£c database tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â»ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â± sinh.
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, quotation.getCustomerId());
             ps.setTimestamp(2, Timestamp.valueOf((quotation.getQuotationDate())));
@@ -267,5 +267,16 @@ public class QuotationDAO extends DBContext {
         }
 
         return details;
+    }
+
+    public void updateStatus(int quotationId, String status) {
+        String sql = "UPDATE quotation SET quotation_status = ? WHERE quotation_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, quotationId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

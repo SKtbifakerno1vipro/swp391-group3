@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>${isForgot? 'Quên Mật Khẩu' : 'Đổi Mật Khẩu'}</title>
+        <title>${isForgot? 'Qun Mt Khu' : 'i Mt Khu'}</title>
         <style>
             body { font-family: Arial, sans-serif; margin: 50px; background-color: #f4f4f9; }
             .form-container { max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -29,7 +29,7 @@
     </head>
     <body>
         <div class="form-container">
-            <h2>${isForgot ? 'Quên Mật Khẩu' : 'Đổi Mật Khẩu'}</h2>
+            <h2>${isForgot ? 'Qun Mt Khu' : 'i Mt Khu'}</h2>
 
             <%-- Thong bao ket qua --%>
             <c:if test="${not empty success}">
@@ -37,14 +37,14 @@
             </c:if>
             <c:if test="${not empty error}">
                 <div class="alert alert-danger">
-                    <strong>Lỗi:</strong> ${error}
+                    <strong>Li:</strong> ${error}
                     <c:if test="${not empty errorDetail}">
                         <br><small>${errorDetail}</small>
                     </c:if>
                 </div>
             </c:if>
 
-            <%-- Form gui yeu cau (Đoi mat khau HOAC Xac nhan ma đe đoi mat khau moi) --%>
+            <%-- Form gui yeu cau (oi mat khau HOAC Xac nhan ma e oi mat khau moi) --%>
             <form action="${pageContext.request.contextPath}/user/password/${isForgot ? 'forgot' : 'change'}" method="POST">
                 <%-- Truyen ngam trang thai isForgot len Servlet --%>
                 <input type="hidden" name="isForgot" value="${isForgot}">
@@ -52,22 +52,22 @@
                 <c:choose>
                     <c:when test="${isForgot}">
                         <div class="form-group">
-                            <label for="email">Email đăng ký:</label>
+                            <label for="email">Email ng k:</label>
                             <div class="input-group">
                                 <input type="email" id="email" name="email" value="${email}" required>
                                 <%-- Nut gui ma OTP --%>
-                                <button type="button" id="btnSendOtp" name="action" onclick="sendOtpAjax()" class="btn-send">Gửi mã</button>
+                                <button type="button" id="btnSendOtp" name="action" onclick="sendOtpAjax()" class="btn-send">Gi m</button>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="phone">Số điện thoại:</label>
+                            <label for="phone">S in thoi:</label>
                             <input type="text" id="phone" name="phone" value="${phone}" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="otpCode">Mã xác nhận (OTP):</label>
-                            <input type="text" id="otpCode" name="otpCode" required placeholder="Nhập mã từ Email">
+                            <label for="otpCode">M xc nhn (OTP):</label>
+                            <input type="text" id="otpCode" name="otpCode" required placeholder="Nhp m t Email">
                         </div>
                     </c:when>
                     
@@ -75,17 +75,17 @@
                         
                         <c:if test="${empty sessionScope.forgetPass}">
                             <div class="form-group">
-                                <label for="currentPassword">Mật khẩu hiện tại:</label>
+                                <label for="currentPassword">Mt khu hin ti:</label>
                                 <input type="password" id="currentPassword" name="currentPassword" required>
                             </div>
                         </c:if>
                         <div class="form-group">
-                            <label for="newPassword">Mật khẩu mới:</label>
+                            <label for="newPassword">Mt khu mi:</label>
                             <input type="password" id="newPassword" name="newPassword" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="confirmPassword">Nhập lại mật khẩu mới:</label>
+                            <label for="confirmPassword">Nhp li mt khu mi:</label>
                             <input type="password" id="confirmPassword" name="confirmPassword" required>
                         </div>
                     </c:otherwise>
@@ -93,10 +93,10 @@
 
                 <c:choose>
                     <c:when test="${isForgot}">
-                        <button type="submit" name="action" value="resetPassword" class="btn-submit">Gửi yêu cầu</button>
+                        <button type="submit" name="action" value="resetPassword" class="btn-submit">Gi yu cu</button>
                     </c:when>
                     <c:otherwise>
-                        <button type="submit" name="action" value="changePassword" class="btn-submit">Đổi mật khẩu</button>
+                        <button type="submit" name="action" value="changePassword" class="btn-submit">i mt khu</button>
                     </c:otherwise>
                 </c:choose>
             </form>
@@ -110,18 +110,18 @@ function sendOtpAjax() {
     const phone = document.getElementById("phone").value;
     const btn = document.getElementById("btnSendOtp");
 
-    // Kiem tra nhanh xem nguoi dung đa nhap đu chua
+    // Kiem tra nhanh xem nguoi dung a nhap u chua
     if (!email || !phone) {
-        alert("Vui lòng nhập đầy đủ Email và Số điện thoại trước khi nhận mã!");
+        alert("Vui lng nhp y  Email v S in thoi trc khi nhn m!");
         return;
     }
 
-    // Vo hieu hoa nut bam tam thoi đe tranh nguoi dung click lien tuc
+    // Vo hieu hoa nut bam tam thoi e tranh nguoi dung click lien tuc
     btn.disabled = true;
-    btn.innerText = "Đang gửi...";
+    btn.innerText = "ang gi...";
 
-    // 2. Tao URL va tham so đe gui ngam len Servlet
-    // Su dung URLSearchParams đe đong goi du lieu giong nhu form submit
+    // 2. Tao URL va tham so e gui ngam len Servlet
+    // Su dung URLSearchParams e ong goi du lieu giong nhu form submit
     const params = new URLSearchParams();
     params.append("action", "sendOtp");
     params.append("isForgot", "true");
@@ -136,24 +136,24 @@ function sendOtpAjax() {
         },
         body: params.toString()
     })
-    .then(response => response.text()) // Nhận phản hồi dạng chữ từ Servlet
+    .then(response => response.text()) // Nhn phn hi dng ch t Servlet
     .then(data => {
         // Khoi phuc lai trang thai nut bam
         btn.disabled = false;
-        btn.innerText = "Gửi mã";
+        btn.innerText = "Gi m";
 
         // Xu ly ket qua tra ve tu Servlet (o Buoc 3 chung ta se cau hinh Servlet tra ve chu "OK" hoac loi)
         if (data.trim() === "SUCCESS") {
-            alert("Mã xác nhận (OTP) đã được gửi tới Email của bạn!");
+            alert("M xc nhn (OTP)  c gi ti Email ca bn!");
         } else {
-            alert("Lỗi: " + data); // Hiển thị thông báo lỗi từ hệ thống
+            alert("Li: " + data); // Hin th thng bo li t h thng
         }
     })
     .catch(error => {
         btn.disabled = false;
-        btn.innerText = "Gửi mã";
-        console.error("Lỗi AJAX:", error);
-        alert("Đã xảy ra lỗi kết nối mạng!");
+        btn.innerText = "Gi m";
+        console.error("Li AJAX:", error);
+        alert(" xy ra li kt ni mng!");
     });
 }
 </script>

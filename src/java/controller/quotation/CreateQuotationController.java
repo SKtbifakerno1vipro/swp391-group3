@@ -19,17 +19,17 @@ import service.QuotationService;
 public class CreateQuotationController extends HttpServlet {
 
     @Override
-    // Má»Ÿ trang form táº¡o quotation -> browser gá»i GET /quotation-create
+    // cleaned comment
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         QuotationService quotationService = new QuotationService();
 
-        // Láº¥y dá»¯ liá»‡u tá»« service Ä‘á»ƒ Ä‘á»• vÃ o dropdown
+        // cleaned comment
         List<CustomerDTO> customers = quotationService.getAllCustomers();
         List<Product> products = quotationService.getAllProducts();
 
-        // Gá»­i dá»¯ liá»‡u sang JSP
+        // cleaned comment
         request.setAttribute("customers", customers);
         request.setAttribute("products", products);
 
@@ -37,12 +37,12 @@ public class CreateQuotationController extends HttpServlet {
     }
 
     @Override
-    // Nháº­n dá»¯ liá»‡u khi user báº¥m nÃºt submit form
+    // cleaned comment
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
-            // Láº¥y dá»¯ liá»‡u tá»« form. request.getParameter luÃ´n tráº£ vá» String.
+            // cleaned comment
             String customerIdRaw = request.getParameter("customerId");
             String productIdRaw = request.getParameter("productId");
             String quantityRaw = request.getParameter("quantity");
@@ -50,26 +50,26 @@ public class CreateQuotationController extends HttpServlet {
             String discountPercentRaw = request.getParameter("discountPercent");
             String taxPercentRaw = request.getParameter("taxPercent");
 
-            // Chuyá»ƒn String sang int
+            // cleaned comment
             int customerId = Integer.parseInt(customerIdRaw);
             int productId = Integer.parseInt(productIdRaw);
             int quantity = Integer.parseInt(quantityRaw);
 
-            // Chuyá»ƒn String sang BigDecimal vÃ¬ Ä‘Ã¢y lÃ  tiá»n/pháº§n trÄƒm
+            // cleaned comment
             BigDecimal sellingPrice = new BigDecimal(sellingPriceRaw);
             BigDecimal discountPercent = new BigDecimal(discountPercentRaw);
             BigDecimal taxPercent = new BigDecimal(taxPercentRaw);
 
-            // Táº¡o object Ä‘á»ƒ lÆ°u báº£ng quotation
+            // cleaned comment
             Quotation quotation = new Quotation();
             quotation.setCustomerId(customerId);
             quotation.setQuotationDate(LocalDateTime.now());
             quotation.setQuotationStatus("DRAFT");
 
-            // Táº¡m thá»i Ä‘á»ƒ lÃ  1. Sau nÃ y ná»‘i login/session thÃ¬ láº¥y userId tá»« session.
+            // cleaned comment
             quotation.setCreatedBy(1);
 
-            // Táº¡o object Ä‘á»ƒ lÆ°u báº£ng quotation_detail
+            // cleaned comment
             QuotationDetail detail = new QuotationDetail();
             detail.setProductId(productId);
             detail.setQuantity(quantity);
@@ -77,21 +77,21 @@ public class CreateQuotationController extends HttpServlet {
             detail.setDiscountPercent(discountPercent);
             detail.setTaxPercent(taxPercent);
 
-            // Gá»i service Ä‘á»ƒ xá»­ lÃ½ logic táº¡o quotation + detail
+            // cleaned comment
             QuotationService quotationService = new QuotationService();
             boolean success = quotationService.createQuotation(quotation, detail);
 
             if (success) {
-                // ThÃ nh cÃ´ng thÃ¬ quay vá» trang danh sÃ¡ch
+                // cleaned comment
                 response.sendRedirect("quotation-list");
             } else {
-                // Tháº¥t báº¡i thÃ¬ quay láº¡i form vÃ  bÃ¡o lá»—i
+                // cleaned comment
                 request.setAttribute("error", "Create quotation failed.");
                 doGet(request, response);
             }
 
         } catch (Exception e) {
-            // Náº¿u parse dá»¯ liá»‡u lá»—i hoáº·c thiáº¿u dá»¯ liá»‡u
+            // cleaned comment
             request.setAttribute("error", "Invalid input data.");
             doGet(request, response);
         }

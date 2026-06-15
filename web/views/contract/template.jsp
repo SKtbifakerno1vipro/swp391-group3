@@ -1,144 +1,95 @@
-<%-- 
-    Document   : ContractTemplate
-    Created on : Jun 8, 2026, 10:57:03 PM
-    Author     : omovi
---%>
+<div style="font-family: 'Times New Roman', Times, serif; font-size: 14pt; line-height: 1.5; padding: 40px; background-color: white; color: black; max-width: 800px; margin: auto; border: 1px solid #ddd; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <div style="text-align: center; font-weight: bold; margin-bottom: 20px;">
+        <p style="margin: 0;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+        <p style="margin: 0; text-decoration: underline;">Độc lập - Tự do - Hạnh phúc</p>
+    </div>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html>
-<html lang="vi">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body {
-                font-family: "Times New Roman", serif;
-                font-size: 14px;
-                line-height: 1.5;
-                color: #000;
-            }
-            .container {
-                width: 85%;
-                margin: 0 auto;
-                padding: 20px;
-            }
-            .text-center {
-                text-align: center;
-            }
-            .bold {
-                font-weight: bold;
-            }
-            .underline {
-                text-decoration: underline;
-            }
-            .section-title {
-                font-weight: bold;
-                margin-top: 20px;
-                margin-bottom: 10px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 10px;
-            }
-            .info-table td {
-                padding: 5px 0;
-                vertical-align: bottom;
-            }
-            .dotted {
-                border-bottom: 1px dotted #000;
-            }
-            .product-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-            }
-            .product-table th, .product-table td {
-                border: 1px solid #000;
-                padding: 8px;
-                text-align: center;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="text-center">
-                <p class="bold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
-                <p class="bold underline">Độc lập - Tự do - Hạnh phúc</p>
-                <h2 class="bold" style="margin-top:40px;">HỢP ĐỒNG MUA BÁN HÀNG HÓA</h2>
-                <p>Số: {contract_number}</p>
-            </div>
+    <div style="text-align: center; font-weight: bold; margin-bottom: 30px;">
+        <h2 style="margin: 0; font-size: 16pt;">HỢP ĐỒNG MUA BÁN HÀNG HÓA</h2>
+        <p style="margin: 0; font-weight: normal;">Hợp đồng số: {contract_number}/HĐMB</p>
+    </div>
 
-            <p>Hôm nay, ngày {sign_date}, tại {location}, chúng tôi gồm có:</p>
+    <div style="margin-bottom: 20px;">
+        <p style="margin: 5px 0;">- Căn cứ Bộ luật Dân sự năm 2015;</p>
+        <p style="margin: 5px 0;">- Căn cứ vào đơn chào hàng (đặt hàng hoặc sự thực hiện thỏa thuận của hai bên).</p>
+    </div>
 
-            <!-- THÔNG TIN BÊN A -->
-            <div class="section-title">BÊN BÁN (BÊN A):</div>
-            <table class="info-table">
-                <tr>
-                    <td style="width: 20%;">Tên doanh nghiệp:</td>
-                    <td colspan="3" class="dotted">{company_name}</td>
-                </tr>
-                <tr>
-                    <td>Địa chỉ:</td>
-                    <td colspan="3" class="dotted">{company_address}</td>
-                </tr>
-                <tr>
-                    <td>Điện thoại:</td>
-                    <td style="width: 30%;" class="dotted">{company_phone}</td>
-                    <td style="width: 15%; padding-left: 20px;">Mã số thuế:</td>
-                    <td style="width: 35%;" class="dotted">{company_tax}</td>
-                </tr>
-                <tr>
-                    <td>Người đại diện:</td>
-                    <td class="dotted">{company_rep}</td>
-                    <td style="padding-left: 20px;">Chức vụ:</td>
-                    <td class="dotted">{company_position}</td>
-                </tr>
-            </table>
+    <p style="margin-bottom: 20px;">Hôm nay, ngày {sign_date}</p>
+    <p style="margin-bottom: 20px;">Tại địa điểm: {company_address}</p>
+    <p style="margin-bottom: 20px;">Chúng tôi gồm:</p>
 
-            <!-- THÔNG TIN BÊN B -->
-            <div class="section-title">BÊN MUA (BÊN B):</div>
-            <table class="info-table">
-                <tr>
-                    <td style="width: 20%;">Tên doanh nghiệp:</td>
-                    <td colspan="3" class="dotted">{customer_name}</td>
-                </tr>
-                <tr>
-                    <td>Địa chỉ:</td>
-                    <td colspan="3" class="dotted">{customer_address}</td>
-                </tr>
-                <tr>
-                    <td>Điện thoại:</td>
-                    <td style="width: 30%;" class="dotted">{customer_phone}</td>
-                    <td style="width: 15%; padding-left: 20px;">Mã số thuế:</td>
-                    <td style="width: 35%;" class="dotted">{customer_tax}</td>
-                </tr>
-            </table>
+    <div style="margin-bottom: 20px;">
+        <p style="font-weight: bold; text-decoration: underline;">Bên A (Bên Bán):</p>
+        <p style="margin: 5px 0;">Tên doanh nghiệp: <strong>{company_name}</strong></p>
+        <p style="margin: 5px 0;">Địa chỉ trụ sở chính: {company_address}</p>
+        <p style="margin: 5px 0;">Điện thoại: {company_phone}</p>
+        <p style="margin: 5px 0;">Mã số thuế: {company_tax}</p>
+        <p style="margin: 5px 0;">Đại diện là Ông (bà): <strong>{company_rep}</strong> - Chức vụ: {company_position}</p>
+    </div>
 
-            <!-- DANH SÁCH SẢN PHẨM -->
-            <div class="section-title">ĐIỀU 1: DANH MỤC HÀNG HÓA</div>
-            <table class="product-table">
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Tên sản phẩm</th>
-                        <th>Đơn vị</th>
-                        <th>Số lượng</th>
-                        <th>Đơn giá</th>
-                        <th>Thành tiền</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {product_list}
-                </tbody>
-            </table>
+    <div style="margin-bottom: 30px;">
+        <p style="font-weight: bold; text-decoration: underline;">Bên B (Bên Mua):</p>
+        <p style="margin: 5px 0;">Tên doanh nghiệp: <strong>{customer_name}</strong></p>
+        <p style="margin: 5px 0;">Địa chỉ trụ sở chính: {customer_address}</p>
+        <p style="margin: 5px 0;">Điện thoại: {customer_phone}</p>
+        <p style="margin: 5px 0;">Mã số thuế: {customer_tax}</p>
+    </div>
 
-            <div style="text-align: right; margin-top: 10px;">
-                <p>Tổng cộng: <span class="bold">{total_amount} VNĐ</span></p>
-            </div>
+    <p style="font-weight: bold; margin-bottom: 15px;">Hai bên thống nhất thỏa thuận nội dung hợp đồng như sau:</p>
 
-            <div class="section-title">ĐIỀU 2: HIỆU LỰC</div>
-            <p>Hợp đồng có hiệu lực từ ngày {effective_date} đến ngày {end_date}.</p>
-        </div>
-    </body>
-</html>
+    <div style="margin-bottom: 20px;">
+        <p style="font-weight: bold; text-decoration: underline;">Điều 1: Nội dung công việc giao dịch</p>
+        <p style="margin: 5px 0;">Bên A bán cho bên B:</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px;">
+            <thead>
+                <tr>
+                    <th style="border: 1px solid black; padding: 5px; text-align: center;">Tên hàng</th>
+                    <th style="border: 1px solid black; padding: 5px; text-align: center;">Đơn vị tính</th>
+                    <th style="border: 1px solid black; padding: 5px; text-align: center;">Số lượng</th>
+                    <th style="border: 1px solid black; padding: 5px; text-align: center;">Đơn giá</th>
+                    <th style="border: 1px solid black; padding: 5px; text-align: center;">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                {product_list}
+            </tbody>
+        </table>
+        
+        <p style="margin: 5px 0; font-weight: bold;">Tổng trị giá: {total_amount} VNĐ</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <p style="font-weight: bold; text-decoration: underline;">Điều 2: Phương thức thanh toán</p>
+        <p style="margin: 5px 0;">Bên B thanh toán cho bên A bằng hình thức Chuyển Khoản Ngân Hàng (VNPay) ngay sau khi ký hợp đồng.</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <p style="font-weight: bold; text-decoration: underline;">Điều 3: Trách nhiệm vật chất trong việc thực hiện hợp đồng</p>
+        <p style="margin: 5px 0;">1. Hai bên cam kết thực hiện nghiêm túc các điều khoản đã thỏa thuận trên, không được đơn phương thay đổi hoặc hủy bỏ hợp đồng.</p>
+        <p style="margin: 5px 0;">2. Bên nào vi phạm các điều khoản trên đây sẽ phải chịu trách nhiệm vật chất theo quy định của các văn bản pháp luật có hiệu lực hiện hành.</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <p style="font-weight: bold; text-decoration: underline;">Điều 4: Hiệu lực của hợp đồng</p>
+        <p style="margin: 5px 0;">Hợp đồng này có hiệu lực từ ngày <strong>{effective_date}</strong> đến ngày <strong>{end_date}</strong>.</p>
+        <p style="margin: 5px 0;">Hợp đồng này được lập thành các bản có giá trị pháp lý như nhau. Đại diện hai bên đồng ý ký xác nhận bằng phương thức điện tử.</p>
+    </div>
+
+    <table style="width: 100%; margin-top: 50px;">
+        <tr>
+            <td style="width: 50%; text-align: center; vertical-align: top;">
+                <p style="font-weight: bold; margin: 0;">ĐẠI DIỆN BÊN A</p>
+                <p style="margin: 0; font-style: italic;">(Ký tên, đóng dấu)</p>
+                <br><br><br><br>
+                <p style="font-weight: bold; margin: 0;">{company_rep}</p>
+            </td>
+            <td style="width: 50%; text-align: center; vertical-align: top;">
+                <p style="font-weight: bold; margin: 0;">ĐẠI DIỆN BÊN B</p>
+                <p style="margin: 0; font-style: italic;">(Ký tên, xác nhận điện tử)</p>
+                <br><br><br><br>
+                <p style="font-weight: bold; margin: 0;">{customer_name}</p>
+            </td>
+        </tr>
+    </table>
+</div>

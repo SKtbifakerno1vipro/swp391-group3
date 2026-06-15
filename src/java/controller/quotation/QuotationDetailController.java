@@ -55,4 +55,17 @@ public class QuotationDetailController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/quotation-list");
         }
     }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String quotationId = request.getParameter("quotationId");
+        String action = request.getParameter("action"); // "accept"
+
+        if ("accept".equals(action) && quotationId != null) {
+            QuotationService service = new QuotationService();
+            service.updateStatus(Integer.parseInt(quotationId), "ACCEPTED");
+            response.sendRedirect("quotation-detail?id=" + quotationId);
+        }
+    }
 }

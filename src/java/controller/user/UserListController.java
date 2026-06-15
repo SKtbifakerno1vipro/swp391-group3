@@ -57,13 +57,15 @@ public class UserListController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        int userId = Integer.parseInt(request.getParameter("userId"));
+                int userId = Integer.parseInt(request.getParameter("userId"));
         String currentStatus = request.getParameter("status");
-        boolean isActive = "ACTIVE".equals(currentStatus);
-        if (isActive) { // status is active
+        
+        if ("ACTIVE".equals(currentStatus)) {
             userService.banUser(userId, "INACTIVE");
-        } else {
+        } else if ("BAN".equals(currentStatus)) {
             userService.banUser(userId, "ACTIVE");
+        } else {
+            userService.banUser(userId, currentStatus);
         }
         response.sendRedirect(request.getContextPath() + "/user-list");
 

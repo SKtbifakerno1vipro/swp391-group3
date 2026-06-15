@@ -3,55 +3,55 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Danh sách Hợp đồng</title>
+        <title>Danh sch Hp ng</title>
     </head>
     <body>
-        <h2>Quản lý Hợp đồng</h2>
+        <h2>Qun l Hp ng</h2>
 
-        <!-- ---------------   Form Tìm Kiếm (4 Trường)   ---------------- -->
+        <!-- ---------------   Form Tm Kim (4 Trng)   ---------------- -->
         <form action="contract-list" method="GET">
-            <!-- 1. Số hợp đồng -->
-            <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Số hợp đồng">
+            <!-- 1. S hp ng -->
+            <input type="text" name="contractNumber" value="${contractNumber}" placeholder="S hp ng">
 
-            <!-- 2. Tên khách hàng -->
-            <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng">
+            <!-- 2. Tn khch hng -->
+            <input type="text" name="customerName" value="${customerName}" placeholder="Tn khch hng">
 
-            <!-- 3. Trạng thái -->
+            <!-- 3. Trng thi -->
             <select name="status">
-                <option value="">-- Tất cả trạng thái --</option>
-                <option value="DRAFT" ${status == 'DRAFT' ? 'selected' : ''}>Bản nháp</option>
-                <option value="SIGNED" ${status == 'SIGNED' ? 'selected' : ''}>Đã ký</option>
-                <option value="CANCELLED" ${status == 'CANCELLED' ? 'selected' : ''}>Đã hủy</option>
+                <option value="">-- Tt c trng thi --</option>
+                <option value="DRAFT" ${status == 'DRAFT' ? 'selected' : ''}>Bn nhp</option>
+                <option value="SIGNED" ${status == 'SIGNED' ? 'selected' : ''}> k</option>
+                <option value="CANCELLED" ${status == 'CANCELLED' ? 'selected' : ''}> hy</option>
             </select>
 
-            <!-- 4. Loại lưu trữ (Mới bổ sung) -->
+            <!-- 4. Loi lu tr (Mi b sung) -->
             <select name="storageType">
-                <option value="">-- Loại lưu trữ --</option>
-                <option value="TEXT" ${storageType == 'TEXT' ? 'selected' : ''}>Văn bản (TEXT)</option>
-                <option value="IMAGE" ${storageType == 'IMAGE' ? 'selected' : ''}>Ảnh scan (IMAGE)</option>
+                <option value="">-- Loi lu tr --</option>
+                <option value="TEXT" ${storageType == 'TEXT' ? 'selected' : ''}>Vn bn (TEXT)</option>
+                <option value="IMAGE" ${storageType == 'IMAGE' ? 'selected' : ''}>nh scan (IMAGE)</option>
             </select>
 
-            <button type="submit">Tìm kiếm</button>
-            <a href="contract-list">Xóa lọc</a>
+            <button type="submit">Tm kim</button>
+            <a href="contract-list">Xa lc</a>
         </form>
 
         <br>
 
-        <!-- ---------------   Bảng Danh Sách   ---------------- -->
+        <!-- ---------------   Bng Danh Sch   ---------------- -->
         <table border="1" cellpadding="5">
             <thead>
                 <tr>
                     <td>ID</td>
-                    <th>Số Hợp đồng</th>
-                    <th>Khách hàng</th>
-                    <th>Trạng thái</th>
-                    <th>Loại lưu trữ</th>
-                    <th>Thao tác</th>
+                    <th>S Hp ng</th>
+                    <th>Khch hng</th>
+                    <th>Trng thi</th>
+                    <th>Loi lu tr</th>
+                    <th>Thao tc</th>
                 </tr>
             </thead>
             <tbody>
                 <c:if test="${empty list}">
-                    <tr><td colspan="5" style="text-align:center;">Không tìm thấy kết quả nào.</td></tr>
+                    <tr><td colspan="5" style="text-align:center;">Khng tm thy kt qu no.</td></tr>
                 </c:if>
 
                 <c:forEach items="${list}" var="c">
@@ -62,8 +62,8 @@
                         <td>${c.contractStatus}</td>
                         <td>${c.storageType}</td>
                         <td>
-                            <a href="contract-save?id=${c.contractId}">Sửa</a> |
-                            <a href="contract-detail?id=${c.contractId}">Chi tiết</a>
+                            <a href="contract-save?id=${c.contractId}">Sa</a> |
+                            <a href="contract-detail?id=${c.contractId}">Chi tit</a>
                         </td>
                     </tr>
                 </c:forEach>
@@ -72,20 +72,20 @@
 
         <br>
 
-        <!-- ---------------   Phân Trang (Giữ trạng thái 4 trường)   ---------------- -->
+        <!-- ---------------   Phn Trang (Gi trng thi 4 trng)   ---------------- -->
         <c:if test="${endPage > 1}">
             <c:set var="params" value="contractNumber=${contractNumber}&customerName=${customerName}&status=${status}&storageType=${storageType}" />
 
             <div>
-                <!-- Về trang 1 -->
+                <!-- V trang 1 -->
                 <a href="contract-list?page=1&${params}" 
                    ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&laquo;</a>
 
-                <!-- Trang trước -->
+                <!-- Trang trc -->
                 <a href="contract-list?page=${currentPage - 1}&${params}" 
                    ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&lsaquo;</a>
 
-                <!-- Các số trang -->
+                <!-- Cc s trang -->
                 <c:forEach begin="${currentPage - 2 > 1 ? currentPage - 2 : 1}" 
                            end="${currentPage + 2 < endPage ? currentPage + 2 : endPage}" var="i">
                     <a href="contract-list?page=${i}&${params}" 
@@ -97,7 +97,7 @@
                 <a href="contract-list?page=${currentPage + 1}&${params}" 
                    ${currentPage == endPage ? 'style="pointer-events:none;color:#aaa;"' : ''}>&rsaquo;</a>
 
-                <!-- Trang cuối -->
+                <!-- Trang cui -->
                 <a href="contract-list?page=${endPage}&${params}" 
                    ${currentPage == endPage ? 'style="pointer-events:none;color:#aaa;"' : ''}>&raquo;</a>
             </div>

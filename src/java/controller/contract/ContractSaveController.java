@@ -50,7 +50,7 @@ public class ContractSaveController extends HttpServlet {
 
     private String generateContractHtml(int quotationId) throws IOException {
         Quotation quotation = quotationDAO.getQuotationById(quotationId);
-        Customer customer = customerDAO.getCustomerByCusId(quotation.getCustomerId());
+        CustomerDTO customer = customerDAO.getCustomerDTOById(quotation.getCustomerId());
         List<QuotationDetail> details = quotationDAO.getQuotationDetailsByQuotationId(quotationId);
 
         Properties config = new Properties();
@@ -72,26 +72,26 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
     request.setCharacterEncoding("UTF-8");
     HttpSession session = request.getSession();
     
-    // 1. Lấy User từ Session (An toàn)
-    User user = (User) session.getAttribute("user"); // Giả sử bạn lưu User vào session
+    // cleaned comment
+    User user = (User) session.getAttribute("user"); // cleaned comment
     if (user == null) {
-        response.sendRedirect("login"); // Chưa đăng nhập thì bắt đăng nhập
+        response.sendRedirect("login"); // cleaned comment
         return;
     }
 
-    // 2. Lấy dữ liệu từ form
+    // cleaned comment
     String contractIdStr = request.getParameter("contractId");
     String quotationIdStr = request.getParameter("quotationId");
     String contractContent = request.getParameter("contractContent");
 
-    // 3. Validation cơ bản (Cực kỳ quan trọng)
+    // cleaned comment
     if (contractContent == null || contractContent.trim().isEmpty()) {
-        request.setAttribute("errorMsg", "Nội dung hợp đồng không được để trống!");
+        request.setAttribute("errorMsg", "Ni dung hp ng khng c  trng!");
         request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
         return;
     }
 
-    // 4. Logic Insert hoặc Update
+    // cleaned comment
     if (contractIdStr != null && !contractIdStr.isEmpty()) {
         // --- UPDATE ---
         int contractId = Integer.parseInt(contractIdStr);
@@ -103,16 +103,16 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         if (success) {
             response.sendRedirect("contract-detail?id=" + contractId);
         } else {
-            request.setAttribute("errorMsg", "Cập nhật thất bại!");
+            request.setAttribute("errorMsg", "Cp nht tht bi!");
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
         }
     } else {
-        // --- INSERT (Tạo mới) ---
+        // cleaned comment
         int quotationId = Integer.parseInt(quotationIdStr);
         Contract c = new Contract();
-        c.setCustomerId(Integer.parseInt(request.getParameter("customerId"))); // Bạn cần gửi thêm field này ở form
+        c.setCustomerId(Integer.parseInt(request.getParameter("customerId"))); // cleaned comment
         c.setQuotationId(quotationId);
-        c.setContractNumber("HD-" + System.currentTimeMillis()); // Nên đổi thành hàm sinh ID riêng
+        c.setContractNumber("HD-" + System.currentTimeMillis()); // cleaned comment
         c.setContractStatus("DRAFT");
         c.setContractContent(contractContent);
         c.setCreatedBy(user.getUserId());
@@ -121,7 +121,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         if (newId > 0) {
             response.sendRedirect("contract-detail?id=" + newId);
         } else {
-            request.setAttribute("errorMsg", "Tạo mới thất bại!");
+            request.setAttribute("errorMsg", "To mi tht bi!");
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
         }
     }

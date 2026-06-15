@@ -1,9 +1,9 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>${contract == null ? 'Táº¡o má»›i' : 'Chá»‰nh sá»­a'} Há»£p Ä‘á»“ng</title>
+        <title>${contract == null ? 'To mi' : 'Chnh sa'} Hp ng</title>
         <style>
             #contract-body {
                 border: 1px solid #999;
@@ -20,34 +20,34 @@
                 ${errorMsg}
             </div>
         </c:if>
-        <h2>${contract == null ? 'Táº¡o Há»£p Ä‘á»“ng má»›i' : 'Chá»‰nh sá»­a Há»£p Ä‘á»“ng'}</h2>
+        <h2>${contract == null ? 'To Hp ng mi' : 'Chnh sa Hp ng'}</h2>
 
-        <!-- Gá»­i POST tá»›i contract-save -->
+        <!-- Gi POST ti contract-save -->
         <form action="contract-save" method="POST" id="contractForm" onsubmit="prepareContent()">
-            <!-- DÃ¹ng cho Update -->
+            <!-- Dng cho Update -->
             <input type="hidden" name="contractId" value="${contract.contractId}">
-            <!-- DÃ¹ng cho Create (khi báº¥m táº¡o tá»« Quotation) -->
+            <!-- Dng cho Create (khi bm to t Quotation) -->
             <input type="hidden" name="quotationId" value="${quotationId}">
 
-            <label>Sá»‘ Há»£p Ä‘á»“ng:</label>
+            <label>S Hp ng:</label>
             <input type="text" name="contractNumber" value="${contract.contractNumber}" required>
 
             <br><br>
 
-            <label>Ná»™i dung há»£p Ä‘á»“ng (CÃ³ thá»ƒ chá»‰nh sá»­a trá»±c tiáº¿p):</label>
-            <!-- Sá»­ dá»¥ng tháº» div vá»›i contenteditable="true" Ä‘á»ƒ trÃ¬nh duyá»‡t render HTML -->
+            <label>Ni dung hp ng (C th chnh sa trc tip):</label>
+            <!-- S dng th div vi contenteditable="true"  trnh duyt render HTML -->
             <div id="contract-body" 
                  style="border: 1px solid #ccc; padding: 20px; min-height: 500px; background: white; margin-top: 10px;"
                  contenteditable="true">
                 ${not empty contract.contractContent ? contract.contractContent : templateContent}
             </div>
 
-            <!-- Input áº©n quan trá»ng Ä‘á»ƒ gá»­i HTML vá» Controller -->
+            <!-- Input n quan trng  gi HTML v Controller -->
             <input type="hidden" name="contractContent" id="contractContentInput">
 
             <br>
-            <!-- NÃºt lÆ°u cáº§n gá»i hÃ m JS Ä‘á»ƒ láº¥y dá»¯ liá»‡u tá»« DIV -->
-            <button type="submit" onclick="prepareContent()">LÆ°u Há»£p Ä‘á»“ng</button>
+            <!-- Nt lu cn gi hm JS  ly d liu t DIV -->
+            <button type="submit" onclick="prepareContent()">Lu Hp ng</button>
 
 
             <script>

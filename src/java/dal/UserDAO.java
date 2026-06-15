@@ -1,5 +1,6 @@
 package dal;
 
+
 import dto.UserRoleDTO;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.PreparedStatement;
@@ -269,7 +270,7 @@ public class UserDAO extends DBContext {
             if (affectedRows > 0) {
                 try (ResultSet rs = stm.getGeneratedKeys()) {
                     if (rs.next()) {
-                        return rs.getInt(1); // Trả về user_id tự tăng ngầm
+                        return rs.getInt(1); // cleaned comment
                     }
                 }
             }
@@ -413,6 +414,21 @@ public class UserDAO extends DBContext {
     /*
     created by vu trong phu
      */
+    
+    public User findUserByUsername(String username) {
+        String sql = "SELECT * FROM [user] WHERE user_name = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapUser(rs);
+            }
+        } catch (Exception e) {
+            System.out.println("findUserByUsername: " + e.getMessage());
+        }
+        return null;
+    }
+
     public User login(String username, String password) {
         String sql = "SELECT * FROM [user] WHERE user_name = ? AND account_status = 'ACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -467,9 +483,9 @@ public class UserDAO extends DBContext {
             ps.setString(1, username);
             ps.setInt(2, userId);
 
-            // Dung try-with-resources đe đam bao ResultSet tu đong đuoc đong
+            // cleaned comment
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // Trả về true nếu bản ghi tồn tại
+                return rs.next(); // cleaned comment
             }
         } catch (Exception e) {
             System.out.println("Error checking username: " + e.getMessage());

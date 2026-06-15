@@ -57,4 +57,8 @@ public class QuotationService {
     public List<QuotationDetail> getQuotationDetailsByQuotationId(int quotationId) {
         return quotationDAO.getQuotationDetailsByQuotationId(quotationId);
     }
+
+    public void updateStatus(int quotationId, String status) {
+        quotationDAO.updateStatus(quotationId, status);
+    }
 }

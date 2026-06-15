@@ -59,8 +59,6 @@
                             <a href="quotation-detail?id=${quotation.quotationId}">view</a>
                         </td>
                         <td>
-                            <a href="quotation-detail?id=${quotation.quotationId}">view</a>
-
                             <%-- Chỉ hiện nút Tạo hợp đồng nếu trạng thái là ACCEPTED --%>
                             <c:if test="${quotation.quotationStatus == 'ACCEPTED'}">
                                 | <a href="contract-save?quotationId=${quotation.quotationId}" 

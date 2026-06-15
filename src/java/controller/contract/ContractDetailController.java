@@ -26,7 +26,7 @@ public class ContractDetailController extends HttpServlet {
 
                 if (contract != null) {
                     request.setAttribute("contract", contract);
-                    // Dùng chung trang form.jsp để xem chi tiết
+                    // cleaned comment
                     request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
                 } else {
                     response.sendRedirect("contract-list");
