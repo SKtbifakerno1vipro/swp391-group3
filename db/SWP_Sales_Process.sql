@@ -446,7 +446,7 @@ INSERT INTO permission (permission_name, url_pattern) VALUES
 ('View Order List', '/customer-order-list'),
 ('View Order Detail', '/customer-order-detail'),
 ('Create Order', '/create-customer-order'),
-('Issue Invoice', '/Invoice');
+('Issue Invoice', '/invoice');
 GO
 INSERT INTO permission (permission_name, url_pattern)
 VALUES ('Create Quotation', '/quotation-create');

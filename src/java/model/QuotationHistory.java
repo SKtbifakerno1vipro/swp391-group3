@@ -1,10 +1,10 @@
-package  model;
+package model;
 import java.time.LocalDateTime;
 
 public class QuotationHistory {
     private int quotationHistoryId;
     private int quotationId;
-    private Integer createdBy; // int ko đuoc phep rong nhung integer thi co
+    private Integer createdBy; // Integer cho phep null, int thi khong.
     private LocalDateTime createdAt;
     private String editHistory;
     

@@ -6,6 +6,7 @@ import java.util.List;
 import model.Product;
 import model.Quotation;
 import model.QuotationDetail;
+import model.QuotationHistory;
 
 public class QuotationService {
 
@@ -22,28 +23,39 @@ public class QuotationService {
     public List<Quotation> getAllQuotations() {
         return quotationDAO.getAllQuotations();
     }
-    
-    public List<Quotation> searchQuotations(String search, String status){
+
+    public List<Quotation> searchQuotations(String search, String status) {
         return quotationDAO.searchQuotations(search, status);
     }
-    
-    public List<CustomerDTO> getAllCustomers(){
+
+    public List<CustomerDTO> getAllCustomers() {
         return customerService.getAllCustomerDTOs();
     }
-    
-    public List<Product> getAllProducts(){
+
+    public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
-    
-    public boolean  createQuotation(Quotation quotation, QuotationDetail detail){
-        int quotationId= quotationDAO.createQuotation(quotation);
-        
-        if (quotationId == -1){
+
+    /*
+     * Tao quotation moi va ghi lich su tao moi.
+     */
+    public boolean createQuotation(Quotation quotation, QuotationDetail detail) {
+        int quotationId = quotationDAO.createQuotation(quotation);
+
+        if (quotationId == -1) {
             return false;
         }
+
         detail.setQuotationId(quotationId);
-        return quotationDAO.addQuotationDetail(detail);
+        boolean detailCreated = quotationDAO.addQuotationDetail(detail);
+
+        if (detailCreated) {
+            quotationDAO.addQuotationHistory(quotationId, quotation.getCreatedBy(), "Tao quotation moi");
+        }
+
+        return detailCreated;
     }
+
     /*
      * Lay thong tin chung cua 1 quotation.
      */
@@ -56,5 +68,29 @@ public class QuotationService {
      */
     public List<QuotationDetail> getQuotationDetailsByQuotationId(int quotationId) {
         return quotationDAO.getQuotationDetailsByQuotationId(quotationId);
+    }
+
+    /*
+     * Lay lich su negotiation cua quotation.
+     */
+    public List<QuotationHistory> getHistoryByQuotationId(int quotationId) {
+        return quotationDAO.getHistoryByQuotationId(quotationId);
+    }
+
+    /*
+     * Cap nhat 1 dong chi tiet quotation va ghi lich su.
+     */
+    public boolean updateQuotationDetail(QuotationDetail detail, Integer userId) {
+        boolean updated = quotationDAO.updateQuotationDetail(detail);
+
+        if (updated) {
+            String note = "Cap nhat detail: quantity=" + detail.getQuantity()
+                    + ", sellingPrice=" + detail.getSellingPrice()
+                    + ", discount=" + detail.getDiscountPercent()
+                    + ", tax=" + detail.getTaxPercent();
+            quotationDAO.addQuotationHistory(detail.getQuotationId(), userId, note);
+        }
+
+        return updated;
     }
 }

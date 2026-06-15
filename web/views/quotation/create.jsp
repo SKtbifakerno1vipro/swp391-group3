@@ -10,14 +10,16 @@
 <body>
 
     <h1>Create Quotation</h1>
-    
+
+    <%-- Neu Controller gui loi sang thi hien thi loi o day. --%>
     <c:if test="${not empty error}">
         <p style="color: red;">${error}</p>
     </c:if>
-    
+
+    <%-- Form nay gui du lieu ve CreateQuotationController bang method POST. --%>
     <form action="${pageContext.request.contextPath}/quotation-create" method="post">
 
-        
+        <%-- Dropdown chon khach hang. Du lieu customers duoc gui tu doGet(). --%>
         <div>
             <label>Customer:</label>
             <select name="customerId" required>
@@ -33,7 +35,7 @@
 
         <br>
 
-        
+        <%-- Dropdown chon san pham. Du lieu products duoc gui tu doGet(). --%>
         <div>
             <label>Product:</label>
             <select name="productId" required>
@@ -49,7 +51,7 @@
 
         <br>
 
-       
+        <%-- Quantity la so luong san pham. min=1 de khong cho nhap 0 hoac so am. --%>
         <div>
             <label>Quantity:</label>
             <input type="number" name="quantity" min="1" required>
@@ -57,7 +59,7 @@
 
         <br>
 
-        
+        <%-- Selling price la gia ban. step=0.01 cho phep nhap so thap phan. --%>
         <div>
             <label>Selling Price:</label>
             <input type="number" name="sellingPrice" min="0" step="0.01" required>
@@ -65,7 +67,7 @@
 
         <br>
 
-        
+        <%-- Discount percent la phan tram giam gia. Mac dinh la 0. --%>
         <div>
             <label>Discount Percent:</label>
             <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required>
@@ -73,7 +75,7 @@
 
         <br>
 
-        
+        <%-- Tax percent la phan tram thue. Mac dinh la 0. --%>
         <div>
             <label>Tax Percent:</label>
             <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required>
@@ -82,7 +84,7 @@
         <br>
 
         <button type="submit">Create Quotation</button>
-        <a href="quotation-list">Back to List</a>
+        <a href="${pageContext.request.contextPath}/quotation-list">Back to List</a>
     </form>
 
 </body>

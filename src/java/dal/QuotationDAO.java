@@ -56,14 +56,14 @@ public class QuotationDAO extends DBContext {
                 + "FROM quotation "
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
                 + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
-                + "WHERE 1=1 "; // CÃƒÆ’Ã‚Â³ dÃƒÂ¡Ã‚ÂºÃ‚Â¥u cÃƒÆ’Ã‚Â¡ch ÃƒÂ¡Ã‚Â»Ã…Â¸ cuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœi
+                + "WHERE 1=1 "; // Co dau cach o cuoi
 
         if (searchText != null && !searchText.trim().isEmpty()) {
-            sql += " AND customer.company_name LIKE ? "; // ThÃƒÆ’Ã‚Âªm dÃƒÂ¡Ã‚ÂºÃ‚Â¥u cÃƒÆ’Ã‚Â¡ch
+            sql += " AND customer.company_name LIKE ? "; // Them dau cach
         }
 
         if (status != null && !status.trim().isEmpty()) {
-            sql += " AND quotation.quotation_status = ? "; // ThÃƒÆ’Ã‚Âªm dÃƒÂ¡Ã‚ÂºÃ‚Â¥u cÃƒÆ’Ã‚Â¡ch
+            sql += " AND quotation.quotation_status = ? "; // Them dau cach
         }
         sql += " ORDER BY quotation.created_at DESC";
 
@@ -72,10 +72,10 @@ public class QuotationDAO extends DBContext {
             int paramIndex = 1;
 
             if (searchText != null && !searchText.trim().isEmpty()) {
-                ps.setString(paramIndex++, "%" + searchText + "%"); // DÃƒÆ’Ã‚Â¹ng ++ Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ tÃƒâ€žÃ†â€™ng vÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ trÃƒÆ’Ã‚Â­
+                ps.setString(paramIndex++, "%" + searchText + "%"); // Dung ++ de tang vi tri
             }
             if (status != null && !status.trim().isEmpty()) {
-                ps.setString(paramIndex++, status); // DÃƒÆ’Ã‚Â¹ng ++ Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ tÃƒâ€žÃ†â€™ng vÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ trÃƒÆ’Ã‚Â­
+                ps.setString(paramIndex++, status); // Dung ++ de tang vi tri
             }
 
             ResultSet rs = ps.executeQuery();
@@ -124,8 +124,7 @@ public class QuotationDAO extends DBContext {
     }
 
     /*
-    create by phu
-    this func find quotation by id
+    Tao boi Phu. Ham nay tim quotation theo id.
      */
     public Quotation getQuotationById(int quotationId) {
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
@@ -165,7 +164,7 @@ public class QuotationDAO extends DBContext {
         String sql = "INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) "
                 + "VALUES (?, ?, ?, ?)";
         try {
-            //RETURN_GENERATED_KEYS giÃƒÆ’Ã‚Âºp lÃƒÂ¡Ã‚ÂºÃ‚Â¥y ID vÃƒÂ¡Ã‚Â»Ã‚Â«a Ãƒâ€žÃ¢â‚¬ËœÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£c database tÃƒÂ¡Ã‚Â»Ã‚Â± sinh.
+            // RETURN_GENERATED_KEYS giup lay ID vua duoc database tu sinh.
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, quotation.getCustomerId());
             ps.setTimestamp(2, Timestamp.valueOf((quotation.getQuotationDate())));
@@ -270,5 +269,59 @@ public class QuotationDAO extends DBContext {
         }
 
         return details;
+    }
+    /*
+     * Cap nhat 1 dong quotation_detail.
+     * Dung khi sales sua quantity, price, discount, tax trong trang detail.
+     */
+    public boolean updateQuotationDetail(QuotationDetail detail) {
+        String sql = "UPDATE quotation_detail "
+                + "SET quantity = ?, "
+                + "selling_price = ?, "
+                + "discount_percent = ?, "
+                + "tax_percent = ? "
+                + "WHERE quotation_detail_id = ?";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+
+            // Gan gia tri moi vao cau SQL.
+            ps.setInt(1, detail.getQuantity());
+            ps.setBigDecimal(2, detail.getSellingPrice());
+            ps.setBigDecimal(3, detail.getDiscountPercent());
+            ps.setBigDecimal(4, detail.getTaxPercent());
+
+            // Dung quotation_detail_id de biet can update dong nao.
+            ps.setInt(5, detail.getQuotationDetailId());
+
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (Exception e) {
+            System.out.println("updateQuotationDetail error: " + e.getMessage());
+        }
+
+        return false;
+    }
+    /*
+     * Them 1 dong lich su cho quotation.
+     * Dung khi tao moi hoac cap nhat quotation detail.
+     */
+    public boolean addQuotationHistory(int quotationId, Integer createdBy, String editHistory) {
+        String sql = "INSERT INTO quotation_history (quotation_id, created_by, edit_history) "
+                + "VALUES (?, ?, ?)";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, quotationId);
+            ps.setObject(2, createdBy);
+            ps.setString(3, editHistory);
+
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }
