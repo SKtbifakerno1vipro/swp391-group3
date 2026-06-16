@@ -33,7 +33,12 @@
 
             <%-- Thông báo kết quả --%>
             <c:if test="${not empty success}">
-                <div class="alert alert-success">${success}</div>
+                <div class="alert alert-success">
+                    ${success}
+                    <c:if test="${isForgetFlowSuccess}">
+                        <br><a href="${pageContext.request.contextPath}/login" style="color: #155724; font-weight: bold; text-decoration: underline;">Đăng nhập ngay</a>
+                    </c:if>
+                </div>
             </c:if>
             <c:if test="${not empty error}">
                 <div class="alert alert-danger">

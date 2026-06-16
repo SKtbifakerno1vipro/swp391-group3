@@ -53,8 +53,8 @@ public class ForgotPassController extends HttpServlet {
 
                 // 3. Lưu OTP và đối tượng User vào Session để kiểm tra lúc sau
                 session.setAttribute("recoveryOtp", otpCode);
+                session.setAttribute("otpCreationTime", System.currentTimeMillis());
                 session.setAttribute("userAuth", u);
-                session.setMaxInactiveInterval(5 * 60); // Hết hạn sau 5 phút
 
                 String emailSubject = "[SWP391] Mã xác thực (OTP) khôi phục mật khẩu";
                 String emailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;'>"
@@ -89,35 +89,67 @@ public class ForgotPassController extends HttpServlet {
             String userOtp = request.getParameter("otpCode");
             
             String sessionOtp = (String) session.getAttribute("recoveryOtp");
-            // test
-            userOtp = sessionOtp;
+            Long otpCreationTime = (Long) session.getAttribute("otpCreationTime");
             User sessionUser = (User) session.getAttribute("userAuth");
-            // Kiểm tra mã OTP hợp lệ
-            if ( (sessionOtp != null && sessionOtp.equals(userOtp) && email.equals(sessionUser.getEmail()))) {
-                
+                        
+            boolean isValid = false;
+            if (sessionOtp != null && otpCreationTime != null && sessionUser != null && userOtp != null && !userOtp.trim().isEmpty()) {
+                long elapsedTime = System.currentTimeMillis() - otpCreationTime;
+                // Kiểm tra mã OTP khớp và còn hiệu lực trong vòng 5 phút (5 * 60 * 1000 ms)
+                if (elapsedTime <= 5 * 60 * 1000 && sessionOtp.equals(userOtp.trim()) && email != null && email.trim().equals(sessionUser.getEmail().trim())) {
+                    isValid = true;
+                    // Xóa mã OTP khỏi session ngay lập tức để đảm bảo sử dụng 1 lần duy nhất (One-time use)
+                    session.removeAttribute("recoveryOtp");
+                    session.removeAttribute("otpCreationTime");
+                }
+            }
+            
+            if (isValid) {
                 String newPass = PasswordUtils.generateRandomText();
-                // Cập nhật mật khẩu mới vào Database dựa vào Email  sessionUser.getUserId()
+                // Cập nhật mật khẩu mới ngẫu nhiên vào Database
                 try {
                     String isUpdated = userService.changePassword(sessionUser.getUserId(), null, newPass); // Hàm tự viết ở dưới
                     
                     if (isUpdated == null) {
-                        request.setAttribute("success", "Xác nhận thành công!");
-                        session.removeAttribute("recoveryOtp");
-                        
                         session.setAttribute("forgetPass", newPass);
-                        request.setAttribute("isForgot", false);
-                        request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+                        // Redirect người dùng đến trang đổi mật khẩu mới
+                        response.sendRedirect(request.getContextPath() + "/user/password/change");
                         return;
                     } else {
+                        session.removeAttribute("userAuth");
+                        session.removeAttribute("recoveryOtp");
+                        session.removeAttribute("otpCreationTime");
                         request.setAttribute("error", "Đặt lại mật khẩu thất bại. Vui lòng thử lại!");
                     }
                 } catch (Exception e) {
                     e.printStackTrace(); 
+                    session.removeAttribute("userAuth");
+                    session.removeAttribute("recoveryOtp");
+                    session.removeAttribute("otpCreationTime");
                     request.setAttribute("error", "Đã xảy ra lỗi hệ thống khi cập nhật mật khẩu.");
                     request.setAttribute("errorDetail", e.getMessage());
                 }
             } else {
-                request.setAttribute("error", "Mã xác nhận (OTP) không chính xác hoặc đã hết hạn!");
+                // Xác định rõ nguyên nhân thất bại để hiển thị thông báo chi tiết và tránh xóa session bừa bãi
+                if (sessionOtp == null || otpCreationTime == null || sessionUser == null) {
+                    request.setAttribute("error", "Vui lòng yêu cầu gửi mã xác nhận trước!");
+                } else if (userOtp == null || userOtp.trim().isEmpty()) {
+                    request.setAttribute("error", "Vui lòng nhập mã xác nhận (OTP)!");
+                } else {
+                    long elapsedTime = System.currentTimeMillis() - otpCreationTime;
+                    if (elapsedTime > 5 * 60 * 1000) {
+                        // Quá hạn: Xóa các thông tin xác thực cũ
+                        session.removeAttribute("userAuth");
+                        session.removeAttribute("recoveryOtp");
+                        session.removeAttribute("otpCreationTime");
+                        request.setAttribute("error", "Mã xác nhận (OTP) đã hết hạn (quá 5 phút). Vui lòng gửi lại mã mới!");
+                    } else if (email == null || !email.trim().equals(sessionUser.getEmail().trim())) {
+                        request.setAttribute("error", "Email không khớp với yêu cầu khôi phục!");
+                    } else {
+                        // Sai mã xác nhận nhưng chưa hết hạn: Cho phép nhập lại (không xóa session)
+                        request.setAttribute("error", "Mã xác nhận (OTP) không chính xác. Vui lòng nhập lại!");
+                    }
+                }
             }
             request.setAttribute("isForgot", true);
             request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
