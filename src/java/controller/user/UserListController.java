@@ -91,7 +91,7 @@ public class UserListController extends HttpServlet {
 
             if ("ACTIVE".equals(currentStatus)) {
                 userService.banUser(userId, "INACTIVE");
-            } else if ("BAN".equals(currentStatus)) {
+            } else if ("INACTIVE".equals(currentStatus)) {
                 userService.banUser(userId, "ACTIVE");
             } else {
                 userService.banUser(userId, currentStatus);

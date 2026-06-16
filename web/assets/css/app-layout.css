@@ -118,6 +118,28 @@ a { color: inherit; text-decoration: none; }
     font-size: 12px;
 }
 
+
+.sidebar .brand-logo-wrap {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+    flex: 0 0 52px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background: #fff !important;
+}
+
+.sidebar .brand-logo {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
 .nav-group {
     display: flex;
     flex-direction: column;
@@ -296,6 +318,37 @@ a { color: inherit; text-decoration: none; }
     max-width: 100%;
 }
 
+
+
+.sidebar .brand-title {
+    margin: 0 !important;
+    color: var(--primary) !important;
+    font-family: 'Literata', Georgia, serif !important;
+    font-size: 21px !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0 !important;
+}
+
+.sidebar .brand-subtitle {
+    margin: 2px 0 0 !important;
+    color: var(--muted) !important;
+    font-family: 'Nunito Sans', Arial, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+}
+
+.sidebar .nav-link,
+.sidebar .user-card {
+    font-family: 'Nunito Sans', Arial, sans-serif !important;
+}
+
+.legacy-page > .flex-1 {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
 @media (max-width: 1080px) {
     .dashboard-shell,
     .role-shell {
@@ -317,4 +370,14 @@ a { color: inherit; text-decoration: none; }
     .nav-group {
         grid-template-columns: 1fr;
     }
+}
+
+
+.sidebar .brand-mark img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
 }
