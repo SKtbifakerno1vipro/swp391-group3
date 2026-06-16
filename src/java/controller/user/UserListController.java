@@ -1,13 +1,15 @@
 package controller.user;
 
 import service.UserService;
+import service.RoleService;
+import model.User;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.annotation.WebServlet;
-import service.RoleService;
 
 @WebServlet(name = "UserListController", urlPatterns = {"/user-list"})
 public class UserListController extends HttpServlet {
@@ -16,7 +18,15 @@ public class UserListController extends HttpServlet {
     private final RoleService roleService = new RoleService();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect("login");
+            return;
+        }
 
         String roleIdString = request.getParameter("roleId");
         String status = request.getParameter("status");
@@ -32,43 +42,64 @@ public class UserListController extends HttpServlet {
             }
         }
 
-        int pageSize = 10; // defaut 10 user one page
-        int pageIndex = 1; //default is page one
+        int pageSize = 10;
+        int pageIndex = 1;
 
         String page = request.getParameter("page");
         if (page != null) {
-            pageIndex = Integer.parseInt(page);
+            try {
+                pageIndex = Integer.parseInt(page);
+            } catch (NumberFormatException e) {
+                pageIndex = 1;
+            }
         }
+
         int totalRecord = userService.getTotalUsers(roleId, status, searchName, searchPhone, searchEmail);
         int endPage = (int) Math.ceil((double) totalRecord / pageSize);
+
+        // Prevent page out of range
+        if (pageIndex > endPage && endPage > 0) {
+            pageIndex = endPage;
+        }
 
         request.setAttribute("roleId", roleId);
         request.setAttribute("status", status);
         request.setAttribute("users", userService.searchUsers(roleId, status, searchName, searchPhone, searchEmail, pageIndex, pageSize));
         request.setAttribute("roles", roleService.getAllRoles());
         request.setAttribute("searchEmail", searchEmail);
-         request.setAttribute("searchPhone", searchPhone);
-          request.setAttribute("searchName", searchName);
+        request.setAttribute("searchPhone", searchPhone);
+        request.setAttribute("searchName", searchName);
         request.setAttribute("endPage", endPage);
         request.setAttribute("currentPage", pageIndex);
         request.getRequestDispatcher("/views/user/list.jsp").forward(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-                int userId = Integer.parseInt(request.getParameter("userId"));
-        String currentStatus = request.getParameter("status");
-        
-        if ("ACTIVE".equals(currentStatus)) {
-            userService.banUser(userId, "INACTIVE");
-        } else if ("BAN".equals(currentStatus)) {
-            userService.banUser(userId, "ACTIVE");
-        } else {
-            userService.banUser(userId, currentStatus);
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect("login");
+            return;
         }
+
+        try {
+            int userId = Integer.parseInt(request.getParameter("userId"));
+            String currentStatus = request.getParameter("status");
+
+            if ("ACTIVE".equals(currentStatus)) {
+                userService.banUser(userId, "INACTIVE");
+            } else if ("BAN".equals(currentStatus)) {
+                userService.banUser(userId, "ACTIVE");
+            } else {
+                userService.banUser(userId, currentStatus);
+            }
+        } catch (NumberFormatException e) {
+
+        }
+
         response.sendRedirect(request.getContextPath() + "/user-list");
-
     }
-
 }
