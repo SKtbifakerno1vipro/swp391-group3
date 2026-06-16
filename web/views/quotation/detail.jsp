@@ -6,8 +6,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Quotation Detail</title>
-</head>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
+    </head>
 <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="quotations"/>
+            </jsp:include>
+            <main class="main legacy-page">
 
     <h1>Quotation Detail</h1>
     <%-- Hien thi thong bao sau khi bam Save. --%>
@@ -161,5 +172,8 @@
     <br>
     <a href="${pageContext.request.contextPath}/quotation-list">Back to List</a>
 
-</body>
+
+            </main>
+        </div>
+    </body>
 </html>

@@ -156,7 +156,7 @@ CREATE TABLE customer_contract (
 	end_date DATETIME,
 	signed_date DATETIME,    
 
-	contract_content NVARCHAR(MAX),
+	contract_content nvarchar(max),
     storage_type VARCHAR(10) NOT NULL DEFAULT 'TEXT',
 
     created_by INT,
@@ -189,6 +189,7 @@ CREATE TABLE contract_edit_history (
     contract_id INT NOT NULL,
     from_status VARCHAR(50),
     to_status VARCHAR(50),
+	edit_status varchar(50),
 	contract_version VARCHAR(50),
 	note nvarchar(max),
     changed_by INT,
@@ -204,6 +205,7 @@ CREATE TABLE contract_revision_item (
     revision_item_id INT IDENTITY(1,1) PRIMARY KEY,
     history_id INT NOT NULL,
 	contract_id INT NOT NULL,
+
     revision_type NVARCHAR(100) NOT NULL,
     revision_detail NVARCHAR(MAX) NOT NULL,
     FOREIGN KEY (history_id) REFERENCES contract_edit_history(history_id),

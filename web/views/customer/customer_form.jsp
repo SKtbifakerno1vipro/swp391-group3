@@ -5,16 +5,16 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <%-- Tu đong đoi Tieu đe trang tuy theo hanh đong --%>
         <c:set var="isEdit" value="${not empty cusDTO}" />
         <title><c:choose><c:when test="${isEdit}">Edit Customer - Terra Enterprise</c:when>
                 <c:otherwise>Create Customer</c:otherwise></c:choose></title>
-        
+
         <link href="https://fonts.googleapis.com" rel="preconnect">
         <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
         <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
-        
+
         <style>
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -165,8 +165,19 @@
                 background-color: #5a6268;
             }
         </style>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
     <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="customers"/>
+            </jsp:include>
+            <main class="main legacy-page">
         <main class="container">
             <div class="nav-links">
                 <a href="${pageContext.request.contextPath}/customer/list">Customer List</a>
@@ -181,7 +192,7 @@
                     <h1>Create Customer</h1>
                 </c:otherwise>
             </c:choose>
-            
+
             <c:if test="${not empty success}">
                 <div class="alert alert-success">
                     <c:choose>
@@ -200,7 +211,7 @@
             </c:if>
 
             <form action="${pageContext.request.contextPath}/customer/${isEdit ? 'edit' : 'create'}" method="post">
-                
+
                 <%-- Neu la EDIT thi moi sinh ra 2 the hidden ID nay --%>
                 <c:if test="${isEdit}">
                     <input type="hidden" name="customerId" value="${cusDTO.customer.customerId}" />
@@ -220,30 +231,30 @@
 
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" class="form-control" 
+                    <input type="text" id="username" name="username" class="form-control"
                            value="${isEdit ? cusDTO.user.userName : ''}" ${isEdit ? 'readonly' : ''} required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-control" 
+                    <input type="email" id="email" name="email" class="form-control"
                            value="${isEdit ? cusDTO.user.email : ''}" ${isEdit ? 'readonly' : ''} required>
                 </div>
-                
+
                 <%-- Full Name --%>
                 <div class="form-group">
                     <label for="fullname">Full Name</label>
-                    <input type="text" id="fullname" name="fullname" class="form-control" 
+                    <input type="text" id="fullname" name="fullname" class="form-control"
                            value="${isEdit ? cusDTO.user.fullName : ''}">
                 </div>
-                
+
                 <%-- Phone --%>
                 <div class="form-group">
                     <label for="phone">Phone</label>
-                    <input type="text" id="phone" name="phone" class="form-control" 
+                    <input type="text" id="phone" name="phone" class="form-control"
                            value="${isEdit ? cusDTO.user.phone : ''}">
                 </div>
-                
+
                 <%-- Status --%>
                 <div class="form-group">
                     <label for="status">Status</label>
@@ -252,7 +263,7 @@
                         <option value="INACTIVE" ${isEdit && cusDTO.user.status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Role</label>
                     <c:choose>
@@ -270,32 +281,32 @@
                         </c:otherwise>
                     </c:choose>
                 </div>
-                
+
                 <%-- Tax Code --%>
                 <div class="form-group">
                     <label for="taxCode">Tax Code</label>
-                    <input type="text" id="taxCode" name="taxCode" class="form-control" 
+                    <input type="text" id="taxCode" name="taxCode" class="form-control"
                            value="${isEdit ? cusDTO.customer.taxCode : ''}" required>
                 </div>
-                
+
                 <%-- Company Name --%>
                 <div class="form-group">
                     <label for="companyName">Company Name</label>
-                    <input type="text" id="companyName" name="companyName" class="form-control" 
+                    <input type="text" id="companyName" name="companyName" class="form-control"
                            value="${isEdit ? cusDTO.customer.companyName : ''}" required>
                 </div>
-                
+
                 <%-- Customer Type--%>
                 <div class="form-group">
                     <label for="customerType">Customer Type</label>
-                    <select id="customerType" name="customerType" class="form-control" ${isEdit ? 'required' : ''}> 
+                    <select id="customerType" name="customerType" class="form-control" ${isEdit ? 'required' : ''}>
                         <option value="">-- Select Type --</option>
                         <c:forEach var="type" items="${listTypeCus}">
                             <option value="${type}" ${isEdit && cusDTO.customer.customerType == type ? 'selected' : ''}>${type}</option>
                         </c:forEach>
                     </select>
                 </div>
-                
+
                 <%-- Assigned To--%>
                 <div class="form-group">
                     <label for="assignedToUserId">Assigned To</label>
@@ -308,7 +319,7 @@
                         </c:forEach>
                     </select>
                 </div>
-                
+
                 <%-- --%>
                 <div class="btn-group">
                     <button type="submit" class="btn-submit">${isEdit ? 'Save changes' : 'Create'}</button>
@@ -316,5 +327,8 @@
                 </div>
             </form>
         </main>
+
+            </main>
+        </div>
     </body>
 </html>

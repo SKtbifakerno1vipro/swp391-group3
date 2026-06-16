@@ -13,10 +13,21 @@
             .pagination-container a { border: 1px solid #ddd; color: #007bff; }
             .pagination-container strong { border: 1px solid #007bff; background-color: #007bff; color: white; }
         </style>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
     <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="customers"/>
+            </jsp:include>
+            <main class="main legacy-page">
         <h2>Quản lý danh sách khách hàng (Hệ thống thành viên)</h2>
-        
+
         <c:if test="${not empty success}">
             <div style="color: green; margin-bottom: 10px;">Edit successful</div>
         </c:if>
@@ -28,37 +39,37 @@
                 </c:if>
             </div>
         </c:if>
-        
+
         <div style="margin-bottom: 15px;">
-            <a href="${pageContext.request.contextPath}/customer/create">Add Customer</a> | 
+            <a href="${pageContext.request.contextPath}/customer/create">Add Customer</a> |
             <a href="${pageContext.request.contextPath}/dashboard">DashBoard</a>
         </div>
-        
+
         <form action="${pageContext.request.contextPath}/customer/list" method="GET">
             <table style="border: none; width: auto; margin-top: 0;">
                 <tr style="border: none;">
                     <td style="border: none; padding: 5px 10px;">
                         <label>Tìm kiếm:</label><br/>
-                        <input type="text" name="searchName" value="${searchName}" 
+                        <input type="text" name="searchName" value="${searchName}"
                                placeholder="Nhập tên..." style="padding: 5px; width: 250px;"/>
-                        <input type="text" name="searchSdt" value="${searchSdt}" 
+                        <input type="text" name="searchSdt" value="${searchSdt}"
                                placeholder="Nhập SĐT..." style="padding: 5px; width: 250px;"/>
-                        <input type="text" name="searchEmail" value="${searchEmail}" 
+                        <input type="text" name="searchEmail" value="${searchEmail}"
                                placeholder="Nhập email..." style="padding: 5px; width: 250px;"/>
-                        <input type="text" name="searchMst" value="${searchMst}" 
+                        <input type="text" name="searchMst" value="${searchMst}"
                                placeholder="Nhập mã số thuế..." style="padding: 5px; width: 250px;"/>
                     </td>
 
                     <td style="border: none; padding: 5px 10px; vertical-align: bottom;">
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Loại khách hàng: </label>
-                        <select name="type" style="padding: 5px; width: 150px; box-sizing: border-box;"> 
+                        <select name="type" style="padding: 5px; width: 150px; box-sizing: border-box;">
                             <option value="">-- Tất cả --</option>
                             <c:forEach var="typeCus" items="${listTypeCus}">
                                 <option value="${typeCus}" ${type eq typeCus ? 'selected' : ''}>${typeCus}</option>
                             </c:forEach>
                         </select>
                     </td>
-                    
+
                     <td style="border: none; padding: 5px 10px; vertical-align: bottom;">
                         <button type="submit" style="padding: 6px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Tìm kiếm</button>
                         <a href="${pageContext.request.contextPath}/customer/list" style="padding: 6px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; margin-left: 5px;">Xóa bộ lọc</a>
@@ -66,7 +77,7 @@
                 </tr>
             </table>
         </form>
-        
+
         <table>
             <thead>
                 <tr>
@@ -113,7 +124,7 @@
 
         <c:if test="${totalPages > 1}">
             <div class="pagination-container" style="margin-top: 20px; text-align: center;">
-                
+
                 <%-- Tinh toan khoang hien thi cac nut so trang --%>
                 <c:set var="startPage" value="${currentPage - 2}" />
                 <c:if test="${startPage < 1}">
@@ -158,5 +169,8 @@
                 </c:choose>
             </div>
         </c:if>
+
+            </main>
+        </div>
     </body>
 </html>

@@ -1,12 +1,11 @@
 package controller.customerorder;
 
-
 import dal.ContractDAO;
 import dto.CustomerDTO;
 import model.CustomerOrder;
 import model.CustomerOrderDetail;
 import model.Product;
-import model.User;
+import model.*;
 import service.CustomerOrderService;
 import service.CustomerService;
 import service.ProductService;
@@ -25,12 +24,14 @@ import java.util.stream.Collectors;
 
 @WebServlet(name = "CreateCustomerOrderController", urlPatterns = {"/create-customer-order"})
 public class CreateCustomerOrderController extends HttpServlet {
+
     private ContractDAO dao = new ContractDAO();
     private final CustomerOrderService customerOrderService = new CustomerOrderService();
     private final CustomerService customerService = new CustomerService();
     private final ProductService productService = new ProductService();
     //nguyenkien - begin
     private final int PAGE_SIZE = 10;
+
     //nguyenkien - end
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -79,7 +80,7 @@ public class CreateCustomerOrderController extends HttpServlet {
 
                 if (customerDto != null) {
                     // Chỉ lấy những hợp đồng đã ký (SIGNED) của khách hàng này
-                    List<model.Contract> contracts = dao.getSignedContractsByCustomerId(customerId);
+                    List<Contract> contracts = dao.getSignedContractsByCustomerId(customerId);
                     request.setAttribute("contracts", contracts);
                 } else {
                     request.setAttribute("error", "Customer not found.");

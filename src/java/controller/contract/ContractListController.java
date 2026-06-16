@@ -4,7 +4,6 @@
  */
 package controller.contract;
 
-import java.io.PrintWriter;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -47,13 +46,12 @@ public class ContractListController extends HttpServlet {
 
         int pageSize = 10;
 
-        // cleaned comment
         List<Contract> list = dao.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize);
         int totalRecord = dao.getTotalContracts(contractNumber, customerName, status, storageType);
 
         // Tinh toan trang cuoi
         int endPage = (int) Math.ceil((double) totalRecord / pageSize);
-        // cleaned comment
+        
         if (pageIndex > endPage && endPage > 0) {
             pageIndex = endPage;
         }
@@ -74,7 +72,5 @@ public class ContractListController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
     }
-
 }

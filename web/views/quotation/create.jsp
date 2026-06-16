@@ -6,8 +6,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Create Quotation</title>
-</head>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
+    </head>
 <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="quotations"/>
+            </jsp:include>
+            <main class="main legacy-page">
 
     <h1>Create Quotation</h1>
 
@@ -35,57 +46,112 @@
 
         <br>
 
-        <%-- Dropdown chon san pham. Du lieu products duoc gui tu doGet(). --%>
-        <div>
-            <label>Product:</label>
-            <select name="productId" required>
-                <option value="">-- Select Product --</option>
-
-                <c:forEach items="${products}" var="product">
-                    <option value="${product.productId}">
-                        ${product.productName}
-                    </option>
-                </c:forEach>
-            </select>
-        </div>
-
-        <br>
-
-        <%-- Quantity la so luong san pham. min=1 de khong cho nhap 0 hoac so am. --%>
-        <div>
-            <label>Quantity:</label>
-            <input type="number" name="quantity" min="1" required>
-        </div>
-
-        <br>
-
-        <%-- Selling price la gia ban. step=0.01 cho phep nhap so thap phan. --%>
-        <div>
-            <label>Selling Price:</label>
-            <input type="number" name="sellingPrice" min="0" step="0.01" required>
-        </div>
-
-        <br>
-
-        <%-- Discount percent la phan tram giam gia. Mac dinh la 0. --%>
-        <div>
-            <label>Discount Percent:</label>
-            <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required>
-        </div>
-
-        <br>
-
-        <%-- Tax percent la phan tram thue. Mac dinh la 0. --%>
-        <div>
-            <label>Tax Percent:</label>
-            <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required>
-        </div>
+        <%-- Bang nay cho phep tao nhieu san pham trong 1 quotation. --%>
+        <h3>Products</h3>
+        <table border="1" cellpadding="7" cellspacing="0" id="productTable">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Selling Price</th>
+                    <th>Discount %</th>
+                    <th>Tax %</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="productRows">
+                <tr>
+                    <td>
+                        <select name="productId" required>
+                            <option value="">-- Select Product --</option>
+                            <c:forEach items="${products}" var="product">
+                                <option value="${product.productId}">
+                                    ${product.productName}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" name="quantity" min="1" value="1" required>
+                    </td>
+                    <td>
+                        <input type="number" name="sellingPrice" min="0" step="0.01" required>
+                    </td>
+                    <td>
+                        <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required>
+                    </td>
+                    <td>
+                        <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required>
+                    </td>
+                    <td>
+                        <button type="button" onclick="removeProductRow(this)">Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
         <br>
 
+        <button type="button" onclick="addProductRow()">Add Product</button>
         <button type="submit">Create Quotation</button>
         <a href="${pageContext.request.contextPath}/quotation-list">Back to List</a>
     </form>
 
-</body>
+    <%-- Template an de clone khi bam Add Product. --%>
+    <table style="display: none;">
+        <tbody>
+            <tr id="productRowTemplate">
+                <td>
+                    <select name="productId" required>
+                        <option value="">-- Select Product --</option>
+                        <c:forEach items="${products}" var="product">
+                            <option value="${product.productId}">
+                                ${product.productName}
+                            </option>
+                        </c:forEach>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="quantity" min="1" value="1" required>
+                </td>
+                <td>
+                    <input type="number" name="sellingPrice" min="0" step="0.01" required>
+                </td>
+                <td>
+                    <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required>
+                </td>
+                <td>
+                    <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required>
+                </td>
+                <td>
+                    <button type="button" onclick="removeProductRow(this)">Remove</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Them 1 dong san pham moi vao bang.
+        function addProductRow() {
+            const template = document.getElementById('productRowTemplate');
+            const newRow = template.cloneNode(true);
+            newRow.removeAttribute('id');
+            document.getElementById('productRows').appendChild(newRow);
+        }
+
+        // Xoa 1 dong san pham, nhung phai giu lai it nhat 1 dong.
+        function removeProductRow(button) {
+            const rows = document.querySelectorAll('#productRows tr');
+            if (rows.length <= 1) {
+                alert('Quotation must have at least one product.');
+                return;
+            }
+            button.closest('tr').remove();
+        }
+    </script>
+
+
+            </main>
+        </div>
+    </body>
 </html>

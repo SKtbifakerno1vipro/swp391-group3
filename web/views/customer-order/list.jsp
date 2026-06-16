@@ -6,8 +6,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Customer Order List</title>
-</head>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
+    </head>
 <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="orders"/>
+            </jsp:include>
+            <main class="main legacy-page">
     <h2>Customer Order List</h2>
     <hr>
     <a href="${pageContext.request.contextPath}/create-customer-order">Create Order</a>
@@ -63,7 +74,7 @@
             </c:if>
 
             <c:forEach begin="1" end="${totalPages}" var="i">
-                <a href="customer-order-list?page=${i}&${queryParams}" 
+                <a href="customer-order-list?page=${i}&${queryParams}"
                    style="margin: 0 5px; ${i == currentPage ? 'font-weight:bold; color:red;' : ''}">${i}</a>
             </c:forEach>
 
@@ -72,5 +83,8 @@
             </c:if>
         </c:if>
     </div>
-</body>
+
+            </main>
+        </div>
+    </body>
 </html>
