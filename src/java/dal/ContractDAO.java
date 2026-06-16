@@ -217,6 +217,7 @@ public class ContractDAO extends DBContext {
     // UPDATE
     public boolean update(Contract c) {
         String sql = "UPDATE customer_contract SET "
+                + "contract_number = ?, "
                 + "contract_content = ?, "
                 + "contract_status = ?, "
                 + "contract_version = ?, "
@@ -228,25 +229,18 @@ public class ContractDAO extends DBContext {
                 + "WHERE customer_contract_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            // Noi dung chinh
-            ps.setString(1, c.getContractContent());
-            ps.setString(2, c.getContractStatus());
-            ps.setString(3, c.getContractVersion());
+            ps.setString(1, c.getContractNumber());
+            ps.setString(2, c.getContractContent());
+            ps.setString(3, c.getContractStatus());
+            ps.setString(4, c.getContractVersion());
+            ps.setTimestamp(5, c.getEffectiveDate() != null ? Timestamp.valueOf(c.getEffectiveDate()) : null);
+            ps.setTimestamp(6, c.getEndDate() != null ? Timestamp.valueOf(c.getEndDate()) : null);
+            ps.setTimestamp(7, c.getSignDate() != null ? Timestamp.valueOf(c.getSignDate()) : null);
+            ps.setInt(8, c.getUpdatedBy());
+            ps.setInt(9, c.getContractId());
 
-            // Xu ly cac truong thoi gian an toan (Null safety)
-            ps.setTimestamp(4, c.getEffectiveDate() != null ? Timestamp.valueOf(c.getEffectiveDate()) : null);
-            ps.setTimestamp(5, c.getEndDate() != null ? Timestamp.valueOf(c.getEndDate()) : null);
-            ps.setTimestamp(6, c.getSignDate() != null ? Timestamp.valueOf(c.getSignDate()) : null);
-
-            // cleaned comment
-            ps.setInt(7, c.getUpdatedBy());
-            ps.setInt(8, c.getContractId());
-
-            int affectedRows = ps.executeUpdate();
-            return affectedRows > 0; // cleaned comment
-
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            System.out.println("update contract error: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -400,6 +394,46 @@ public class ContractDAO extends DBContext {
             e.printStackTrace();
         }
         return items;
+    }
+
+    public java.math.BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
+        // Lưu ý: Thay đổi tên cột 'tax_percent' và 'discount_amount' 
+        // cho đúng với database thực tế của bạn
+        String sql = "SELECT q.tax_percent, q.discount_amount, "
+                + "(SELECT SUM(quantity * selling_price) FROM quotation_detail WHERE quotation_id = q.quotation_id) as subtotal "
+                + "FROM quotation q WHERE q.quotation_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, quotationId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    java.math.BigDecimal subtotal = rs.getBigDecimal("subtotal");
+                    if (subtotal == null) {
+                        subtotal = java.math.BigDecimal.ZERO;
+                    }
+
+                    java.math.BigDecimal taxPercent = rs.getBigDecimal("tax_percent");
+                    java.math.BigDecimal discount = rs.getBigDecimal("discount_amount");
+
+                    if (taxPercent == null) {
+                        taxPercent = java.math.BigDecimal.ZERO;
+                    }
+                    if (discount == null) {
+                        discount = java.math.BigDecimal.ZERO;
+                    }
+
+                    // Công thức: (Subtotal + Tax) - Discount
+                    // Tax = Subtotal * (taxPercent / 100)
+                    java.math.BigDecimal taxAmount = subtotal.multiply(taxPercent.divide(new java.math.BigDecimal("100")));
+                    java.math.BigDecimal total = subtotal.add(taxAmount).subtract(discount);
+
+                    return total.compareTo(java.math.BigDecimal.ZERO) > 0 ? total : java.math.BigDecimal.ZERO;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return java.math.BigDecimal.ZERO;
     }
 
 }

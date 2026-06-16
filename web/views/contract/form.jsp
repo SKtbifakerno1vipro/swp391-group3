@@ -13,53 +13,59 @@
                 background: #fff;
                 margin-top: 10px;
             }
+            .btn {
+                padding: 10px 20px;
+                margin-right: 10px;
+                cursor: pointer;
+            }
         </style>
     </head>
     <body>
         <c:if test="${not empty errorMsg}">
-            <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;">
-                ${errorMsg}
-            </div>
+            <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;">${errorMsg}</div>
         </c:if>
         <h2>${contract == null ? 'Create Contract' : 'Edit Contract'}</h2>
 
         <!-- Form gửi POST tới contract-save -->
-        <form action="contract-save" method="POST" id="contractForm" onsubmit="prepareContent()">
-            <!-- Dùng cho Update -->
+        <form action="contract-save" method="POST" id="contractForm">
             <input type="hidden" name="contractId" value="${contract.contractId}">
-            <!-- Dùng cho Create (khi bấm tạo từ Quotation) -->
             <input type="hidden" name="quotationId" value="${quotationId}">
             <input type="hidden" name="customerId" value="${customerId}">
+            <input type="hidden" name="action" id="actionInput">
+            <input type="hidden" name="contractContent" id="contractContentInput">
 
-            <!-- Hiển thị mã nếu đã có (Edit mode) -->
             <c:if test="${not empty contract.contractNumber}">
-                <label><strong>Contract Number:</strong></label>
-                <input type="text" value="${contract.contractNumber}" readonly style="border:none; background:transparent; font-weight:bold;">
-                <br><br>
+                <p><strong>Contract Number:</strong> ${contract.contractNumber}</p>
             </c:if>
 
-            <br><br>
-
-            <label>Contract Content (Can edit directly):</label>
-            <!-- Sử dụng thẻ div với contenteditable="true" để trình duyệt render HTML -->
+            <label>Contract Content:</label>
             <div id="contract-body" 
                  style="border: 1px solid #ccc; padding: 20px; min-height: 500px; background: white; margin-top: 10px;"
-                 contenteditable="true">
+                 contenteditable="${editable ? 'true' : 'false'}">
                 ${not empty contract.contractContent ? contract.contractContent : templateContent}
             </div>
 
-            <!-- Input ẩn quan trọng để gửi HTML về Controller -->
-            <input type="hidden" name="contractContent" id="contractContentInput">
-
             <br>
-            <!-- Nút lưu cần gọi hàm JS để lấy dữ liệu từ DIV -->
-            <button type="submit" onclick="prepareContent()">${contract == null ? 'Create' : 'Save'} Contract</button>
-            <div><a href="contract-list">Back to contract list</a></div>
+            <c:if test="${editable}">
+                <button type="button" class="btn" onclick="submitForm('save')">Save Changes</button>
+
+                <c:if test="${sessionScope.user.roleId == 2}">
+                    <button type="button" class="btn" onclick="submitForm('manager_approve')" style="background:green; color:white;">Lưu & Duyệt (Approve)</button>
+                </c:if>
+
+                <c:if test="${sessionScope.user.roleId == 5}">
+                    <button type="button" class="btn" onclick="submitForm('submit_for_review')" style="background:blue; color:white;">Gửi duyệt lại</button>
+                </c:if>
+            </c:if>
+
+            <div style="margin-top: 20px;"><a href="contract-list">Back to contract list</a></div>
 
             <script>
-                function prepareContent() {
+                function submitForm(action) {
                     var content = document.getElementById('contract-body').innerHTML;
                     document.getElementById('contractContentInput').value = content;
+                    document.getElementById('actionInput').value = action;
+                    document.getElementById('contractForm').submit();
                 }
             </script>
         </form>

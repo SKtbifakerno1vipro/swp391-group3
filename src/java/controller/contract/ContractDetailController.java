@@ -30,13 +30,30 @@ public class ContractDetailController extends HttpServlet {
                 Contract contract = contractDAO.getContractById(id);
 
                 if (contract != null) {
-                    // Lấy lịch sử phê duyệt để hiển thị trên Dashboard
                     List<ContractHistory> historyList = contractDAO.getHistoriesByContractId(id);
                     request.setAttribute("contract", contract);
                     request.setAttribute("historyList", historyList);
 
-                    // Forward đến detail.jsp (Giao diện Dashboard)
-                    request.getRequestDispatcher("views/contract/detail.jsp").forward(request, response);
+                    // ===== PHẦN MỚI THÊM BẮT ĐẦU =====
+                    String status = contract.getContractStatus();
+                    HttpSession session = request.getSession();
+                    User user = (User) session.getAttribute("user");
+
+                    // Xác định hành động khả dụng theo trạng thái
+                    boolean canRequestEdit = "DRAFT".equals(status)
+                            || "PENDING_REVIEW".equals(status);
+                    boolean canApprove = "PENDING_REVIEW".equals(status);
+                    boolean canCustomerCheck = "CUSTOMER_CHECK".equals(status);
+                    boolean isApproved = "APPROVED".equals(status);
+
+                    request.setAttribute("canRequestEdit", canRequestEdit);
+                    request.setAttribute("canApprove", canApprove);
+                    request.setAttribute("canCustomerCheck", canCustomerCheck);
+                    request.setAttribute("isApproved", isApproved);
+                    // ===== PHẦN MỚI THÊM KẾT THÚC =====
+
+                    request.getRequestDispatcher("views/contract/detail.jsp")
+                            .forward(request, response);
                 } else {
                     response.sendRedirect("contract-list");
                 }
@@ -108,15 +125,15 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("approve".equals(action)) {
-            // Cập nhật status
-            contractDAO.updateStatus(contractId, "PENDING_SIGNATURE");
+            // Manager Approve: Chuyển sang cho khách hàng kiểm tra
+            contractDAO.updateStatus(contractId, "CUSTOMER_CHECK");
 
             // Lưu lịch sử
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
             h.setFromStatus(contract.getContractStatus());
-            h.setToStatus("PENDING_SIGNATURE");
-            h.setNote("Manager đã phê duyệt hợp đồng.");
+            h.setToStatus("CUSTOMER_CHECK");
+            h.setNote("Manager đã phê duyệt hợp đồng. Chờ khách hàng kiểm tra.");
             h.setChangedBy(user.getUserId());
             contractDAO.insertHistory(h);
 
@@ -124,6 +141,22 @@ public class ContractDetailController extends HttpServlet {
             // NotificationService notificationService = new NotificationService();
             // notificationService.sendContractReadyMail(contractId);
             response.sendRedirect("contract-detail?id=" + contractId);
+
+        } else if ("customer_approve".equals(action)) {
+            // Khách hàng đồng ý: Chuyển trạng thái sang APPROVED
+            contractDAO.updateStatus(contractId, "APPROVED");
+
+            // Lưu lịch sử
+            ContractHistory h = new ContractHistory();
+            h.setContractId(contractId);
+            h.setFromStatus(contract.getContractStatus());
+            h.setToStatus("APPROVED");
+            h.setNote("Khách hàng đã đồng ý với các điều khoản hợp đồng.");
+            h.setChangedBy(user.getUserId());
+            contractDAO.insertHistory(h);
+
+            response.sendRedirect("contract-detail?id=" + contractId);
+
         } else if ("send_to_manager".equals(action)) {
             // Cập nhật status
             contractDAO.updateStatus(contractId, "PENDING_REVIEW");
@@ -133,11 +166,12 @@ public class ContractDetailController extends HttpServlet {
             h.setContractId(contractId);
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("PENDING_REVIEW");
-            h.setNote("Admin Officer đã chỉnh sửa và gửi lại.");
+            h.setNote("Admin Officer đã chỉnh sửa và gửi lại cho Manager.");
             h.setChangedBy(user.getUserId());
             contractDAO.insertHistory(h);
 
             response.sendRedirect("contract-detail?id=" + contractId);
+
         } else {
             // Action không xác định
             response.sendRedirect("contract-detail?id=" + contractId);

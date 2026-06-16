@@ -11,7 +11,8 @@ import java.util.Properties;
 import dal.*;
 
 public class ContractService {
-        private final ContractDAO contractDAO = new ContractDAO();
+
+    private final ContractDAO contractDAO = new ContractDAO();
 
     public String fillTemplate(Quotation q, CustomerDTO cust, List<QuotationDetail> details,
             String template, Properties config) {
@@ -76,10 +77,14 @@ public class ContractService {
         template = template.replace("{effective_date}", effective.format(fmt));
         template = template.replace("{end_date}", effective.plusYears(1).format(fmt));
 
+        String yearMonth = java.time.LocalDate.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMM"));
+        String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", q.getQuotationId());
         template = template.replace("{contract_number}",
-                q.getQuotationId() + "/HKT");
+                newContractNumber);
 
-        BigDecimal total = q.getTotalAmount() != null ? q.getTotalAmount() : BigDecimal.ZERO;
+        BigDecimal total = contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) != null ?
+                contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) : BigDecimal.ZERO;
         template = template.replace("{total_amount}",
                 String.format(locale, "%,.0f", total));
 
@@ -87,7 +92,6 @@ public class ContractService {
     }
 
     // XHieu-begin - delete contact me
-
     public List<Contract> getContractsByCustomerId(int customerId) {
         return contractDAO.getContractsByCustomerId(customerId);
     }

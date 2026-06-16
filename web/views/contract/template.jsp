@@ -6,7 +6,7 @@
 
     <div style="text-align: center; font-weight: bold; margin-top: 20px;">
         <h2 style="margin: 0;">HỢP ĐỒNG MUA BÁN HÀNG HÓA</h2>
-        <p style="margin: 0; font-weight: normal; font-style: italic;">Hợp đồng số: {contract_number}/HĐMB</p>
+        <p style="margin: 0; font-weight: normal; font-style: italic;">Hợp đồng số: {contract_number}</p>
     </div>
 
     <div style="margin-top: 20px;">
