@@ -174,7 +174,7 @@
                                 <label class="font-label-md text-on-surface-variant" for="userName">Username</label>
                                 <input type="text" id="userName" name="userName" value="${u.userName}" required minlength="4" maxlength="20"
                                        pattern="^[a-zA-Z0-9_]{4,20}$"
-                                       title="Username t 4-20 k t, ch cha ch, s v gch di."
+                                       title="Require enter 4-20 characters and not have blank"
                                        class="w-full px-4 py-2 rounded-lg border border-border-subtle focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-body-md" />
                             </div>
 
@@ -195,7 +195,7 @@
                             <div class="space-y-2">
                                 <label class="font-label-md text-on-surface-variant" for="phone">Phone Number</label>
                                 <input type="tel" id="phone" name="phone" value="${u.phone}" required pattern="^0[0-9]{9}$"
-                                       title="S in thoi phi bt u bng s 0 v c ng 10 ch s."
+                                       title="Require enter exact 10 digits and start with 0"
                                        class="w-full px-4 py-2 rounded-lg border border-border-subtle focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-body-md" />
                             </div>
 

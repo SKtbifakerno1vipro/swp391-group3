@@ -80,9 +80,6 @@ public class LoginController extends HttpServlet {
             session.setAttribute("failedAttempts", 0);
             session.setAttribute("user", authenticatedUser);
 
-            // Log for auditing
-            System.out.println("User logged in successfully: " + authenticatedUser.getUserName());
-
             response.sendRedirect(request.getContextPath() + "/dashboard");
         } else {
             // Login Failed: Increment attempts
