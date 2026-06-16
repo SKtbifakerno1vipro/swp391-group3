@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
@@ -76,8 +76,19 @@
                 background-color: #45a049;
             }
         </style>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
     <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="contracts"/>
+            </jsp:include>
+            <main class="main legacy-page">
         <h1>Signature List</h1>
         <div>
             <table>
@@ -94,9 +105,9 @@
                             <td> ${s.id} </td>
                             <td>${s.fileName}</td>
                             <td>${s.fileUrl}</td>
-                            <td><img src="File?name=${s.fileName}" alt="Chá»¯ kÃ½" style="height:40px;"/></td>
+                            <td><img src="File?name=${s.fileName}" alt="Signature" style="height:40px;"/></td>
                             <td>${s.signedAt}</td>
-                        </tr> 
+                        </tr>
                     </c:forEach>
                 </c:if>
             </table>
@@ -223,5 +234,8 @@
                 storeCanvas("canvasB", "inputB");
             };
         </script>
+
+            </main>
+        </div>
     </body>
 </html>

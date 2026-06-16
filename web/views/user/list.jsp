@@ -20,29 +20,21 @@
                 font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             }
         </style>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
 
-    <body class="flex min-h-screen bg-background">
-
-        <aside class="hidden md:flex flex-col h-full py-stack-lg bg-surface-alt border-r border-border-subtle fixed left-0 top-0 w-[240px] z-50">
-            <div class="px-6 mb-8 flex items-center gap-3">
-                <div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
-                    <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">dashboard_customize</span>
-                </div>
-                <div>
-                    <h2 class="font-headline-md text-headline-md font-extrabold text-primary">SaleFlow</h2>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant">Enterprise Suite</p>
-                </div>
-            </div>
-            <nav class="flex-1 px-4 space-y-2">
-                <a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-container text-primary font-semibold border-r-4 border-primary transition-all scale-95 font-body-md text-body-md" href="dashboard">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
-                    Admin Panel
-                </a>
-            </nav>
-        </aside>
-
-        <div class="flex-1 md:ml-[240px] flex flex-col">
+    <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="users"/>
+            </jsp:include>
+            <main class="main legacy-page">
+<div class="flex-1 md:ml-[240px] flex flex-col">
             <header class="flex justify-between items-center w-full px-container-margin h-16 bg-surface-main border-b border-border-subtle sticky top-0 z-40">
                 <div class="flex items-center gap-4 flex-1">
                     <p class="font-headline-md text-on-surface-variant">User Management</p>
@@ -64,7 +56,7 @@
                 <section class="bg-surface-main p-stack-lg rounded-xl border border-border-subtle shadow-[0px_4px_12px_rgba(0,0,0,0.05)]">
                     <form method="get" action="${pageContext.request.contextPath}/user-list">
                         <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
-                            <input type="text" name="searchName" placeholder="Search by Name..." value="${searchName}" 
+                            <input type="text" name="searchName" placeholder="Search by Name..." value="${searchName}"
                                    class="px-4 py-2 bg-surface-alt border border-border-subtle rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none font-body-md w-full">
 
                             <input type="text" name="searchPhone" placeholder="Search by Phone..." value="${searchPhone}"
@@ -133,7 +125,7 @@
                                                     <span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase">${u.roleName}</span>
                                                 </td>
                                                 <td class="px-6 py-4 text-center">
-                                                    <a href="${pageContext.request.contextPath}/edit-user?id=${u.userId}" 
+                                                    <a href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"
                                                        class="p-2 inline-flex hover:bg-surface-container rounded-lg text-primary transition-colors" title="Edit">
                                                         <span class="material-symbols-outlined text-lg">edit</span>
                                                     </a>
@@ -142,7 +134,7 @@
                                                     <form action="${pageContext.request.contextPath}/user-list" method="post" style="display:inline;">
                                                         <input type="hidden" name="userId" value="${u.userId}">
                                                         <input type="hidden" name="status" value="${u.status}">
-                                                        <button type="submit" 
+                                                        <button type="submit"
                                                                 onclick="return confirm('Bạn có chắc chắn muốn ${u.status == 'ACTIVE' ? 'KHÓA' : 'MỞ KHÓA'} người dùng này?')"
                                                                 class="font-label-sm font-semibold underline bg-transparent border-none cursor-pointer p-0 transition-opacity hover:opacity-75 ${u.status == 'ACTIVE' ? 'text-error-red' : 'text-success-green'}">
                                                             ${u.status == 'ACTIVE' ? 'Ban' : 'Unban'}
@@ -158,17 +150,17 @@
                     </div>
 
                     <c:if test="${endPage > 1}">
-                        <c:set var="windowSize" value="2" />   
+                        <c:set var="windowSize" value="2" />
                         <c:set var="start" value="${currentPage - windowSize > 1 ? currentPage - windowSize : 1}" />
                         <c:set var="end" value="${currentPage + windowSize < endPage ? currentPage + windowSize : endPage}" />
 
                         <div class="p-stack-lg border-t border-border-subtle flex flex-col sm:flex-row items-center justify-end gap-4">
                             <div class="flex items-center gap-2">
-                                <a href="user-list?page=1&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}" 
+                                <a href="user-list?page=1&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}"
                                    class="w-8 h-8 rounded-lg flex items-center justify-center border border-border-subtle text-on-surface-variant hover:bg-surface-alt transition-colors ${currentPage == 1 ? 'opacity-50 pointer-events-none' : ''}">
                                     <span class="material-symbols-outlined text-sm">keyboard_double_arrow_left</span>
                                 </a>
-                                <a href="user-list?page=${currentPage - 1}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}" 
+                                <a href="user-list?page=${currentPage - 1}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}"
                                    class="w-8 h-8 rounded-lg flex items-center justify-center border border-border-subtle text-on-surface-variant hover:bg-surface-alt transition-colors ${currentPage == 1 ? 'opacity-50 pointer-events-none' : ''}">
                                     <span class="material-symbols-outlined text-sm">chevron_left</span>
                                 </a>
@@ -178,7 +170,7 @@
                                 </c:if>
 
                                 <c:forEach begin="${start}" end="${end}" var="i">
-                                    <a href="user-list?page=${i}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}" 
+                                    <a href="user-list?page=${i}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}"
                                        class="w-8 h-8 rounded-lg flex items-center justify-center font-label-sm text-label-sm transition-colors ${currentPage == i ? 'bg-primary text-white border border-primary' : 'border border-border-subtle text-on-surface-variant hover:bg-surface-alt'}">
                                         ${i}
                                     </a>
@@ -189,12 +181,12 @@
                                 </c:if>
 
                                 <c:if test="${currentPage < endPage}">
-                                    <a href="user-list?page=${currentPage + 1}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}" 
+                                    <a href="user-list?page=${currentPage + 1}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}"
                                        class="w-8 h-8 rounded-lg flex items-center justify-center border border-border-subtle text-on-surface-variant hover:bg-surface-alt transition-colors ${currentPage == endPage ? 'opacity-50 pointer-events-none' : ''}">
                                         <span class="material-symbols-outlined text-sm">chevron_right</span>
                                     </a>
                                 </c:if>
-                                <a href="user-list?page=${endPage}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}" 
+                                <a href="user-list?page=${endPage}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}"
                                    class="w-8 h-8 rounded-lg flex items-center justify-center border border-border-subtle text-on-surface-variant hover:bg-surface-alt transition-colors ${currentPage == endPage ? 'opacity-50 pointer-events-none' : ''}">
                                     <span class="material-symbols-outlined text-sm">keyboard_double_arrow_right</span>
                                 </a>
@@ -202,6 +194,9 @@
                         </div>
                     </c:if>
                 </section>
+            </main>
+        </div>
+
             </main>
         </div>
     </body>

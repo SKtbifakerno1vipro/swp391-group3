@@ -1,4 +1,4 @@
-<%-- 
+<%--
     Document   : change_pass
     Created on : Jun 3, 2026, 1:18:42 PM
     Author     : XHieu
@@ -26,8 +26,19 @@
             .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
             .alert-danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         </style>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
     <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="users"/>
+            </jsp:include>
+            <main class="main legacy-page">
         <div class="form-container">
             <h2>${isForgot ? 'Qun Mt Khu' : 'i Mt Khu'}</h2>
 
@@ -70,9 +81,9 @@
                             <input type="text" id="otpCode" name="otpCode" required placeholder="Nhp m t Email">
                         </div>
                     </c:when>
-                    
+
                     <c:otherwise>
-                        
+
                         <c:if test="${empty sessionScope.forgetPass}">
                             <div class="form-group">
                                 <label for="currentPassword">Mt khu hin ti:</label>
@@ -100,6 +111,9 @@
                     </c:otherwise>
                 </c:choose>
             </form>
+        </div>
+
+            </main>
         </div>
     </body>
 </html>

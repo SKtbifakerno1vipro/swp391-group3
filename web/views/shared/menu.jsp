@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!-- Thanh menu chung -->
 <nav style="background-color: #f8f9fa; padding: 10px; margin-bottom: 20px; border-bottom: 1px solid #dee2e6;">
     <ul style="list-style-type: none; padding: 0; margin: 0; display: flex; gap: 15px;">

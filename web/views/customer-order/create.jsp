@@ -86,8 +86,19 @@
                 return true;
             }
         </script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
     <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="orders"/>
+            </jsp:include>
+            <main class="main legacy-page">
         <c:choose>
             <c:when test="${not empty customer}">
                 <h2>Create Order for ${customer.user.fullName}</h2>
@@ -175,10 +186,10 @@
                     <a href="?customerId=${param.customerId}&productPage=${currentProductPage - 1}">Previous</a>
                 </c:if>
                 <c:forEach begin="1" end="${totalProductPages}" var="i">
-                    <a href="?customerId=${param.customerId}&productPage=${i}" 
+                    <a href="?customerId=${param.customerId}&productPage=${i}"
                        style="margin: 0 5px; ${i == currentProductPage ? 'font-weight:bold; color:red;' : ''}">${i}</a>
                 </c:forEach>
-                
+
 
                 <c:if test="${currentProductPage < totalProductPages}">
                     <a href="?customerId=${param.customerId}&productPage=${currentProductPage + 1}">Next</a>
@@ -187,5 +198,8 @@
             <br>
             <button type="submit">Create Order</button>
         </form>
+
+            </main>
+        </div>
     </body>
 </html>

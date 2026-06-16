@@ -1,106 +1,89 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>Danh sch Hp ng</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Contract List - Po Bread Sales</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
     <body>
-        <h2>Qun l Hp ng</h2>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="contracts"/>
+            </jsp:include>
+            <main class="main legacy-page">
+                <h2>Contract Management</h2>
 
-        <!-- ---------------   Form Tm Kim (4 Trng)   ---------------- -->
-        <form action="contract-list" method="GET">
-            <!-- 1. S hp ng -->
-            <input type="text" name="contractNumber" value="${contractNumber}" placeholder="S hp ng">
+                <form action="contract-list" method="GET">
+                    <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Contract number">
+                    <input type="text" name="customerName" value="${customerName}" placeholder="Customer name">
+                    <select name="status">
+                        <option value="">-- All statuses --</option>
+                        <option value="DRAFT" ${status == 'DRAFT' ? 'selected' : ''}>Draft</option>
+                        <option value="SIGNED" ${status == 'SIGNED' ? 'selected' : ''}>Signed</option>
+                        <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Active</option>
+                        <option value="CUSTOMER_REQUESTED_REVISION" ${status == 'CUSTOMER_REQUESTED_REVISION' ? 'selected' : ''}>Customer Requested Revision</option>
+                        <option value="CANCELLED" ${status == 'CANCELLED' ? 'selected' : ''}>Cancelled</option>
+                    </select>
+                    <select name="storageType">
+                        <option value="">-- Storage type --</option>
+                        <option value="TEXT" ${storageType == 'TEXT' ? 'selected' : ''}>Text</option>
+                        <option value="IMAGE" ${storageType == 'IMAGE' ? 'selected' : ''}>Image scan</option>
+                    </select>
+                    <button type="submit">Search</button>
+                    <a href="${pageContext.request.contextPath}/contract-list">Reset filters</a>
+                </form>
 
-            <!-- 2. Tn khch hng -->
-            <input type="text" name="customerName" value="${customerName}" placeholder="Tn khch hng">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Contract Number</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Storage Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:if test="${empty list}">
+                            <tr><td colspan="6" style="text-align:center;">No contracts found.</td></tr>
+                        </c:if>
+                        <c:forEach items="${list}" var="c">
+                            <tr>
+                                <td>${c.contractId}</td>
+                                <td>${c.contractNumber}</td>
+                                <td>${c.customerName}</td>
+                                <td>${c.contractStatus}</td>
+                                <td>${c.storageType}</td>
+                                <td>
+                                    <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |
+                                    <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">Details</a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
 
-            <!-- 3. Trng thi -->
-            <select name="status">
-                <option value="">-- Tt c trng thi --</option>
-                <option value="DRAFT" ${status == 'DRAFT' ? 'selected' : ''}>Bn nhp</option>
-                <option value="SIGNED" ${status == 'SIGNED' ? 'selected' : ''}> k</option>
-                <option value="CANCELLED" ${status == 'CANCELLED' ? 'selected' : ''}> hy</option>
-            </select>
-
-            <!-- 4. Loi lu tr (Mi b sung) -->
-            <select name="storageType">
-                <option value="">-- Loi lu tr --</option>
-                <option value="TEXT" ${storageType == 'TEXT' ? 'selected' : ''}>Vn bn (TEXT)</option>
-                <option value="IMAGE" ${storageType == 'IMAGE' ? 'selected' : ''}>nh scan (IMAGE)</option>
-            </select>
-
-            <button type="submit">Tm kim</button>
-            <a href="contract-list">Xa lc</a>
-        </form>
-
-        <br>
-
-        <!-- ---------------   Bng Danh Sch   ---------------- -->
-        <table border="1" cellpadding="5">
-            <thead>
-                <tr>
-                    <td>ID</td>
-                    <th>S Hp ng</th>
-                    <th>Khch hng</th>
-                    <th>Trng thi</th>
-                    <th>Loi lu tr</th>
-                    <th>Thao tc</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:if test="${empty list}">
-                    <tr><td colspan="5" style="text-align:center;">Khng tm thy kt qu no.</td></tr>
+                <c:if test="${endPage > 1}">
+                    <c:set var="params" value="contractNumber=${contractNumber}&customerName=${customerName}&status=${status}&storageType=${storageType}" />
+                    <div>
+                        <a href="contract-list?page=1&${params}" ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&laquo;</a>
+                        <a href="contract-list?page=${currentPage - 1}&${params}" ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&lsaquo;</a>
+                        <c:forEach begin="${currentPage - 2 > 1 ? currentPage - 2 : 1}" end="${currentPage + 2 < endPage ? currentPage + 2 : endPage}" var="i">
+                            <a href="contract-list?page=${i}&${params}" ${i == currentPage ? 'style="font-weight:bold;color:red;"' : ''}>${i}</a>&nbsp;
+                        </c:forEach>
+                        <a href="contract-list?page=${currentPage + 1}&${params}" ${currentPage == endPage ? 'style="pointer-events:none;color:#aaa;"' : ''}>&rsaquo;</a>
+                        <a href="contract-list?page=${endPage}&${params}" ${currentPage == endPage ? 'style="pointer-events:none;color:#aaa;"' : ''}>&raquo;</a>
+                    </div>
                 </c:if>
-
-                <c:forEach items="${list}" var="c">
-                    <tr>
-                        <td>${c.contractId}</td>
-                        <td>${c.contractNumber}</td>
-                        <td>${c.customerName}</td>
-                        <td>${c.contractStatus}</td>
-                        <td>${c.storageType}</td>
-                        <td>
-                            <a href="contract-save?id=${c.contractId}">Sa</a> |
-                            <a href="contract-detail?id=${c.contractId}">Chi tit</a>
-                        </td>
-                    </tr>
-                </c:forEach>
-            </tbody>
-        </table>
-
-        <br>
-
-        <!-- ---------------   Phn Trang (Gi trng thi 4 trng)   ---------------- -->
-        <c:if test="${endPage > 1}">
-            <c:set var="params" value="contractNumber=${contractNumber}&customerName=${customerName}&status=${status}&storageType=${storageType}" />
-
-            <div>
-                <!-- V trang 1 -->
-                <a href="contract-list?page=1&${params}" 
-                   ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&laquo;</a>
-
-                <!-- Trang trc -->
-                <a href="contract-list?page=${currentPage - 1}&${params}" 
-                   ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&lsaquo;</a>
-
-                <!-- Cc s trang -->
-                <c:forEach begin="${currentPage - 2 > 1 ? currentPage - 2 : 1}" 
-                           end="${currentPage + 2 < endPage ? currentPage + 2 : endPage}" var="i">
-                    <a href="contract-list?page=${i}&${params}" 
-                       ${i == currentPage ? 'style="font-weight:bold;color:red;"' : ''}>${i}</a>
-                    &nbsp;
-                </c:forEach>
-
-                <!-- Trang sau -->
-                <a href="contract-list?page=${currentPage + 1}&${params}" 
-                   ${currentPage == endPage ? 'style="pointer-events:none;color:#aaa;"' : ''}>&rsaquo;</a>
-
-                <!-- Trang cui -->
-                <a href="contract-list?page=${endPage}&${params}" 
-                   ${currentPage == endPage ? 'style="pointer-events:none;color:#aaa;"' : ''}>&raquo;</a>
-            </div>
-        </c:if>
+            </main>
+        </div>
     </body>
 </html>

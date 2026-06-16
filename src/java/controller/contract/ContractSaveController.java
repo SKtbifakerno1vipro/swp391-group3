@@ -1,6 +1,7 @@
 package controller.contract;
 
 import dal.*;
+import dto.CustomerDTO;
 import model.*;
 import service.ContractService;
 import java.io.IOException;

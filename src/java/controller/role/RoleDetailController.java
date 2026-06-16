@@ -22,6 +22,8 @@ public class RoleDetailController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         try {
             String roleIdParam = request.getParameter("roleId");
             if (roleIdParam == null || roleIdParam.trim().isEmpty()) {
@@ -57,6 +59,7 @@ public class RoleDetailController extends HttpServlet {
             throws ServletException, IOException {
         try {
             request.setCharacterEncoding("UTF-8");
+            response.setCharacterEncoding("UTF-8");
             int roleId = Integer.parseInt(request.getParameter("roleId"));
             String roleName = request.getParameter("roleName");
 

@@ -1,4 +1,3 @@
-
 package controller.role;
 
 import service.RoleService;
@@ -23,6 +22,8 @@ public class EditRolePermissionsController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         String roleIdParam = request.getParameter("roleId");
         if (roleIdParam == null || roleIdParam.isBlank()) {
             response.sendRedirect(request.getContextPath() + "/role-list");
@@ -49,6 +50,8 @@ public class EditRolePermissionsController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         int roleId = Integer.parseInt(request.getParameter("roleId"));
         String[] permissionIdValues = request.getParameterValues("permissionIds");
 

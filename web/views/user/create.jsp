@@ -123,31 +123,20 @@
                 font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             }
         </style>
-    </head>
-    <body class="flex min-h-screen bg-background">
-        <aside class="hidden md:flex flex-col h-full py-stack-lg bg-surface-alt border-r border-border-subtle fixed left-0 top-0 w-[240px] z-50">
-            <div class="px-6 mb-8 flex items-center gap-3">
-                <div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
-                    <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">dashboard_customize</span>
-                </div>
-                <div>
-                    <h2 class="font-headline-md text-headline-md font-extrabold text-primary">SaleFlow</h2>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant">Enterprise Suite</p>
-                </div>
-            </div>
-            <nav class="flex-1 px-4 space-y-2">
-                <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all font-body-md text-body-md" href="dashboard">
-                    <span class="material-symbols-outlined">dashboard</span>
-                    Dashboard
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-container text-primary font-semibold border-r-4 border-primary transition-all scale-95 font-body-md text-body-md" href="user-list">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
-                    User Management
-                </a>
-            </nav>
-        </aside>
 
-        <div class="flex-1 md:ml-[240px] flex flex-col">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
+    </head>
+    <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="users"/>
+            </jsp:include>
+            <main class="main legacy-page">
+<div class="flex-1 md:ml-[240px] flex flex-col">
             <header class="flex justify-between items-center w-full px-container-margin h-16 bg-surface-main border-b border-border-subtle sticky top-0 z-40">
                 <div class="flex items-center gap-4 flex-1">
                     <p class="font-headline-md text-on-surface-variant">Create New User</p>
@@ -233,6 +222,9 @@
             <footer class="mt-auto flex justify-between items-center px-container-margin py-stack-md w-full bg-surface-main border-t border-border-subtle">
                 <p class="font-label-sm text-label-sm text-on-surface-variant"> 2024 SaleFlow Digitalization System.</p>
             </footer>
+        </div>
+
+            </main>
         </div>
     </body>
 </html>
