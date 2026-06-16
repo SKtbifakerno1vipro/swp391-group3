@@ -31,8 +31,12 @@
             <input type="hidden" name="quotationId" value="${quotationId}">
             <input type="hidden" name="customerId" value="${customerId}">
 
-            <label>Contract Number:</label>
-            <input type="text" name="contractNumber" value="${contract.contractNumber}" required>
+            <!-- Hiển thị mã nếu đã có (Edit mode) -->
+            <c:if test="${not empty contract.contractNumber}">
+                <label><strong>Contract Number:</strong></label>
+                <input type="text" value="${contract.contractNumber}" readonly style="border:none; background:transparent; font-weight:bold;">
+                <br><br>
+            </c:if>
 
             <br><br>
 
@@ -49,7 +53,7 @@
 
             <br>
             <!-- Nút lưu cần gọi hàm JS để lấy dữ liệu từ DIV -->
-            <button type="submit" onclick="prepareContent()">Save Contract</button>
+            <button type="submit" onclick="prepareContent()">${contract == null ? 'Create' : 'Save'} Contract</button>
             <div><a href="contract-list">Back to contract list</a></div>
 
             <script>
