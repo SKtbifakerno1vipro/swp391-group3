@@ -17,7 +17,7 @@ public class CustomerService {
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
     
-    private List<String> cusTypeList = Arrays.asList("NEW CUSTOMER", "LOYAL CUSTOMER"); 
+    private List<String> cusTypeList = Arrays.asList("CUSTOMER", "LOYAL CUSTOMER"); 
     
     public List<String> getCusTypeList() {
         return cusTypeList;
@@ -211,11 +211,8 @@ public class CustomerService {
         return customerDAO.getCustomerByCusId(userId);
     }
     public List<User> getAllSalesExecutiveUsers() {
-        Integer salesExecutiveRoleId = roleService.getRoleIdByName("Sales Staff");
+        Integer salesExecutiveRoleId = roleService.getRoleIdByName("Sale Staff");
 
-        if (salesExecutiveRoleId == null) {
-            salesExecutiveRoleId = roleService.getRoleIdByName("Sale Staff");
-        }
         if (salesExecutiveRoleId == null) {
             salesExecutiveRoleId = 4; // default sale staff role in seed data
         }

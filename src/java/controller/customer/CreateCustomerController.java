@@ -63,6 +63,8 @@ public class CreateCustomerController extends HttpServlet {
             
         } else if ((errorMsg = Validation.validateCompanyName(companyName)) != null) {
             
+        } else if (customerType == null || customerType.trim().isEmpty()) {
+            errorMsg = "Please select customer type.";
         }
 
         if (errorMsg != null) {
@@ -104,14 +106,4 @@ public class CreateCustomerController extends HttpServlet {
         }
         request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }
-    
-    
-//        System.out.println("--- DANH SACH PARAMETERS (LAMBDA) ---");
-//
-//        Map<String, String[]> paramMap = request.getParameterMap();
-//        paramMap.forEach((key, values) -> {
-//            System.out.println(key + " : " + Arrays.toString(values));
-//        });
-//
-//        System.out.println("-------------------------------------");
 }

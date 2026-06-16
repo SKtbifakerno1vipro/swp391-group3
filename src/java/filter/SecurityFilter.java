@@ -29,7 +29,8 @@ public class SecurityFilter implements Filter {
             "/logout",
             "/register",
             "/reset-password",
-            "/user/password/forgot"
+            "/user/password/forgot",
+            "/user/password/change"
     );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
