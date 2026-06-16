@@ -29,7 +29,7 @@ public class SecurityFilter implements Filter {
             "/logout",
             "/register",
             "/reset-password",
-            "/user/password/forgot",
+            "/auth/forgot",
             "/user/password/change"
     );
 

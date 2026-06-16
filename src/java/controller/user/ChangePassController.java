@@ -38,7 +38,7 @@ public class ChangePassController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/user/change_pass.jsp").forward(request, response);
     }
 
     @Override
@@ -95,12 +95,12 @@ public class ChangePassController extends HttpServlet {
             confirmPassword == null || confirmPassword.trim().isEmpty()) {
 
             request.setAttribute("error", "Vui lòng nhập đầy đủ tất cả các trường!");
-            request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/user/change_pass.jsp").forward(request, response);
             return;
         }
         if (!newPassword.equals(confirmPassword)) {
             request.setAttribute("error", "Mật khẩu mới và xác nhận mật khẩu không khớp!");
-            request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/user/change_pass.jsp").forward(request, response);
             return;
         }
         try {     
@@ -120,6 +120,6 @@ public class ChangePassController extends HttpServlet {
             request.setAttribute("errorDetail", e.getMessage());
         }
 
-        request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/user/change_pass.jsp").forward(request, response);
     }
 }
