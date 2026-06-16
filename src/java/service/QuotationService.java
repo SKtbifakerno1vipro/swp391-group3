@@ -127,4 +127,9 @@ public class QuotationService {
         quotationDAO.updateStatus(quotationId, status);
     }
 
+    // XHieu-begin - delete contact me
+    public List<Quotation> getQuotationsByCustomerId(int customerId) {
+        return quotationDAO.getQuotationsByCustomerId(customerId);
+    }
+    // Xhieu - end
 }

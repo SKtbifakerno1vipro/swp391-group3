@@ -58,29 +58,38 @@ public class QuotationDetailController extends HttpServlet {
     }
 
     /*
-     * doPost chay khi user bam Save tren tung dong san pham.
+     * doPost chay khi user bam Save tren tung dong san pham hoac bam Accept Quotation
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        int quotationId = 0;
+        String action = request.getParameter("action");
+        String quotationIdStr = request.getParameter("quotationId");
 
+        // Xu ly Action: Accept Quotation
+        if ("accept".equals(action) && quotationIdStr != null) {
+            int qId = Integer.parseInt(quotationIdStr);
+            QuotationService service = new QuotationService();
+            service.updateStatus(qId, "ACCEPTED");
+            response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + qId + "&message=accepted");
+            return;
+        }
+
+        // Xu ly Action: Update Quotation Detail
+        int quotationId = 0;
         try {
-            // Lay du lieu tu form edit.
-            quotationId = Integer.parseInt(request.getParameter("quotationId"));
+            quotationId = Integer.parseInt(quotationIdStr);
             int quotationDetailId = Integer.parseInt(request.getParameter("quotationDetailId"));
             int quantity = Integer.parseInt(request.getParameter("quantity"));
             BigDecimal sellingPrice = new BigDecimal(request.getParameter("sellingPrice"));
             BigDecimal discountPercent = new BigDecimal(request.getParameter("discountPercent"));
             BigDecimal taxPercent = new BigDecimal(request.getParameter("taxPercent"));
 
-            // Lay user dang dang nhap de ghi vao quotation_history.
             HttpSession session = request.getSession(false);
             User user = (session != null) ? (User) session.getAttribute("user") : null;
             Integer userId = (user != null) ? user.getUserId() : null;
 
-            // Tao object detail chua du lieu moi.
             QuotationDetail detail = new QuotationDetail();
             detail.setQuotationDetailId(quotationDetailId);
             detail.setQuotationId(quotationId);
@@ -89,7 +98,6 @@ public class QuotationDetailController extends HttpServlet {
             detail.setDiscountPercent(discountPercent);
             detail.setTaxPercent(taxPercent);
 
-            // Cap nhat database va ghi history neu update thanh cong.
             QuotationService quotationService = new QuotationService();
             boolean success = quotationService.updateQuotationDetail(detail, userId);
 

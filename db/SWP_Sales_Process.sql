@@ -156,7 +156,7 @@ CREATE TABLE customer_contract (
 	end_date DATETIME,
 	signed_date DATETIME,    
 
-	contract_content NVARCHAR(MAX),
+	contract_content nvarchar(max),
     storage_type VARCHAR(10) NOT NULL DEFAULT 'TEXT',
 
     created_by INT,
@@ -189,6 +189,7 @@ CREATE TABLE contract_edit_history (
     contract_id INT NOT NULL,
     from_status VARCHAR(50),
     to_status VARCHAR(50),
+	edit_status varchar(50),
 	contract_version VARCHAR(50),
 	note nvarchar(max),
     changed_by INT,
@@ -204,6 +205,7 @@ CREATE TABLE contract_revision_item (
     revision_item_id INT IDENTITY(1,1) PRIMARY KEY,
     history_id INT NOT NULL,
 	contract_id INT NOT NULL,
+
     revision_type NVARCHAR(100) NOT NULL,
     revision_detail NVARCHAR(MAX) NOT NULL,
     FOREIGN KEY (history_id) REFERENCES contract_edit_history(history_id),
@@ -332,9 +334,9 @@ GO
 
 -- 4. HO SO KHACH HANG (CUSTOMER)
 INSERT INTO customer (tax_code, customer_type, company_name, user_id, assigned_to_user_id) VALUES 
-('0390000001', 'B2B', N'Công ty Bánh Ngọt ABC', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'), (SELECT user_id FROM [user] WHERE user_name = 'sale_01')),
-('0390000002', 'B2C', N'Cửa hàng Bánh kem Thủy Tiên', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_02'), (SELECT user_id FROM [user] WHERE user_name = 'sale_01')),
-('0390000003', 'B2B', N'Tiệm Bánh Mì Truyền Thống', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_03'), (SELECT user_id FROM [user] WHERE user_name = 'sale_02'));
+('0390000001', 'CUSTOMER', N'Công ty Bánh Ngọt ABC', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'), (SELECT user_id FROM [user] WHERE user_name = 'sale_01')),
+('0390000002', 'CUSTOMER', N'Cửa hàng Bánh kem Thủy Tiên', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_02'), (SELECT user_id FROM [user] WHERE user_name = 'sale_01')),
+('0390000003', 'CUSTOMER', N'Tiệm Bánh Mì Truyền Thống', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_03'), (SELECT user_id FROM [user] WHERE user_name = 'sale_02'));
 GO
 
 -- 5. DANH MUC & SAN PHAM
@@ -474,8 +476,8 @@ INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, full
 
 -- 2. Them ho so cho Customer 4 va 5 (Bay gio he thong se co đu customer_id tu 1 đen 5)
 INSERT INTO customer (tax_code, customer_type, company_name, user_id, assigned_to_user_id) VALUES 
-('0390000004', 'B2C', N'Tiệm Bánh Ngọt Homie', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_04'), (SELECT user_id FROM [user] WHERE user_name = 'sale_01')),
-('0390000005', 'B2B', N'Nhà Hàng Tiệc Cưới Golden', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_05'), (SELECT user_id FROM [user] WHERE user_name = 'sale_02'));
+('0390000004', 'LOYAL CUSTOMER', N'Tiệm Bánh Ngọt Homie', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_04'), (SELECT user_id FROM [user] WHERE user_name = 'sale_01')),
+('0390000005', 'LOYAL CUSTOMER', N'Nhà Hàng Tiệc Cưới Golden', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_05'), (SELECT user_id FROM [user] WHERE user_name = 'sale_02'));
 
 -- 3. Them 1 san pham mau ID = 5 đe khop voi customer_order_detail
 INSERT INTO product (product_name, cost_price, selling_price, description, unit, product_status, reorder_level, quantity_available, updated_by, category_id) VALUES 

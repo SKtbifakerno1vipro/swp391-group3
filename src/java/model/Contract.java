@@ -15,6 +15,7 @@ public class Contract {
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
+
     private int quotationId;
     private String contractNumber;
     private String contractFileUrl;
@@ -161,6 +162,16 @@ public class Contract {
     }
 
     public Contract() {
+    }
+
+
+    // XHieu-begin - delete contact me
+    public String getFormattedSignDate() {
+        if (this.signDate != null) {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.signDate.format(formatter);
+        }
+        return "N/A";
     }
 
 }

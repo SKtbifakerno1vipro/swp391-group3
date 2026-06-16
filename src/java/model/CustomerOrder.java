@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class CustomerOrder {
     private int customerOrderId;
@@ -24,4 +25,12 @@ public class CustomerOrder {
     public void setCreatedBy(Integer createdBy) { this.createdBy = createdBy; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getFormattedCreatedAt() {
+        if (this.createdAt != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.createdAt.format(formatter);
+        }
+        return "";
+    }
 }

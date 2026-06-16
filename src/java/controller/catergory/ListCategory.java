@@ -9,7 +9,7 @@ import java.io.IOException;
 import service.CategoryService;
 
 @WebServlet(name = "ListCatagory", urlPatterns = {"/category/list"})
-public class ListCatagory extends HttpServlet {
+public class ListCategory extends HttpServlet {
 
     private final CategoryService categoryService = new CategoryService();
 

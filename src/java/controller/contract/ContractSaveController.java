@@ -3,6 +3,7 @@ package controller.contract;
 import dal.*;
 import dto.CustomerDTO;
 import model.*;
+import dto.*;
 import service.ContractService;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,8 +27,10 @@ public class ContractSaveController extends HttpServlet {
     private final ContractService contractService = new ContractService();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
+
         String id = request.getParameter("id");
         String quotationId = request.getParameter("quotationId");
 
@@ -35,15 +38,19 @@ public class ContractSaveController extends HttpServlet {
             int contractId = Integer.parseInt(id);
             Contract contract = contractDAO.getContractById(contractId);
             request.setAttribute("contract", contract);
-            request.getRequestDispatcher("views/contract/form.jsp")
-                    .forward(request, response);
+            request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
         } else if (quotationId != null && !quotationId.isEmpty()) {
             int qId = Integer.parseInt(quotationId);
-            String templateHtml = generateContractHtml(qId);
-            request.setAttribute("templateContent", templateHtml);
-            request.setAttribute("quotationId", qId);
-            request.getRequestDispatcher("views/contract/form.jsp")
-                    .forward(request, response);
+            Quotation quotation = quotationDAO.getQuotationById(qId);
+            if (quotation != null) {
+                String templateHtml = generateContractHtml(qId);
+                request.setAttribute("templateContent", templateHtml);
+                request.setAttribute("quotationId", qId);
+                request.setAttribute("customerId", quotation.getCustomerId());
+                request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+            } else {
+                response.sendRedirect("quotation-list");
+            }
         } else {
             response.sendRedirect("contract-list");
         }
@@ -62,69 +69,108 @@ public class ContractSaveController extends HttpServlet {
         }
 
         String templatePath = getServletContext().getRealPath("/views/contract/template.jsp");
-        String template = new String(Files.readAllBytes(Paths.get(templatePath)), "UTF-8");
+        String template = new String(Files.readAllBytes(Paths.get(templatePath)), java.nio.charset.StandardCharsets.UTF_8);
 
         return contractService.fillTemplate(quotation, customer, details, template, config);
     }
 
-   @Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    request.setCharacterEncoding("UTF-8");
-    HttpSession session = request.getSession();
-    
-    // cleaned comment
-    User user = (User) session.getAttribute("user"); // cleaned comment
-    if (user == null) {
-        response.sendRedirect("login"); // cleaned comment
-        return;
-    }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
-    // cleaned comment
-    String contractIdStr = request.getParameter("contractId");
-    String quotationIdStr = request.getParameter("quotationId");
-    String contractContent = request.getParameter("contractContent");
-
-    // cleaned comment
-    if (contractContent == null || contractContent.trim().isEmpty()) {
-        request.setAttribute("errorMsg", "Ni dung hp ng khng c  trng!");
-        request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
-        return;
-    }
-
-    // cleaned comment
-    if (contractIdStr != null && !contractIdStr.isEmpty()) {
-        // --- UPDATE ---
-        int contractId = Integer.parseInt(contractIdStr);
-        Contract c = contractDAO.getContractById(contractId);
-        c.setContractContent(contractContent);
-        c.setUpdatedBy(user.getUserId());
-        
-        boolean success = contractDAO.update(c);
-        if (success) {
-            response.sendRedirect("contract-detail?id=" + contractId);
-        } else {
-            request.setAttribute("errorMsg", "Cp nht tht bi!");
-            request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login");
+            return;
         }
-    } else {
-        // cleaned comment
-        int quotationId = Integer.parseInt(quotationIdStr);
+
+        String contractIdStr = request.getParameter("contractId");
+        String quotationIdStr = request.getParameter("quotationId");
+        String contractContent = request.getParameter("contractContent");
+
+        if (contractContent == null || contractContent.trim().isEmpty()) {
+            request.setAttribute("errorMsg", "Contract content cannot be empty!");
+            request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+            return;
+        }
+
+        if (contractIdStr != null && !contractIdStr.isEmpty()) {
+            // --- UPDATE ---
+            int contractId = Integer.parseInt(contractIdStr);
+            Contract c = contractDAO.getContractById(contractId);
+            if (c != null) {
+                c.setContractContent(contractContent);
+                c.setUpdatedBy(user.getUserId());
+                // Explicitly keep the status as it was in the database
+                c.setContractStatus(c.getContractStatus());
+
+                boolean success = contractDAO.update(c);
+                if (success) {
+                    response.sendRedirect("contract-detail?id=" + contractId);
+                } else {
+                    request.setAttribute("errorMsg", "Update failed!");
+                    request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+                }
+            } else {
+                response.sendRedirect("contract-list");
+            }
+            
+        } else {
+            // --- CREATE ---
+            int quotationId = 0;
+            try {
+                quotationId = Integer.parseInt(quotationIdStr);
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorMsg", "Invalid Quotation ID format!");
+                request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+                return;
+            }
+
+            String customerIdStr = request.getParameter("customerId");
+            int customerId = 0;
+            try {
+                customerId = Integer.parseInt(customerIdStr);
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorMsg", "Invalid Customer ID format! customerId=" + customerIdStr);
+                request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+                return;
+            }
+
+            Contract existingContract = contractDAO.getContractByQuotationId(quotationId);
+            if (existingContract != null) {
+                request.setAttribute("errorMsg", "A contract for this quotation already exists!");
+                request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+                return;
+            }
+
         Contract c = new Contract();
-        c.setCustomerId(Integer.parseInt(request.getParameter("customerId"))); // cleaned comment
-        c.setQuotationId(quotationId);
-        c.setContractNumber("HD-" + System.currentTimeMillis()); // cleaned comment
-        c.setContractStatus("DRAFT");
-        c.setContractContent(contractContent);
-        c.setCreatedBy(user.getUserId());
+            c.setCustomerId(customerId);
+            c.setQuotationId(quotationId);
+            // Tạm thời để trống hoặc một chuỗi tạm
+            c.setContractNumber("TEMP"); 
+            c.setContractStatus("DRAFT");
+            c.setStorageType("TEXT");
+            c.setContractContent(contractContent);
+            c.setCreatedBy(user.getUserId());
 
-        int newId = contractDAO.insert(c);
-        if (newId > 0) {
-            response.sendRedirect("contract-detail?id=" + newId);
-        } else {
-            request.setAttribute("errorMsg", "To mi tht bi!");
-            request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+            int newId = contractDAO.insert(c);
+            if (newId > 0) {
+                // Sinh mã chuẩn dựa trên ID vừa tạo
+                String yearMonth = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMM"));
+                String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", newId);
+                
+                // Cập nhật mã chuẩn vào DB
+                c.setContractId(newId);
+                c.setContractNumber(newContractNumber);
+                contractDAO.updateContractNumber(c); // Gọi phương thức mới trong DAO
+                
+                response.sendRedirect("contract-detail?id=" + newId);
+            } else {
+                request.setAttribute("errorMsg", "Creation failed!");
+                request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+            }
         }
     }
-}
 }
