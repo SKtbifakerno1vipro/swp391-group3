@@ -596,7 +596,7 @@ GO
 select * from [customer_order]
 select * from [user]
 select * from [Customer]
-
+select * from [role]
 UPDATE customer
 SET customer_type = 'LOYAL CUSTOMER'
 WHERE customer_type = 'B2B';
@@ -604,3 +604,7 @@ GO
 
 USE SWP_Sales_Process;
 GO
+
+SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name
+                , address, phone, account_status, created_at, updated_at, role_id 
+                FROM [user] WHERE 1=2 or role_id = 4

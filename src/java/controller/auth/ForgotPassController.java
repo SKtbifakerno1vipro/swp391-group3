@@ -1,4 +1,4 @@
-package controller.user;
+package controller.auth;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -14,7 +14,7 @@ import service.UserService;
 import utils.*;
 import model.*;
 
-@WebServlet("/user/password/forgot")
+@WebServlet("/auth/forgot")
 public class ForgotPassController extends HttpServlet {
 
     private final UserService userService = new UserService();
@@ -24,7 +24,7 @@ public class ForgotPassController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         request.setAttribute("isForgot", true);
-        request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/auth/forgot_pass.jsp").forward(request, response);
     }
 
     // Xu ly du lieu Form gui len khi goi POST
@@ -152,7 +152,7 @@ public class ForgotPassController extends HttpServlet {
                 }
             }
             request.setAttribute("isForgot", true);
-            request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/auth/forgot_pass.jsp").forward(request, response);
         }
     }
 }

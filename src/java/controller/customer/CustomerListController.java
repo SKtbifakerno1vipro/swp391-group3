@@ -30,7 +30,7 @@ public class CustomerListController extends HttpServlet {
         String typeCus = request.getParameter("type");
         String pageRaw = request.getParameter("page");
         
-        int page = 1;       // Trang mặc định khi mới vào lần đầu
+        int page = 1;       // Default page when accessing for the first time
         if (pageRaw != null && !pageRaw.isBlank()) {
             try {
                 page = Integer.parseInt(pageRaw);
@@ -39,7 +39,7 @@ public class CustomerListController extends HttpServlet {
             }
         }
 
-        // validate + format / max 150 ki tu
+        // validate + format / max 150 characters
         String error =
                 Validation.validateInputSearch(searchName, 150);
 
@@ -58,7 +58,7 @@ public class CustomerListController extends HttpServlet {
             return;
         }
 
-        // format bo khoang trang
+        // format and remove extra whitespaces
         if (searchName != null) {
             searchName = searchName.trim().replaceAll("\\s+", " ");
         }
@@ -75,7 +75,7 @@ public class CustomerListController extends HttpServlet {
             searchMst = searchMst.trim().replaceAll("\\s+", " ");
         }
 
-        // loc va phan trang
+        // filter and paginate
         List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, searchSdt, searchEmail,
                 searchMst, typeCus, page, PAGE_SIZE);
         int totalPages = customerService.getTotalPages(searchName, searchSdt, searchEmail, searchMst, typeCus, PAGE_SIZE);
