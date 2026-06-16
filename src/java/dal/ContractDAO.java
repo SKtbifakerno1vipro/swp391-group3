@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import model.Contract;
+import model.*;
 import dto.*;
 
 public class ContractDAO extends DBContext {
@@ -14,7 +14,7 @@ public class ContractDAO extends DBContext {
     public int insert(Contract c) {
         String sql = "INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_status, contract_content, storage_type, created_by, created_at, updated_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
-        
+
         try (PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, c.getCustomerId());
             ps.setInt(2, c.getQuotationId());
@@ -23,7 +23,7 @@ public class ContractDAO extends DBContext {
             ps.setString(5, c.getContractContent());
             ps.setString(6, c.getStorageType());
             ps.setInt(7, c.getCreatedBy());
-            
+
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
@@ -38,14 +38,14 @@ public class ContractDAO extends DBContext {
         }
         return -1;
     }
-    
+
     public List<Contract> searchContracts(String contractNumber, String customerName, String status, String storageType, int pageIndex, int pageSize) {
         List<Contract> list = new ArrayList<>();
         String sql = "SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type, "
                 + "c.effective_date, c.end_date, c.created_at, cust.company_name "
                 + "FROM customer_contract c LEFT JOIN customer cust ON c.customer_id = cust.customer_id "
                 + "WHERE 1=1 ";
-        
+
         if (contractNumber != null && !contractNumber.trim().isEmpty()) {
             sql += " AND c.contract_number LIKE ? ";
         }
@@ -58,9 +58,9 @@ public class ContractDAO extends DBContext {
         if (storageType != null && !storageType.trim().isEmpty()) {
             sql += " AND c.storage_type = ? ";
         }
-        
+
         sql += " ORDER BY c.created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
             if (contractNumber != null && !contractNumber.trim().isEmpty()) {
@@ -77,7 +77,7 @@ public class ContractDAO extends DBContext {
             }
             ps.setInt(index++, (pageIndex - 1) * pageSize);
             ps.setInt(index++, pageSize);
-            
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Contract c = new Contract();
@@ -102,7 +102,7 @@ public class ContractDAO extends DBContext {
         }
         return list;
     }
-    
+
     public int getTotalContracts(String contractNumber, String customerName, String status, String storageType) {
         String sql = "SELECT COUNT(*) FROM customer_contract c LEFT JOIN customer cust ON c.customer_id = cust.customer_id WHERE 1=1 ";
         if (contractNumber != null && !contractNumber.trim().isEmpty()) {
@@ -117,7 +117,7 @@ public class ContractDAO extends DBContext {
         if (storageType != null && !storageType.trim().isEmpty()) {
             sql += " AND c.storage_type = ? ";
         }
-        
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
             if (contractNumber != null && !contractNumber.trim().isEmpty()) {
@@ -132,7 +132,7 @@ public class ContractDAO extends DBContext {
             if (storageType != null && !storageType.trim().isEmpty()) {
                 ps.setString(index++, storageType);
             }
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -143,7 +143,7 @@ public class ContractDAO extends DBContext {
         }
         return 0;
     }
-    
+
     public Contract getContractById(int id) {
         String sql = "SELECT * FROM customer_contract WHERE customer_contract_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -174,9 +174,7 @@ public class ContractDAO extends DBContext {
         }
         return null;
     }
-    
 
-    
     public Contract getContractByQuotationId(int quotationId) {
         String sql = "SELECT * FROM customer_contract WHERE quotation_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -193,7 +191,7 @@ public class ContractDAO extends DBContext {
         }
         return null;
     }
-    
+
     public List<model.Contract> getSignedContractsByCustomerId(int customerId) {
         List<model.Contract> list = new ArrayList<>();
         // Truy vấn các hợp đồng đã Ký (SIGNED) của khách hàng
@@ -215,7 +213,6 @@ public class ContractDAO extends DBContext {
         }
         return list;
     }
-
 
     // UPDATE
     public boolean update(Contract c) {
@@ -298,5 +295,111 @@ public class ContractDAO extends DBContext {
         return list;
     }
     // Xhieu - end
+
+    public boolean updateContractNumber(Contract c) {
+        String sql = "UPDATE customer_contract SET contract_number = ? WHERE customer_contract_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, c.getContractNumber());
+            ps.setInt(2, c.getContractId());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    //////////////////////////////detail contract
+    // Lấy lịch sử và danh sách item liên quan
+    public List<ContractHistory> getHistoriesByContractId(int contractId) {
+        List<ContractHistory> list = new ArrayList<>();
+        String sql = "SELECT h.*, u.user_name FROM contract_edit_history h LEFT JOIN [user] u ON h.changed_by = u.user_id WHERE h.contract_id = ? ORDER BY h.created_at DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contractId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ContractHistory h = new ContractHistory();
+                h.setHistoryId(rs.getInt("history_id"));
+                h.setFromStatus(rs.getString("from_status"));
+                h.setToStatus(rs.getString("to_status"));
+                h.setNote(rs.getString("note"));
+                h.setChangedByName(rs.getString("user_name"));
+                h.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                h.setRevisionItems(getRevisionItemsByHistoryId(h.getHistoryId()));
+                list.add(h);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int insertHistory(ContractHistory h) {
+        String sql = "INSERT INTO contract_edit_history (contract_id, from_status, to_status, note, changed_by) VALUES (?,?,?,?,?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, h.getContractId());
+            ps.setString(2, h.getFromStatus());
+            ps.setString(3, h.getToStatus());
+            ps.setString(4, h.getNote());
+            ps.setInt(5, h.getChangedBy());
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public void insertRevisionItem(ContractRevisionItem item) {
+        String sql = "INSERT INTO contract_revision_item (history_id, contract_id, revision_type, revision_detail) VALUES (?,?,?,?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, item.getHistoryId());
+            ps.setInt(2, item.getContractId());
+            ps.setString(3, item.getRevisionType());
+            ps.setString(4, item.getRevisionDetail());
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Cập nhật trạng thái của hợp đồng
+    public boolean updateStatus(int contractId, String newStatus) {
+        String sql = "UPDATE customer_contract SET contract_status = ? WHERE customer_contract_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, contractId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("ContractDAO updateStatus error: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Lấy danh sách chi tiết các mục yêu cầu sửa đổi theo historyId
+    public List<ContractRevisionItem> getRevisionItemsByHistoryId(int historyId) {
+        List<ContractRevisionItem> items = new ArrayList<>();
+        String sql = "SELECT * FROM contract_revision_item WHERE history_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, historyId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ContractRevisionItem item = new ContractRevisionItem();
+                item.setRevisionItemId(rs.getInt("revision_item_id"));
+                item.setHistoryId(rs.getInt("history_id"));
+                item.setContractId(rs.getInt("contract_id"));
+                item.setRevisionType(rs.getString("revision_type"));
+                item.setRevisionDetail(rs.getString("revision_detail"));
+                items.add(item);
+            }
+        } catch (Exception e) {
+            System.err.println("ContractDAO getRevisionItemsByHistoryId error: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return items;
+    }
 
 }

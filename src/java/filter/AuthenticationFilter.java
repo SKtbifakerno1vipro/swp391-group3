@@ -24,28 +24,29 @@ public class AuthenticationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-        HttpSession session = req.getSession(false);
-
-        String loginURI = req.getContextPath() + "/login";
-        String forgotPassURI = req.getContextPath() + "/forgot-password";
-        
-        // Check if user is trying to access static resources
-        boolean isStaticResource = req.getRequestURI().matches(".*(css|jpg|png|gif|js)");
-        
-        // Check if user is logged in
-        boolean loggedIn = session != null && session.getAttribute("user") != null;
-        boolean loginRequest = req.getRequestURI().equals(loginURI);
-        boolean forgotPassRequest = req.getRequestURI().equals(forgotPassURI);
-
-        if (loggedIn || loginRequest || forgotPassRequest || isStaticResource) {
-            // Allow the request to pass
-            chain.doFilter(request, response);
-        } else {
-            // Redirect to login page
-            res.sendRedirect(loginURI);
-        }
+//        HttpServletRequest req = (HttpServletRequest) request;
+//        HttpServletResponse res = (HttpServletResponse) response;
+//        HttpSession session = req.getSession(false);
+//
+//        String loginURI = req.getContextPath() + "/login";
+//        String forgotPassURI = req.getContextPath() + "/forgot-password";
+//        
+//        // Check if user is trying to access static resources
+//        boolean isStaticResource = req.getRequestURI().matches(".*(css|jpg|png|gif|js)");
+//        
+//        // Check if user is logged in
+//        boolean loggedIn = session != null && session.getAttribute("user") != null;
+//        boolean loginRequest = req.getRequestURI().equals(loginURI);
+//        boolean forgotPassRequest = req.getRequestURI().equals(forgotPassURI);
+//
+//        if (loggedIn || loginRequest || forgotPassRequest || isStaticResource) {
+//            // Allow the request to pass
+//            chain.doFilter(request, response);
+//        } else {
+//            // Redirect to login page
+//            res.sendRedirect(loginURI);
+//        }
+        chain.doFilter(request, response);
     }
 
     @Override

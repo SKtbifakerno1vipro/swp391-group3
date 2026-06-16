@@ -144,10 +144,11 @@ public class ContractSaveController extends HttpServlet {
                 return;
             }
 
-            Contract c = new Contract();
+        Contract c = new Contract();
             c.setCustomerId(customerId);
             c.setQuotationId(quotationId);
-            c.setContractNumber("HD-" + System.currentTimeMillis());
+            // Tạm thời để trống hoặc một chuỗi tạm
+            c.setContractNumber("TEMP"); 
             c.setContractStatus("DRAFT");
             c.setStorageType("TEXT");
             c.setContractContent(contractContent);
@@ -155,6 +156,15 @@ public class ContractSaveController extends HttpServlet {
 
             int newId = contractDAO.insert(c);
             if (newId > 0) {
+                // Sinh mã chuẩn dựa trên ID vừa tạo
+                String yearMonth = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMM"));
+                String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", newId);
+                
+                // Cập nhật mã chuẩn vào DB
+                c.setContractId(newId);
+                c.setContractNumber(newContractNumber);
+                contractDAO.updateContractNumber(c); // Gọi phương thức mới trong DAO
+                
                 response.sendRedirect("contract-detail?id=" + newId);
             } else {
                 request.setAttribute("errorMsg", "Creation failed!");
