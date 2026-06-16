@@ -28,9 +28,9 @@ public class SecurityFilter implements Filter {
             "/login",
             "/logout",
             "/register",
-            "/forgot-password",
             "/reset-password",
-            "/user/password/forgot"
+            "/user/password/forgot",
+            "/user/password/change"
     );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
@@ -140,7 +140,6 @@ public class SecurityFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
 //        HttpServletRequest req = (HttpServletRequest) request;
 //        HttpServletResponse res = (HttpServletResponse) response;
 //        String path = req.getServletPath();

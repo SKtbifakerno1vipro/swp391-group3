@@ -16,10 +16,8 @@ import model.*;
 
 @WebServlet("/user/password/forgot")
 public class ForgotPassController extends HttpServlet {
-    
-    private final CustomerService customerService = new CustomerService();
+
     private final UserService userService = new UserService();
-    private final RoleService roleService = new RoleService();
     
     // Hien thi Form khi goi GET
     @Override
@@ -50,76 +48,108 @@ public class ForgotPassController extends HttpServlet {
             User u = userService.checkCorrectEmailAndPhone(phone, email); 
 
             if (u != null) {
-                // 2. Tao ma OTP ngau nhien
+                // 2. Tạo mã OTP ngẫu nhiên
                 String otpCode = PasswordUtils.generateRandomText();
 
-                // 3. Luu OTP va oi tuong User vao Session e kiem tra luc sau
+                // 3. Lưu OTP và đối tượng User vào Session để kiểm tra lúc sau
                 session.setAttribute("recoveryOtp", otpCode);
+                session.setAttribute("otpCreationTime", System.currentTimeMillis());
                 session.setAttribute("userAuth", u);
-                session.setMaxInactiveInterval(5 * 60); // Ht hn sau 5 pht
 
-                String emailSubject = "[SWP391] M xc thc (OTP) khi phc mt khu";
+                String emailSubject = "[SWP391] Mã xác thực (OTP) khôi phục mật khẩu";
                 String emailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;'>"
-                                 + "<h2>Xc thc yu cu cp li mt khu</h2>"
-                                 + "<p>Xin cho,</p>"
-                                 + "<p>Chng ti nhn c yu cu khi phc mt khu cho ti khon lin kt vi Email ny trn h thng <strong>SWP391</strong>.</p>"
-                                 + "<p>M xc thc (OTP) ca bn l:</p>"
+                                 + "<h2>Xác thực yêu cầu cấp lại mật khẩu</h2>"
+                                 + "<p>Xin chào,</p>"
+                                 + "<p>Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản liên kết với Email này trên hệ thống <strong>SWP391</strong>.</p>"
+                                 + "<p>Mã xác thực (OTP) của bạn là:</p>"
                                  + "<div style='text-align: center; margin: 20px 0;'>"
                                  + "    <span style='font-size: 24px; font-weight: bold; color: #4CAF50; letter-spacing: 5px; border: 2px dashed #4CAF50; padding: 10px 20px; background-color: #f9f9f9;'>" + otpCode + "</span>"
                                  + "</div>"
-                                 + "<p style='color: red;'><strong>Lu :</strong> M ny c hiu lc trong vng 5 pht.  bo mt, tuyt i KHNG chia s m ny vi bt k ai.</p>"
-                                 + "<p>Nu bn khng thc hin yu cu ny, vui lng b qua email hoc lin h vi b phn h tr ca chng ti  m bo an ton cho ti khon.</p>"
+                                 + "<p style='color: red;'><strong>Lưu ý:</strong> Mã này có hiệu lực trong vòng 5 phút. Để bảo mật, tuyệt đối KHÔNG chia sẻ mã này với bất kỳ ai.</p>"
+                                 + "<p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email hoặc liên hệ với bộ phận hỗ trợ của chúng tôi để đảm bảo an toàn cho tài khoản.</p>"
                                  + "<hr style='border: none; border-top: 1px solid #eee;'/>"
-                                 + "<p style='font-size: 12px; color: #888;'>Trn trng,<br/>i ng h tr k thut SWP391.</p>"
+                                 + "<p style='font-size: 12px; color: #888;'>Trân trọng,<br/>Đội ngũ hỗ trợ kỹ thuật SWP391.</p>"
                                  + "</div>";
 
-                // 4. Gui email chua ma OTP cho nguoi dung
-//                boolean isSent = EmailUtils.sendEmail(email, emailSubject, emailBody);
-//
-//                if (isSent) {
-//                    response.getWriter().write("SUCCESS");
-//                } else {
-//                    response.getWriter().write("Khong the gui Email. Vui long thu lai!");
-//                }
+                //4. Gửi email chứa mã OTP cho người dùng
+                boolean isSent = EmailUtils.sendEmail(email, emailSubject, emailBody);
+
+                if (isSent) {
+                    response.getWriter().write("SUCCESS");
+                } else {
+                    response.getWriter().write("Không thể gửi Email. Vui lòng thử lại!");
+                }
             } else {
-                response.getWriter().write("Email hoc S in thoi khng khp vi h thng!");
+                response.getWriter().write("Email hoặc Số điện thoại không khớp với hệ thống!");
             }
             return; 
 
         } else if ("resetPassword".equals(action)) {
-            // ---- LUONG 2: BAM NUT CAP NHAT MAT KHAU ----
+            // ---- LUỒNG 2: BẤM NÚT CẬP NHẬT MẬT KHẨU ----
             String userOtp = request.getParameter("otpCode");
             
             String sessionOtp = (String) session.getAttribute("recoveryOtp");
-            // test
-            userOtp = sessionOtp;
+            Long otpCreationTime = (Long) session.getAttribute("otpCreationTime");
             User sessionUser = (User) session.getAttribute("userAuth");
-            // Kiem tra ma OTP hop le
-            if ( (sessionOtp != null && sessionOtp.equals(userOtp) && email.equals(sessionUser.getEmail()))) {
-                
+                        
+            boolean isValid = false;
+            if (sessionOtp != null && otpCreationTime != null && sessionUser != null && userOtp != null && !userOtp.trim().isEmpty()) {
+                long elapsedTime = System.currentTimeMillis() - otpCreationTime;
+                // Kiểm tra mã OTP khớp và còn hiệu lực trong vòng 5 phút (5 * 60 * 1000 ms)
+                if (elapsedTime <= 5 * 60 * 1000 && sessionOtp.equals(userOtp.trim()) && email != null && email.trim().equals(sessionUser.getEmail().trim())) {
+                    isValid = true;
+                    // Xóa mã OTP khỏi session ngay lập tức để đảm bảo sử dụng 1 lần duy nhất (One-time use)
+                    session.removeAttribute("recoveryOtp");
+                    session.removeAttribute("otpCreationTime");
+                }
+            }
+            
+            if (isValid) {
                 String newPass = PasswordUtils.generateRandomText();
-                // Cap nhat mat khau moi vao Database dua vao Email  sessionUser.getUserId()
+                // Cập nhật mật khẩu mới ngẫu nhiên vào Database
                 try {
-                    String isUpdated = userService.changePassword(sessionUser.getUserId(), null, newPass); // Hm t vit  di
+                    String isUpdated = userService.changePassword(sessionUser.getUserId(), null, newPass); // Hàm tự viết ở dưới
                     
                     if (isUpdated == null) {
-                        request.setAttribute("success", "Xc nhn thnh cng!");
-                        session.removeAttribute("recoveryOtp");
-                        
                         session.setAttribute("forgetPass", newPass);
-                        request.setAttribute("isForgot", false);
-                        request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+                        // Redirect người dùng đến trang đổi mật khẩu mới
+                        response.sendRedirect(request.getContextPath() + "/user/password/change");
                         return;
                     } else {
-                        request.setAttribute("error", "t li mt khu tht bi. Vui lng th li!");
+                        session.removeAttribute("userAuth");
+                        session.removeAttribute("recoveryOtp");
+                        session.removeAttribute("otpCreationTime");
+                        request.setAttribute("error", "Đặt lại mật khẩu thất bại. Vui lòng thử lại!");
                     }
                 } catch (Exception e) {
                     e.printStackTrace(); 
-                    request.setAttribute("error", " xy ra li h thng khi cp nht mt khu.");
+                    session.removeAttribute("userAuth");
+                    session.removeAttribute("recoveryOtp");
+                    session.removeAttribute("otpCreationTime");
+                    request.setAttribute("error", "Đã xảy ra lỗi hệ thống khi cập nhật mật khẩu.");
                     request.setAttribute("errorDetail", e.getMessage());
                 }
             } else {
-                request.setAttribute("error", "M xc nhn (OTP) khng chnh xc hoc  ht hn!");
+                // Xác định rõ nguyên nhân thất bại để hiển thị thông báo chi tiết và tránh xóa session bừa bãi
+                if (sessionOtp == null || otpCreationTime == null || sessionUser == null) {
+                    request.setAttribute("error", "Vui lòng yêu cầu gửi mã xác nhận trước!");
+                } else if (userOtp == null || userOtp.trim().isEmpty()) {
+                    request.setAttribute("error", "Vui lòng nhập mã xác nhận (OTP)!");
+                } else {
+                    long elapsedTime = System.currentTimeMillis() - otpCreationTime;
+                    if (elapsedTime > 5 * 60 * 1000) {
+                        // Quá hạn: Xóa các thông tin xác thực cũ
+                        session.removeAttribute("userAuth");
+                        session.removeAttribute("recoveryOtp");
+                        session.removeAttribute("otpCreationTime");
+                        request.setAttribute("error", "Mã xác nhận (OTP) đã hết hạn (quá 5 phút). Vui lòng gửi lại mã mới!");
+                    } else if (email == null || !email.trim().equals(sessionUser.getEmail().trim())) {
+                        request.setAttribute("error", "Email không khớp với yêu cầu khôi phục!");
+                    } else {
+                        // Sai mã xác nhận nhưng chưa hết hạn: Cho phép nhập lại (không xóa session)
+                        request.setAttribute("error", "Mã xác nhận (OTP) không chính xác. Vui lòng nhập lại!");
+                    }
+                }
             }
             request.setAttribute("isForgot", true);
             request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
