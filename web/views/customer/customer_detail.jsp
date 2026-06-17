@@ -278,7 +278,8 @@
                             <div class="header-section">
                                 <div>
                                     <h1>Customer Profile</h1>
-                                    <span style="color: var(--muted); font-size: 14px;">ID: ${cusDTO.customer.customerId} |
+                                    <span style="color: var(--muted); font-size: 14px;">ID:
+                                        ${cusDTO.customer.customerId} |
                                         User ID: ${cusDTO.customer.userId}</span>
                                 </div>
                                 <div>
@@ -294,7 +295,8 @@
                             <div class="kpi-container">
                                 <div class="kpi-card">
                                     <div class="kpi-title">Total Orders Placed</div>
-                                    <div class="kpi-value">${totalOrdersCus != null ? totalOrdersCus : 0} Orders</div>
+                                    <div class="kpi-value">${listOrdersForCus != null ? listOrdersForCus.size() : 0}
+                                        Orders</div>
                                 </div>
                                 <div class="kpi-card success">
                                     <div class="kpi-title">Total Paid Amount</div>
@@ -478,7 +480,7 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </tbody>
-                                        </table>
+                                    </table>
                                 </div>
 
                                 <div id="ordersTab" class="tab-content">
@@ -551,8 +553,8 @@
                             <div class="btn-group">
                                 <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customer.customerId}"
                                     class="btn-edit">Edit Profile</a>
-                                <a href="${pageContext.request.contextPath}/customer/list"
-                                    class="btn-back">Back to List</a>
+                                <a href="${pageContext.request.contextPath}/customer/list" class="btn-back">Back to
+                                    List</a>
                             </div>
                         </div>
 

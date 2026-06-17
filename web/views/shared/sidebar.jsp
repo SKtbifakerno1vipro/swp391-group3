@@ -51,7 +51,8 @@
                         </div>
                     </div>
                 </c:if>
-                <a class="nav-link" href="${pageContext.request.contextPath}/user/password/change"><span class="material-symbols-outlined">lock_reset</span>Change password</a>
+                <a class="nav-link" href="${pageContext.request.contextPath}/user/password/change"><span
+                        class="material-symbols-outlined">lock_reset</span>Change password</a>
                 <a class="nav-link" href="${pageContext.request.contextPath}/logout"><span
                         class="material-symbols-outlined">logout</span>Logout</a>
             </div>
