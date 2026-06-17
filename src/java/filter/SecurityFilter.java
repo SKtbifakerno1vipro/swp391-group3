@@ -28,7 +28,6 @@ public class SecurityFilter implements Filter {
             "/login",
             "/logout",
             "/register",
-            "/reset-password",
             "/auth/forgot",
             "/user/password/change"
     );
@@ -222,7 +221,6 @@ public class SecurityFilter implements Filter {
        } else {
            res.sendRedirect(req.getContextPath() + "/dashboard");
        }
-        chain.doFilter(request, response);
     }
     
     @Override

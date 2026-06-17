@@ -181,11 +181,6 @@
                 </jsp:include>
                 <main class="main legacy-page">
                     <div class="container">
-                        <div class="nav-links">
-                            <a href="${pageContext.request.contextPath}/customer/list">Customer List</a>
-                            <a href="${pageContext.request.contextPath}/dashboard">DashBoard</a>
-                        </div>
-
                         <c:choose>
                             <c:when test="${isEdit}">
                                 <h2>Edit Customer</h2>

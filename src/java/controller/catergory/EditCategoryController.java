@@ -32,7 +32,7 @@ public class EditCategoryController extends HttpServlet {
                 return;
             }
             request.setAttribute("category", category);
-            request.getRequestDispatcher("/views/category/edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/category/category_edit.jsp").forward(request, response);
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/category/list?status=edit_failed");
         }
@@ -62,7 +62,7 @@ public class EditCategoryController extends HttpServlet {
             if (categoryName == null || categoryName.trim().isEmpty()) {
                 request.setAttribute("error", "Vui lòng nhập tên danh mục!");
                 request.setAttribute("category", category);
-                request.getRequestDispatcher("/views/category/edit.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/category/category_edit.jsp").forward(request, response);
                 return;
             }
 
@@ -72,7 +72,7 @@ public class EditCategoryController extends HttpServlet {
                 request.setAttribute("error", "Tên danh mục này đã tồn tại!");
                 category.setCategoryName(categoryName);
                 request.setAttribute("category", category);
-                request.getRequestDispatcher("/views/category/edit.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/category/category_edit.jsp").forward(request, response);
                 return;
             }
 
@@ -82,7 +82,7 @@ public class EditCategoryController extends HttpServlet {
             } else {
                 request.setAttribute("error", "Lỗi khi cập nhật danh mục!");
                 request.setAttribute("category", category);
-                request.getRequestDispatcher("/views/category/edit.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/category/category_edit.jsp").forward(request, response);
             }
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/category/list?status=edit_failed");

@@ -14,10 +14,15 @@ import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet(name = "CustomerListController", urlPatterns = {"/customer/list"})
 public class CustomerListController extends HttpServlet {
-
-    private final CustomerService customerService = new CustomerService();
+    private static final int ROLE_SYSTEM_ADMIN = 1;
+    private static final int ROLE_MANAGER = 2;
+    private static final int ROLE_CUSTOMER = 3;
+    private static final int ROLE_SALE_STAFF = 4;
+    private static final int ROLE_ADMIN_OFFICER = 5;
+    private static final int ROLE_WAREHOUSE_STAFF = 6;
     private static final int PAGE_SIZE = 10;
 
+    private final CustomerService customerService = new CustomerService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
