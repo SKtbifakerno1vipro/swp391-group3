@@ -16,7 +16,7 @@ public class Signature {
     private int customerContractId;
     private String fileName;
     private String fileUrl;
-    private Integer signerUserId; // Sử dụng Integer vì trong DB có thể NULL
+    private Integer signerUserId;
     private String signerName;
     private Timestamp signedAt;
     private Integer uploadedBy;
@@ -31,6 +31,14 @@ public class Signature {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getCustomerContractId() {
+        return customerContractId;
+    }
+
+    public void setCustomerContractId(int customerContractId) {
+        this.customerContractId = customerContractId;
     }
 
     public String getFileName() {
@@ -49,6 +57,14 @@ public class Signature {
         this.fileUrl = fileUrl;
     }
 
+    public Integer getSignerUserId() {
+        return signerUserId;
+    }
+
+    public void setSignerUserId(Integer signerUserId) {
+        this.signerUserId = signerUserId;
+    }
+
     public String getSignerName() {
         return signerName;
     }
@@ -65,37 +81,20 @@ public class Signature {
         this.signedAt = signedAt;
     }
 
-    public Timestamp getUploadedAt() {
-        return uploadedAt;
-    }
-
-    public void setUploadedAt(Timestamp uploadedAt) {
-        this.uploadedAt = uploadedAt;
-    }
-
-    // Các getters và setters cho thuộc tính mới
-    public int getCustomerContractId() {
-        return customerContractId;
-    }
-
-    public void setCustomerContractId(int customerContractId) {
-        this.customerContractId = customerContractId;
-    }
-
-    public Integer getSignerUserId() {
-        return signerUserId;
-    }
-
-    public void setSignerUserId(Integer signerUserId) {
-        this.signerUserId = signerUserId;
-    }
-
     public Integer getUploadedBy() {
         return uploadedBy;
     }
 
     public void setUploadedBy(Integer uploadedBy) {
         this.uploadedBy = uploadedBy;
+    }
+
+    public Timestamp getUploadedAt() {
+        return uploadedAt;
+    }
+
+    public void setUploadedAt(Timestamp uploadedAt) {
+        this.uploadedAt = uploadedAt;
     }
 
 }

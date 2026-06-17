@@ -147,6 +147,7 @@ public class SecurityFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
+
 //        HttpServletRequest req = (HttpServletRequest) request;
 //        HttpServletResponse res = (HttpServletResponse) response;
 //        String path = req.getServletPath();
@@ -186,6 +187,7 @@ public class SecurityFilter implements Filter {
 //            res.sendRedirect(req.getContextPath() + "/dashboard?error=denied");
 //        }
         chain.doFilter(request, response);
+
     }
 
     private boolean hasPermission(int roleId, String path) {
