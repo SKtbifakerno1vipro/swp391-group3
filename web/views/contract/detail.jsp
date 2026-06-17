@@ -170,21 +170,21 @@
 
             <!-- CỘT 3: HISTORY -->
             <div class="history">
-                <h3>Lịch sử chỉnh sửa</h3>
-                <c:choose>
+                <h3>Edit request history</h3>
+                <c:choose>Edit request history
                     <c:when test="${not empty historyList}">
                         <div style="max-height: 600px; overflow-y: auto;">
                             <c:forEach var="h" items="${historyList}">
                                 <div style="border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px;">
                                     <p style="margin: 0 0 5px 0; color: #666; font-size: 0.9em;">🕒 ${h.createdAt}</p>
-                                    <p style="margin: 0 0 5px 0;"><strong>Trạng thái:</strong> ${h.toStatus}</p>
-                                    <p style="margin: 0 0 10px 0;"><strong>Bởi:</strong> ${h.changedByName}</p>
+                                    <p style="margin: 0 0 5px 0;"><strong>Statusi:</strong> ${h.toStatus}</p>
+                                    <p style="margin: 0 0 10px 0;"><strong>By:</strong> ${h.changedByName}</p>
                                     <c:if test="${not empty h.revisionItems}">
-                                        <button class="btn btn-blue" style="padding: 5px 10px; font-size: 0.85em; width: auto;" onclick="viewHistoryDetail(${h.historyId})">Xem chi tiết</button>
+                                        <button class="btn btn-blue" style="padding: 5px 10px; font-size: 0.85em; width: auto;" onclick="viewHistoryDetail(${h.historyId})">View detail</button>
                                         <div id="history-data-${h.historyId}" style="display:none;">
                                             <c:forEach var="item" items="${h.revisionItems}">
                                                 <div style="border-left: 3px solid #007bff; padding: 8px; margin-bottom: 5px; background: #f8f9fa;">
-                                                    <strong>Vị trí:</strong> ${item.revisionType} <br> <strong>Thay đổi:</strong> ${item.revisionDetail}
+                                                    <strong>Location:</strong> ${item.revisionType} <br> <strong>Change:</strong> ${item.revisionDetail}
                                                 </div>
                                             </c:forEach>
                                         </div>
@@ -193,7 +193,7 @@
                             </c:forEach>
                         </div>
                     </c:when>
-                    <c:otherwise><p style="color: #888;">Chưa có lịch sử.</p></c:otherwise>
+                    <c:otherwise><p style="color: #888;">Not have any history</p></c:otherwise>
                 </c:choose>
             </div>
         </div>
@@ -206,20 +206,20 @@
                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
                 <div id="revisionContainer">
                     <div class="revision-box">
-                        <input type="text" name="revision_type[]" placeholder="Vị trí (vd: Điều 2)" required style="width:40%; padding: 8px;">
-                        <input type="text" name="revision_detail[]" placeholder="Thông tin thay đổi" required style="width:50%; padding: 8px;">
+                        <input type="text" name="revision_type[]" placeholder="Location (Ex: Name...)" required style="width:40%; padding: 8px;">
+                        <input type="text" name="revision_detail[]" placeholder="Change information" required style="width:50%; padding: 8px;">
                     </div>
                 </div>
-                <button type="button" onclick="addRevisionBox()" class="btn btn-add">+ Thêm mục</button>
+                <button type="button" onclick="addRevisionBox()" class="btn btn-add">+ Add more</button>
                 <div style="margin-top: 20px; text-align: right;">
-                    <button type="button" onclick="hideModals()" class="btn btn-red" style="width:auto;">Hủy</button>
-                    <button type="submit" class="btn btn-green" style="width:auto;">Gửi phản hồi</button>
+                    <button type="button" onclick="hideModals()" class="btn btn-red" style="width:auto;">Cancel</button>
+                    <button type="submit" class="btn btn-green" style="width:auto;">Send feedback</button>
                 </div>
             </form>
         </div>
 
         <div id="viewHistoryModal" class="modal-content" style="width: 40%; left: 30%;">
-            <h3>Chi tiết Yêu cầu sửa đổi</h3>
+            <h3>Detail of edit request</h3>
             <div id="viewHistoryBody" style="margin-bottom: 20px;"></div>
             <button type="button" onclick="hideModals()" class="btn btn-gray" style="width: auto;">Đóng</button>
         </div>
