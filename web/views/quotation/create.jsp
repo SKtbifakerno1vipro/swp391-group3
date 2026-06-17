@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>`n<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html>
@@ -47,19 +47,17 @@
 
                 <%-- Khu vuc search san pham va add vao quotation. --%>
                 <h3>Search Product</h3>
-                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <input type="text" id="productSearch" placeholder="Search product name..." onkeyup="filterProductOptions()" style="min-width: 260px;">
-
-                    <select id="productPicker" style="min-width: 320px;">
-                        <option value="" data-price="0">-- Select Product --</option>
-                        <c:forEach items="${products}" var="product">
-                            <option value="${product.productId}" data-price="${product.sellingPrice}">
-                                ${product.productName} - ${product.sellingPrice}
-                            </option>
-                        </c:forEach>
-                    </select>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; position: relative;">
+                    <input type="text" id="productSearch" placeholder="Search product name..." autocomplete="off" onkeyup="showCreateProductSuggestions()" style="min-width: 300px;">
+                    <input type="hidden" id="selectedProductId">
+                    <input type="hidden" id="selectedProductName">
+                    <input type="hidden" id="selectedProductPrice">
 
                     <button type="button" onclick="addSelectedProduct()">Add</button>
+                    <span id="selectedProductText" style="font-weight: bold; color: green;"></span>
+
+                    <%-- Hop goi y san pham sau khi search. --%>
+                    <div id="createProductSuggestions" style="border: 1px solid #ccc; max-width: 420px; display: none; background: white; position: absolute; top: 34px; left: 0; z-index: 10;"></div>
                 </div>
 
                 <br>
@@ -97,36 +95,82 @@
             </form>
 
             <script>
-                // Loc danh sach san pham theo text search.
-                function filterProductOptions() {
-                    const keyword = document.getElementById('productSearch').value.toLowerCase().trim();
-                    const options = document.querySelectorAll('#productPicker option');
+                // Luu danh sach product tu server sang JavaScript de search goi y.
+                const products = [
+                    <c:forEach items="${products}" var="product" varStatus="status">
+                        {
+                            id: '${product.productId}',
+                            name: '${product.productName}',
+                            price: '${product.sellingPrice}'
+                        }${status.last ? '' : ','}
+                    </c:forEach>
+                ];
 
-                    options.forEach(function(option, index) {
-                        if (index === 0) {
-                            option.hidden = false;
-                            return;
-                        }
+                // Hien thi goi y san pham khi user go search.
+                function showCreateProductSuggestions() {
+                    const keyword = document.getElementById('productSearch').value.toLowerCase().trim().replace(/\s+/g, ' ');
+                    const box = document.getElementById('createProductSuggestions');
 
-                        const text = option.textContent.toLowerCase();
-                        option.hidden = keyword !== '' && !text.includes(keyword);
-                    });
-                }
+                    document.getElementById('selectedProductId').value = '';
+                    document.getElementById('selectedProductName').value = '';
+                    document.getElementById('selectedProductPrice').value = '';
+                    document.getElementById('selectedProductText').textContent = '';
 
-                // Add san pham dang chon vao bang selected products.
-                function addSelectedProduct() {
-                    const picker = document.getElementById('productPicker');
-                    const selectedOption = picker.options[picker.selectedIndex];
-
-                    if (!picker.value) {
-                        alert('Please select a product first.');
+                    if (keyword === '') {
+                        box.style.display = 'none';
+                        box.innerHTML = '';
                         return;
                     }
 
-                    const productId = picker.value;
-                    const productText = selectedOption.textContent.trim();
-                    const productName = productText.split(' - ')[0];
-                    const sellingPrice = selectedOption.getAttribute('data-price');
+                    const matchedProducts = products.filter(function(product) {
+                        return product.name.toLowerCase().includes(keyword);
+                    });
+
+                    if (matchedProducts.length === 0) {
+                        box.innerHTML = '<div style="padding: 8px; color: red;">No product found</div>';
+                        box.style.display = 'block';
+                        return;
+                    }
+
+                    let html = '';
+                    matchedProducts.forEach(function(product) {
+                        html += '<div style="padding: 8px; cursor: pointer; border-bottom: 1px solid #eee;" data-id="' + product.id + '">'
+                            + product.name + ' - ' + product.price
+                            + '</div>';
+                    });
+
+                    box.innerHTML = html;
+                    box.style.display = 'block';
+
+                    const suggestionItems = box.querySelectorAll('div[data-id]');
+                    suggestionItems.forEach(function(item, index) {
+                        item.onclick = function() {
+                            const product = matchedProducts[index];
+                            selectCreateProduct(product.id, product.name, product.price);
+                        };
+                    });
+                }
+
+                // Chon 1 san pham tu goi y.
+                function selectCreateProduct(productId, productName, productPrice) {
+                    document.getElementById('selectedProductId').value = productId;
+                    document.getElementById('selectedProductName').value = productName;
+                    document.getElementById('selectedProductPrice').value = productPrice;
+                    document.getElementById('productSearch').value = productName;
+                    document.getElementById('selectedProductText').textContent = 'Selected: ' + productName;
+                    document.getElementById('createProductSuggestions').style.display = 'none';
+                }
+
+                // Add san pham da chon vao bang selected products.
+                function addSelectedProduct() {
+                    const productId = document.getElementById('selectedProductId').value;
+                    const productName = document.getElementById('selectedProductName').value;
+                    const sellingPrice = document.getElementById('selectedProductPrice').value;
+
+                    if (!productId) {
+                        alert('Please select a product from suggestions first.');
+                        return;
+                    }
 
                     const tbody = document.getElementById('productRows');
                     const row = document.createElement('tr');
@@ -137,13 +181,20 @@
                         + '<input type="hidden" name="productId" value="' + productId + '">'
                         + '</td>'
                         + '<td><input type="number" name="quantity" min="1" value="1" required oninput="calculateTotals()"></td>'
-                        + '<td><input type="number" name="sellingPrice" min="0" step="0.01" value="' + sellingPrice + '" required oninput="calculateTotals()"></td>'
+                        + '<td><input type="number" name="sellingPrice" min="0" step="0.01" value="' + sellingPrice + '" readonly oninput="calculateTotals()"></td>'
                         + '<td><input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required oninput="calculateTotals()"></td>'
                         + '<td><input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required oninput="calculateTotals()"></td>'
                         + '<td class="lineTotal">0</td>'
                         + '<td><button type="button" onclick="removeProductRow(this)">Remove</button></td>';
 
                     tbody.appendChild(row);
+
+                    document.getElementById('productSearch').value = '';
+                    document.getElementById('selectedProductId').value = '';
+                    document.getElementById('selectedProductName').value = '';
+                    document.getElementById('selectedProductPrice').value = '';
+                    document.getElementById('selectedProductText').textContent = '';
+
                     calculateTotals();
                 }
 
@@ -170,11 +221,11 @@
                         const taxAmount = afterDiscount * taxPercent / 100;
                         const lineTotal = afterDiscount + taxAmount;
 
-                        row.querySelector('.lineTotal').textContent = lineTotal.toFixed(2);
+                        row.querySelector('.lineTotal').textContent = lineTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                         grandTotal += lineTotal;
                     });
 
-                    document.getElementById('grandTotal').textContent = grandTotal.toFixed(2);
+                    document.getElementById('grandTotal').textContent = grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 }
 
                 // Khong cho submit neu chua add san pham nao.
@@ -192,3 +243,5 @@
     </div>
 </body>
 </html>
+
+

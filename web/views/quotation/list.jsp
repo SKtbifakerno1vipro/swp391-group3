@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>`n<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -66,12 +66,12 @@
                         <td>${quotation.createdByName}</td>
                         <td>${quotation.createdAt}</td>
                         <td>
-                            <a href="quotation-detail?id=${quotation.quotationId}">view</a> | <a href="quotation-detail?id=${quotation.quotationId}">history</a>
+                            <a href="quotation-detail?id=${quotation.quotationId}">View Detail</a>
 
                             <%-- Chi hien nut tao hop dong neu trang thai la ACCEPTED. --%>
                             <c:if test="${quotation.quotationStatus == 'ACCEPTED'}">
                                 | <a href="contract-save?quotationId=${quotation.quotationId}"
-                                     style="color: green; font-weight: bold;">Tao Hop dong</a>
+                                     style="color: green; font-weight: bold;">Create Contract</a>
                             </c:if>
                         </td>
                     </tr>
@@ -83,3 +83,5 @@
         </div>
     </body>
 </html>
+
+
