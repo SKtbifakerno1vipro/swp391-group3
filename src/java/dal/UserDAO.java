@@ -329,7 +329,6 @@ public class UserDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(list);
         return list;
     }
 /// end - Xhieu

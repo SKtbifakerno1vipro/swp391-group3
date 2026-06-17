@@ -279,6 +279,7 @@ public class CustomerDAO extends DBContext {
             e.printStackTrace();
             error = "searchAndPaginateCustomers: " + e.getMessage();
         }
+        System.out.println("searchAndPaginateCustomers: " + list);
         return list;
     }
 
