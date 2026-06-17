@@ -27,17 +27,17 @@ public class ContractService {
                 cust.getTaxCode() != null ? cust.getTaxCode() : "");
 
         template = template.replace("{company_name}",
-                config.getProperty("company_name", "COMPANY LTD SWP"));
+                config.getProperty("company_name", ""));
         template = template.replace("{company_address}",
-                config.getProperty("company_address", "Hanoi"));
+                config.getProperty("company_address", ""));
         template = template.replace("{company_phone}",
-                config.getProperty("company_phone", "0123456789"));
+                config.getProperty("company_phone", ""));
         template = template.replace("{company_tax}",
-                config.getProperty("company_tax_code", "0101010101"));
+                config.getProperty("company_tax_code", ""));
         template = template.replace("{company_rep}",
-                config.getProperty("company_rep_name", "Director"));
+                config.getProperty("company_rep_name", ""));
         template = template.replace("{company_position}",
-                config.getProperty("company_position", "Director"));
+                config.getProperty("company_position", ""));
 
         StringBuilder productRows = new StringBuilder();
         int stt = 1;
@@ -77,14 +77,15 @@ public class ContractService {
         template = template.replace("{effective_date}", effective.format(fmt));
         template = template.replace("{end_date}", effective.plusYears(1).format(fmt));
 
-        String yearMonth = java.time.LocalDate.now()
-                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMM"));
-        String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", q.getQuotationId());
+        String year = java.time.LocalDate.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy"));
+//        String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", q.getQuotationId());
+        String newContractNumber = String.format("%03d", q.getQuotationId()) + "/" + year + "-HĐ";
         template = template.replace("{contract_number}",
                 newContractNumber);
 
-        BigDecimal total = contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) != null ?
-                contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) : BigDecimal.ZERO;
+        BigDecimal total = contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) != null
+                ? contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) : BigDecimal.ZERO;
         template = template.replace("{total_amount}",
                 String.format(locale, "%,.0f", total));
 
