@@ -29,13 +29,12 @@ public class SecurityFilter implements Filter {
             "/logout",
             "/register",
             "/auth/forgot",
-            "/forgot-password"
+            "/user/password/change"
     );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
             "/dashboard",
-            "/user/password/change",
-            "/user/password/forgot"
+            "/user/password/change"
     );
 
     private static final List<String> SYSTEM_ADMIN_URLS = List.of(
@@ -70,7 +69,8 @@ public class SecurityFilter implements Filter {
             "/customer-order-detail",
             "/create-customer-order",
             "/Invoice",
-            "/invoice"
+            "/invoice",
+            "/email/logs"
     );
 
     private static final List<String> MANAGER_URLS = List.of(
@@ -90,7 +90,8 @@ public class SecurityFilter implements Filter {
             "/contract-list",
             "/contract-detail",
             "/Invoice",
-            "/invoice"
+            "/invoice",
+            "/email/logs"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(

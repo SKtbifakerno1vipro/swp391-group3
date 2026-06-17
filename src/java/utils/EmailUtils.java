@@ -4,10 +4,11 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.io.InputStream;
 import java.util.Properties;
+import dal.EmailLogDAO;
 
 public class EmailUtils {
     //thu vien Jakarta Mail API đe ket noi voi Server SMTP cua Google (Gmail) va gui email đi duoi dang ma HTML
-
+    private static final EmailLogDAO emailLogDAO = new EmailLogDAO();
     private static final String HOSTNAME = "smtp.gmail.com";
     private static final String PORT = "587"; // Cổng TLS của Gmail
     
@@ -73,10 +74,20 @@ public class EmailUtils {
             System.out.println("[INFO] Attempting to send email to: " + toEmail);
             Transport.send(msg);
             System.out.println("[SUCCESS] Email sent successfully to: " + toEmail);
+            try {
+                emailLogDAO.insertLog(toEmail, subject, content, "SUCCESS");
+            } catch (Exception ex) {
+                System.out.println("[WARNING] Failed to write email log: " + ex.getMessage());
+            }
             return true;
         } catch (Exception e) {
             System.out.println("[SEVERE] Failed to send email to: " + toEmail + ". Error: " + e.getMessage());
             e.printStackTrace();
+            try {
+                emailLogDAO.insertLog(toEmail, subject, content, "FAILED");
+            } catch (Exception ex) {
+                System.out.println("[WARNING] Failed to write email log: " + ex.getMessage());
+            }
             return false;
         }
     }
