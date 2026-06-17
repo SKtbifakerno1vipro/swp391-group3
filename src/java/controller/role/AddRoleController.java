@@ -18,6 +18,8 @@ public class AddRoleController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         // Lay danh sach permissions đe hien thi checkbox
         request.setAttribute("permissionList", roleService.getAllPermissions());
         request.getRequestDispatcher("/views/role/add-role.jsp").forward(request, response);

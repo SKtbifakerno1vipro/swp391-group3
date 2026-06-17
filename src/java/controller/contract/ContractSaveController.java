@@ -1,8 +1,8 @@
 package controller.contract;
 
-import dal.*;
+import dto.CustomerDTO;
 import model.*;
-import dto.*;
+import service.*;
 import service.ContractService;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,32 +20,59 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet(urlPatterns = {"/contract-save"})
 public class ContractSaveController extends HttpServlet {
 
-    private final ContractDAO contractDAO = new ContractDAO();
-    private final QuotationDAO quotationDAO = new QuotationDAO();
-    private final CustomerDAO customerDAO = new CustomerDAO();
     private final ContractService contractService = new ContractService();
+    private final QuotationService quotationService = new QuotationService();
+    private final CustomerService customerService = new CustomerService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setCharacterEncoding("UTF-8");
         request.setCharacterEncoding("UTF-8");
 
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
         String id = request.getParameter("id");
         String quotationId = request.getParameter("quotationId");
 
+        //check  contract exist by id?
         if (id != null && !id.isEmpty()) {
             int contractId = Integer.parseInt(id);
-            Contract contract = contractDAO.getContractById(contractId);
+            Contract contract = contractService.getContractById(contractId);
+
+            if (contract == null) {
+                response.sendRedirect("contract-list");
+                return;
+            }
+
+            String status = contract.getContractStatus();
+
+            // If contract status is customer_approve so can not edit
+            if ("APPROVED".equals(status)) {
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+
+            // Chuyển trạng thái hiển thị cho JSP
+            boolean editable = "DRAFT".equals(status) || "PENDING_REVIEW".equals(status);
+            request.setAttribute("editable", editable);
             request.setAttribute("contract", contract);
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+
+            // --- Tạo mới hợp đồng từ quotation ---
         } else if (quotationId != null && !quotationId.isEmpty()) {
             int qId = Integer.parseInt(quotationId);
-            Quotation quotation = quotationDAO.getQuotationById(qId);
+            Quotation quotation = quotationService.getQuotationById(qId);
             if (quotation != null) {
                 String templateHtml = generateContractHtml(qId);
                 request.setAttribute("templateContent", templateHtml);
                 request.setAttribute("quotationId", qId);
                 request.setAttribute("customerId", quotation.getCustomerId());
+                request.setAttribute("editable", true);
                 request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
             } else {
                 response.sendRedirect("quotation-list");
@@ -56,9 +83,9 @@ public class ContractSaveController extends HttpServlet {
     }
 
     private String generateContractHtml(int quotationId) throws IOException {
-        Quotation quotation = quotationDAO.getQuotationById(quotationId);
-        CustomerDTO customer = customerDAO.getCustomerDTOById(quotation.getCustomerId());
-        List<QuotationDetail> details = quotationDAO.getQuotationDetailsByQuotationId(quotationId);
+        Quotation quotation = quotationService.getQuotationById(quotationId);
+        CustomerDTO customer = customerService.getCustomerDTOById(quotation.getCustomerId());
+        List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotationId);
 
         Properties config = new Properties();
         try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/config.properties")) {
@@ -74,7 +101,9 @@ public class ContractSaveController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
@@ -88,6 +117,7 @@ public class ContractSaveController extends HttpServlet {
         String contractIdStr = request.getParameter("contractId");
         String quotationIdStr = request.getParameter("quotationId");
         String contractContent = request.getParameter("contractContent");
+        String action = request.getParameter("action");
 
         if (contractContent == null || contractContent.trim().isEmpty()) {
             request.setAttribute("errorMsg", "Contract content cannot be empty!");
@@ -95,81 +125,83 @@ public class ContractSaveController extends HttpServlet {
             return;
         }
 
+        // --- UPDATE ---
         if (contractIdStr != null && !contractIdStr.isEmpty()) {
-            // --- UPDATE ---
             int contractId = Integer.parseInt(contractIdStr);
-            Contract c = contractDAO.getContractById(contractId);
-            if (c != null) {
-                c.setContractContent(contractContent);
-                c.setUpdatedBy(user.getUserId());
-                // Explicitly keep the status as it was in the database
-                c.setContractStatus(c.getContractStatus());
-
-                boolean success = contractDAO.update(c);
-                if (success) {
-                    response.sendRedirect("contract-detail?id=" + contractId);
-                } else {
-                    request.setAttribute("errorMsg", "Update failed!");
-                    request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
-                }
-            } else {
+            Contract c = contractService.getContractById(contractId);
+            if (c == null) {
                 response.sendRedirect("contract-list");
-            }
-            
-        } else {
-            // --- CREATE ---
-            int quotationId = 0;
-            try {
-                quotationId = Integer.parseInt(quotationIdStr);
-            } catch (NumberFormatException e) {
-                request.setAttribute("errorMsg", "Invalid Quotation ID format!");
-                request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
                 return;
             }
 
-            String customerIdStr = request.getParameter("customerId");
-            int customerId = 0;
-            try {
-                customerId = Integer.parseInt(customerIdStr);
-            } catch (NumberFormatException e) {
-                request.setAttribute("errorMsg", "Invalid Customer ID format! customerId=" + customerIdStr);
-                request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
-                return;
-            }
+            c.setContractContent(contractContent);
+            c.setUpdatedBy(user.getUserId());
+            boolean ok = contractService.update(c);
 
-            Contract existingContract = contractDAO.getContractByQuotationId(quotationId);
-            if (existingContract != null) {
-                request.setAttribute("errorMsg", "A contract for this quotation already exists!");
+            if (ok) {
+                if ("submit_for_review".equals(action)) {
+                    contractService.updateStatus(contractId, "PENDING_REVIEW");
+                    insertHistory(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
+                } else {
+                    insertHistory(c, c.getContractStatus(), "User saved contract content.", user.getUserId());
+                }
+                response.sendRedirect("contract-detail?id=" + contractId);
+            } else {
+                request.setAttribute("errorMsg", "Update failed!");
                 request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
-                return;
             }
+            return;
+        }
+
+        // --- CREATE ---
+        int quotationId = Integer.parseInt(quotationIdStr);
+        int customerId = Integer.parseInt(request.getParameter("customerId"));
+
+        if (contractService.getContractByQuotationId(quotationId) != null) {
+            request.setAttribute("errorMsg", "A contract for this quotation already exists!");
+            request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+            return;
+        }
+
+        // Tạo mã hợp đồng ngay tại đây để gán vào object trước khi insert
+        String yearMonth = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMM"));
+        String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", quotationId);
 
         Contract c = new Contract();
-            c.setCustomerId(customerId);
-            c.setQuotationId(quotationId);
-            // Tạm thời để trống hoặc một chuỗi tạm
-            c.setContractNumber("TEMP"); 
-            c.setContractStatus("DRAFT");
-            c.setStorageType("TEXT");
-            c.setContractContent(contractContent);
-            c.setCreatedBy(user.getUserId());
+        c.setCustomerId(customerId);
+        c.setQuotationId(quotationId);
+        c.setContractNumber(newContractNumber); // Đã có mã ngay khi tạo
+        c.setContractStatus("DRAFT");
+        c.setStorageType("TEXT");
+        c.setContractContent(contractContent);
+        c.setCreatedBy(user.getUserId());
 
-            int newId = contractDAO.insert(c);
-            if (newId > 0) {
-                // Sinh mã chuẩn dựa trên ID vừa tạo
-                String yearMonth = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMM"));
-                String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", newId);
-                
-                // Cập nhật mã chuẩn vào DB
-                c.setContractId(newId);
-                c.setContractNumber(newContractNumber);
-                contractDAO.updateContractNumber(c); // Gọi phương thức mới trong DAO
-                
-                response.sendRedirect("contract-detail?id=" + newId);
-            } else {
-                request.setAttribute("errorMsg", "Creation failed!");
-                request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+        int newId = contractService.insert(c);
+        if (newId > 0) {
+            c.setContractId(newId);
+            insertHistory(c, "DRAFT", "Contract created in DRAFT status.", user.getUserId());
+
+            if ("submit_for_review".equals(action)) {
+                contractService.updateStatus(newId, "PENDING_REVIEW");
+                insertHistory(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
             }
+            response.sendRedirect("contract-detail?id=" + newId);
+        } else {
+            request.setAttribute("errorMsg", "Creation failed!");
+            request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
         }
+    }
+
+    /**
+     * Helper that records a status change / activity in ContractHistory.
+     */
+    private void insertHistory(Contract contract, String toStatus, String note, int changedBy) {
+        ContractHistory h = new ContractHistory();
+        h.setContractId(contract.getContractId());
+        h.setFromStatus(contract.getContractStatus());   // previous status
+        h.setToStatus(toStatus);
+        h.setNote(note);
+        h.setChangedBy(changedBy);
+        contractService.insertHistory(h);
     }
 }

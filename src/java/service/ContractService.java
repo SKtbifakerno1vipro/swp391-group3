@@ -11,7 +11,8 @@ import java.util.Properties;
 import dal.*;
 
 public class ContractService {
-        private final ContractDAO contractDAO = new ContractDAO();
+
+    private final ContractDAO contractDAO = new ContractDAO();
 
     public String fillTemplate(Quotation q, CustomerDTO cust, List<QuotationDetail> details,
             String template, Properties config) {
@@ -26,17 +27,17 @@ public class ContractService {
                 cust.getTaxCode() != null ? cust.getTaxCode() : "");
 
         template = template.replace("{company_name}",
-                config.getProperty("company_name", "COMPANY LTD SWP"));
+                config.getProperty("company_name", ""));
         template = template.replace("{company_address}",
-                config.getProperty("company_address", "Hanoi"));
+                config.getProperty("company_address", ""));
         template = template.replace("{company_phone}",
-                config.getProperty("company_phone", "0123456789"));
+                config.getProperty("company_phone", ""));
         template = template.replace("{company_tax}",
-                config.getProperty("company_tax_code", "0101010101"));
+                config.getProperty("company_tax_code", ""));
         template = template.replace("{company_rep}",
-                config.getProperty("company_rep_name", "Director"));
+                config.getProperty("company_rep_name", ""));
         template = template.replace("{company_position}",
-                config.getProperty("company_position", "Director"));
+                config.getProperty("company_position", ""));
 
         StringBuilder productRows = new StringBuilder();
         int stt = 1;
@@ -76,18 +77,63 @@ public class ContractService {
         template = template.replace("{effective_date}", effective.format(fmt));
         template = template.replace("{end_date}", effective.plusYears(1).format(fmt));
 
+        String year = java.time.LocalDate.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy"));
+//        String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", q.getQuotationId());
+        String newContractNumber = String.format("%03d", q.getQuotationId()) + "/" + year + "-HĐ";
         template = template.replace("{contract_number}",
-                q.getQuotationId() + "/HKT");
+                newContractNumber);
 
-        BigDecimal total = q.getTotalAmount() != null ? q.getTotalAmount() : BigDecimal.ZERO;
+        BigDecimal total = contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) != null
+                ? contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) : BigDecimal.ZERO;
         template = template.replace("{total_amount}",
                 String.format(locale, "%,.0f", total));
 
         return template;
     }
 
-    // XHieu-begin - delete contact me
+    public List<Contract> searchContracts(String contractNumber, String customerName, String status,
+            String storageType, int pageIndex, int pageSize, int userId, int roleId) {
+        return contractDAO.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize, userId, roleId);
+    }
 
+    public int getTotalContracts(String contractNumber, String customerName, String status, String storageType) {
+        return contractDAO.getTotalContracts(contractNumber, customerName, status, storageType);
+    }
+
+    public Contract getContractById(int id) {
+        return contractDAO.getContractById(id);
+    }
+
+    public int insert(Contract c) {
+        return contractDAO.insert(c);
+    }
+
+    public List<ContractHistory> getHistoriesByContractId(int contractId) {
+        return contractDAO.getHistoriesByContractId(contractId);
+    }
+
+    public int insertHistory(ContractHistory h) {
+        return contractDAO.insertHistory(h);
+    }
+
+    public void insertRevisionItem(ContractRevisionItem item) {
+        contractDAO.insertRevisionItem(item);
+    }
+
+    public boolean update(Contract c) {
+        return contractDAO.update(c);
+    }
+
+    public boolean updateStatus(int contractId, String newStatus) {
+        return contractDAO.updateStatus(contractId, newStatus);
+    }
+
+    public Contract getContractByQuotationId(int quotationId) {
+        return contractDAO.getContractByQuotationId(quotationId);
+    }
+
+    // XHieu-begin - delete contact me
     public List<Contract> getContractsByCustomerId(int customerId) {
         return contractDAO.getContractsByCustomerId(customerId);
     }

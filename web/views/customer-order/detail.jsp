@@ -6,10 +6,21 @@
     <head>
         <meta charset="UTF-8">
         <title>Customer Order Detail</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
     <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="orders"/>
+            </jsp:include>
+            <main class="main legacy-page">
         <h2>Customer Order Detail</h2>
-        
+
 
         <h3>Order Information</h3>
         <form action="${pageContext.request.contextPath}/customer-order-detail" method="POST">
@@ -19,7 +30,7 @@
                 <li><strong>Order ID:</strong> ${order.customerOrder.customerOrderId}</li>
                 <li><strong>Customer Name:</strong> ${order.customerUser.fullName}</li>
                 <li><strong>Tax Code:</strong> ${order.customer.taxCode}</li>
-                <li><strong>Status:</strong> 
+                <li><strong>Status:</strong>
                     <select name="status">
                         <option value="PENDING" ${order.customerOrder.orderStatus == 'PENDING' ? 'selected' : ''}>PENDING</option>
                         <option value="SHIPPING" ${order.customerOrder.orderStatus == 'SHIPPING' ? 'selected' : ''}>SHIPPING</option>
@@ -27,7 +38,7 @@
                     </select>
                     <button type="submit">Update Status</button>
                 </li>
-                <li><strong>Created At:</strong> 
+                <li><strong>Created At:</strong>
                     <fmt:parseDate value="${order.customerOrder.createdAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
                     <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
                 </li>
@@ -91,5 +102,8 @@
             </tfoot>
         </table>
         <a href="${pageContext.request.contextPath}/customer-order-list">Back to List</a>
+
+            </main>
+        </div>
     </body>
 </html>

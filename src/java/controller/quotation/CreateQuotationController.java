@@ -4,6 +4,7 @@ import dto.CustomerDTO;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -42,23 +43,24 @@ public class CreateQuotationController extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            // Lay du lieu tu form. request.getParameter luon tra ve String.
-            String customerIdRaw = request.getParameter("customerId");
-            String productIdRaw = request.getParameter("productId");
-            String quantityRaw = request.getParameter("quantity");
-            String sellingPriceRaw = request.getParameter("sellingPrice");
-            String discountPercentRaw = request.getParameter("discountPercent");
-            String taxPercentRaw = request.getParameter("taxPercent");
+            // Lay customer cua quotation.
+            int customerId = Integer.parseInt(request.getParameter("customerId"));
 
-            // Chuyen String sang int
-            int customerId = Integer.parseInt(customerIdRaw);
-            int productId = Integer.parseInt(productIdRaw);
-            int quantity = Integer.parseInt(quantityRaw);
+            /*
+             * Cac input san pham co cung name nen dung getParameterValues.
+             * Moi mang se chua nhieu gia tri tu nhieu dong san pham.
+             */
+            String[] productIds = request.getParameterValues("productId");
+            String[] quantities = request.getParameterValues("quantity");
+            String[] sellingPrices = request.getParameterValues("sellingPrice");
+            String[] discountPercents = request.getParameterValues("discountPercent");
+            String[] taxPercents = request.getParameterValues("taxPercent");
 
-            // Chuyen String sang BigDecimal vi day la tien/phan tram
-            BigDecimal sellingPrice = new BigDecimal(sellingPriceRaw);
-            BigDecimal discountPercent = new BigDecimal(discountPercentRaw);
-            BigDecimal taxPercent = new BigDecimal(taxPercentRaw);
+            if (productIds == null || productIds.length == 0) {
+                request.setAttribute("error", "Please add at least one product.");
+                doGet(request, response);
+                return;
+            }
 
             // Tao object de luu bang quotation
             Quotation quotation = new Quotation();
@@ -69,17 +71,34 @@ public class CreateQuotationController extends HttpServlet {
             // Tam thoi de la 1. Sau nay noi login/session thi lay userId tu session.
             quotation.setCreatedBy(1);
 
-            // Tao object de luu bang quotation_detail
-            QuotationDetail detail = new QuotationDetail();
-            detail.setProductId(productId);
-            detail.setQuantity(quantity);
-            detail.setSellingPrice(sellingPrice);
-            detail.setDiscountPercent(discountPercent);
-            detail.setTaxPercent(taxPercent);
+            // Tao danh sach detail de luu nhieu dong quotation_detail.
+            List<QuotationDetail> details = new ArrayList<>();
 
-            // Goi service de xu ly logic tao quotation + detail
+            for (int i = 0; i < productIds.length; i++) {
+                // Bo qua dong san pham bi rong.
+                if (productIds[i] == null || productIds[i].trim().isEmpty()) {
+                    continue;
+                }
+
+                QuotationDetail detail = new QuotationDetail();
+                detail.setProductId(Integer.parseInt(productIds[i]));
+                detail.setQuantity(Integer.parseInt(quantities[i]));
+                detail.setSellingPrice(new BigDecimal(sellingPrices[i]));
+                detail.setDiscountPercent(new BigDecimal(discountPercents[i]));
+                detail.setTaxPercent(new BigDecimal(taxPercents[i]));
+
+                details.add(detail);
+            }
+
+            if (details.isEmpty()) {
+                request.setAttribute("error", "Please add at least one valid product.");
+                doGet(request, response);
+                return;
+            }
+
+            // Goi service de xu ly logic tao quotation + nhieu detail
             QuotationService quotationService = new QuotationService();
-            boolean success = quotationService.createQuotation(quotation, detail);
+            boolean success = quotationService.createQuotation(quotation, details);
 
             if (success) {
                 // Thanh cong thi quay ve trang danh sach

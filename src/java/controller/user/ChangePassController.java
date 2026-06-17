@@ -26,7 +26,19 @@ public class ChangePassController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+        HttpSession session = request.getSession(false);
+        User user = null;
+        if (session != null) {
+            user = (User) session.getAttribute("user");
+            if (user == null) {
+                user = (User) session.getAttribute("userAuth");
+            }
+        }
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        request.getRequestDispatcher("/views/user/change_pass.jsp").forward(request, response);
     }
 
     @Override
@@ -36,62 +48,78 @@ public class ChangePassController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        User user = (User) request.getSession().getAttribute("user"); 
-        if (user==null) user = (User) request.getSession().getAttribute("userAuth");
+        HttpSession session = request.getSession(false);
+        User user = null;
+        if (session != null) {
+            user = (User) session.getAttribute("user");
+            if (user == null) {
+                user = (User) session.getAttribute("userAuth");
+            }
+        }
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
         
         String currentPassword = request.getParameter("currentPassword");
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
         
-                        Enumeration<String> attrs = request.getAttributeNames();
+        Enumeration<String> attrs = request.getAttributeNames();
 
-                            while(attrs.hasMoreElements()) {
-                                String name = attrs.nextElement();
-                                System.out.println(name + " = " + request.getAttribute(name));
-                            }
-
-                        HttpSession session = request.getSession(false);
-
-                            if(session != null) {
-                                Enumeration<String> names = session.getAttributeNames();
-
-                                while(names.hasMoreElements()) {
-                                    String name = names.nextElement();
-                                    System.out.println(name + " = " + session.getAttribute(name));
-                                }
-                            }
-        
-        if(currentPassword == null || currentPassword.trim().isEmpty()){
-            currentPassword = (String)request.getSession().getAttribute("forgetPass");
-            
-            request.getSession().removeAttribute("forgetPass");
-            request.getSession().removeAttribute("userAuth");
+        while(attrs.hasMoreElements()) {
+            String name = attrs.nextElement();
+            System.out.println(name + " = " + request.getAttribute(name));
         }
+
+        if(session != null) {
+            Enumeration<String> names = session.getAttributeNames();
+
+            while(names.hasMoreElements()) {
+                String name = names.nextElement();
+                System.out.println(name + " = " + session.getAttribute(name));
+            }
+        }
+        
+        boolean isForgetFlow = false;
+        if (currentPassword == null || currentPassword.trim().isEmpty()) {
+            String forgetPass = (String) session.getAttribute("forgetPass");
+            if (forgetPass != null && !forgetPass.trim().isEmpty()) {
+                currentPassword = forgetPass;
+                isForgetFlow = true;
+            }
+        }
+        
         if (currentPassword == null || currentPassword.trim().isEmpty() ||
             newPassword == null || newPassword.trim().isEmpty() ||
             confirmPassword == null || confirmPassword.trim().isEmpty()) {
 
-            request.setAttribute("error", "Vui lng nhp y  tt c cc trng!");
-            request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+            request.setAttribute("error", "Vui lòng nhập đầy đủ tất cả các trường!");
+            request.getRequestDispatcher("/views/user/change_pass.jsp").forward(request, response);
             return;
         }
         if (!newPassword.equals(confirmPassword)) {
-            request.setAttribute("error", "Mt khu mi v xc nhn mt khu khng khp!");
-            request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+            request.setAttribute("error", "Mật khẩu mới và xác nhận mật khẩu không khớp!");
+            request.getRequestDispatcher("/views/user/change_pass.jsp").forward(request, response);
             return;
         }
         try {     
             String resultMessage = userService.changePassword(user.getUserId(), currentPassword, newPassword);
             if (resultMessage == null) {
-                request.setAttribute("success", "i mt khu thnh cng!");
+                request.setAttribute("success", "Đổi mật khẩu thành công!");
+                if (isForgetFlow) {
+                    request.setAttribute("isForgetFlowSuccess", true);
+                    session.removeAttribute("forgetPass");
+                    session.removeAttribute("userAuth");
+                }
             } else {
                 request.setAttribute("error", resultMessage);
             }
         } catch (Exception e) {
-            request.setAttribute("error", " xy ra li khi kt ni c s d liu!");
+            request.setAttribute("error", "Đã xảy ra lỗi khi kết nối cơ sở dữ liệu!");
             request.setAttribute("errorDetail", e.getMessage());
         }
 
-        request.getRequestDispatcher("/views/user/password.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/user/change_pass.jsp").forward(request, response);
     }
 }

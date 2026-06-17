@@ -35,16 +35,19 @@ Thumbs.db
 # Legacy local path artifact
 # Claude local metadata
 .claude/
-n b p r o j e c t / 
- 
-
+nbproject/
 nbproject/private/
 
 # email
 web/WEB-INF/EmailConfig.properties
+EmailConfig.properties
 
-# intellij          . la file,   / la folder 
+# DBContext
+web/WEB-INF/ConnectDB.properties
+ConnectDB.properties
+
+# intellij
 .idea
 .smarttomcat
-.iml
+*.iml
 /out/

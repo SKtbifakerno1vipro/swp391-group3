@@ -20,14 +20,22 @@ public class EditUserController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
         String idStr = request.getParameter("id");
         request.setAttribute("roles", roleService.getAllRoles());
-
 
         if (idStr != null && !idStr.trim().isEmpty()) {
             try {
                 User u = userService.getUserById(Integer.parseInt(idStr));
-                                if (u != null) {
+                if (u != null) {
                     request.setAttribute("u", u);
                     request.setAttribute("mode", "edit");
                     request.setAttribute("userService", userService);
@@ -38,8 +46,8 @@ public class EditUserController extends HttpServlet {
             } catch (Exception e) {
                 response.sendRedirect("user-list");
             }
-        } 
-        else {
+        } else {
+
             request.setAttribute("mode", "create");
             request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
         }
@@ -48,7 +56,17 @@ public class EditUserController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+
         request.setCharacterEncoding("UTF-8");
+
+
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect("login");
+            return;
+        }
 
         String idStr = request.getParameter("id");
         boolean isEdit = (idStr != null && !idStr.isEmpty());
@@ -58,7 +76,7 @@ public class EditUserController extends HttpServlet {
             u.setUserId(Integer.parseInt(idStr));
         }
 
-        // 1. Lay du lieu chung
+
         u.setUserName(request.getParameter("userName"));
         u.setEmail(request.getParameter("email"));
         u.setFullName(request.getParameter("fullName"));
@@ -73,7 +91,7 @@ public class EditUserController extends HttpServlet {
             u.setRoleId(0);
         }
 
-        // 2. Validation
+        // 3. Validation Logic
         String error = Validation.validateEmpty(u.getFullName(), "Full Name");
         if (error == null) {
             error = Validation.validateEmail(u.getEmail());
@@ -95,7 +113,7 @@ public class EditUserController extends HttpServlet {
         }
 
 
-        String password = "1234"; //defautl password,  if finish email then update final
+        String password = "1234"; // Default password, TODO: if finish email then update final
         if (!isEdit && error == null) {
             if (password == null || password.trim().isEmpty()) {
                 error = "Password is required!";
@@ -104,7 +122,7 @@ public class EditUserController extends HttpServlet {
             }
         }
 
-
+  
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("u", u);
@@ -114,17 +132,14 @@ public class EditUserController extends HttpServlet {
             return;
         }
 
-        HttpSession session = request.getSession();
-        User currentUser = (User) session.getAttribute("user");
 
         if (isEdit) {
-   
             u.setUpdatedBy(currentUser.getUserId());
         } else {
-
             u.setCreatedBy(currentUser.getUserId());
             u.setUpdatedBy(currentUser.getUserId());
         }
+
 
         boolean success = isEdit ? userService.updateUser(u) : userService.createUser(u);
 
@@ -132,6 +147,8 @@ public class EditUserController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/user-list");
         } else {
             request.setAttribute("error", "Database error!");
+            request.setAttribute("u", u);
+            request.setAttribute("roles", roleService.getAllRoles());
             String targetJSP = isEdit ? "/views/user/detail.jsp" : "/views/user/create.jsp";
             request.getRequestDispatcher(targetJSP).forward(request, response);
         }

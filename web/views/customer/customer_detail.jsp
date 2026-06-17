@@ -9,196 +9,182 @@
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Customer Details - Terra Enterprise</title>
 
-                <link href="https://fonts.googleapis.com" rel="preconnect">
-                <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-                <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap"
+                <link rel="preconnect" href="https://fonts.googleapis.com">
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap"
                     rel="stylesheet">
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block"
+                    rel="stylesheet">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
 
                 <style>
-                    body {
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        background-color: #f8f9fa;
-                        color: #212529;
-                        margin: 0;
-                        padding: 20px;
-                    }
-
                     .container {
-                        max-width: 1000px;
-                        /* Mở rộng rộng hơn form edit để chứa bảng dữ liệu */
-                        margin: 20px auto;
-                        background: #ffffff;
-                        padding: 30px;
-                        border-radius: 6px;
-                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                        border: 1px solid #dee2e6;
+                        max-width: 1200px;
+                        margin: 0 auto;
                     }
 
                     .header-section {
                         display: flex;
                         justify-content: space-between;
-                        align-items: flex-start;
-                        border-bottom: 2px solid #212529;
-                        padding-bottom: 10px;
-                        margin-bottom: 20px;
+                        align-items: center;
+                        margin-bottom: 25px;
                     }
 
                     h1 {
-                        font-size: 24px;
+                        font-family: 'Literata', Georgia, serif;
+                        font-size: 28px;
                         font-weight: 700;
                         margin: 0;
-                        color: #000000;
+                        color: var(--text);
                     }
 
-                    .nav-links {
-                        margin-bottom: 25px;
-                    }
-
-                    .nav-links a {
-                        color: #0056b3;
-                        text-decoration: underline;
-                        font-size: 14px;
-                        margin-right: 15px;
-                    }
-
-                    /* CSS cho 3 Hộp KPI Thống kê nhanh */
+                    /* KPI Container & Cards */
                     .kpi-container {
                         display: grid;
                         grid-template-columns: repeat(3, 1fr);
-                        gap: 15px;
-                        margin-bottom: 25px;
-                    }
-
-                    .kpi-card {
-                        background: #f1f3f5;
-                        padding: 15px;
-                        border-radius: 4px;
-                        border-left: 4px solid #007bff;
-                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-                    }
-
-                    .kpi-card.success {
-                        border-left-color: #28a745;
-                    }
-
-                    .kpi-card.warning {
-                        border-left-color: #ffc107;
-                    }
-
-                    .kpi-title {
-                        font-size: 12px;
-                        text-transform: uppercase;
-                        color: #6c757d;
-                        font-weight: 600;
-                        margin-bottom: 5px;
-                    }
-
-                    .kpi-value {
-                        font-size: 20px;
-                        font-weight: 700;
-                        color: #212529;
-                    }
-
-                    /* Bố cục thông tin cá nhân dạng 2 cột */
-                    .info-grid {
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
                         gap: 20px;
                         margin-bottom: 30px;
                     }
 
+                    .kpi-card {
+                        background: var(--surface);
+                        padding: 20px;
+                        border-radius: 18px;
+                        border: 1px solid rgba(221, 213, 201, 0.85);
+                        border-left: 6px solid var(--secondary);
+                        box-shadow: var(--shadow);
+                    }
+
+                    .kpi-card.success {
+                        border-left-color: var(--primary);
+                    }
+
+                    .kpi-card.warning {
+                        border-left-color: var(--tertiary);
+                    }
+
+                    .kpi-title {
+                        font-size: 11px;
+                        text-transform: uppercase;
+                        color: var(--muted);
+                        font-weight: 800;
+                        letter-spacing: 0.05em;
+                        margin-bottom: 8px;
+                    }
+
+                    .kpi-value {
+                        font-size: 22px;
+                        font-weight: 800;
+                        color: var(--text);
+                    }
+
+                    /* 2-column layout for personal info */
+                    .info-grid {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 24px;
+                        margin-bottom: 30px;
+                    }
+
                     .info-section {
-                        background: #fff;
-                        padding: 15px;
-                        border: 1px solid #e9ecef;
-                        border-radius: 4px;
+                        background: var(--surface);
+                        padding: 24px;
+                        border: 1px solid rgba(221, 213, 201, 0.85);
+                        border-radius: 22px;
+                        box-shadow: var(--shadow);
                     }
 
                     .info-section h3 {
+                        font-family: 'Literata', Georgia, serif;
                         margin-top: 0;
-                        margin-bottom: 15px;
-                        font-size: 16px;
-                        border-bottom: 1px solid #dee2e6;
-                        padding-bottom: 5px;
-                        color: #495057;
+                        margin-bottom: 20px;
+                        font-size: 18px;
+                        border-bottom: 1px solid var(--line);
+                        padding-bottom: 10px;
+                        color: var(--text);
                     }
 
                     .info-row {
                         display: flex;
-                        margin-bottom: 10px;
+                        margin-bottom: 12px;
                         font-size: 14px;
                     }
 
                     .info-label {
-                        width: 140px;
-                        font-weight: 600;
-                        color: #495057;
+                        width: 160px;
+                        font-weight: 700;
+                        color: var(--muted);
                     }
 
                     .info-value {
                         flex: 1;
-                        color: #212529;
+                        color: var(--text);
                     }
 
-                    /* Badge trạng thái */
+                    /* Status badge */
                     .badge {
                         display: inline-block;
-                        padding: 2px 8px;
-                        font-size: 12px;
-                        font-weight: 600;
-                        border-radius: 4px;
+                        padding: 4px 10px;
+                        font-size: 11px;
+                        font-weight: 800;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                        border-radius: 12px;
                     }
 
                     .badge-active {
-                        background-color: #d1e7dd;
-                        color: #0f5132;
+                        background-color: var(--primary-soft);
+                        color: var(--primary);
                     }
 
                     .badge-inactive {
-                        background-color: #f8d7da;
-                        color: #842029;
+                        background-color: var(--danger-soft);
+                        color: var(--danger);
                     }
 
                     .badge-role {
-                        background-color: #e9ecef;
-                        color: #495057;
-                        border: 1px solid #ced4da;
+                        background-color: var(--surface-soft);
+                        color: var(--muted);
+                        border: 1px solid var(--line);
                     }
 
-                    /* CSS Hệ thống Tabs xử lý luồng lịch sử giao dịch */
+                    /* Tabs Handling */
                     .tabs-container {
                         margin-top: 30px;
                     }
 
                     .tab-menu {
                         display: flex;
-                        border-bottom: 1px solid #dee2e6;
-                        margin-bottom: 15px;
+                        border-bottom: 1px solid var(--line);
+                        margin-bottom: 20px;
                         padding: 0;
                         list-style: none;
                     }
 
                     .tab-item {
-                        padding: 10px 20px;
+                        padding: 12px 24px;
                         cursor: pointer;
-                        font-weight: 600;
+                        font-weight: 800;
                         font-size: 14px;
-                        color: #495057;
+                        color: var(--muted);
                         border: 1px solid transparent;
                         border-bottom: none;
                         margin-bottom: -1px;
+                        border-radius: 16px 16px 0 0;
+                        transition: all 0.2s ease;
                     }
 
                     .tab-item:hover {
-                        color: #0056b3;
-                        background-color: #f8f9fa;
+                        color: var(--primary);
+                        background-color: var(--primary-soft);
                     }
 
                     .tab-item.active {
-                        color: #007bff;
-                        background-color: #fff;
-                        border-color: #dee2e6 #dee2e6 #fff;
-                        border-radius: 4px 4px 0 0;
+                        color: var(--primary);
+                        background-color: var(--surface);
+                        border-color: rgba(221, 213, 201, 0.85) rgba(221, 213, 201, 0.85) var(--bg);
                     }
 
                     .tab-content {
@@ -209,369 +195,391 @@
                         display: block;
                     }
 
-                    /* Table chuẩn FPT hiển thị danh sách con */
-                    .data-table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        font-size: 14px;
-                        margin-bottom: 15px;
-                    }
-
-                    .data-table th,
-                    .data-table td {
-                        border: 1px solid #dee2e6;
-                        padding: 10px;
-                        text-align: left;
-                    }
-
-                    .data-table th {
-                        background-color: #f1f3f5;
-                        font-weight: 600;
-                    }
-
-                    .data-table tbody tr:hover {
-                        background-color: #f8f9fa;
-                    }
-
                     .text-right {
                         text-align: right;
                     }
 
                     .no-data {
                         text-align: center;
-                        color: #6c757d;
-                        padding: 20px !important;
+                        color: var(--muted);
+                        padding: 30px !important;
+                        font-style: italic;
                     }
 
-                    /* Nút hành động thao tác nhanh */
+                    /* Action buttons & links */
                     .btn-action-sm {
-                        padding: 4px 10px;
+                        display: inline-block;
+                        padding: 6px 14px;
                         font-size: 12px;
+                        font-weight: 800;
                         text-decoration: none;
-                        border-radius: 4px;
-                        color: #fff;
-                        background-color: #17a2b8;
+                        border-radius: 999px;
+                        background-color: var(--primary-soft);
+                        color: var(--primary) !important;
+                        transition: all 0.2s ease;
                     }
 
                     .btn-action-sm:hover {
-                        background-color: #138496;
+                        background-color: var(--primary);
+                        color: #fff !important;
                     }
 
                     .btn-group {
-                        margin-top: 25px;
+                        margin-top: 30px;
                         display: flex;
-                        gap: 10px;
+                        gap: 12px;
                     }
 
                     .btn-edit {
-                        color: #fff;
-                        background-color: #007bff;
-                        padding: 8px 20px;
+                        display: inline-block;
+                        color: #fff !important;
+                        background-color: var(--primary);
+                        padding: 10px 24px;
                         font-size: 14px;
-                        border-radius: 4px;
+                        font-weight: 800;
+                        border-radius: 999px;
                         text-decoration: none;
+                        box-shadow: var(--shadow);
+                        transition: all 0.2s ease;
                     }
 
                     .btn-edit:hover {
-                        background-color: #0069d9;
+                        transform: translateY(-2px);
+                        filter: brightness(1.1);
                     }
 
                     .btn-back {
-                        color: #212529;
-                        background-color: #e2e6ea;
-                        padding: 8px 20px;
+                        display: inline-block;
+                        color: var(--text) !important;
+                        background-color: var(--surface-soft);
+                        padding: 10px 24px;
                         font-size: 14px;
-                        border-radius: 4px;
+                        font-weight: 800;
+                        border-radius: 999px;
                         text-decoration: none;
-                        border: 1px solid #dae0e5;
+                        border: 1px solid var(--line);
+                        transition: all 0.2s ease;
                     }
 
                     .btn-back:hover {
-                        background-color: #d3d9df;
+                        background-color: var(--surface-strong);
+                        transform: translateY(-2px);
                     }
                 </style>
             </head>
 
             <body>
-                <main class="container">
-                    <div class="nav-links">
-                        <a href="${pageContext.request.contextPath}/customer/list">Customer List</a>
-                        <a href="${pageContext.request.contextPath}/dashboard">DashBoard</a>
-                    </div>
-
-                    <div class="header-section">
-                        <div>
-                            <h1>Customer Profile</h1>
-                            <span style="color: #6c757d; font-size: 14px;">ID: ${cusDTO.customer.customerId} | User ID:
-                                ${cusDTO.customer.userId}</span>
-                        </div>
-                    </div>
-
-                    <div class="kpi-container">
-                        <div class="kpi-card">
-                            <div class="kpi-title">Total Orders Placed</div>
-                            <div class="kpi-value">${listOrdersForCus.size() != null ? listOrdersForCus.size() : 0} Orders</div>
-                        </div>
-                        <div class="kpi-card success">
-                            <div class="kpi-title">Total Paid Amount</div>
-                            <div class="kpi-value">
-                                <fmt:formatNumber value="${totalPaid != null ? totalPaid : 0}" type="currency"
-                                    currencySymbol="VND" maxFractionDigits="0" />
-                            </div>
-                        </div>
-                        <div class="kpi-card warning">
-                            <div class="kpi-title">Account Status</div>
-                            <div class="kpi-value" style="font-size: 18px; padding-top: 2px;">
-                                <span
-                                    class="badge ${cusDTO.user.status == 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">${cusDTO.user.status}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="info-grid">
-                        <div class="info-section">
-                            <h3>Account & Contact Info</h3>
-                            <div class="info-row">
-                                <div class="info-label">Username:</div>
-                                <div class="info-value">${cusDTO.user.userName}</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Full Name:</div>
-                                <div class="info-value">${not empty cusDTO.user.fullName ? cusDTO.user.fullName : 'N/A'}
+                <div class="dashboard-shell">
+                    <jsp:include page="/views/shared/sidebar.jsp">
+                        <jsp:param name="activeMenu" value="customers" />
+                    </jsp:include>
+                    <main class="main legacy-page">
+                        <div class="container">
+                            <div class="header-section">
+                                <div>
+                                    <h1>Customer Profile</h1>
+                                    <span style="color: var(--muted); font-size: 14px;">ID:
+                                        ${cusDTO.customerId} |
+                                        User ID: ${cusDTO.userId}</span>
+                                </div>
+                                <div>
+                                    <%-- THEM BAO VE NGHIEP VU: Neu la Sale Staff thi cho phep bam nut tao bao gia nhanh
+                                        cho rieng khach nay --%>
+                                        <c:if test="${sessionScope.user.roleId == 4}">
+                                            <a href="${pageContext.request.contextPath}/quotation/create?customerId=${cusDTO.customerId}"
+                                                class="btn-edit">+ Quick Quotation</a>
+                                        </c:if>
                                 </div>
                             </div>
-                            <div class="info-row">
-                                <div class="info-label">Email Address:</div>
-                                <div class="info-value">${cusDTO.user.email}</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Phone Number:</div>
-                                <div class="info-value">${not empty cusDTO.user.phone ? cusDTO.user.phone : 'N/A'}</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">System Role:</div>
-                                <div class="info-value"><span class="badge badge-role">Customer</span></div>
-                            </div>
-                        </div>
 
-                        <div class="info-section">
-                            <h3>Commercial Profile</h3>
-                            <div class="info-row">
-                                <div class="info-label">Company Name:</div>
-                                <div class="info-value"><strong>${cusDTO.customer.companyName}</strong></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Tax Code:</div>
-                                <div class="info-value">${not empty cusDTO.customer.taxCode ? cusDTO.customer.taxCode :
-                                    'N/A'}</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Customer Type:</div>
-                                <div class="info-value">${cusDTO.customer.customerType}</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Assigned To Sale:</div>
-                                <div class="info-value" style="color: #0056b3; font-weight: 600;">
-                                    <c:choose>
-                                        <c:when test="${not empty cusDTO.customer.assignedToUserId}">
-                                            <c:forEach var="u" items="${users}">
-                                                <c:if test="${cusDTO.customer.assignedToUserId == u.userId}">
-                                                    ${u.fullName} (${u.userName})
-                                                </c:if>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise><span class="text-muted"
-                                                style="font-weight: 400;">Unassigned</span></c:otherwise>
-                                    </c:choose>
+                            <div class="kpi-container">
+                                <div class="kpi-card">
+                                    <div class="kpi-title">Total Orders Placed</div>
+                                    <div class="kpi-value">${listOrdersForCus != null ? listOrdersForCus.size() : 0}
+                                        Orders</div>
+                                </div>
+                                <div class="kpi-card success">
+                                    <div class="kpi-title">Total Paid Amount</div>
+                                    <div class="kpi-value">
+                                        <fmt:formatNumber value="${totalPaid != null ? totalPaid : 0}" type="currency"
+                                            currencySymbol="VND" maxFractionDigits="0" />
+                                    </div>
+                                </div>
+                                <div class="kpi-card warning">
+                                    <div class="kpi-title">Account Status</div>
+                                    <div class="kpi-value" style="font-size: 18px; padding-top: 2px;">
+                                        <span
+                                            class="badge ${cusDTO.status == 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">${cusDTO.status}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="tabs-container">
-                        <ul class="tab-menu">
-                            <li class="tab-item active" onclick="switchTab(event, 'quotationsTab')">Quotations
-                                (${listQuotationsForCus.size() != null ? listQuotationsForCus.size() : 0})</li>
-                            <li class="tab-item" onclick="switchTab(event, 'contractsTab')">Contracts & Signatures
-                                (${listContractsForCus.size() != null ? listContractsForCus.size() : 0})</li>
-                            <li class="tab-item" onclick="switchTab(event, 'ordersTab')">Orders Progress
-                                (${listOrdersForCus.size() != null ? listOrdersForCus.size() : 0})</li>
-                            <li class="tab-item" onclick="switchTab(event, 'billingTab')">Invoices & Payments</li>
-                        </ul>
+                            <div class="info-grid">
+                                <div class="info-section">
+                                    <h3>Account & Contact Info</h3>
+                                    <div class="info-row">
+                                        <div class="info-label">Username:</div>
+                                        <div class="info-value">${cusDTO.userName}</div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Full Name:</div>
+                                        <div class="info-value">${not empty cusDTO.fullName ? cusDTO.fullName
+                                            : 'N/A'}</div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Email Address:</div>
+                                        <div class="info-value">${cusDTO.email}</div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Phone Number:</div>
+                                        <div class="info-value">${not empty cusDTO.phone ? cusDTO.phone :
+                                            'N/A'}</div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">System Role:</div>
+                                        <div class="info-value"><span class="badge badge-role">Customer</span></div>
+                                    </div>
+                                </div>
 
-                        <div id="quotationsTab" class="tab-content active">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Quotation ID</th>
-                                        <th>Quotation Date</th>
-                                        <th>Status</th>
-                                        <th>Created By</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:choose>
-                                        <c:when test="${not empty listQuotationsForCus}">
-                                            <c:forEach var="q" items="${listQuotationsForCus}">
-                                                <tr>
-                                                    <td>#${q.quotationId}</td>
-                                                    <td>${q.formattedQuotationDate}</td>
-                                                    <td><span class="badge" style="background-color: #e2e3e5; color: #383d41;">${q.quotationStatus}</span></td>
-                                                    <td>${not empty q.createdByName ? q.createdByName : 'N/A'}</td>
-                                                    <td><a href="${pageContext.request.contextPath}/quotation-detail?id=${q.quotationId}" class="btn-action-sm">View Details</a></td>
-                                                </tr>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise>
+                                <div class="info-section">
+                                    <h3>Commercial Profile</h3>
+                                    <div class="info-row">
+                                        <div class="info-label">Company Name:</div>
+                                        <div class="info-value"><strong>${cusDTO.companyName}</strong></div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Tax Code:</div>
+                                        <div class="info-value">${not empty cusDTO.taxCode ?
+                                            cusDTO.taxCode : 'N/A'}</div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Customer Type:</div>
+                                        <div class="info-value">${cusDTO.customerType}</div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Assigned To Sale:</div>
+                                        <div class="info-value" style="color: var(--primary); font-weight: 700;">
+                                            <c:choose>
+                                                <c:when test="${not empty cusDTO.assignedToUserId}">
+                                                    <c:forEach var="u" items="${users}">
+                                                        <c:if test="${cusDTO.assignedToUserId == u.userId}">
+                                                            ${u.fullName} (${u.userName})
+                                                        </c:if>
+                                                    </c:forEach>
+                                                </c:when>
+                                                <c:otherwise><span class="text-muted"
+                                                        style="font-weight: 400;">Unassigned</span></c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tabs-container">
+                                <ul class="tab-menu">
+                                    <li class="tab-item active" onclick="switchTab(event, 'quotationsTab')">Quotations
+                                        (${listQuotationsForCus != null ? listQuotationsForCus.size() : 0})</li>
+                                    <li class="tab-item" onclick="switchTab(event, 'contractsTab')">Contracts &
+                                        Signatures (${listContractsForCus != null ? listContractsForCus.size() : 0})
+                                    </li>
+                                    <li class="tab-item" onclick="switchTab(event, 'ordersTab')">Orders Progress
+                                        (${listOrdersForCus != null ? listOrdersForCus.size() : 0})</li>
+                                    <li class="tab-item" onclick="switchTab(event, 'billingTab')">Invoices & Payments
+                                    </li>
+                                </ul>
+
+                                <div id="quotationsTab" class="tab-content active">
+                                    <table>
+                                        <thead>
                                             <tr>
-                                                <td colspan="5" class="no-data">No quotations recorded for this client.
-                                                </td>
+                                                <th>Quotation ID</th>
+                                                <th>Quotation Date</th>
+                                                <th>Status</th>
+                                                <th>Created By</th>
+                                                <th>Action</th>
                                             </tr>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </tbody>
-                            </table>
-                        </div>
+                                        </thead>
+                                        <tbody>
+                                            <c:choose>
+                                                <c:when test="${not empty listQuotationsForCus}">
+                                                    <c:forEach var="q" items="${listQuotationsForCus}">
+                                                        <tr>
+                                                            <td>#${q.quotationId}</td>
+                                                            <td>${q.formattedQuotationDate}</td>
+                                                            <td><span class="badge"
+                                                                    style="background-color: #e2e3e5; color: #383d41;">${q.quotationStatus}</span>
+                                                            </td>
+                                                            <td>${not empty q.createdByName ? q.createdByName : 'N/A'}
+                                                            </td>
+                                                            <td><a href="${pageContext.request.contextPath}/quotation-detail?id=${q.quotationId}"
+                                                                    class="btn-action-sm">View Details</a></td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <tr>
+                                                        <td colspan="5" class="no-data">No quotations recorded for this
+                                                            client.
+                                                        </td>
+                                                    </tr>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                        <div id="contractsTab" class="tab-content">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Contract No.</th>
-                                        <th>Version</th>
-                                        <th>Status</th>
-                                        <th>Signed At</th>
-                                        <th>Documents</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:choose>
-                                        <c:when test="${not empty listContractsForCus}">
-                                            <c:forEach var="c" items="${listContractsForCus}">
-                                                <tr>
-                                                    <td>
-                                                        <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">
-                                                            ${c.contractNumber}
-                                                        </a>
-                                                    </td>
-                                                    <td>v${c.contractVersion}</td>
-                                                    <td><span class="badge" style="background-color: #e2e3e5; color: #383d41;">${c.contractStatus}</span></td>
-                                                    <td>${c.formattedSignDate}</td>
-                                                    <td>
-                                                        <c:choose>
-                                                            <c:when test="${not empty c.contractFileUrl}">
-                                                                <a href="${pageContext.request.contextPath}/${c.contractFileUrl}" target="_blank" class="btn-action-sm" style="background-color: #28a745;">Download</a>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <span style="color: #6c757d; font-style: italic;">No Document</span>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </td>
-                                                </tr>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise>
+                                <div id="contractsTab" class="tab-content">
+                                    <table>
+                                        <thead>
                                             <tr>
-                                                <td colspan="5" class="no-data">No legal contracts initialized.</td>
+                                                <th>Contract No.</th>
+                                                <th>Version</th>
+                                                <th>Status</th>
+                                                <th>Signed At</th>
+                                                <th>Documents</th>
                                             </tr>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </tbody>
-                            </table>
-                        </div>
+                                        </thead>
+                                        <tbody>
+                                            <c:choose>
+                                                <c:when test="${not empty listContractsForCus}">
+                                                    <c:forEach var="c" items="${listContractsForCus}">
+                                                        <tr>
+                                                            <td>
+                                                                <a
+                                                                    href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">
+                                                                    ${c.contractNumber}
+                                                                </a>
+                                                            </td>
+                                                            <td>v${c.contractVersion}</td>
+                                                            <td><span class="badge"
+                                                                    style="background-color: #e2e3e5; color: #383d41;">${c.contractStatus}</span>
+                                                            </td>
+                                                            <td>${c.formattedSignDate}</td>
+                                                            <td>
+                                                                <c:choose>
+                                                                    <c:when test="${not empty c.contractFileUrl}">
+                                                                        <a href="${pageContext.request.contextPath}/${c.contractFileUrl}"
+                                                                            target="_blank" class="btn-action-sm"
+                                                                            style="background-color: #28a745;">Download</a>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span
+                                                                            style="color: #6c757d; font-style: italic;">No
+                                                                            Document</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <tr>
+                                                        <td colspan="5" class="no-data">No legal contracts initialized.
+                                                        </td>
+                                                    </tr>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                        <div id="ordersTab" class="tab-content">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Order ID</th>
-                                        <th>Date Created</th>
-                                        <th>Current Status</th>
-                                        <th>Details</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:choose>
-                                        <c:when test="${not empty listOrdersForCus}">
-                                            <c:forEach var="o" items="${listOrdersForCus}">
-                                                <tr>
-                                                    <td>#${o.customerOrder.customerOrderId}</td>
-                                                    <td>${o.customerOrder.formattedCreatedAt}</td>
-                                                    <td><span class="badge"
-                                                            style="background-color: #e2e3e5; color: #383d41;">${o.customerOrder.orderStatus}</span>
-                                                    </td>
-                                                    <td><a
-                                                            href="${pageContext.request.contextPath}/order/detail?id=${o.customerOrder.customerOrderId}" class="btn-action-sm">View
-                                                            Details</a></td>
-                                                </tr>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise>
+                                <div id="ordersTab" class="tab-content">
+                                    <table>
+                                        <thead>
                                             <tr>
-                                                <td colspan="4" class="no-data">No product orders have been executed.
-                                                </td>
+                                                <th>Order ID</th>
+                                                <th>Date Created</th>
+                                                <th>Current Status</th>
+                                                <th>Handler</th>
                                             </tr>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </tbody>
-                            </table>
-                        </div>
+                                        </thead>
+                                        <tbody>
+                                            <c:choose>
+                                                <c:when test="${not empty listOrdersForCus}">
+                                                    <c:forEach var="o" items="${listOrdersForCus}">
+                                                        <tr>
+                                                            <td>#${o.customerOrder.customerOrderId}</td>
+                                                            <td>${o.customerOrder.formattedCreatedAt}</td>
+                                                            <td><span class="badge"
+                                                                    style="background-color: #e2e3e5; color: #383d41;">${o.customerOrder.orderStatus}</span>
+                                                            </td>
+                                                            <td><a href="${pageContext.request.contextPath}/customer-order-detail?id=${o.customerOrder.customerOrderId}"
+                                                                    class="btn-action-sm">View
+                                                                    Details
+                                                                </a></td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <tr>
+                                                        <td colspan="4" class="no-data">No product orders have been
+                                                            executed.
+                                                        </td>
+                                                    </tr>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                        <div id="billingTab" class="tab-content">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Invoice No.</th>
-                                        <th>Issue Date</th>
-                                        <th>Amount Paid</th>
-                                        <th>Payment Type</th>
-                                        <th>Payment Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:choose>
-                                        <c:when test="${not empty listBillings}">
-                                            <!-- chua co -->
-                                        </c:when>
-                                        <c:otherwise>
+                                <div id="billingTab" class="tab-content">
+                                    <table>
+                                        <thead>
                                             <tr>
-                                                <td colspan="5" class="no-data">No financial statements or payments
-                                                    found.</td>
+                                                <th>Invoice No.</th>
+                                                <th>Issue Date</th>
+                                                <th>Amount Paid</th>
+                                                <th>Payment Type</th>
+                                                <th>Payment Status</th>
                                             </tr>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </tbody>
-                            </table>
+                                        </thead>
+                                        <tbody style="background: none;">
+                                            <c:choose>
+                                                <c:when test="${not empty listBillings}">
+                                                    <!-- not yet available -->
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <tr>
+                                                        <td colspan="5" class="no-data">No financial statements or
+                                                            payments found.</td>
+                                                    </tr>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="btn-group">
+                                <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customerId}"
+                                    class="btn-edit">Edit Profile</a>
+                                <a href="${pageContext.request.contextPath}/customer/list" class="btn-back">Back to
+                                    List</a>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="btn-group">
-                        <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customer.customerId}"
-                            class="btn-edit">Edit Profile</a>
-                        <a href="${pageContext.request.contextPath}/customer/list" class="btn-back">Back to List</a>
-                    </div>
-                </main>
+                        <script>
+                            function switchTab(event, tabId) {
+                                // 1. Hide all tab contents currently displayed
+                                const tabContents = document.getElementsByClassName("tab-content");
+                                for (let i = 0; i < tabContents.length; i++) {
+                                    tabContents[i].classList.remove("active");
+                                }
 
-                <script>
-                    function switchTab(event, tabId) {
-                        // 1. Ẩn toàn bộ nội dung của các tab đang hiển thị
-                        const tabContents = document.getElementsByClassName("tab-content");
-                        for (let i = 0; i < tabContents.length; i++) {
-                            tabContents[i].classList.remove("active");
-                        }
+                                // 2. Remove active state from old tab items
+                                const tabItems = document.getElementsByClassName("tab-item");
+                                for (let i = 0; i < tabItems.length; i++) {
+                                    tabItems[i].classList.remove("active");
+                                }
 
-                        // 2. Gỡ bỏ trạng thái active của các nút tab menu cũ
-                        const tabItems = document.getElementsByClassName("tab-item");
-                        for (let i = 0; i < tabItems.length; i++) {
-                            tabItems[i].classList.remove("active");
-                        }
+                                // 3. Show clicked tab content and activate corresponding tab item
+                                document.getElementById(tabId).classList.add("active");
+                                event.currentTarget.classList.add("active");
+                            }
+                        </script>
 
-                        // 3. Hiển thị nội dung của tab được click và bật trạng thái active cho nút tương ứng
-                        document.getElementById(tabId).classList.add("active");
-                        event.currentTarget.classList.add("active");
-                    }
-                </script>
+                    </main>
+                </div>
             </body>
 
             </html>

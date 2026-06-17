@@ -22,7 +22,7 @@ public class QuotationDAO extends DBContext {
                 + "FROM quotation "
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
                 + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
-                + "ORDER BY quotation.created_at DESC";
+                + "ORDER BY quotation.quotation_id ASC";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -65,7 +65,7 @@ public class QuotationDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql += " AND quotation.quotation_status = ? "; // Them dau cach
         }
-        sql += " ORDER BY quotation.created_at DESC";
+        sql += " ORDER BY quotation.quotation_id ASC";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -349,7 +349,7 @@ public class QuotationDAO extends DBContext {
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
                 + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
                 + "WHERE quotation.customer_id = ? "
-                + "ORDER BY quotation.created_at DESC";
+                + "ORDER BY quotation.quotation_id ASC";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, customerId);
@@ -376,4 +376,22 @@ public class QuotationDAO extends DBContext {
         return list;
     }
     // Xhieu - end
+    /*
+     * Xoa 1 dong san pham khoi quotation_detail.
+     */
+    public boolean deleteQuotationDetail(int quotationDetailId) {
+        String sql = "DELETE FROM quotation_detail WHERE quotation_detail_id = ?";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, quotationDetailId);
+
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (Exception e) {
+            System.out.println("deleteQuotationDetail error: " + e.getMessage());
+        }
+
+        return false;
+    }
 }

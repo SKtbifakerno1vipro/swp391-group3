@@ -500,11 +500,6 @@ GO
 USE SWP_Sales_Process;
 GO
 
--- Xoa du lieu rac cu neu co trong 2 bang nay đe lam sach
-DELETE FROM customer_order_detail;
-DELETE FROM customer_order;
-GO
-
 -- ==========================================================
 -- SU DUNG VONG LAP ĐE CHEN ĐONG 30 ĐON HANG KHONG LO LOI ID
 -- ==========================================================
@@ -598,8 +593,10 @@ UNION ALL
 SELECT 'Tổng số chi tiết đơn' AS [Bảng], COUNT(*) AS [Số lượng] FROM customer_order_detail;
 GO
 
+select * from [customer_order]
 select * from [user]
 select * from [Customer]
+select * from [role]
 UPDATE customer
 SET customer_type = 'LOYAL CUSTOMER'
 WHERE customer_type = 'B2B';
@@ -607,3 +604,7 @@ GO
 
 USE SWP_Sales_Process;
 GO
+
+SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name
+                , address, phone, account_status, created_at, updated_at, role_id 
+                FROM [user] WHERE 1=2 or role_id = 4

@@ -35,10 +35,10 @@ public class UserService {
         return userDAO.updateUser(user);
     }
 
-        public String getUsernameById(int userId) {
+    public String getUsernameById(int userId) {
         if (userId <= 0) return "N/A";
         User u = userDAO.getUserById(userId);
-        return (u != null) ? u.getUserName() : "Khng tm thy";
+        return (u != null) ? u.getUserName() : "Không tìm thấy";
     }
 
     public User findUserByUsername(String username) {
@@ -92,8 +92,8 @@ public class UserService {
         return userDAO.createUserFullParameter(user, conn);
     }
 
-    public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer role_id) {
-        return userDAO.searchUserFieldsByOR(userName, phone, email, role_id);
+    public List<User> searchUserFieldsByOR(String userName, String phone, String email, Integer roleId) {
+        return userDAO.searchUserFieldsByOR(userName, phone, email, roleId);
     }
 
     public Connection getConnection() {
@@ -105,13 +105,13 @@ public class UserService {
         User u = getUserByIdFullParameter(userId);
         if (currentPassword != null) { // ko co pass la quen mat khau
             if (!BCrypt.checkpw(currentPassword, u.getPassword())) {
-                return "Mt khu hin ti khng chnh xc!";
+                return "Mật khẩu hiện tại không chính xác!";
             }
         }
         // 3. Thuc hien cap nhat mat khau moi vao DB
         boolean isUpdateSuccess = userDAO.updatePassword(userId, newPassword);
         if (!isUpdateSuccess) {
-            return " xy ra li h thng khi cp nht d liu. Vui lng th li sau!";
+            return "Đã xảy ra lỗi hệ thống khi cập nhật dữ liệu. Vui lòng thử lại sau!";
         }
         return null;
     }

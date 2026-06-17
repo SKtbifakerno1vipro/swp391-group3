@@ -93,6 +93,60 @@ public class QuotationService {
 
         return updated;
     }
+    /*
+     * Tao quotation moi voi nhieu san pham.
+     * Buoc 1: tao quotation de lay quotationId.
+     * Buoc 2: lap qua tung detail va insert vao quotation_detail.
+     */
+    public boolean createQuotation(Quotation quotation, List<QuotationDetail> details) {
+        int quotationId = quotationDAO.createQuotation(quotation);
+
+        if (quotationId == -1) {
+            return false;
+        }
+
+        boolean allDetailsCreated = true;
+
+        for (QuotationDetail detail : details) {
+            detail.setQuotationId(quotationId);
+            boolean detailCreated = quotationDAO.addQuotationDetail(detail);
+
+            if (!detailCreated) {
+                allDetailsCreated = false;
+            }
+        }
+
+        if (allDetailsCreated) {
+            quotationDAO.addQuotationHistory(quotationId, quotation.getCreatedBy(), "Tao quotation moi voi " + details.size() + " san pham");
+        }
+
+        return allDetailsCreated;
+    }
+    /*
+     * Them 1 san pham moi vao quotation dang co va ghi lich su.
+     */
+    public boolean addProductToQuotation(QuotationDetail detail, Integer userId) {
+        boolean added = quotationDAO.addQuotationDetail(detail);
+
+        if (added) {
+            quotationDAO.addQuotationHistory(detail.getQuotationId(), userId, "Them san pham vao quotation");
+        }
+
+        return added;
+    }
+
+    /*
+     * Xoa 1 san pham khoi quotation dang co va ghi lich su.
+     */
+    public boolean deleteProductFromQuotation(int quotationId, int quotationDetailId, Integer userId) {
+        boolean deleted = quotationDAO.deleteQuotationDetail(quotationDetailId);
+
+        if (deleted) {
+            quotationDAO.addQuotationHistory(quotationId, userId, "Xoa san pham khoi quotation");
+        }
+
+        return deleted;
+    }
 
     public void updateStatus(int quotationId, String status) {
         quotationDAO.updateStatus(quotationId, status);
