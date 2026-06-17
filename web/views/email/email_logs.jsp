@@ -40,6 +40,103 @@
             text-decoration: underline;
             color: var(--primary);
         }
+        /* Search Form & Inputs Styling */
+        .search-form-responsive {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: var(--surface) !important;
+            border: 1px solid rgba(221, 213, 201, 0.85) !important;
+            border-radius: 22px !important;
+            box-shadow: var(--shadow) !important;
+            padding: 22px !important;
+            margin: 16px 0 22px !important;
+        }
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .search-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .inputs-grid input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 14px !important;
+            font-size: 14px !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 12px !important;
+            color: var(--text) !important;
+            background-color: #fff !important;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .inputs-grid input:focus {
+            border-color: var(--primary) !important;
+        }
+        .actions-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .btn-search {
+            padding: 10px 24px !important;
+            background-color: var(--primary) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 999px !important;
+            font-weight: 800 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease;
+        }
+        .btn-search:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+        .btn-clear {
+            padding: 10px 24px !important;
+            background-color: var(--surface-soft) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 999px !important;
+            text-decoration: none !important;
+            font-weight: 800 !important;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+        .btn-clear:hover {
+            background-color: var(--surface-strong) !important;
+            transform: translateY(-2px);
+        }
+        .pagination-container a,
+        .pagination-container span,
+        .pagination-container strong {
+            margin: 0 4px;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .pagination-container a {
+            border: 1px solid var(--line);
+            color: var(--primary);
+            font-weight: 800;
+        }
+        .pagination-container strong {
+            border: 1px solid var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
         /* Modal simple style */
         .modal {
             display: none;
@@ -86,11 +183,35 @@
             <h2>Email Activity Logs</h2>
             <p style="color: var(--muted); margin-bottom: 20px;">Review all outgoing system email communications (such as password recovery OTPs).</p>
             
+            <form action="${pageContext.request.contextPath}/email/logs" method="GET" class="search-form-responsive">
+                <div class="search-group">
+                    <label class="search-label">Search Filters:</label>
+                    <div class="inputs-grid">
+                        <input type="text" name="searchEmail" value="${searchEmail}" placeholder="Recipient Email..." />
+                        <input type="text" name="searchUsername" value="${searchUsername}" placeholder="Recipient Username..." />
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase;">From Date/Time</span>
+                            <input type="datetime-local" name="startDate" value="${startDate}" />
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase;">To Date/Time</span>
+                            <input type="datetime-local" name="endDate" value="${endDate}" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-group">
+                    <button type="submit" class="btn-search">Search</button>
+                    <a href="${pageContext.request.contextPath}/email/logs" class="btn-clear">Clear Filter</a>
+                </div>
+            </form>
+
             <table>
                 <thead>
                     <tr>
                         <th>Log ID</th>
-                        <th>Recipient</th>
+                        <th>Recipient Email</th>
+                        <th>Recipient Username</th>
                         <th>Subject</th>
                         <th>Content Preview</th>
                         <th>Sent At</th>
@@ -100,13 +221,14 @@
                 <tbody>
                     <c:if test="${empty emailLogs}">
                         <tr>
-                            <td colspan="6" style="text-align: center;">No email logs found.</td>
+                            <td colspan="7" style="text-align: center;">No email logs found.</td>
                         </tr>
                     </c:if>
                     <c:forEach var="log" items="${emailLogs}">
                         <tr>
                             <td>${log.logId}</td>
                             <td><strong>${log.recipient}</strong></td>
+                            <td><c:out value="${not empty log.userName ? log.userName : 'N/A'}"/></td>
                             <td>${log.subject}</td>
                             <td class="content-cell" onclick="showModal('${log.logId}')">
                                 Click to view content
@@ -122,6 +244,57 @@
                     </c:forEach>
                 </tbody>
             </table>
+
+            <c:set var="currentPage" value="${empty currentPage ? 1 : currentPage}" />
+            <c:set var="totalPages" value="${empty totalPages ? 1 : totalPages}" />
+
+            <c:if test="${totalPages > 1}">
+                <div class="pagination-container" style="margin-top: 20px; text-align: center;">
+
+                    <%-- Calculate page range for buttons --%>
+                    <c:set var="startPage" value="${currentPage - 2}" />
+                    <c:if test="${startPage < 1}">
+                        <c:set var="startPage" value="1" />
+                    </c:if>
+                    <c:set var="endPage" value="${startPage + 4}" />
+                    <c:if test="${endPage > totalPages}">
+                        <c:set var="endPage" value="${totalPages}" />
+                        <c:set var="startPage" value="${endPage - 4 < 1 ? 1 : endPage - 4}" />
+                    </c:if>
+
+                    <%-- Back button (<) --%>
+                    <c:choose>
+                        <c:when test="${currentPage > 1}">
+                            <a href="${pageContext.request.contextPath}/email/logs?page=${currentPage - 1}&searchEmail=${searchEmail}&searchUsername=${searchUsername}&startDate=${startDate}&endDate=${endDate}">&lt;</a>
+                        </c:when>
+                        <c:otherwise>
+                            <span style="color: #999; border: 1px solid #ddd; padding: 5px 10px;">&lt;</span>
+                        </c:otherwise>
+                    </c:choose>
+
+                    <%-- Loop to show page numbers --%>
+                    <c:forEach var="i" begin="${startPage}" end="${endPage}">
+                        <c:choose>
+                            <c:when test="${i == currentPage}">
+                                <strong>${i}</strong>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${pageContext.request.contextPath}/email/logs?page=${i}&searchEmail=${searchEmail}&searchUsername=${searchUsername}&startDate=${startDate}&endDate=${endDate}">${i}</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:forEach>
+
+                    <%-- Next button (>) --%>
+                    <c:choose>
+                        <c:when test="${currentPage < totalPages}">
+                            <a href="${pageContext.request.contextPath}/email/logs?page=${currentPage + 1}&searchEmail=${searchEmail}&searchUsername=${searchUsername}&startDate=${startDate}&endDate=${endDate}">&gt;</a>
+                        </c:when>
+                        <c:otherwise>
+                            <span style="color: #999; border: 1px solid #ddd; padding: 5px 10px;">&gt;</span>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </c:if>
         </main>
     </div>
 

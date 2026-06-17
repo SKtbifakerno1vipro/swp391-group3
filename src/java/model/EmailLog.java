@@ -9,17 +9,27 @@ public class EmailLog {
     private String content;
     private Timestamp sentAt;
     private String status;
+    private String userName;
 
     public EmailLog() {
     }
 
-    public EmailLog(int logId, String recipient, String subject, String content, Timestamp sentAt, String status) {
+    public EmailLog(int logId, String recipient, String subject, String content, Timestamp sentAt, String status, String userName) {
         this.logId = logId;
         this.recipient = recipient;
         this.subject = subject;
         this.content = content;
         this.sentAt = sentAt;
         this.status = status;
+        this.userName = userName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public int getLogId() {
