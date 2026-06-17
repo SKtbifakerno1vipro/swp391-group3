@@ -110,11 +110,13 @@
                 <hr>
 
                 <c:choose>
-                    <%-- 1. TRẠNG THÁI: DRAFT / PENDING_REVIEW --%>
-                    <c:when test="${contract.contractStatus == 'DRAFT' or contract.contractStatus == 'PENDING_REVIEW'}">
+                    <%-- 1. Status: DRAFT / PENDING_REVIEW --%>
+                    <c:when test="${contract.contractStatus == 'DRAFT' 
+                                    or contract.contractStatus == 'PENDING_REVIEW'}">
+                            
                         <!-- Manager (Role 2) -->
                         <c:if test="${sessionScope.user.roleId == 2}">
-                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Edit Request</button>
+                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Request edit</button>
                             <form method="POST" action="contract-detail" style="margin:0;">
                                 <input type="hidden" name="action" value="approve"/>
                                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
@@ -140,9 +142,9 @@
                             <form method="POST" action="contract-detail" style="margin:0;">
                                 <input type="hidden" name="action" value="customer_approve"/>
                                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
-                                <button type="submit" class="btn btn-green">Đồng ý hợp đồng (Approve)</button>
+                                <button type="submit" class="btn btn-green">Approve</button>
                             </form>
-                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Edit Request</button>
+                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Edit request</button>
                         </c:if>
                     </c:when>
 
@@ -158,10 +160,10 @@
 
             <!-- CỘT 2: CONTENT -->
             <div class="content">
-                <h3>Chi tiết Nội dung</h3>
+                <h3>Content Details</h3>
                 <div style="background: #fdfdfd; padding: 15px; border: 1px solid #eee; margin-bottom: 15px; border-radius: 4px;">
                     <p style="margin: 0 0 5px 0;"><strong>Customer</strong> ${contract.customerName}</p>
-                    <p style="margin: 0;"><strong>Loại lưu trữ:</strong> ${contract.storageType}</p>
+                    <p style="margin: 0;"><strong>Storage type:</strong> ${contract.storageType}</p>
                 </div>
                 <div style="border: 1px solid #ddd; padding: 20px; background: #fff; min-height: 500px; overflow-x: auto;">
                     ${contract.contractContent}
@@ -170,14 +172,14 @@
 
             <!-- CỘT 3: HISTORY -->
             <div class="history">
-                <h3>Edit request history</h3>
-                <c:choose>Edit request history
+                <h3>Contract history</h3>
+                <c:choose>
                     <c:when test="${not empty historyList}">
                         <div style="max-height: 600px; overflow-y: auto;">
                             <c:forEach var="h" items="${historyList}">
                                 <div style="border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px;">
                                     <p style="margin: 0 0 5px 0; color: #666; font-size: 0.9em;">🕒 ${h.createdAt}</p>
-                                    <p style="margin: 0 0 5px 0;"><strong>Statusi:</strong> ${h.toStatus}</p>
+                                    <p style="margin: 0 0 5px 0;"><strong>Status:</strong> ${h.toStatus}</p>
                                     <p style="margin: 0 0 10px 0;"><strong>By:</strong> ${h.changedByName}</p>
                                     <c:if test="${not empty h.revisionItems}">
                                         <button class="btn btn-blue" style="padding: 5px 10px; font-size: 0.85em; width: auto;" onclick="viewHistoryDetail(${h.historyId})">View detail</button>

@@ -317,7 +317,12 @@ public class ContractDAO extends DBContext {
     // Lấy lịch sử và danh sách item liên quan
     public List<ContractHistory> getHistoriesByContractId(int contractId) {
         List<ContractHistory> list = new ArrayList<>();
-        String sql = "SELECT h.*, u.user_name FROM contract_edit_history h LEFT JOIN [user] u ON h.changed_by = u.user_id WHERE h.contract_id = ? ORDER BY h.created_at DESC";
+        String sql = "SELECT h.*, u.user_name "
+                + "FROM contract_edit_history h "
+                + "LEFT JOIN [user] u "
+                + "ON h.changed_by = u.user_id "
+                + "WHERE h.contract_id = ? "
+                + "ORDER BY h.created_at DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
             ResultSet rs = ps.executeQuery();
@@ -407,7 +412,7 @@ public class ContractDAO extends DBContext {
         return items;
     }
 
-    public java.math.BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
+    public BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
 
         String sql = """
                      SELECT SUM(
