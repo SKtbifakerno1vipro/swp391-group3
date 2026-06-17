@@ -1,7 +1,8 @@
 package controller.contract;
 
 import dal.ContractDAO;
-import model.Contract;
+import dto.CustomerDTO;
+import model.*;
 import model.ContractHistory;
 import model.ContractRevisionItem;
 import model.User;
@@ -14,11 +15,15 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import service.ContractService;
+import service.CustomerService;
+import service.SignatureService;
 
 @WebServlet("/contract-detail")
 public class ContractDetailController extends HttpServlet {
 
     private ContractService contractService = new ContractService();
+    private SignatureService sService = new SignatureService();
+    private CustomerService cService = new CustomerService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,6 +44,19 @@ public class ContractDetailController extends HttpServlet {
 
                 if (contract != null) {
                     List<ContractHistory> historyList = contractService.getHistoriesByContractId(id);
+//nguyenkien begin
+                    CustomerDTO c = cService.getCustomerDTOByCusId(contract.getCustomerId());
+                    Signature sig = sService.getSignatureByContractIdAndSignerId(id, c.getCustomer().getUserId());
+
+                    String finalHtml = contract.getContractContent();
+
+                    if (sig != null) {
+
+                        String imgTag = "<div style=\"height: 100px;\" id=\"seller\">" + "<img src='File?name=" + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>" + "</div>";
+                        finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
+                    } 
+                    contract.setContractContent(finalHtml);
+//nguyen kien end
                     request.setAttribute("contract", contract);
                     request.setAttribute("historyList", historyList);
 

@@ -197,6 +197,7 @@
                     </c:when>
                     <c:otherwise><p style="color: #888;">Not have any history</p></c:otherwise>
                 </c:choose>
+                    <a href="Signature?contractId=${contract.contractId}&customerId=${contract.customerId}"><button>Sign Contract</button></a>
             </div>
         </div>
 

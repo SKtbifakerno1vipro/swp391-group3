@@ -3,17 +3,23 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
-import  java.sql.Timestamp;
+
+import java.sql.Timestamp;
+
 /**
  *
  * @author ADMIN
  */
 public class Signature {
+
     private int id;
+    private int customerContractId;
     private String fileName;
     private String fileUrl;
+    private Integer signerUserId;
     private String signerName;
     private Timestamp signedAt;
+    private Integer uploadedBy;
     private Timestamp uploadedAt;
 
     public Signature() {
@@ -25,6 +31,14 @@ public class Signature {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getCustomerContractId() {
+        return customerContractId;
+    }
+
+    public void setCustomerContractId(int customerContractId) {
+        this.customerContractId = customerContractId;
     }
 
     public String getFileName() {
@@ -43,6 +57,14 @@ public class Signature {
         this.fileUrl = fileUrl;
     }
 
+    public Integer getSignerUserId() {
+        return signerUserId;
+    }
+
+    public void setSignerUserId(Integer signerUserId) {
+        this.signerUserId = signerUserId;
+    }
+
     public String getSignerName() {
         return signerName;
     }
@@ -59,6 +81,14 @@ public class Signature {
         this.signedAt = signedAt;
     }
 
+    public Integer getUploadedBy() {
+        return uploadedBy;
+    }
+
+    public void setUploadedBy(Integer uploadedBy) {
+        this.uploadedBy = uploadedBy;
+    }
+
     public Timestamp getUploadedAt() {
         return uploadedAt;
     }
@@ -66,6 +96,5 @@ public class Signature {
     public void setUploadedAt(Timestamp uploadedAt) {
         this.uploadedAt = uploadedAt;
     }
-    
-    
+
 }
