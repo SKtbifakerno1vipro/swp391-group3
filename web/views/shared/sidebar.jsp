@@ -2,7 +2,12 @@
     <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         <aside class="sidebar">
             <div class="brand">
-                <div class="brand-mark"><span class="material-symbols-outlined">bakery_dining</span></div>
+                <div class="brand-mark brand-logo-wrap"
+                    style="width:52px;height:52px;min-width:52px;max-width:52px;overflow:hidden;border-radius:50%;background:#fff;">
+                    <img class="brand-logo" src="${pageContext.request.contextPath}/assets/img/po-bread-logo.jpg"
+                        alt="Po Bread logo"
+                        style="width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;display:block;">
+                </div>
                 <div>
                     <h1 class="brand-title">Po Bread</h1>
                     <p class="brand-subtitle">Sales Process Portal</p>
