@@ -15,7 +15,7 @@
 <body>
         <div class="dashboard-shell">
             <jsp:include page="/views/shared/sidebar.jsp">
-                <jsp:param name="activeMenu" value="products"/>
+                <jsp:param name="activeMenu" value="categories"/>
             </jsp:include>
             <main class="main legacy-page">
     <h2>Sửa danh mục</h2>

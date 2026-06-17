@@ -27,6 +27,9 @@
                 <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
                     href="${pageContext.request.contextPath}/product-list"><span
                         class="material-symbols-outlined">inventory_2</span>Products</a>
+                <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}"
+                    href="${pageContext.request.contextPath}/category/list"><span
+                        class="material-symbols-outlined">category</span>Categories</a>
                 <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
                     href="${pageContext.request.contextPath}/quotation-list"><span
                         class="material-symbols-outlined">request_quote</span>Quotations</a>
