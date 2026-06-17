@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.*;
 import dal.*;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/contract-list")
 public class ContractListController extends HttpServlet {
@@ -23,6 +24,13 @@ public class ContractListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect("login");
+            return;
+        }
 
         // 1. LAY THAM SO TIM KIEM
         String contractNumber = request.getParameter("contractNumber");
@@ -46,12 +54,13 @@ public class ContractListController extends HttpServlet {
 
         int pageSize = 10;
 
-        List<Contract> list = dao.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize);
+        List<Contract> list = dao.searchContracts(contractNumber, customerName, status, storageType, pageIndex, 
+                pageSize, currentUser.getUserId(), currentUser.getRoleId());
         int totalRecord = dao.getTotalContracts(contractNumber, customerName, status, storageType);
 
         // Tinh toan trang cuoi
         int endPage = (int) Math.ceil((double) totalRecord / pageSize);
-        
+
         if (pageIndex > endPage && endPage > 0) {
             pageIndex = endPage;
         }
