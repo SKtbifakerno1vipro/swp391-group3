@@ -376,4 +376,22 @@ public class QuotationDAO extends DBContext {
         return list;
     }
     // Xhieu - end
+    /*
+     * Xoa 1 dong san pham khoi quotation_detail.
+     */
+    public boolean deleteQuotationDetail(int quotationDetailId) {
+        String sql = "DELETE FROM quotation_detail WHERE quotation_detail_id = ?";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, quotationDetailId);
+
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (Exception e) {
+            System.out.println("deleteQuotationDetail error: " + e.getMessage());
+        }
+
+        return false;
+    }
 }

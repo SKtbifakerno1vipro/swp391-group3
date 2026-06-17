@@ -25,11 +25,11 @@ public class CustomerService {
     // new
     
     public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String searchSdt, String searchEmail, String searchMst,
-            String typeCus, int page, int pageSize) {
+            String typeCus, Integer assignedToUserId, int page, int pageSize) {
         
         List<CustomerDTO> dtoList = new ArrayList<>();
 
-        List<Customer> customerList = customerDAO.searchAndPaginateCustomers(searchName,searchSdt,searchEmail,searchMst, typeCus, page, pageSize);
+        List<Customer> customerList = customerDAO.searchAndPaginateCustomers(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId, page, pageSize);
         if (customerList == null || customerList.isEmpty()) {
             return dtoList; 
         }
@@ -44,16 +44,16 @@ public class CustomerService {
         for (Customer c : customerList) {
             User u = userMap.get(c.getUserId());
             if (u != null) {
-                dtoList.add(new CustomerDTO(c, u, null));
+                dtoList.add(new CustomerDTO(c, u));
             }
         }
         return dtoList;
     }
     // new 
     public int getTotalPages(String searchName, String searchSdt, String searchEmail, String searchMst,
-            String typeCus, int pageSize) {
+            String typeCus, Integer assignedToUserId, int pageSize) {
         // Goi ham đem tong so dong thoa man đieu kien loc duoi DAO
-        int totalRecords = customerDAO.getTotalCustomersCount(searchName, searchSdt, searchEmail, searchMst, typeCus);
+        int totalRecords = customerDAO.getTotalCustomersCount(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId);
         
         if (totalRecords == 0) return 1;
         
@@ -82,7 +82,7 @@ public class CustomerService {
             User u = userMap.get(c.getUserId());
 
             if (u != null) {
-                CustomerDTO dto = new CustomerDTO(c, u, "Customer");
+                CustomerDTO dto = new CustomerDTO(c, u);
                 dtoList.add(dto);
             }
         }
@@ -102,7 +102,7 @@ public class CustomerService {
     if (u == null) {
         return null;
     }
-    CustomerDTO dto = new CustomerDTO(c, u, "Customer");
+    CustomerDTO dto = new CustomerDTO(c, u);
     return dto;
 }
     // new

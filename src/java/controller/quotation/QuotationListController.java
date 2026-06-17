@@ -17,6 +17,9 @@ public class QuotationListController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         String searchText = request.getParameter("search");
+        if (searchText != null) {
+            searchText = searchText.trim().replaceAll("\\s+", " ");
+        }
                
         String status = request.getParameter("status");
         

@@ -171,26 +171,41 @@
                         <a href="${pageContext.request.contextPath}/customer/create">Add Customer</a>
                     </div>
 
-                    <form action="${pageContext.request.contextPath}/customer/list" method="GET" class="search-form-responsive">
+                    <form action="${pageContext.request.contextPath}/customer/list" method="GET"
+                        class="search-form-responsive">
                         <div class="search-group">
                             <label class="search-label">Search Filters:</label>
                             <div class="inputs-grid">
-                                <input type="text" name="searchName" value="${searchName}" placeholder="Enter name..." />
+                                <input type="text" name="searchName" value="${searchName}"
+                                    placeholder="Enter name..." />
                                 <input type="text" name="searchSdt" value="${searchSdt}" placeholder="Enter phone..." />
-                                <input type="text" name="searchEmail" value="${searchEmail}" placeholder="Enter email..." />
-                                <input type="text" name="searchMst" value="${searchMst}" placeholder="Enter tax code..." />
+                                <input type="text" name="searchEmail" value="${searchEmail}"
+                                    placeholder="Enter email..." />
+                                <input type="text" name="searchMst" value="${searchMst}"
+                                    placeholder="Enter tax code..." />
                                 <select name="type">
                                     <option value="">-- All Types --</option>
                                     <c:forEach var="typeCus" items="${listTypeCus}">
-                                        <option value="${typeCus}" ${type eq typeCus ? 'selected' : '' }>${typeCus}</option>
+                                        <option value="${typeCus}" ${type eq typeCus ? 'selected' : '' }>${typeCus}
+                                        </option>
                                     </c:forEach>
                                 </select>
+                                <c:if test="${sessionScope.user.roleId != 4}">
+                                    <select name="assignedToUserId">
+                                        <option value="">-- All Sale Staff --</option>
+                                        <c:forEach var="sale" items="${listSales}">
+                                            <option value="${sale.userId}" ${assignedToUserId eq sale.userId
+                                                ? 'selected' : '' }>${sale.fullName}</option>
+                                        </c:forEach>
+                                    </select>
+                                </c:if>
                             </div>
                         </div>
 
                         <div class="actions-group">
                             <button type="submit" class="btn-search">Search</button>
-                            <a href="${pageContext.request.contextPath}/customer/list" class="btn-clear">Clear Filter</a>
+                            <a href="${pageContext.request.contextPath}/customer/list" class="btn-clear">Clear
+                                Filter</a>
                         </div>
                     </form>
 
@@ -203,6 +218,7 @@
                                 <th>Email</th>
                                 <th>Phone Number</th>
                                 <th>Tax Code</th>
+                                <th>Assigned Sale Staff</th>
                                 <th>Status</th>
                                 <th>Created At</th>
                                 <th>Last Updated</th>
@@ -210,26 +226,35 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <c:if test="${empty customers}">
+                            <c:if test="${empty customersDTOs}">
                                 <tr>
-                                    <td colspan="10" style="text-align: center;">No customer data found</td>
+                                    <td colspan="11" style="text-align: center;">No customer data found</td>
                                 </tr>
                             </c:if>
 
-                            <c:forEach var="cust" items="${customers}">
+                            <c:forEach var="cust" items="${customersDTOs}">
                                 <tr>
-                                    <td>${cust.customer.customerId}</td>
-                                    <td><strong>${cust.user.fullName}</strong></td>
-                                    <td>${cust.customer.companyName}</td>
-                                    <td>${cust.user.email}</td>
-                                    <td>${cust.user.phone}</td>
-                                    <td>${cust.customer.taxCode}</td>
-                                    <td><span>${cust.user.status}</span></td>
-                                    <td>${cust.user.createTimeString}</td>
-                                    <td>${cust.user.updateTimeString}</td>
+                                    <td>${cust.customerId}</td>
+                                    <td><strong>${cust.fullName}</strong></td>
+                                    <td>${cust.companyName}</td>
+                                    <td>${cust.email}</td>
+                                    <td>${cust.phone}</td>
+                                    <td>${cust.taxCode}</td>
+                                    <td>
+                                        <c:set var="assignedName" value="Unassigned" />
+                                        <c:forEach var="sale" items="${listSales}">
+                                            <c:if test="${cust.assignedToUserId eq sale.userId}">
+                                                <c:set var="assignedName" value="${sale.fullName}" />
+                                            </c:if>
+                                        </c:forEach>
+                                        ${assignedName}
+                                    </td>
+                                    <td><span>${cust.status}</span></td>
+                                    <td>${cust.createTimeString}</td>
+                                    <td>${cust.updateTimeString}</td>
                                     <td>
                                         <a
-                                            href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customer.customerId}">Detail</a>
+                                            href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customerId}">Detail</a>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -257,7 +282,7 @@
                                     <c:choose>
                                         <c:when test="${currentPage > 1}">
                                             <a
-                                                href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">&lt;</a>
+                                                href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}&assignedToUserId=${assignedToUserId}">&lt;</a>
                                         </c:when>
                                         <c:otherwise>
                                             <span
@@ -273,7 +298,7 @@
                                                 </c:when>
                                                 <c:otherwise>
                                                     <a
-                                                        href="${pageContext.request.contextPath}/customer/list?page=${i}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">${i}</a>
+                                                        href="${pageContext.request.contextPath}/customer/list?page=${i}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}&assignedToUserId=${assignedToUserId}">${i}</a>
                                                 </c:otherwise>
                                             </c:choose>
                                         </c:forEach>
@@ -282,7 +307,7 @@
                                             <c:choose>
                                                 <c:when test="${currentPage < totalPages}">
                                                     <a
-                                                        href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}">&gt;</a>
+                                                        href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}&assignedToUserId=${assignedToUserId}">&gt;</a>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <span

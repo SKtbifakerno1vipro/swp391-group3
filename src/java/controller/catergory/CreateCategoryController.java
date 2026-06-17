@@ -16,7 +16,7 @@ public class CreateCategoryController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/views/category/create.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/category/category_create.jsp").forward(request, response);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class CreateCategoryController extends HttpServlet {
         if (categoryName == null || categoryName.trim().isEmpty()) {
             request.setAttribute("error", "Vui lòng nhập tên danh mục!");
             request.setAttribute("categoryName", categoryName);
-            request.getRequestDispatcher("/views/category/create.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/category/category_create.jsp").forward(request, response);
             return;
         }
 
@@ -37,7 +37,7 @@ public class CreateCategoryController extends HttpServlet {
         if (categoryService.isCategoryNameExists(categoryName)) {
             request.setAttribute("error", "Tên danh mục này đã tồn tại!");
             request.setAttribute("categoryName", categoryName);
-            request.getRequestDispatcher("/views/category/create.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/category/category_create.jsp").forward(request, response);
             return;
         }
 
@@ -47,7 +47,7 @@ public class CreateCategoryController extends HttpServlet {
         } else {
             request.setAttribute("error", "Lỗi khi thêm danh mục vào database!");
             request.setAttribute("categoryName", categoryName);
-            request.getRequestDispatcher("/views/category/create.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/category/category_create.jsp").forward(request, response);
         }
     }
 }

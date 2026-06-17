@@ -191,7 +191,7 @@ public class CustomerDAO extends DBContext {
     }
 
     public List<Customer> searchAndPaginateCustomers(String searchName, String searchSdt, String searchEmail, String searchMst,
-            String typeCus, int page, int pageSize) {
+            String typeCus, Integer assignedToUserId, int page, int pageSize) {
         List<Customer> list = new ArrayList<>();
 
         // 1. Khoi tao cau lenh SQL co ban
@@ -209,6 +209,7 @@ public class CustomerDAO extends DBContext {
         boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
         boolean hasMst = (searchMst != null && !searchMst.isBlank());
         boolean hasType = (typeCus != null && !typeCus.isBlank());
+        boolean hasAssigned = (assignedToUserId != null && assignedToUserId > 0);
 
         if (hasName) {
             sql.append("AND u.full_name LIKE ? ");
@@ -232,8 +233,11 @@ public class CustomerDAO extends DBContext {
         if (hasType) {
             sql.append("AND c.customer_type = ? ");
         }
+        if (hasAssigned) {
+            sql.append("AND c.assigned_to_user_id = ? ");
+        }
 
-        // 3. Ã„Âuoi phan trang co Ã„â€˜inh
+        // 3. Ã„Â uoi phan trang co Ã„â€˜inh
         sql.append("ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
         int offset = (page - 1) * pageSize;
@@ -257,6 +261,9 @@ public class CustomerDAO extends DBContext {
             if (hasType) {
                 stm.setString(index++, typeCus.trim());
             }
+            if (hasAssigned) {
+                stm.setInt(index++, assignedToUserId);
+            }
 
             // 5. Gan tham so phan trang luon o cuoi cung
             stm.setInt(index++, offset);
@@ -276,7 +283,7 @@ public class CustomerDAO extends DBContext {
     }
 
     public int getTotalCustomersCount(String searchName, String searchSdt, String searchEmail, String searchMst,
-            String typeCus) {
+            String typeCus, Integer assignedToUserId) {
 
         // 1. Khoi tao cau lenh SQL co ban
         StringBuilder sql = new StringBuilder(
@@ -292,6 +299,7 @@ public class CustomerDAO extends DBContext {
         boolean hasEmail = (searchEmail != null && !searchEmail.isBlank());
         boolean hasMst = (searchMst != null && !searchMst.isBlank());
         boolean hasType = (typeCus != null && !typeCus.isBlank());
+        boolean hasAssigned = (assignedToUserId != null && assignedToUserId > 0);
 
         if (hasName) {
             sql.append("AND u.full_name LIKE ? ");
@@ -307,6 +315,9 @@ public class CustomerDAO extends DBContext {
         }
         if (hasType) {
             sql.append("AND c.customer_type = ? ");
+        }
+        if (hasAssigned) {
+            sql.append("AND c.assigned_to_user_id = ? ");
         }
 
         try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
@@ -327,6 +338,9 @@ public class CustomerDAO extends DBContext {
             }
             if (hasType) {
                 stm.setString(index++, typeCus.trim());
+            }
+            if (hasAssigned) {
+                stm.setInt(index++, assignedToUserId);
             }
             // 6. Thuc thi truy van
             try (ResultSet rs = stm.executeQuery()) {
