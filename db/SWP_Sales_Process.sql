@@ -220,7 +220,7 @@ CREATE TABLE signature (
     file_url NVARCHAR(1000),
     signer_user_id INT NULL,
     signer_name NVARCHAR(255),
-    signer_type VARCHAR(50),
+    --signer_type VARCHAR(50), DROP COLUMN
     signed_at DATETIME,
     uploaded_by INT,
     uploaded_at DATETIME DEFAULT GETDATE(),

@@ -142,48 +142,50 @@ public class SecurityFilter implements Filter {
             "/category/delete"
     );
 //update security bo comment di 
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-        String path = req.getServletPath();
-
-        if (isStaticResource(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        HttpSession session = req.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
-
-        if (user == null) {
-            res.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
-        if (LOGGED_IN_URLS.contains(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-        
-        if (path.startsWith("/views/")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (hasPermission(user.getRoleId(), path)) {
-            chain.doFilter(request, response);
-        } else {
-            System.out.println("Access Denied: Role " + user.getRoleId() + " tried to access " + path);
-            res.sendRedirect(req.getContextPath() + "/dashboard?error=denied");
-        }
+//        HttpServletRequest req = (HttpServletRequest) request;
+//        HttpServletResponse res = (HttpServletResponse) response;
+//        String path = req.getServletPath();
+//
+//        if (isStaticResource(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        HttpSession session = req.getSession(false);
+//        User user = (session != null) ? (User) session.getAttribute("user") : null;
+//
+//        if (user == null) {
+//            res.sendRedirect(req.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        if (LOGGED_IN_URLS.contains(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//        
+//        if (path.startsWith("/views/")) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (hasPermission(user.getRoleId(), path)) {
+//            chain.doFilter(request, response);
+//        } else {
+//            System.out.println("Access Denied: Role " + user.getRoleId() + " tried to access " + path);
+//            res.sendRedirect(req.getContextPath() + "/dashboard?error=denied");
+//        }
+        chain.doFilter(request, response);
     }
 
     private boolean hasPermission(int roleId, String path) {
@@ -228,11 +230,11 @@ public class SecurityFilter implements Filter {
                 || path.endsWith(".woff")
                 || path.endsWith(".woff2");
     }
-    
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }
-    
+
     @Override
     public void destroy() {
     }

@@ -195,6 +195,7 @@
                     </c:when>
                     <c:otherwise><p style="color: #888;">Chưa có lịch sử.</p></c:otherwise>
                 </c:choose>
+                    <a href="Signature?contractId=${contract.contractId}&customerId=${contract.customerId}"><button>Sign Contract</button></a>
             </div>
         </div>
 

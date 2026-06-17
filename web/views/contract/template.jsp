@@ -65,10 +65,23 @@
     <p style="font-weight: bold; margin-top: 10px;">Điều 11: Hiệu lực của hợp đồng</p>
     <p style="margin: 0;">Hợp đồng có hiệu lực từ ngày <strong>{effective_date}</strong> đến ngày <strong>{end_date}</strong>.</p>
 
-    <table style="width: 100%; margin-top: 40px;">
-        <tr>
-            <td style="width: 50%; text-align: center;"><strong>ĐẠI DIỆN BÊN A</strong><br><br><br><br><strong>{company_rep}</strong></td>
-            <td style="width: 50%; text-align: center;"><strong>ĐẠI DIỆN BÊN B</strong><br><br><br><br><strong>{customer_name}</strong></td>
-        </tr>
-    </table>
+    <table style="width: 100%; margin-top: 40px; border-collapse: collapse;">
+    <tr>
+        <!-- Thêm style vertical-align: top; vào đây -->
+        <td style="width: 40%; text-align: center; vertical-align: top;">
+            <strong>ĐẠI DIỆN BÊN A</strong>
+            <div style="height: 100px;">
+                <!-- Ảnh chữ ký bên A nếu có -->
+            </div>
+            <strong>{company_rep}</strong>
+        </td>
+        <td style="width: 20%;"></td>
+        <!-- Và cả ở đây -->
+        <td style="width: 40%; text-align: center; vertical-align: top;">
+            <strong>ĐẠI DIỆN BÊN B</strong><br>
+            <div style="height: 100px;" id="seller"></div>
+            <strong>{customer_name}</strong>
+        </td>
+    </tr>
+</table>
 </div>
