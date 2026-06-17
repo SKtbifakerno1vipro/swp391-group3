@@ -39,12 +39,12 @@ public class ContractDAO extends DBContext {
         return -1;
     }
 
-    public List<Contract> searchContracts(String contractNumber, String customerName, String status, String storageType, int pageIndex, int pageSize) {
+    public List<Contract> searchContracts(String contractNumber, String customerName, String status, String storageType, int pageIndex, int pageSize, int userId, int roleId) {
         List<Contract> list = new ArrayList<>();
-        String sql = "SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type, "
-                + "c.effective_date, c.end_date, c.created_at, cust.company_name "
-                + "FROM customer_contract c LEFT JOIN customer cust ON c.customer_id = cust.customer_id "
-                + "WHERE 1=1 ";
+        String sql = """
+                     SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type,  c.effective_date, c.end_date, c.created_at,
+                     cust.company_name, cust.user_id FROM customer_contract c LEFT JOIN customer cust
+                     ON c.customer_id = cust.customer_id  WHERE 1=1 """;
 
         if (contractNumber != null && !contractNumber.trim().isEmpty()) {
             sql += " AND c.contract_number LIKE ? ";
@@ -57,6 +57,9 @@ public class ContractDAO extends DBContext {
         }
         if (storageType != null && !storageType.trim().isEmpty()) {
             sql += " AND c.storage_type = ? ";
+        }
+        if (userId != 0 && userId > 0 && roleId == 3) {
+            sql += " and cust.user_id= ? ";
         }
 
         sql += " ORDER BY c.created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
@@ -75,6 +78,10 @@ public class ContractDAO extends DBContext {
             if (storageType != null && !storageType.trim().isEmpty()) {
                 ps.setString(index++, storageType);
             }
+              if (userId != 0 && userId > 0 && roleId == 3) {
+                  ps.setInt(index++, userId);
+              }
+            
             ps.setInt(index++, (pageIndex - 1) * pageSize);
             ps.setInt(index++, pageSize);
 
@@ -145,7 +152,10 @@ public class ContractDAO extends DBContext {
     }
 
     public Contract getContractById(int id) {
-        String sql = "SELECT * FROM customer_contract WHERE customer_contract_id = ?";
+        String sql = """
+                     SELECT *, cu.company_name FROM customer_contract  co 
+                     join dbo.customer cu on co.customer_id= cu.customer_id
+                     WHERE customer_contract_id = ?""";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -153,6 +163,7 @@ public class ContractDAO extends DBContext {
                     Contract c = new Contract();
                     c.setContractId(rs.getInt("customer_contract_id"));
                     c.setCustomerId(rs.getInt("customer_id"));
+                    c.setCustomerName(rs.getString("company_name"));
                     c.setQuotationId(rs.getInt("quotation_id"));
                     c.setContractNumber(rs.getString("contract_number"));
                     c.setContractContent(rs.getString("contract_content"));

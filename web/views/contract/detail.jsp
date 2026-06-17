@@ -100,13 +100,13 @@
         </style>
     </head>
     <body>
-        <h2>Quản lý Hợp đồng: ${contract.contractNumber}</h2>
+        <h2>No Contract: ${contract.contractNumber}</h2>
 
         <div class="layout-container">
             <!-- CỘT 1: SIDEBAR (Menu & Actions) -->
             <div class="sidebar">
-                <h3>Thao tác Hợp đồng</h3>
-                <p><strong>Trạng thái:</strong> <span style="color: red; font-weight: bold;">${contract.contractStatus}</span></p>
+                <h3>Action For Contract</h3>
+                <p><strong>Status</strong> <span style="color: red; font-weight: bold;">${contract.contractStatus}</span></p>
                 <hr>
 
                 <c:choose>
@@ -114,21 +114,21 @@
                     <c:when test="${contract.contractStatus == 'DRAFT' or contract.contractStatus == 'PENDING_REVIEW'}">
                         <!-- Manager (Role 2) -->
                         <c:if test="${sessionScope.user.roleId == 2}">
-                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Yêu cầu sửa đổi</button>
+                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Edit Request</button>
                             <form method="POST" action="contract-detail" style="margin:0;">
                                 <input type="hidden" name="action" value="approve"/>
                                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
-                                <button type="submit" class="btn btn-green">Phê duyệt (Approve)</button>
+                                <button type="submit" class="btn btn-green">Approve</button>
                             </form>
                         </c:if>
 
                         <!-- Admin Officer (Role 5) -->
                         <c:if test="${sessionScope.user.roleId == 5}">
-                            <a href="contract-save?id=${contract.contractId}" class="btn btn-blue">Chỉnh sửa HTML</a>
+                            <a href="contract-save?id=${contract.contractId}" class="btn btn-blue">Edit Contract</a>
                             <form method="POST" action="contract-detail" style="margin:0;">
                                 <input type="hidden" name="action" value="send_to_manager"/>
                                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
-                                <button type="submit" class="btn btn-gray">Gửi lại cho Manager</button>
+                                <button type="submit" class="btn btn-gray">Send to Manager</button>
                             </form>
                         </c:if>
                     </c:when>
@@ -142,25 +142,25 @@
                                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
                                 <button type="submit" class="btn btn-green">Đồng ý hợp đồng (Approve)</button>
                             </form>
-                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Yêu cầu sửa đổi</button>
+                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Edit Request</button>
                         </c:if>
                     </c:when>
 
                     <%-- 3. TRẠNG THÁI: APPROVED --%>
                     <c:when test="${contract.contractStatus == 'APPROVED'}">
-                        <p style="color: green; text-align: center; font-weight: bold;">Hợp đồng đã được phê duyệt!</p>
+                        <p style="color: green; text-align: center; font-weight: bold;">Contract Approved</p>
                     </c:when>
                 </c:choose>
 
                 <hr>
-                <a href="contract-list" style="color: #007bff; text-decoration: none;">⬅ Quay lại danh sách</a>
+                <a href="contract-list" style="color: #007bff; text-decoration: none;">⬅ Back to contract list</a>
             </div>
 
             <!-- CỘT 2: CONTENT -->
             <div class="content">
                 <h3>Chi tiết Nội dung</h3>
                 <div style="background: #fdfdfd; padding: 15px; border: 1px solid #eee; margin-bottom: 15px; border-radius: 4px;">
-                    <p style="margin: 0 0 5px 0;"><strong>Khách hàng:</strong> ${contract.customerName}</p>
+                    <p style="margin: 0 0 5px 0;"><strong>Customer</strong> ${contract.customerName}</p>
                     <p style="margin: 0;"><strong>Loại lưu trữ:</strong> ${contract.storageType}</p>
                 </div>
                 <div style="border: 1px solid #ddd; padding: 20px; background: #fff; min-height: 500px; overflow-x: auto;">
