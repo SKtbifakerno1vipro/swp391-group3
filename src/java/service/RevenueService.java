@@ -10,15 +10,15 @@ public class RevenueService {
         revenueDAO = new RevenueDAO();
     }
 
-    public Map<String, Double> getRevenueByDay(String startDate, String endDate) {
-        return revenueDAO.getRevenueByDay(startDate, endDate);
+    public Map<String, Double> getRevenueByDay(String startDate, String endDate, Integer userId) {
+        return revenueDAO.getRevenueByDay(startDate, endDate, userId);
     }
 
-    public Map<String, Double> getRevenueByMonth(String startDate, String endDate) {
-        return revenueDAO.getRevenueByMonth(startDate, endDate);
+    public Map<String, Double> getRevenueByMonth(String startDate, String endDate, Integer userId) {
+        return revenueDAO.getRevenueByMonth(startDate, endDate, userId);
     }
 
-    public Map<String, Double> getRevenueByYear(String startDate, String endDate) {
-        return revenueDAO.getRevenueByYear(startDate, endDate);
+    public Map<String, Double> getRevenueByYear(String startDate, String endDate, Integer userId) {
+        return revenueDAO.getRevenueByYear(startDate, endDate, userId);
     }
 }

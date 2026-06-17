@@ -116,7 +116,8 @@ public class SecurityFilter implements Filter {
             "/customer-order-detail",
             "/create-customer-order",
             "/product-list",
-            "/category/list"
+            "/category/list",
+            "/revenue-report"
     );
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(

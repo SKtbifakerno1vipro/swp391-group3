@@ -82,7 +82,7 @@
                             <tr>
                                 <td style="font-weight: 700;">${entry.key}</td>
                                 <td style="text-align: right; font-weight: 700; color: #4a7c59;">
-                                    <fmt:formatNumber value="${entry.value}" type="currency" currencySymbol="VND" />
+                                    <fmt:formatNumber value="${entry.value}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                                 </td>
                             </tr>
                             <c:set var="totalRevenue" value="${totalRevenue + entry.value}" />
@@ -92,7 +92,7 @@
                         <tr class="total-row">
                             <td style="font-size: 18px;">Total Revenue</td>
                             <td style="text-align: right; font-size: 20px; color: #b1812f;">
-                                <fmt:formatNumber value="${totalRevenue}" type="currency" currencySymbol="VND" />
+                                <fmt:formatNumber value="${totalRevenue}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
                             </td>
                         </tr>
                     </tfoot>

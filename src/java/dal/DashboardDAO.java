@@ -224,7 +224,7 @@ public class DashboardDAO extends DBContext {
         String sql = "SELECT SUM(cod.quantity * cod.selling_price) as total_revenue " +
                      "FROM customer_order_detail cod " +
                      "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id " +
-                     "WHERE co.order_status = 'Completed'";
+                     "WHERE co.order_status IN ('Completed', 'DELIVERED')";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -284,13 +284,13 @@ public class DashboardDAO extends DBContext {
 
 
     public Map<String, Double> getRevenueByMonth() {
-        Map<String, Double> revenueMap = new HashMap<>();
+        Map<String, Double> revenueMap = new LinkedHashMap<>();
         String sql = "SELECT FORMAT(co.created_at, 'yyyy-MM') as month, SUM(cod.quantity * cod.selling_price) as revenue " +
                      "FROM customer_order_detail cod " +
                      "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id " +
-                     "WHERE co.order_status = 'Completed' " +
+                     "WHERE co.order_status IN ('Completed', 'DELIVERED') " +
                      "GROUP BY FORMAT(co.created_at, 'yyyy-MM') " +
-                     "ORDER BY month DESC";
+                     "ORDER BY month ASC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -326,7 +326,7 @@ public class DashboardDAO extends DBContext {
                      "FROM customer_order_detail cod " +
                      "JOIN product p ON cod.product_id = p.product_id " +
                      "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id " +
-                     "WHERE co.order_status = 'Completed' " +
+                     "WHERE co.order_status IN ('Completed', 'DELIVERED') " +
                      "GROUP BY p.product_name " +
                      "ORDER BY total_sold DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -349,7 +349,7 @@ public class DashboardDAO extends DBContext {
     public List<Map<String, Object>> getStaffPerformance() {
         List<Map<String, Object>> list = new ArrayList<>();
         String sql = "SELECT u.full_name, COUNT(DISTINCT co.customer_order_id) as total_orders, " +
-                     "SUM(CASE WHEN co.order_status = 'Completed' THEN cod.quantity * cod.selling_price ELSE 0 END) as total_revenue " +
+                     "SUM(CASE WHEN co.order_status IN ('Completed', 'DELIVERED') THEN cod.quantity * cod.selling_price ELSE 0 END) as total_revenue " +
                      "FROM [user] u " +
                      "JOIN customer_order co ON u.user_id = co.created_by " +
                      "LEFT JOIN customer_order_detail cod ON co.customer_order_id = cod.customer_order_id " +
