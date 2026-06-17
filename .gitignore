@@ -1,0 +1,8 @@
+build/
+dist/
+nbproject/private/
+*.class
+*.jar
+*.war
+*.ear
+*.log
