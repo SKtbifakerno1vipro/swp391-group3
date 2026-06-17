@@ -139,6 +139,50 @@ public class SecurityFilter implements Filter {
             "/category/edit",
             "/category/delete"
     );
+//update security bo comment di 
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        String path = req.getServletPath();
+
+        if (isStaticResource(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        if (LOGGED_IN_URLS.contains(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        if (path.startsWith("/views/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (hasPermission(user.getRoleId(), path)) {
+            chain.doFilter(request, response);
+        } else {
+            System.out.println("Access Denied: Role " + user.getRoleId() + " tried to access " + path);
+            res.sendRedirect(req.getContextPath() + "/dashboard?error=denied");
+        }
+    }
 
     private boolean hasPermission(int roleId, String path) {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
@@ -185,44 +229,6 @@ public class SecurityFilter implements Filter {
     
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-    }
-
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-        String path = req.getServletPath();
-
-       if (isStaticResource(path)) {
-           chain.doFilter(request, response);
-           return;
-       }
-
-       if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("")) {
-           chain.doFilter(request, response);
-           return;
-       }
-
-       HttpSession session = req.getSession(false);
-       User user = (session != null) ? (User) session.getAttribute("user") : null;
-
-       if (user == null) {
-           res.sendRedirect(req.getContextPath() + "/login");
-           return;
-       }
-
-       if (LOGGED_IN_URLS.contains(path)) {
-           chain.doFilter(request, response);
-           return;
-       }
-
-       if (hasPermission(user.getRoleId(), path)) {
-           chain.doFilter(request, response);
-       } else {
-           System.out.println("You are not authorized to perform this action.");
-           res.sendRedirect(req.getContextPath() + "/dashboard");
-       }
     }
     
     @Override
