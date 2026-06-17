@@ -278,14 +278,15 @@
                             <div class="header-section">
                                 <div>
                                     <h1>Customer Profile</h1>
-                                    <span style="color: var(--muted); font-size: 14px;">ID: ${cusDTO.customer.customerId} |
-                                        User ID: ${cusDTO.customer.userId}</span>
+                                    <span style="color: var(--muted); font-size: 14px;">ID:
+                                        ${cusDTO.customerId} |
+                                        User ID: ${cusDTO.userId}</span>
                                 </div>
                                 <div>
                                     <%-- THEM BAO VE NGHIEP VU: Neu la Sale Staff thi cho phep bam nut tao bao gia nhanh
                                         cho rieng khach nay --%>
                                         <c:if test="${sessionScope.user.roleId == 4}">
-                                            <a href="${pageContext.request.contextPath}/quotation/create?customerId=${cusDTO.customer.customerId}"
+                                            <a href="${pageContext.request.contextPath}/quotation/create?customerId=${cusDTO.customerId}"
                                                 class="btn-edit">+ Quick Quotation</a>
                                         </c:if>
                                 </div>
@@ -294,7 +295,8 @@
                             <div class="kpi-container">
                                 <div class="kpi-card">
                                     <div class="kpi-title">Total Orders Placed</div>
-                                    <div class="kpi-value">${totalOrdersCus != null ? totalOrdersCus : 0} Orders</div>
+                                    <div class="kpi-value">${listOrdersForCus != null ? listOrdersForCus.size() : 0}
+                                        Orders</div>
                                 </div>
                                 <div class="kpi-card success">
                                     <div class="kpi-title">Total Paid Amount</div>
@@ -307,7 +309,7 @@
                                     <div class="kpi-title">Account Status</div>
                                     <div class="kpi-value" style="font-size: 18px; padding-top: 2px;">
                                         <span
-                                            class="badge ${cusDTO.user.status == 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">${cusDTO.user.status}</span>
+                                            class="badge ${cusDTO.status == 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">${cusDTO.status}</span>
                                     </div>
                                 </div>
                             </div>
@@ -317,20 +319,20 @@
                                     <h3>Account & Contact Info</h3>
                                     <div class="info-row">
                                         <div class="info-label">Username:</div>
-                                        <div class="info-value">${cusDTO.user.userName}</div>
+                                        <div class="info-value">${cusDTO.userName}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Full Name:</div>
-                                        <div class="info-value">${not empty cusDTO.user.fullName ? cusDTO.user.fullName
+                                        <div class="info-value">${not empty cusDTO.fullName ? cusDTO.fullName
                                             : 'N/A'}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Email Address:</div>
-                                        <div class="info-value">${cusDTO.user.email}</div>
+                                        <div class="info-value">${cusDTO.email}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Phone Number:</div>
-                                        <div class="info-value">${not empty cusDTO.user.phone ? cusDTO.user.phone :
+                                        <div class="info-value">${not empty cusDTO.phone ? cusDTO.phone :
                                             'N/A'}</div>
                                     </div>
                                     <div class="info-row">
@@ -343,24 +345,24 @@
                                     <h3>Commercial Profile</h3>
                                     <div class="info-row">
                                         <div class="info-label">Company Name:</div>
-                                        <div class="info-value"><strong>${cusDTO.customer.companyName}</strong></div>
+                                        <div class="info-value"><strong>${cusDTO.companyName}</strong></div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Tax Code:</div>
-                                        <div class="info-value">${not empty cusDTO.customer.taxCode ?
-                                            cusDTO.customer.taxCode : 'N/A'}</div>
+                                        <div class="info-value">${not empty cusDTO.taxCode ?
+                                            cusDTO.taxCode : 'N/A'}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Customer Type:</div>
-                                        <div class="info-value">${cusDTO.customer.customerType}</div>
+                                        <div class="info-value">${cusDTO.customerType}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Assigned To Sale:</div>
                                         <div class="info-value" style="color: var(--primary); font-weight: 700;">
                                             <c:choose>
-                                                <c:when test="${not empty cusDTO.customer.assignedToUserId}">
+                                                <c:when test="${not empty cusDTO.assignedToUserId}">
                                                     <c:forEach var="u" items="${users}">
-                                                        <c:if test="${cusDTO.customer.assignedToUserId == u.userId}">
+                                                        <c:if test="${cusDTO.assignedToUserId == u.userId}">
                                                             ${u.fullName} (${u.userName})
                                                         </c:if>
                                                     </c:forEach>
@@ -478,7 +480,7 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </tbody>
-                                        </table>
+                                    </table>
                                 </div>
 
                                 <div id="ordersTab" class="tab-content">
@@ -501,7 +503,7 @@
                                                             <td><span class="badge"
                                                                     style="background-color: #e2e3e5; color: #383d41;">${o.customerOrder.orderStatus}</span>
                                                             </td>
-                                                            <td><a href="${pageContext.request.contextPath}/order/detail?id=${o.customerOrder.customerOrderId}"
+                                                            <td><a href="${pageContext.request.contextPath}/customer-order-detail?id=${o.customerOrder.customerOrderId}"
                                                                     class="btn-action-sm">View
                                                                     Details
                                                                 </a></td>
@@ -549,10 +551,10 @@
                             </div>
 
                             <div class="btn-group">
-                                <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customer.customerId}"
+                                <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customerId}"
                                     class="btn-edit">Edit Profile</a>
-                                <a href="${pageContext.request.contextPath}/customer/list"
-                                    class="btn-back">Back to List</a>
+                                <a href="${pageContext.request.contextPath}/customer/list" class="btn-back">Back to
+                                    List</a>
                             </div>
                         </div>
 

@@ -1,8 +1,6 @@
 package model;
 
-import java.time.LocalDateTime;
-
-public class Customer {
+public class Customer{
 
     private int customerId;
     private Integer userId;
@@ -10,8 +8,6 @@ public class Customer {
     private String customerType;
     private String companyName;
     private Integer assignedToUserId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     public Customer() {
     }
@@ -63,21 +59,4 @@ public class Customer {
     public void setAssignedToUserId(Integer assignedToUserId) {
         this.assignedToUserId = assignedToUserId;
     }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
 }

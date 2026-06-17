@@ -28,7 +28,6 @@ public class SecurityFilter implements Filter {
             "/login",
             "/logout",
             "/register",
-            "/reset-password",
             "/auth/forgot",
             "/forgot-password"
     );
@@ -187,7 +186,7 @@ public class SecurityFilter implements Filter {
 
     private boolean hasPermission(int roleId, String path) {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
-
+        System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
         if (roleId == ROLE_SYSTEM_ADMIN) {
             return SYSTEM_ADMIN_URLS.contains(cleanPath);
         }
@@ -227,11 +226,11 @@ public class SecurityFilter implements Filter {
                 || path.endsWith(".woff")
                 || path.endsWith(".woff2");
     }
-
+    
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }
-
+    
     @Override
     public void destroy() {
     }

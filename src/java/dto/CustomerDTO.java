@@ -1,6 +1,7 @@
 package dto;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import model.Customer;
 import model.User;
 
@@ -8,116 +9,15 @@ public class CustomerDTO {
 
     private Customer customer;
     private User user;
-    private String userRoleName;
 
     public CustomerDTO() {
+        this.customer = new Customer();
+        this.user = new User();
     }
 
-    public CustomerDTO(Customer customer, User user, String userRoleName) {
+    public CustomerDTO(Customer customer, User user) {
         this.customer = customer;
         this.user = user;
-        this.userRoleName = userRoleName;
-    }
-    private int customerId;
-    private Integer userId;
-    private String taxCode;
-    private String customerType;
-    private String companyName;
-    private Integer assignedToUserId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    // Additional fields from User table
-    private String address;
-    private String phone;
-    private String email;
-
-    // Getters and Setters
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getTaxCode() {
-        return taxCode;
-    }
-
-    public void setTaxCode(String taxCode) {
-        this.taxCode = taxCode;
-    }
-
-    public String getCustomerType() {
-        return customerType;
-    }
-
-    public void setCustomerType(String customerType) {
-        this.customerType = customerType;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public Integer getAssignedToUserId() {
-        return assignedToUserId;
-    }
-
-    public void setAssignedToUserId(Integer assignedToUserId) {
-        this.assignedToUserId = assignedToUserId;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public Customer getCustomer() {
@@ -136,11 +36,173 @@ public class CustomerDTO {
         this.user = user;
     }
 
-    public String getUserRoleName() {
-        return userRoleName;
+    // Customer properties
+    public int getCustomerId() {
+        return customer.getCustomerId();
     }
 
-    public void setUserRoleName(String userRoleName) {
-        this.userRoleName = userRoleName;
+    public void setCustomerId(int customerId) {
+        customer.setCustomerId(customerId);
+    }
+
+    public String getTaxCode() {
+        return customer.getTaxCode();
+    }
+
+    public void setTaxCode(String taxCode) {
+        customer.setTaxCode(taxCode);
+    }
+
+    public String getCustomerType() {
+        return customer.getCustomerType();
+    }
+
+    public void setCustomerType(String customerType) {
+        customer.setCustomerType(customerType);
+    }
+
+    public String getCompanyName() {
+        return customer.getCompanyName();
+    }
+
+    public void setCompanyName(String companyName) {
+        customer.setCompanyName(companyName);
+    }
+
+    public Integer getAssignedToUserId() {
+        return customer.getAssignedToUserId();
+    }
+
+    public void setAssignedToUserId(Integer assignedToUserId) {
+        customer.setAssignedToUserId(assignedToUserId);
+    }
+
+    // User properties
+    public int getUserId() {
+        return user.getUserId();
+    }
+
+    public void setUserId(int userId) {
+        user.setUserId(userId);
+    }
+
+    public String getUserName() {
+        return user.getUserName();
+    }
+
+    public void setUserName(String userName) {
+        user.setUserName(userName);
+    }
+
+    public String getPassword() {
+        return user.getPassword();
+    }
+
+    public void setPassword(String password) {
+        user.setPassword(password);
+    }
+
+    public String getEmail() {
+        return user.getEmail();
+    }
+
+    public void setEmail(String email) {
+        user.setEmail(email);
+    }
+
+    public String getGender() {
+        return user.getGender();
+    }
+
+    public void setGender(String gender) {
+        user.setGender(gender);
+    }
+
+    public String getFullName() {
+        return user.getFullName();
+    }
+
+    public void setFullName(String fullName) {
+        user.setFullName(fullName);
+    }
+
+    public String getPhone() {
+        return user.getPhone();
+    }
+
+    public void setPhone(String phone) {
+        user.setPhone(phone);
+    }
+
+    public String getStatus() {
+        return user.getStatus();
+    }
+
+    public void setStatus(String status) {
+        user.setStatus(status);
+    }
+
+    public int getRoleId() {
+        return user.getRoleId();
+    }
+
+    public void setRoleId(int roleId) {
+        user.setRoleId(roleId);
+    }
+
+    public LocalDateTime getCreateAt() {
+        return user.getCreateAt();
+    }
+
+    public void setCreateAt(LocalDateTime createAt) {
+        user.setCreateAt(createAt);
+    }
+
+    public LocalDateTime getUpdateAt() {
+        return user.getUpdateAt();
+    }
+
+    public void setUpdateAt(LocalDateTime updateAt) {
+        user.setUpdateAt(updateAt);
+    }
+
+    public Date getDateBirth() {
+        return user.getDateBirth();
+    }
+
+    public void setDateBirth(Date dateBirth) {
+        user.setDateBirth(dateBirth);
+    }
+
+    public String getAddress() {
+        return user.getAddress();
+    }
+
+    public void setAddress(String address) {
+        user.setAddress(address);
+    }
+
+    public int getCreatedBy() {
+        return user.getCreatedBy();
+    }
+
+    public void setCreatedBy(int createdBy) {
+        user.setCreatedBy(createdBy);
+    }
+
+    public int getUpdatedBy() {
+        return user.getUpdatedBy();
+    }
+
+    public void setUpdatedBy(int updatedBy) {
+        user.setUpdatedBy(updatedBy);
+    }
+
+    public String getCreateTimeString() {
+        return user.getCreateTimeString();
+    }
+
+    public String getUpdateTimeString() {
+        return user.getUpdateTimeString();
     }
 }

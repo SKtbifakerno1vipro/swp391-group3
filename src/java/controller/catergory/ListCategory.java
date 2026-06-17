@@ -17,6 +17,6 @@ public class ListCategory extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setAttribute("categoryList", categoryService.getAllCategories());
-        request.getRequestDispatcher("/views/category/list.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/category/category_list.jsp").forward(request, response);
     }
 }
