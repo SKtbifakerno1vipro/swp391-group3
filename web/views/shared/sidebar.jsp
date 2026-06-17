@@ -39,6 +39,11 @@
                 <a class="nav-link ${param.activeMenu == 'roles' ? 'active' : ''}"
                     href="${pageContext.request.contextPath}/role-list"><span
                         class="material-symbols-outlined">admin_panel_settings</span>Roles</a>
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
+                    <a class="nav-link ${param.activeMenu == 'revenue' ? 'active' : ''}"
+                        href="${pageContext.request.contextPath}/revenue-report"><span
+                            class="material-symbols-outlined">analytics</span>Revenue Report</a>
+                </c:if>
             </nav>
 
             <div class="sidebar-footer">

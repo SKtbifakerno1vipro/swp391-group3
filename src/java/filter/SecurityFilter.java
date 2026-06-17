@@ -70,7 +70,8 @@ public class SecurityFilter implements Filter {
             "/customer-order-detail",
             "/create-customer-order",
             "/Invoice",
-            "/invoice"
+            "/invoice",
+            "/revenue-report"
     );
 
     private static final List<String> MANAGER_URLS = List.of(
@@ -90,7 +91,8 @@ public class SecurityFilter implements Filter {
             "/contract-list",
             "/contract-detail",
             "/Invoice",
-            "/invoice"
+            "/invoice",
+            "/revenue-report"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
