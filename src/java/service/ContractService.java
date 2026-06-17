@@ -105,6 +105,10 @@ public class ContractService {
         return contractDAO.getContractById(id);
     }
 
+    public int insert(Contract c) {
+        return contractDAO.insert(c);
+    }
+
     public List<ContractHistory> getHistoriesByContractId(int contractId) {
         return contractDAO.getHistoriesByContractId(contractId);
     }
@@ -117,8 +121,16 @@ public class ContractService {
         contractDAO.insertRevisionItem(item);
     }
 
+    public boolean update(Contract c) {
+        return contractDAO.update(c);
+    }
+
     public boolean updateStatus(int contractId, String newStatus) {
         return contractDAO.updateStatus(contractId, newStatus);
+    }
+
+    public Contract getContractByQuotationId(int quotationId) {
+        return contractDAO.getContractByQuotationId(quotationId);
     }
 
     // XHieu-begin - delete contact me

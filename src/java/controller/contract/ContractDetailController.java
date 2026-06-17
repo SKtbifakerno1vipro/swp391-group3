@@ -47,15 +47,12 @@ public class ContractDetailController extends HttpServlet {
                     // clear the status of contract
                     boolean canRequestEdit = "DRAFT".equals(status)
                             || "PENDING_REVIEW".equals(status);
-                    boolean canApprove = "PENDING_REVIEW".equals(status);
                     boolean canCustomerCheck = "CUSTOMER_CHECK".equals(status);
                     boolean isApproved = "APPROVED".equals(status);
 
                     request.setAttribute("canRequestEdit", canRequestEdit);
-                    request.setAttribute("canApprove", canApprove);
                     request.setAttribute("canCustomerCheck", canCustomerCheck);
                     request.setAttribute("isApproved", isApproved);
-                    // ===== PHẦN MỚI THÊM KẾT THÚC =====
 
                     request.getRequestDispatcher("views/contract/detail.jsp")
                             .forward(request, response);
@@ -96,7 +93,7 @@ public class ContractDetailController extends HttpServlet {
             return;
         }
 
-        // 2. Xử lý các Action từ Dashboard
+        // 2. Xử lý các Action từ contract list
         if ("request_edit".equals(action)) {
             String[] types = request.getParameterValues("revision_type[]");
             String[] details = request.getParameterValues("revision_detail[]");
@@ -109,10 +106,9 @@ public class ContractDetailController extends HttpServlet {
             h.setChangedBy(user.getUserId());
             int historyId = contractService.insertHistory(h);
 
-            // Lưu các chi tiết (revision items)
             if (types != null && historyId > 0) {
                 for (int i = 0; i < types.length; i++) {
-                    // Bỏ qua nếu dòng đó trống
+
                     if (types[i] == null || types[i].trim().isEmpty()) {
                         continue;
                     }

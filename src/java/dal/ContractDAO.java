@@ -203,7 +203,7 @@ public class ContractDAO extends DBContext {
         return null;
     }
 
-    public List<model.Contract> getSignedContractsByCustomerId(int customerId) {
+    public List<Contract> getSignedContractsByCustomerId(int customerId) {
         List<model.Contract> list = new ArrayList<>();
         // Truy vấn các hợp đồng đã Ký (SIGNED) của khách hàng
         String sql = "SELECT * FROM customer_contract WHERE customer_id = ? AND contract_status = 'SIGNED'";

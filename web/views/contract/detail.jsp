@@ -111,9 +111,8 @@
 
                 <c:choose>
                     <%-- 1. Status: DRAFT / PENDING_REVIEW --%>
-                    <c:when test="${contract.contractStatus == 'DRAFT' 
-                                    or contract.contractStatus == 'PENDING_REVIEW'}">
-                            
+                    <c:when test="${canRequestEdit}">
+
                         <!-- Manager (Role 2) -->
                         <c:if test="${sessionScope.user.roleId == 2}">
                             <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Request edit</button>
@@ -136,20 +135,21 @@
                     </c:when>
 
                     <%-- 2. TRẠNG THÁI: CUSTOMER_CHECK --%>
-                    <c:when test="${contract.contractStatus == 'CUSTOMER_CHECK'}">
+                    <c:when test="${canCustomerCheck}">
                         <!-- Khách hàng (Role 3) -->
                         <c:if test="${sessionScope.user.roleId == 3}">
+                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Edit request</button>
                             <form method="POST" action="contract-detail" style="margin:0;">
                                 <input type="hidden" name="action" value="customer_approve"/>
                                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
                                 <button type="submit" class="btn btn-green">Approve</button>
                             </form>
-                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Edit request</button>
+
                         </c:if>
                     </c:when>
 
                     <%-- 3. TRẠNG THÁI: APPROVED --%>
-                    <c:when test="${contract.contractStatus == 'APPROVED'}">
+                    <c:when test="${isApproved}">
                         <p style="color: green; text-align: center; font-weight: bold;">Contract Approved</p>
                     </c:when>
                 </c:choose>
@@ -200,9 +200,12 @@
             </div>
         </div>
 
+        <!--Popup-->
+        <!--background-->
         <div id="modalOverlay" class="modal-overlay"></div>
+        <!--content revision-->
         <div id="feedbackModal" class="modal-content">
-            <h3>Yêu cầu sửa đổi</h3>
+            <h3>Request edit</h3>
             <form method="POST" action="contract-detail" id="feedbackForm">
                 <input type="hidden" name="action" value="request_edit"/>
                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
@@ -223,7 +226,7 @@
         <div id="viewHistoryModal" class="modal-content" style="width: 40%; left: 30%;">
             <h3>Detail of edit request</h3>
             <div id="viewHistoryBody" style="margin-bottom: 20px;"></div>
-            <button type="button" onclick="hideModals()" class="btn btn-gray" style="width: auto;">Đóng</button>
+            <button type="button" onclick="hideModals()" class="btn btn-gray" style="width: auto;">Cancel</button>
         </div>
 
         <script>
@@ -240,8 +243,8 @@
                 var container = document.getElementById('revisionContainer');
                 var div = document.createElement('div');
                 div.className = 'revision-box';
-                div.innerHTML = '<input type="text" name="revision_type[]" placeholder="Vị trí" required style="width:40%; padding: 8px; margin-top: 5px;"> ' +
-                        '<input type="text" name="revision_detail[]" placeholder="Thay đổi" required style="width:50%; padding: 8px;">';
+                div.innerHTML = '<input type="text" name="revision_type[]" placeholder="Location" required style="width:40%; padding: 8px; margin-top: 5px;"> ' +
+                        '<input type="text" name="revision_detail[]" placeholder="Change" required style="width:50%; padding: 8px;">';
                 container.appendChild(div);
             }
             function viewHistoryDetail(historyId) {
