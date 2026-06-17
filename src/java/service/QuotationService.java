@@ -122,6 +122,31 @@ public class QuotationService {
 
         return allDetailsCreated;
     }
+    /*
+     * Them 1 san pham moi vao quotation dang co va ghi lich su.
+     */
+    public boolean addProductToQuotation(QuotationDetail detail, Integer userId) {
+        boolean added = quotationDAO.addQuotationDetail(detail);
+
+        if (added) {
+            quotationDAO.addQuotationHistory(detail.getQuotationId(), userId, "Them san pham vao quotation");
+        }
+
+        return added;
+    }
+
+    /*
+     * Xoa 1 san pham khoi quotation dang co va ghi lich su.
+     */
+    public boolean deleteProductFromQuotation(int quotationId, int quotationDetailId, Integer userId) {
+        boolean deleted = quotationDAO.deleteQuotationDetail(quotationDetailId);
+
+        if (deleted) {
+            quotationDAO.addQuotationHistory(quotationId, userId, "Xoa san pham khoi quotation");
+        }
+
+        return deleted;
+    }
 
     public void updateStatus(int quotationId, String status) {
         quotationDAO.updateStatus(quotationId, status);
