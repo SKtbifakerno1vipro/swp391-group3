@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import model.*;
-import dto.*;
+import java.math.BigDecimal;
 
 public class ContractDAO extends DBContext {
 
@@ -217,6 +217,7 @@ public class ContractDAO extends DBContext {
     // UPDATE
     public boolean update(Contract c) {
         String sql = "UPDATE customer_contract SET "
+                + "contract_number = ?, "
                 + "contract_content = ?, "
                 + "contract_status = ?, "
                 + "contract_version = ?, "
@@ -228,25 +229,18 @@ public class ContractDAO extends DBContext {
                 + "WHERE customer_contract_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            // Noi dung chinh
-            ps.setString(1, c.getContractContent());
-            ps.setString(2, c.getContractStatus());
-            ps.setString(3, c.getContractVersion());
+            ps.setString(1, c.getContractNumber());
+            ps.setString(2, c.getContractContent());
+            ps.setString(3, c.getContractStatus());
+            ps.setString(4, c.getContractVersion());
+            ps.setTimestamp(5, c.getEffectiveDate() != null ? Timestamp.valueOf(c.getEffectiveDate()) : null);
+            ps.setTimestamp(6, c.getEndDate() != null ? Timestamp.valueOf(c.getEndDate()) : null);
+            ps.setTimestamp(7, c.getSignDate() != null ? Timestamp.valueOf(c.getSignDate()) : null);
+            ps.setInt(8, c.getUpdatedBy());
+            ps.setInt(9, c.getContractId());
 
-            // Xu ly cac truong thoi gian an toan (Null safety)
-            ps.setTimestamp(4, c.getEffectiveDate() != null ? Timestamp.valueOf(c.getEffectiveDate()) : null);
-            ps.setTimestamp(5, c.getEndDate() != null ? Timestamp.valueOf(c.getEndDate()) : null);
-            ps.setTimestamp(6, c.getSignDate() != null ? Timestamp.valueOf(c.getSignDate()) : null);
-
-            // cleaned comment
-            ps.setInt(7, c.getUpdatedBy());
-            ps.setInt(8, c.getContractId());
-
-            int affectedRows = ps.executeUpdate();
-            return affectedRows > 0; // cleaned comment
-
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            System.out.println("update contract error: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -400,6 +394,34 @@ public class ContractDAO extends DBContext {
             e.printStackTrace();
         }
         return items;
+    }
+
+    public java.math.BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
+
+        String sql = """
+                     SELECT SUM(
+                         (quantity * selling_price) 
+                         * (1 + (ISNULL(tax_percent, 0) / 100.0)) 
+                         * (1 - (ISNULL(discount_percent, 0) / 100.0))
+                     ) as total_amount
+                     FROM quotation_detail 
+                     WHERE quotation_id = ?""";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, quotationId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    BigDecimal totalAmount = rs.getBigDecimal("total_amount");
+                    if (totalAmount == null) {
+                        totalAmount = BigDecimal.ZERO;
+                    }
+                    return totalAmount.compareTo(BigDecimal.ZERO) > 0 ? totalAmount : java.math.BigDecimal.ZERO;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return BigDecimal.ZERO;
     }
 
 }
