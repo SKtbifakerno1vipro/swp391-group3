@@ -142,7 +142,7 @@ public class SecurityFilter implements Filter {
 
     private boolean hasPermission(int roleId, String path) {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
-        System.out.println("Checking permission for role " + roleId + " on path " + path);
+        System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
         if (roleId == ROLE_SYSTEM_ADMIN) {
             return SYSTEM_ADMIN_URLS.contains(cleanPath);
         }
