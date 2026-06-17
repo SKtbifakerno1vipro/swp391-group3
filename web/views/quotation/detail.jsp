@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>`n<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html>
@@ -111,7 +111,7 @@
                         <td><input type="number" name="sellingPrice" min="0" step="0.01" value="${detail.sellingPrice}" readonly></td>
                         <td><input type="number" name="discountPercent" min="0" max="100" step="0.01" value="${detail.discountPercent}" required></td>
                         <td><input type="number" name="taxPercent" min="0" max="100" step="0.01" value="${detail.taxPercent}" required></td>
-                        <td>${detail.amount}</td>
+                        <td><fmt:formatNumber value="${detail.amount}" type="number" minFractionDigits="2" maxFractionDigits="2" /></td>
                         <td>
                             <input type="hidden" name="quotationId" value="${quotation.quotationId}">
                             <input type="hidden" name="quotationDetailId" value="${detail.quotationDetailId}">
@@ -182,7 +182,7 @@
 
         // Hien thi danh sach goi y theo keyword user dang go.
         function showProductSuggestions() {
-            const keyword = document.getElementById('addProductSearch').value.toLowerCase().trim();
+            const keyword = document.getElementById('addProductSearch').value.toLowerCase().trim().replace(/\s+/g, ' ');
             const box = document.getElementById('productSuggestions');
 
             document.getElementById('addProductId').value = '';
@@ -244,6 +244,8 @@
         </div>
     </body>
 </html>
+
+
 
 
 

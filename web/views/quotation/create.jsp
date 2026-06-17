@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>`n<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html>
@@ -108,7 +108,7 @@
 
                 // Hien thi goi y san pham khi user go search.
                 function showCreateProductSuggestions() {
-                    const keyword = document.getElementById('productSearch').value.toLowerCase().trim();
+                    const keyword = document.getElementById('productSearch').value.toLowerCase().trim().replace(/\s+/g, ' ');
                     const box = document.getElementById('createProductSuggestions');
 
                     document.getElementById('selectedProductId').value = '';
@@ -221,11 +221,11 @@
                         const taxAmount = afterDiscount * taxPercent / 100;
                         const lineTotal = afterDiscount + taxAmount;
 
-                        row.querySelector('.lineTotal').textContent = lineTotal.toFixed(2);
+                        row.querySelector('.lineTotal').textContent = lineTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                         grandTotal += lineTotal;
                     });
 
-                    document.getElementById('grandTotal').textContent = grandTotal.toFixed(2);
+                    document.getElementById('grandTotal').textContent = grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 }
 
                 // Khong cho submit neu chua add san pham nao.
@@ -243,3 +243,5 @@
     </div>
 </body>
 </html>
+
+
