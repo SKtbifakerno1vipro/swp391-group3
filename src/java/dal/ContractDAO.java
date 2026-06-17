@@ -412,7 +412,7 @@ public class ContractDAO extends DBContext {
                         subtotal = java.math.BigDecimal.ZERO;
                     }
 
-                    java.math.BigDecimal taxPercent = rs.getBigDecimal("tax_percent");
+          git           java.math.BigDecimal taxPercent = rs.getBigDecimal("tax_percent");
                     java.math.BigDecimal discount = rs.getBigDecimal("discount_amount");
 
                     if (taxPercent == null) {
