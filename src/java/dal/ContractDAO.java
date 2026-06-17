@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import model.*;
-import dto.*;
+import java.math.BigDecimal;
 
 public class ContractDAO extends DBContext {
 
@@ -397,43 +397,31 @@ public class ContractDAO extends DBContext {
     }
 
     public java.math.BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
-        // Lưu ý: Thay đổi tên cột 'tax_percent' và 'discount_amount' 
-        // cho đúng với database thực tế của bạn
-        String sql = "SELECT q.tax_percent, q.discount_amount, "
-                + "(SELECT SUM(quantity * selling_price) FROM quotation_detail WHERE quotation_id = q.quotation_id) as subtotal "
-                + "FROM quotation q WHERE q.quotation_id = ?";
+
+        String sql = """
+                     SELECT SUM(
+                         (quantity * selling_price) 
+                         * (1 + (ISNULL(tax_percent, 0) / 100.0)) 
+                         * (1 - (ISNULL(discount_percent, 0) / 100.0))
+                     ) as total_amount
+                     FROM quotation_detail 
+                     WHERE quotation_id = ?""";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, quotationId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    java.math.BigDecimal subtotal = rs.getBigDecimal("subtotal");
-                    if (subtotal == null) {
-                        subtotal = java.math.BigDecimal.ZERO;
+                    BigDecimal totalAmount = rs.getBigDecimal("total_amount");
+                    if (totalAmount == null) {
+                        totalAmount = BigDecimal.ZERO;
                     }
-
-          git           java.math.BigDecimal taxPercent = rs.getBigDecimal("tax_percent");
-                    java.math.BigDecimal discount = rs.getBigDecimal("discount_amount");
-
-                    if (taxPercent == null) {
-                        taxPercent = java.math.BigDecimal.ZERO;
-                    }
-                    if (discount == null) {
-                        discount = java.math.BigDecimal.ZERO;
-                    }
-
-                    // Công thức: (Subtotal + Tax) - Discount
-                    // Tax = Subtotal * (taxPercent / 100)
-                    java.math.BigDecimal taxAmount = subtotal.multiply(taxPercent.divide(new java.math.BigDecimal("100")));
-                    java.math.BigDecimal total = subtotal.add(taxAmount).subtract(discount);
-
-                    return total.compareTo(java.math.BigDecimal.ZERO) > 0 ? total : java.math.BigDecimal.ZERO;
+                    return totalAmount.compareTo(BigDecimal.ZERO) > 0 ? totalAmount : java.math.BigDecimal.ZERO;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return java.math.BigDecimal.ZERO;
+        return BigDecimal.ZERO;
     }
 
 }

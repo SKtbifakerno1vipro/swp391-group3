@@ -1,0 +1,89 @@
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Contract List - Po Bread Sales</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
+    </head>
+    <body>
+        <div class="dashboard-shell">
+            <jsp:include page="/views/shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="contracts"/>
+            </jsp:include>
+            <main class="main legacy-page">
+                <h2>Contract Management</h2>
+
+                <form action="contract-list" method="GET">
+                    <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Contract number">
+                    <input type="text" name="customerName" value="${customerName}" placeholder="Customer name">
+                    <select name="status">
+                        <option value="">-- All statuses --</option>
+                        <option value="DRAFT" ${status == 'DRAFT' ? 'selected' : ''}>Draft</option>
+                        <option value="SIGNED" ${status == 'SIGNED' ? 'selected' : ''}>Signed</option>
+                        <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Active</option>
+                        <option value="CUSTOMER_REQUESTED_REVISION" ${status == 'CUSTOMER_REQUESTED_REVISION' ? 'selected' : ''}>Customer Requested Revision</option>
+                        <option value="CANCELLED" ${status == 'CANCELLED' ? 'selected' : ''}>Cancelled</option>
+                    </select>
+                    <select name="storageType">
+                        <option value="">-- Storage type --</option>
+                        <option value="TEXT" ${storageType == 'TEXT' ? 'selected' : ''}>Text</option>
+                        <option value="IMAGE" ${storageType == 'IMAGE' ? 'selected' : ''}>Image scan</option>
+                    </select>
+                    <button type="submit">Search</button>
+                    <a href="${pageContext.request.contextPath}/contract-list">Reset filters</a>
+                </form>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Contract Number</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Storage Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:if test="${empty list}">
+                            <tr><td colspan="6" style="text-align:center;">No contracts found.</td></tr>
+                        </c:if>
+                        <c:forEach items="${list}" var="c">
+                            <tr>
+                                <td>${c.contractId}</td>
+                                <td>${c.contractNumber}</td>
+                                <td>${c.customerName}</td>
+                                <td>${c.contractStatus}</td>
+                                <td>${c.storageType}</td>
+                                <td>
+                                    <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |
+                                    <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">Details</a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+
+                <c:if test="${endPage > 1}">
+                    <c:set var="params" value="contractNumber=${contractNumber}&customerName=${customerName}&status=${status}&storageType=${storageType}" />
+                    <div>
+                        <a href="contract-list?page=1&${params}" ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&laquo;</a>
+                        <a href="contract-list?page=${currentPage - 1}&${params}" ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&lsaquo;</a>
+                        <c:forEach begin="${currentPage - 2 > 1 ? currentPage - 2 : 1}" end="${currentPage + 2 < endPage ? currentPage + 2 : endPage}" var="i">
+                            <a href="contract-list?page=${i}&${params}" ${i == currentPage ? 'style="font-weight:bold;color:red;"' : ''}>${i}</a>&nbsp;
+                        </c:forEach>
+                        <a href="contract-list?page=${currentPage + 1}&${params}" ${currentPage == endPage ? 'style="pointer-events:none;color:#aaa;"' : ''}>&rsaquo;</a>
+                        <a href="contract-list?page=${endPage}&${params}" ${currentPage == endPage ? 'style="pointer-events:none;color:#aaa;"' : ''}>&raquo;</a>
+                    </div>
+                </c:if>
+            </main>
+        </div>
+    </body>
+</html>
