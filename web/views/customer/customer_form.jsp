@@ -210,21 +210,21 @@
                         <form action="${pageContext.request.contextPath}/customer/${isEdit ? 'edit' : 'create'}"
                             method="post">
 
-                            <%-- Neu la EDIT thi moi sinh ra 2 the hidden ID nay --%>
+                             <%-- Neu la EDIT thi moi sinh ra 2 the hidden ID nay --%>
                                 <c:if test="${isEdit}">
-                                    <input type="hidden" name="customerId" value="${cusDTO.customer.customerId}" />
-                                    <input type="hidden" name="userId" value="${cusDTO.customer.userId}" />
+                                    <input type="hidden" name="customerId" value="${cusDTO.customerId}" />
+                                    <input type="hidden" name="userId" value="${cusDTO.userId}" />
 
                                     <%-- Hien thi Customer ID va User ID (Chi Edit moi thay) --%>
                                         <div class="form-group">
                                             <label>Customer ID</label>
                                             <input type="text" class="form-control"
-                                                value="${cusDTO.customer.customerId}" readonly>
+                                                value="${cusDTO.customerId}" readonly>
                                         </div>
 
                                         <div class="form-group">
                                             <label>User ID</label>
-                                            <input type="text" class="form-control" value="${cusDTO.customer.userId}"
+                                            <input type="text" class="form-control" value="${cusDTO.userId}"
                                                 readonly>
                                         </div>
                                 </c:if>
@@ -232,14 +232,14 @@
                                 <div class="form-group">
                                     <label for="username">Username</label>
                                     <input type="text" id="username" name="username" class="form-control"
-                                        value="${isEdit ? cusDTO.user.userName : ''}" ${isEdit ? 'readonly' : '' }
+                                        value="${isEdit ? cusDTO.userName : ''}" ${isEdit ? 'readonly' : '' }
                                         required>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input type="email" id="email" name="email" class="form-control"
-                                        value="${isEdit ? cusDTO.user.email : ''}" ${isEdit ? 'readonly' : '' }
+                                        value="${isEdit ? cusDTO.email : ''}" ${isEdit ? 'readonly' : '' }
                                         required>
                                 </div>
 
@@ -247,23 +247,23 @@
                                     <div class="form-group">
                                         <label for="fullname">Full Name</label>
                                         <input type="text" id="fullname" name="fullname" class="form-control"
-                                            value="${isEdit ? cusDTO.user.fullName : ''}">
+                                            value="${isEdit ? cusDTO.fullName : ''}">
                                     </div>
 
                                     <%-- Phone --%>
                                         <div class="form-group">
                                             <label for="phone">Phone</label>
                                             <input type="text" id="phone" name="phone" class="form-control"
-                                                value="${isEdit ? cusDTO.user.phone : ''}">
+                                                value="${isEdit ? cusDTO.phone : ''}">
                                         </div>
 
                                         <%-- Status --%>
                                             <div class="form-group">
                                                 <label for="status">Status</label>
                                                 <select id="status" name="status" class="form-control">
-                                                    <option value="ACTIVE" ${isEdit && cusDTO.user.status=='ACTIVE'
+                                                    <option value="ACTIVE" ${isEdit && cusDTO.status=='ACTIVE'
                                                         ? 'selected' : '' }>ACTIVE</option>
-                                                    <option value="INACTIVE" ${isEdit && cusDTO.user.status=='INACTIVE'
+                                                    <option value="INACTIVE" ${isEdit && cusDTO.status=='INACTIVE'
                                                         ? 'selected' : '' }>INACTIVE</option>
                                                 </select>
                                             </div>
@@ -273,7 +273,7 @@
                                                 <c:choose>
                                                     <c:when test="${isEdit}">
                                                         <c:forEach var="role" items="${roles}">
-                                                            <c:if test="${role.roleId == cusDTO.user.roleId}">
+                                                            <c:if test="${role.roleId == cusDTO.roleId}">
                                                                 <input type="text" class="form-control"
                                                                     value="${role.roleName}" readonly>
                                                                 <input type="hidden" name="roleId"
@@ -292,7 +292,7 @@
                                                 <div class="form-group">
                                                     <label for="taxCode">Tax Code</label>
                                                     <input type="text" id="taxCode" name="taxCode" class="form-control"
-                                                        value="${isEdit ? cusDTO.customer.taxCode : ''}" required>
+                                                        value="${isEdit ? cusDTO.taxCode : ''}" required>
                                                 </div>
 
                                                 <%-- Company Name --%>
@@ -300,7 +300,7 @@
                                                         <label for="companyName">Company Name</label>
                                                         <input type="text" id="companyName" name="companyName"
                                                             class="form-control"
-                                                            value="${isEdit ? cusDTO.customer.companyName : ''}"
+                                                            value="${isEdit ? cusDTO.companyName : ''}"
                                                             required>
                                                     </div>
 
@@ -312,7 +312,7 @@
                                                                 <option value="">-- Select Type --</option>
                                                                 <c:forEach var="type" items="${listTypeCus}">
                                                                     <option value="${type}" ${isEdit &&
-                                                                        cusDTO.customer.customerType==type ? 'selected'
+                                                                        cusDTO.customerType==type ? 'selected'
                                                                         : '' }>${type}</option>
                                                                 </c:forEach>
                                                             </select>
@@ -326,7 +326,7 @@
                                                                     <option value="">-- None --</option>
                                                                     <c:forEach var="u" items="${users}">
                                                                         <option value="${u.userId}" ${isEdit &&
-                                                                            cusDTO.customer.assignedToUserId==u.userId
+                                                                            cusDTO.assignedToUserId==u.userId
                                                                             ? 'selected' : '' }>
                                                                             ${u.fullName} (${u.userName})
                                                                         </option>

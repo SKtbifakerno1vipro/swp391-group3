@@ -137,6 +137,7 @@ public class SecurityFilter implements Filter {
     );
 
     private boolean hasPermission(int roleId, String path) {
+        System.out.println("Checking permission for role " + roleId + " on path " + path);
         if (roleId == ROLE_SYSTEM_ADMIN) {
             return SYSTEM_ADMIN_URLS.contains(path);
         }
@@ -181,7 +182,7 @@ public class SecurityFilter implements Filter {
                 || path.endsWith(".woff")
                 || path.endsWith(".woff2");
     }
-
+    
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }
@@ -219,6 +220,7 @@ public class SecurityFilter implements Filter {
        if (hasPermission(user.getRoleId(), path)) {
            chain.doFilter(request, response);
        } else {
+           System.out.println("You are not authorized to perform this action.");
            res.sendRedirect(req.getContextPath() + "/dashboard");
        }
     }

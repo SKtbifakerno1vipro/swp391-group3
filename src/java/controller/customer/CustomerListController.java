@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import dto.CustomerDTO;
+import model.User;
+import jakarta.servlet.http.HttpSession;
 import utils.*;
 
 import jakarta.servlet.annotation.WebServlet;
@@ -27,14 +29,32 @@ public class CustomerListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // authorization check 
+        HttpSession session = request.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        // one user one ability
+        if (user.getRoleId() == ROLE_SALE_STAFF) {
+            
+        }
+        Integer assignedToUserId = null;
         String searchName = request.getParameter("searchName");
         String searchSdt = request.getParameter("searchSdt");
         String searchEmail = request.getParameter("searchEmail");
         String searchMst = request.getParameter("searchMst");
+
+        try {
+            assignedToUserId = Integer.parseInt(request.getParameter("searchAssignedTo"));
+        } catch (NumberFormatException e){
+            assignedToUserId = null;
+        }
         
         String typeCus = request.getParameter("type");
         String pageRaw = request.getParameter("page");
-        
+
         int page = 1;       // Default page when accessing for the first time
         if (pageRaw != null && !pageRaw.isBlank()) {
             try {
@@ -82,10 +102,10 @@ public class CustomerListController extends HttpServlet {
 
         // filter and paginate
         List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, searchSdt, searchEmail,
-                searchMst, typeCus, page, PAGE_SIZE);
-        int totalPages = customerService.getTotalPages(searchName, searchSdt, searchEmail, searchMst, typeCus, PAGE_SIZE);
+                searchMst, typeCus, assignedToUserId, page, PAGE_SIZE);
+        int totalPages = customerService.getTotalPages(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId, PAGE_SIZE);
 
-        request.setAttribute("customers", list);
+        request.setAttribute("customersDTOs", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
 
@@ -96,6 +116,9 @@ public class CustomerListController extends HttpServlet {
         
         request.setAttribute("listTypeCus", customerService.getCusTypeList());
         request.setAttribute("type", typeCus);
+
+        request.setAttribute("assignedToUserId", assignedToUserId);
+        request.setAttribute("listSales", customerService.getAllSalesExecutiveUsers());
 
         request.getRequestDispatcher("/views/customer/customer_list.jsp").forward(request, response);
     }
