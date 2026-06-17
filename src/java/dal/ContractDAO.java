@@ -58,9 +58,9 @@ public class ContractDAO extends DBContext {
         if (storageType != null && !storageType.trim().isEmpty()) {
             sql += " AND c.storage_type = ? ";
         }
-        if (userId != 0 && userId > 0 && roleId == 3) {
-            sql += " and cust.user_id= ? ";
-        }
+//        if (userId != 0 && userId > 0 && roleId == 3) {
+//            sql += " and cust.user_id= ? ";
+//        }
 
         sql += " ORDER BY c.created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
@@ -78,9 +78,9 @@ public class ContractDAO extends DBContext {
             if (storageType != null && !storageType.trim().isEmpty()) {
                 ps.setString(index++, storageType);
             }
-              if (userId != 0 && userId > 0 && roleId == 3) {
-                  ps.setInt(index++, userId);
-              }
+//              if (userId != 0 && userId > 0 && roleId == 3) {
+//                  ps.setInt(index++, userId);
+//              }
             
             ps.setInt(index++, (pageIndex - 1) * pageSize);
             ps.setInt(index++, pageSize);
@@ -203,7 +203,7 @@ public class ContractDAO extends DBContext {
         return null;
     }
 
-    public List<model.Contract> getSignedContractsByCustomerId(int customerId) {
+    public List<Contract> getSignedContractsByCustomerId(int customerId) {
         List<model.Contract> list = new ArrayList<>();
         // Truy vấn các hợp đồng đã Ký (SIGNED) của khách hàng
         String sql = "SELECT * FROM customer_contract WHERE customer_id = ? AND contract_status = 'SIGNED'";
@@ -317,7 +317,12 @@ public class ContractDAO extends DBContext {
     // Lấy lịch sử và danh sách item liên quan
     public List<ContractHistory> getHistoriesByContractId(int contractId) {
         List<ContractHistory> list = new ArrayList<>();
-        String sql = "SELECT h.*, u.user_name FROM contract_edit_history h LEFT JOIN [user] u ON h.changed_by = u.user_id WHERE h.contract_id = ? ORDER BY h.created_at DESC";
+        String sql = "SELECT h.*, u.user_name "
+                + "FROM contract_edit_history h "
+                + "LEFT JOIN [user] u "
+                + "ON h.changed_by = u.user_id "
+                + "WHERE h.contract_id = ? "
+                + "ORDER BY h.created_at DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
             ResultSet rs = ps.executeQuery();
@@ -407,7 +412,7 @@ public class ContractDAO extends DBContext {
         return items;
     }
 
-    public java.math.BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
+    public BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
 
         String sql = """
                      SELECT SUM(

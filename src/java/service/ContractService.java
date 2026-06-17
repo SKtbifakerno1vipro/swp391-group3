@@ -92,6 +92,47 @@ public class ContractService {
         return template;
     }
 
+    public List<Contract> searchContracts(String contractNumber, String customerName, String status,
+            String storageType, int pageIndex, int pageSize, int userId, int roleId) {
+        return contractDAO.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize, userId, roleId);
+    }
+
+    public int getTotalContracts(String contractNumber, String customerName, String status, String storageType) {
+        return contractDAO.getTotalContracts(contractNumber, customerName, status, storageType);
+    }
+
+    public Contract getContractById(int id) {
+        return contractDAO.getContractById(id);
+    }
+
+    public int insert(Contract c) {
+        return contractDAO.insert(c);
+    }
+
+    public List<ContractHistory> getHistoriesByContractId(int contractId) {
+        return contractDAO.getHistoriesByContractId(contractId);
+    }
+
+    public int insertHistory(ContractHistory h) {
+        return contractDAO.insertHistory(h);
+    }
+
+    public void insertRevisionItem(ContractRevisionItem item) {
+        contractDAO.insertRevisionItem(item);
+    }
+
+    public boolean update(Contract c) {
+        return contractDAO.update(c);
+    }
+
+    public boolean updateStatus(int contractId, String newStatus) {
+        return contractDAO.updateStatus(contractId, newStatus);
+    }
+
+    public Contract getContractByQuotationId(int quotationId) {
+        return contractDAO.getContractByQuotationId(quotationId);
+    }
+
     // XHieu-begin - delete contact me
     public List<Contract> getContractsByCustomerId(int customerId) {
         return contractDAO.getContractsByCustomerId(customerId);
