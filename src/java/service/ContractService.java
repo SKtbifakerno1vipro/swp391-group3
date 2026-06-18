@@ -79,7 +79,6 @@ public class ContractService {
 
         String year = java.time.LocalDate.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyy"));
-//        String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", q.getQuotationId());
         String newContractNumber = String.format("%03d", q.getQuotationId()) + "/" + year + "-HĐ";
         template = template.replace("{contract_number}",
                 newContractNumber);

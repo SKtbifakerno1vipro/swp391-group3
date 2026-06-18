@@ -16,6 +16,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet(urlPatterns = {"/contract-save"})
 public class ContractSaveController extends HttpServlet {
@@ -95,7 +98,7 @@ public class ContractSaveController extends HttpServlet {
         }
 
         String templatePath = getServletContext().getRealPath("/views/contract/template.jsp");
-        String template = new String(Files.readAllBytes(Paths.get(templatePath)), java.nio.charset.StandardCharsets.UTF_8);
+        String template = new String(Files.readAllBytes(Paths.get(templatePath)), StandardCharsets.UTF_8);
 
         return contractService.fillTemplate(quotation, customer, details, template, config);
     }
@@ -164,8 +167,9 @@ public class ContractSaveController extends HttpServlet {
         }
 
         // Tạo mã hợp đồng ngay tại đây để gán vào object trước khi insert
-        String yearMonth = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMM"));
-        String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", quotationId);
+        String year = LocalDate.now()
+                .format(DateTimeFormatter.ofPattern("yyyy"));
+        String newContractNumber = String.format("%03d", quotationId) + "/" + year + "-HĐ";
 
         Contract c = new Contract();
         c.setCustomerId(customerId);
