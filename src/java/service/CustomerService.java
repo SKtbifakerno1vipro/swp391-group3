@@ -91,20 +91,20 @@ public class CustomerService {
     // new 
     public CustomerDTO getCustomerDTOByCusId(int customerId) {
 
-    Customer c = customerDAO.getCustomerByCusId(customerId);
-    if (c == null) {
-        return null;
-    }
-    
-    int userId = c.getUserId();
-    User u = userService.getUserByIdFullParameter(userId);
+        Customer c = customerDAO.getCustomerByCusId(customerId);
+        if (c == null) {
+            return null;
+        }
+        
+        int userId = c.getUserId();
+        User u = userService.getUserByIdFullParameter(userId);
 
-    if (u == null) {
-        return null;
+        if (u == null) {
+            return null;
+        }
+        CustomerDTO dto = new CustomerDTO(c, u);
+        return dto;
     }
-    CustomerDTO dto = new CustomerDTO(c, u);
-    return dto;
-}
     // new
     public String isDuplicateCusFields(String userName, String phone, String email, String taxCode) {
         // tim cac custome trung du lieu
@@ -167,8 +167,8 @@ public class CustomerService {
             boolean isCustomerInserted = customerDAO.insertCustomer(customer,conn);
             
             if (isCustomerInserted) {
-                Integer customerRoleId = roleService.getRoleIdByName("Customer");
-                if (user.getRoleId() != null && user.getRoleId().equals(customerRoleId)) {
+                int customerRoleId = roleService.getRoleIdByName("Customer");
+                if (user.getRoleId() == customerRoleId) {
                     String emailSubject = "Chào mừng thành viên mới - Po Bread";
                     String emailBody = "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e0e0e0; border-radius: 16px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);\">"
                                      + "    <div style=\"text-align: center; margin-bottom: 24px; border-bottom: 2px solid #eaeaea; padding-bottom: 16px;\">"
@@ -241,13 +241,13 @@ public class CustomerService {
     public String getLastError() {
         return customerDAO.getLastError();
     }
-    public Customer getCustomerByCusId(int userId) {
-        return customerDAO.getCustomerByCusId(userId);
+    public Customer getCustomerByCusId(int customerId) {
+        return customerDAO.getCustomerByCusId(customerId);
     }
     public List<User> getAllSalesExecutiveUsers() {
-        Integer salesExecutiveRoleId = roleService.getRoleIdByName("Sale Staff");
+        int salesExecutiveRoleId = roleService.getRoleIdByName("Sale Staff");
 
-        if (salesExecutiveRoleId == null) {
+        if (salesExecutiveRoleId <= 0) {
             salesExecutiveRoleId = 4; // default sale staff role in seed data
         }
 

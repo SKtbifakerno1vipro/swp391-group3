@@ -4,7 +4,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Sửa danh mục</title>
+    <title>Edit Category</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
                 <jsp:param name="activeMenu" value="categories"/>
             </jsp:include>
             <main class="main legacy-page">
-    <h2>Sửa danh mục</h2>
+    <h2>Edit Category</h2>
 
     <c:if test="${not empty error}">
         <div style="color: red; margin-bottom: 10px;">${error}</div>
@@ -28,7 +28,7 @@
         <input type="hidden" name="categoryId" value="${category.categoryId}">
 
         <div style="margin-bottom: 10px;">
-            <label for="categoryName">Tên danh mục:</label><br/>
+            <label for="categoryName">Category Name:</label><br/>
             <input type="text"
                    id="categoryName"
                    name="categoryName"
@@ -36,8 +36,8 @@
                    required>
         </div>
 
-        <button type="submit">Cập nhật</button>
-        <a href="${pageContext.request.contextPath}/category/list">Hủy</a>
+        <button type="submit">Update</button>
+        <a href="${pageContext.request.contextPath}/category/list">Cancel</a>
     </form>
 
             </main>

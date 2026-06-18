@@ -4,7 +4,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Thêm danh mục</title>
+    <title>Add Category</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
                 <jsp:param name="activeMenu" value="categories"/>
             </jsp:include>
             <main class="main legacy-page">
-    <h2>Thêm danh mục mới</h2>
+    <h2>Add New Category</h2>
 
     <c:if test="${not empty error}">
         <div style="color: red; margin-bottom: 10px;">${error}</div>
@@ -26,17 +26,17 @@
 
     <form action="${pageContext.request.contextPath}/category/create" method="POST">
         <div style="margin-bottom: 10px;">
-            <label for="categoryName">Tên danh mục:</label><br/>
+            <label for="categoryName">Category Name:</label><br/>
             <input type="text"
                    id="categoryName"
                    name="categoryName"
                    value="${categoryName}"
                    required
-                   placeholder="Ví dụ: Bánh mì, Bánh ngọt...">
+                   placeholder="e.g. Bread, Cake...">
         </div>
 
-        <button type="submit">Thêm mới</button>
-        <a href="${pageContext.request.contextPath}/category/list">Hủy</a>
+        <button type="submit">Add New</button>
+        <a href="${pageContext.request.contextPath}/category/list">Cancel</a>
     </form>
 
             </main>

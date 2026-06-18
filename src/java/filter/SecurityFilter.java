@@ -47,18 +47,11 @@ public class SecurityFilter implements Filter {
             "/role-detail",
             "/add-role",
             "/edit-role-permissions",
-            "/category/list",
-            "/category/create",
-            "/category/edit",
-            "/category/delete",
             "/product-list",
             "/create-product",
             "/edit-product",
             "/product-delete",
-            "/customer/list",
-            "/customer/detail",
-            "/customer/create",
-            "/customer/edit",
+            "/email/logs",
             "/quotation-list",
             "/quotation-create",
             "/quotation-detail",
@@ -69,8 +62,7 @@ public class SecurityFilter implements Filter {
             "/customer-order-detail",
             "/create-customer-order",
             "/Invoice",
-            "/invoice",
-            "/email/logs"
+            "/invoice"
     );
 
     private static final List<String> MANAGER_URLS = List.of(
@@ -81,6 +73,8 @@ public class SecurityFilter implements Filter {
             "/role-detail",
             "/customer/list",
             "/customer/detail",
+            "/customer/create",
+            "/customer/edit",
             "/customer-order-list",
             "/customer-order-detail",
             "/product-list",
@@ -97,7 +91,8 @@ public class SecurityFilter implements Filter {
     private static final List<String> CUSTOMER_URLS = List.of(
             "/dashboard",
             "/quotation-detail",
-            "/contract-detail"
+            "/contract-detail",
+            "/customer/detail"
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(

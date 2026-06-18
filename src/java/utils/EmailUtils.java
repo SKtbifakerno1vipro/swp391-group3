@@ -27,7 +27,6 @@ public class EmailUtils {
         }
         return props;
     }
-    
     public static boolean sendEmail(String toEmail, String subject, String content) {
         // Read credentials from local properties file
         Properties config = loadEmailProperties();
@@ -68,7 +67,7 @@ public class EmailUtils {
             msg.setFrom(new InternetAddress(senderEmail, senderName));
             
             msg.setSubject(subject, "UTF-8");
-            msg.setContent(content, "text/html; charset=UTF-8"); // Supports HTML tags for rich layout
+            msg.setContent(content, "text/html; charset=UTF-8");
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
 
             System.out.println("[INFO] Attempting to send email to: " + toEmail);
