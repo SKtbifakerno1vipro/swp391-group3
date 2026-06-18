@@ -51,7 +51,8 @@ public class ContractDetailController extends HttpServlet {
                     String finalHtml = contract.getContractContent();
                     String status = contract.getContractStatus();
                     boolean isApproved = "APPROVED".equals(status);
-                    if (isApproved) {
+                    boolean isSigned = "SIGNED".equals(status);
+                    if (isApproved || isSigned) {
                         Signature existSign = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
                         existSignature = (existSign!=null);
                         request.setAttribute("signed", existSignature);
