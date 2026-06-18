@@ -29,8 +29,6 @@ public class ContractSaveController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setCharacterEncoding("UTF-8");
-        request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
@@ -39,12 +37,12 @@ public class ContractSaveController extends HttpServlet {
             return;
         }
 
-        String id = request.getParameter("id");
+        String contractIdRaw = request.getParameter("id");
         String quotationId = request.getParameter("quotationId");
 
         //check  contract exist by id?
-        if (id != null && !id.isEmpty()) {
-            int contractId = Integer.parseInt(id);
+        if (contractIdRaw != null && !contractIdRaw.isEmpty()) {
+            int contractId = Integer.parseInt(contractIdRaw);
             Contract contract = contractService.getContractById(contractId);
 
             if (contract == null) {
@@ -71,7 +69,7 @@ public class ContractSaveController extends HttpServlet {
             int qId = Integer.parseInt(quotationId);
             Quotation quotation = quotationService.getQuotationById(qId);
             if (quotation != null) {
-                String templateHtml = generateContractHtml(qId);
+                String templateHtml = generateContractHtml(quotation);
                 request.setAttribute("templateContent", templateHtml);
                 request.setAttribute("quotationId", qId);
                 request.setAttribute("customerId", quotation.getCustomerId());
@@ -81,14 +79,13 @@ public class ContractSaveController extends HttpServlet {
                 response.sendRedirect("quotation-list");
             }
         } else {
-            response.sendRedirect("contract-list");
+            response.sendRedirect(  "contract-list");
         }
     }
 
-    private String generateContractHtml(int quotationId) throws IOException {
-        Quotation quotation = quotationService.getQuotationById(quotationId);
+    private String generateContractHtml(Quotation quotation) throws IOException {
         CustomerDTO customer = customerService.getCustomerDTOById(quotation.getCustomerId());
-        List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotationId);
+        List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotation.getQuotationId());
 
         Properties config = new Properties();
         try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/config.properties")) {
