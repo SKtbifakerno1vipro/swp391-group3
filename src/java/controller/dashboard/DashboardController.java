@@ -10,7 +10,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import model.User;
+import java.util.List;
+import model.*;
+import dal.*;
+import service.*;
 
 @WebServlet(name = "DashboardController", urlPatterns = {"/dashboard"})
 public class DashboardController extends HttpServlet {
@@ -26,8 +29,42 @@ public class DashboardController extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         DashboardDAO dashboardDAO = new DashboardDAO();
-
+        QuotationService quotationService = new QuotationService();
+        CustomerService customerService = new CustomerService();
+        ContractService contractService = new ContractService();
         request.setAttribute("user", user);
+
+        if (user.getRoleId() == 3) { // ROLE_CUSTOMER
+
+            Customer customer = customerService.getCustomerByUserId(user.getUserId());
+            if (customer == null) {
+                response.sendRedirect(request.getContextPath() + "/login?error=customer_not_found");
+                return;
+            }
+            int customerId = customer.getCustomerId();
+            session.setAttribute("customerId", customerId);
+            request.setAttribute("customer", customer);
+
+            List<Quotation> quotations = quotationService.getQuotationsByCustomerId(customerId);
+            request.setAttribute("totalQuotations", quotations.size());
+            List<Quotation> recentQuotations = quotations;
+            if (recentQuotations.size() > 5) {
+                recentQuotations = recentQuotations.subList(recentQuotations.size() - 5, recentQuotations.size());
+            }
+            request.setAttribute("recentQuotations", recentQuotations);
+
+            List<Contract> contracts = contractService.getContractsByCustomerId(customerId);
+            request.setAttribute("totalContracts", contracts.size());
+            List<Contract> recentContracts = contracts;
+            if (recentContracts.size() > 5) {
+                recentContracts = recentContracts.subList(0, 5);
+            }
+            request.setAttribute("recentContracts", recentContracts);
+
+            request.getRequestDispatcher("/views/customer-dashboard.jsp").forward(request, response);
+            return;
+        }
+
         request.setAttribute("totalCustomers", dashboardDAO.count("customer"));
         request.setAttribute("totalProducts", dashboardDAO.countWhere("product", "product_status", "ACTIVE"));
         request.setAttribute("totalQuotations", dashboardDAO.count("quotation"));

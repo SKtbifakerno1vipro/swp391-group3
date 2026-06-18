@@ -18,35 +18,50 @@
                 <a class="nav-link ${param.activeMenu == 'dashboard' ? 'active' : ''}"
                     href="${pageContext.request.contextPath}/dashboard"><span
                         class="material-symbols-outlined">dashboard</span>Dashboard</a>
-                <a class="nav-link ${param.activeMenu == 'customers' ? 'active' : ''}"
-                    href="${pageContext.request.contextPath}/customer/list"><span
-                        class="material-symbols-outlined">groups</span>Customers</a>
-                <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
-                    href="${pageContext.request.contextPath}/customer-order-list"><span
-                        class="material-symbols-outlined">receipt_long</span>Orders</a>
-                <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
-                    href="${pageContext.request.contextPath}/product-list"><span
-                        class="material-symbols-outlined">inventory_2</span>Products</a>
-                <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}"
-                    href="${pageContext.request.contextPath}/category/list"><span
-                        class="material-symbols-outlined">category</span>Categories</a>
-                <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
-                    href="${pageContext.request.contextPath}/quotation-list"><span
-                        class="material-symbols-outlined">request_quote</span>Quotations</a>
-                <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
-                    href="${pageContext.request.contextPath}/contract-list"><span
-                        class="material-symbols-outlined">contract</span>Contracts</a>
-                <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"
-                    href="${pageContext.request.contextPath}/user-list"><span
-                        class="material-symbols-outlined">manage_accounts</span>Users</a>
-                <a class="nav-link ${param.activeMenu == 'roles' ? 'active' : ''}"
-                    href="${pageContext.request.contextPath}/role-list"><span
-                        class="material-symbols-outlined">admin_panel_settings</span>Roles</a>
-                <c:if test="${sessionScope.user.roleId == 1}">
-                    <a class="nav-link ${param.activeMenu == 'emailLogs' ? 'active' : ''}"
-                        href="${pageContext.request.contextPath}/email/logs"><span
-                            class="material-symbols-outlined">mail</span>Email Logs</a>
-                </c:if>
+                <c:choose>
+                    <c:when test="${sessionScope.user.roleId == 3}">
+                        <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/customer/detail?id_cus=${sessionScope.customerId}"><span
+                                class="material-symbols-outlined">account_circle</span>My Profile</a>
+                        <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/quotation-list"><span
+                                class="material-symbols-outlined">request_quote</span>Quotations</a>
+                        <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/contract-list"><span
+                                class="material-symbols-outlined">contract</span>Contracts</a>
+                    </c:when>
+                    <c:otherwise>
+                        <a class="nav-link ${param.activeMenu == 'customers' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/customer/list"><span
+                                class="material-symbols-outlined">groups</span>Customers</a>
+                        <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/customer-order-list"><span
+                                class="material-symbols-outlined">receipt_long</span>Orders</a>
+                        <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/product-list"><span
+                                class="material-symbols-outlined">inventory_2</span>Products</a>
+                        <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/category/list"><span
+                                class="material-symbols-outlined">category</span>Categories</a>
+                        <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/quotation-list"><span
+                                class="material-symbols-outlined">request_quote</span>Quotations</a>
+                        <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/contract-list"><span
+                                class="material-symbols-outlined">contract</span>Contracts</a>
+                        <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/user-list"><span
+                                class="material-symbols-outlined">manage_accounts</span>Users</a>
+                        <a class="nav-link ${param.activeMenu == 'roles' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/role-list"><span
+                                class="material-symbols-outlined">admin_panel_settings</span>Roles</a>
+                        <c:if test="${sessionScope.user.roleId == 1}">
+                            <a class="nav-link ${param.activeMenu == 'emailLogs' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/email/logs"><span
+                                    class="material-symbols-outlined">mail</span>Email Logs</a>
+                        </c:if>
+                    </c:otherwise>
+                </c:choose>
             </nav>
 
             <div class="sidebar-footer">

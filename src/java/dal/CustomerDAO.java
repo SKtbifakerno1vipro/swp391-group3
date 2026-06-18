@@ -71,26 +71,6 @@ public class CustomerDAO extends DBContext {
         return list;
     }
 
-    public Customer getCustomerByCusId(int id) {
-        try {
-            // Join with user table to get address and phone
-            String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, "
-                    + "u.address, u.phone, u.email "
-                    + "FROM customer c "
-                    + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                    + "WHERE c.customer_id = ?";
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setInt(1, id);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                return mapCustomer(rs);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public Integer getCustomerIdByTaxCode(String taxCode) {
         String sql = "SELECT customer_id FROM customer WHERE tax_code = ?";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
@@ -381,6 +361,22 @@ public class CustomerDAO extends DBContext {
             error = "searchAndPaginateCustomers_Total: " + e.getMessage();
         }
         return 0;
+    }
+
+    public Customer getCustomerByUserId(int userId) {
+        try {
+            String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
+                    + "FROM customer WHERE user_id = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, userId);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                return mapCustomer(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public CustomerDTO getCustomerDTOById(int id) {
