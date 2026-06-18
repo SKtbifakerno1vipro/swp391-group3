@@ -100,68 +100,70 @@
         </style>
     </head>
     <body>
-        <h2>Quản lý Hợp đồng: ${contract.contractNumber}</h2>
+        <h2>No Contract: ${contract.contractNumber}</h2>
 
         <div class="layout-container">
             <!-- CỘT 1: SIDEBAR (Menu & Actions) -->
             <div class="sidebar">
-                <h3>Thao tác Hợp đồng</h3>
-                <p><strong>Trạng thái:</strong> <span style="color: red; font-weight: bold;">${contract.contractStatus}</span></p>
+                <h3>Action For Contract</h3>
+                <p><strong>Status</strong> <span style="color: red; font-weight: bold;">${contract.contractStatus}</span></p>
                 <hr>
 
                 <c:choose>
-                    <%-- 1. TRẠNG THÁI: DRAFT / PENDING_REVIEW --%>
-                    <c:when test="${contract.contractStatus == 'DRAFT' or contract.contractStatus == 'PENDING_REVIEW'}">
+                    <%-- 1. Status: DRAFT / PENDING_REVIEW --%>
+                    <c:when test="${canRequestEdit}">
+
                         <!-- Manager (Role 2) -->
                         <c:if test="${sessionScope.user.roleId == 2}">
-                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Yêu cầu sửa đổi</button>
+                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Request edit</button>
                             <form method="POST" action="contract-detail" style="margin:0;">
                                 <input type="hidden" name="action" value="approve"/>
                                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
-                                <button type="submit" class="btn btn-green">Phê duyệt (Approve)</button>
+                                <button type="submit" class="btn btn-green">Approve</button>
                             </form>
                         </c:if>
 
                         <!-- Admin Officer (Role 5) -->
                         <c:if test="${sessionScope.user.roleId == 5}">
-                            <a href="contract-save?id=${contract.contractId}" class="btn btn-blue">Chỉnh sửa HTML</a>
+                            <a href="contract-save?id=${contract.contractId}" class="btn btn-blue">Edit Contract</a>
                             <form method="POST" action="contract-detail" style="margin:0;">
                                 <input type="hidden" name="action" value="send_to_manager"/>
                                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
-                                <button type="submit" class="btn btn-gray">Gửi lại cho Manager</button>
+                                <button type="submit" class="btn btn-gray">Send to Manager</button>
                             </form>
                         </c:if>
                     </c:when>
 
                     <%-- 2. TRẠNG THÁI: CUSTOMER_CHECK --%>
-                    <c:when test="${contract.contractStatus == 'CUSTOMER_CHECK'}">
+                    <c:when test="${canCustomerCheck}">
                         <!-- Khách hàng (Role 3) -->
                         <c:if test="${sessionScope.user.roleId == 3}">
+                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Edit request</button>
                             <form method="POST" action="contract-detail" style="margin:0;">
                                 <input type="hidden" name="action" value="customer_approve"/>
                                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
-                                <button type="submit" class="btn btn-green">Đồng ý hợp đồng (Approve)</button>
+                                <button type="submit" class="btn btn-green">Approve</button>
                             </form>
-                            <button type="button" onclick="showFeedbackModal()" class="btn btn-orange">Yêu cầu sửa đổi</button>
+
                         </c:if>
                     </c:when>
 
                     <%-- 3. TRẠNG THÁI: APPROVED --%>
-                    <c:when test="${contract.contractStatus == 'APPROVED'}">
-                        <p style="color: green; text-align: center; font-weight: bold;">Hợp đồng đã được phê duyệt!</p>
+                    <c:when test="${isApproved}">
+                        <p style="color: green; text-align: center; font-weight: bold;">Contract Approved</p>
                     </c:when>
                 </c:choose>
 
                 <hr>
-                <a href="contract-list" style="color: #007bff; text-decoration: none;">⬅ Quay lại danh sách</a>
+                <a href="contract-list" style="color: #007bff; text-decoration: none;">⬅ Back to contract list</a>
             </div>
 
             <!-- CỘT 2: CONTENT -->
             <div class="content">
-                <h3>Chi tiết Nội dung</h3>
+                <h3>Content Details</h3>
                 <div style="background: #fdfdfd; padding: 15px; border: 1px solid #eee; margin-bottom: 15px; border-radius: 4px;">
-                    <p style="margin: 0 0 5px 0;"><strong>Khách hàng:</strong> ${contract.customerName}</p>
-                    <p style="margin: 0;"><strong>Loại lưu trữ:</strong> ${contract.storageType}</p>
+                    <p style="margin: 0 0 5px 0;"><strong>Customer</strong> ${contract.customerName}</p>
+                    <p style="margin: 0;"><strong>Storage type:</strong> ${contract.storageType}</p>
                 </div>
                 <div style="border: 1px solid #ddd; padding: 20px; background: #fff; min-height: 500px; overflow-x: auto;">
                     ${contract.contractContent}
@@ -170,21 +172,25 @@
 
             <!-- CỘT 3: HISTORY -->
             <div class="history">
-                <h3>Lịch sử chỉnh sửa</h3>
+                <h3>Contract history</h3>
                 <c:choose>
                     <c:when test="${not empty historyList}">
                         <div style="max-height: 600px; overflow-y: auto;">
                             <c:forEach var="h" items="${historyList}">
                                 <div style="border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px;">
                                     <p style="margin: 0 0 5px 0; color: #666; font-size: 0.9em;">🕒 ${h.createdAt}</p>
-                                    <p style="margin: 0 0 5px 0;"><strong>Trạng thái:</strong> ${h.toStatus}</p>
-                                    <p style="margin: 0 0 10px 0;"><strong>Bởi:</strong> ${h.changedByName}</p>
+                                    <p style="margin: 0 0 5px 0;"><strong>Status:</strong> ${h.toStatus}</p>
+                                    <p style="margin: 0 0 10px 0;"><strong>By:</strong> ${h.changedByName}</p>
+                                    <!--Only admin officier can see NOTE-->
+                                    <c:if test="${sessionScope.user.roleId== 5}">
+                                        <p style="margin: 0 0 10px 0; color: red"><strong>Note:</strong> ${h.note}</p>
+                                    </c:if>
                                     <c:if test="${not empty h.revisionItems}">
-                                        <button class="btn btn-blue" style="padding: 5px 10px; font-size: 0.85em; width: auto;" onclick="viewHistoryDetail(${h.historyId})">Xem chi tiết</button>
+                                        <button class="btn btn-blue" style="padding: 5px 10px; font-size: 0.85em; width: auto;" onclick="viewHistoryDetail(${h.historyId})">View detail</button>
                                         <div id="history-data-${h.historyId}" style="display:none;">
                                             <c:forEach var="item" items="${h.revisionItems}">
                                                 <div style="border-left: 3px solid #007bff; padding: 8px; margin-bottom: 5px; background: #f8f9fa;">
-                                                    <strong>Vị trí:</strong> ${item.revisionType} <br> <strong>Thay đổi:</strong> ${item.revisionDetail}
+                                                    <strong>Location:</strong> ${item.revisionType} <br> <strong>Change:</strong> ${item.revisionDetail}
                                                 </div>
                                             </c:forEach>
                                         </div>
@@ -193,35 +199,39 @@
                             </c:forEach>
                         </div>
                     </c:when>
-                    <c:otherwise><p style="color: #888;">Chưa có lịch sử.</p></c:otherwise>
+                    <c:otherwise><p style="color: #888;">Not have any history</p></c:otherwise>
                 </c:choose>
+                <a href="Signature?contractId=${contract.contractId}&customerId=${contract.customerId}"><button>Sign Contract</button></a>
             </div>
         </div>
 
+        <!--Popup-->
+        <!--background-->
         <div id="modalOverlay" class="modal-overlay"></div>
+        <!--content revision-->
         <div id="feedbackModal" class="modal-content">
-            <h3>Yêu cầu sửa đổi</h3>
+            <h3>Request edit</h3>
             <form method="POST" action="contract-detail" id="feedbackForm">
                 <input type="hidden" name="action" value="request_edit"/>
                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
                 <div id="revisionContainer">
                     <div class="revision-box">
-                        <input type="text" name="revision_type[]" placeholder="Vị trí (vd: Điều 2)" required style="width:40%; padding: 8px;">
-                        <input type="text" name="revision_detail[]" placeholder="Thông tin thay đổi" required style="width:50%; padding: 8px;">
+                        <input type="text" name="revision_type[]" placeholder="Location (Ex: Name...)" required style="width:40%; padding: 8px;">
+                        <input type="text" name="revision_detail[]" placeholder="Change information" required style="width:50%; padding: 8px;">
                     </div>
                 </div>
-                <button type="button" onclick="addRevisionBox()" class="btn btn-add">+ Thêm mục</button>
+                <button type="button" onclick="addRevisionBox()" class="btn btn-add">+ Add more</button>
                 <div style="margin-top: 20px; text-align: right;">
-                    <button type="button" onclick="hideModals()" class="btn btn-red" style="width:auto;">Hủy</button>
-                    <button type="submit" class="btn btn-green" style="width:auto;">Gửi phản hồi</button>
+                    <button type="button" onclick="hideModals()" class="btn btn-red" style="width:auto;">Cancel</button>
+                    <button type="submit" class="btn btn-green" style="width:auto;">Send feedback</button>
                 </div>
             </form>
         </div>
 
         <div id="viewHistoryModal" class="modal-content" style="width: 40%; left: 30%;">
-            <h3>Chi tiết Yêu cầu sửa đổi</h3>
+            <h3>Detail of edit request</h3>
             <div id="viewHistoryBody" style="margin-bottom: 20px;"></div>
-            <button type="button" onclick="hideModals()" class="btn btn-gray" style="width: auto;">Đóng</button>
+            <button type="button" onclick="hideModals()" class="btn btn-gray" style="width: auto;">Cancel</button>
         </div>
 
         <script>
@@ -238,8 +248,8 @@
                 var container = document.getElementById('revisionContainer');
                 var div = document.createElement('div');
                 div.className = 'revision-box';
-                div.innerHTML = '<input type="text" name="revision_type[]" placeholder="Vị trí" required style="width:40%; padding: 8px; margin-top: 5px;"> ' +
-                        '<input type="text" name="revision_detail[]" placeholder="Thay đổi" required style="width:50%; padding: 8px;">';
+                div.innerHTML = '<input type="text" name="revision_type[]" placeholder="Location" required style="width:40%; padding: 8px; margin-top: 5px;"> ' +
+                        '<input type="text" name="revision_detail[]" placeholder="Change" required style="width:50%; padding: 8px;">';
                 container.appendChild(div);
             }
             function viewHistoryDetail(historyId) {

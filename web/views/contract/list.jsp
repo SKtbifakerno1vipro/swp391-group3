@@ -63,7 +63,9 @@
                                 <td>${c.contractStatus}</td>
                                 <td>${c.storageType}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |
+                                    <c:if test="${sessionScope.user.roleId==5}">
+                                        <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |
+                                    </c:if>
                                     <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">Details</a>
                                 </td>
                             </tr>

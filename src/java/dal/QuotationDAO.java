@@ -260,22 +260,23 @@ public class QuotationDAO extends DBContext {
          * Join quotation_detail voi product de lay them product_name.
          * Neu chi lay quotation_detail thi chi co product_id, nguoi dung kho hieu.
          */
-        String sql = "SELECT quotation_detail.quotation_detail_id, "
-                + "quotation_detail.quotation_id, "
-                + "quotation_detail.product_id, "
-                + "quotation_detail.quantity, "
-                + "quotation_detail.selling_price, "
-                + "quotation_detail.discount_percent, "
-                + "quotation_detail.tax_percent, "
-                + "product.product_name "
-                + "FROM quotation_detail "
-                + "JOIN product ON quotation_detail.product_id = product.product_id "
-                + "WHERE quotation_detail.quotation_id = ?";
+        String sql = """
+                     SELECT quotation_detail.quotation_detail_id,
+                                   quotation_detail.quotation_id, 
+                                  quotation_detail.product_id, 
+                                    quotation_detail.quantity, 
+                                    quotation_detail.selling_price, 
+                                   quotation_detail.discount_percent, 
+                                   product.unit,
+                                   quotation_detail.tax_percent, 
+                                    product.product_name 
+                                     FROM quotation_detail 
+                                   JOIN product ON quotation_detail.product_id = product.product_id 
+                                     WHERE quotation_detail.quotation_id = ?""";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
 
-            // Gan quotationId vao dau ? trong cau SQL.
             ps.setInt(1, quotationId);
 
             ResultSet rs = ps.executeQuery();
@@ -287,6 +288,7 @@ public class QuotationDAO extends DBContext {
                 detail.setQuotationId(rs.getInt("quotation_id"));
                 detail.setProductId(rs.getInt("product_id"));
                 detail.setQuantity(rs.getInt("quantity"));
+                detail.setUnit(rs.getString("unit"));
                 detail.setSellingPrice(rs.getBigDecimal("selling_price"));
                 detail.setDiscountPercent(rs.getBigDecimal("discount_percent"));
                 detail.setTaxPercent(rs.getBigDecimal("tax_percent"));
@@ -441,6 +443,7 @@ public class QuotationDAO extends DBContext {
         }
         return list;
     }
+
     // Xhieu - end
     /*
      * Xoa 1 dong san pham khoi quotation_detail.

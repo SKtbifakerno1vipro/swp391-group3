@@ -7,9 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import model.User;
@@ -28,7 +25,6 @@ public class SecurityFilter implements Filter {
             "/login",
             "/logout",
             "/register",
-            "/reset-password",
             "/auth/forgot",
             "/forgot-password"
     );
@@ -71,7 +67,8 @@ public class SecurityFilter implements Filter {
             "/customer-order-detail",
             "/create-customer-order",
             "/Invoice",
-            "/invoice"
+            "/invoice",
+            "/revenue-report"
     );
 
     private static final List<String> MANAGER_URLS = List.of(
@@ -91,7 +88,8 @@ public class SecurityFilter implements Filter {
             "/contract-list",
             "/contract-detail",
             "/Invoice",
-            "/invoice"
+            "/invoice",
+            "/revenue-report"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
@@ -115,7 +113,8 @@ public class SecurityFilter implements Filter {
             "/customer-order-detail",
             "/create-customer-order",
             "/product-list",
-            "/category/list"
+            "/category/list",
+            "/revenue-report"
     );
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
@@ -141,53 +140,55 @@ public class SecurityFilter implements Filter {
             "/category/delete"
     );
 //update security bo comment di 
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-        String path = req.getServletPath();
-
-        if (isStaticResource(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        HttpSession session = req.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
-
-        if (user == null) {
-            res.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
-        if (LOGGED_IN_URLS.contains(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-        
-        if (path.startsWith("/views/")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (hasPermission(user.getRoleId(), path)) {
-            chain.doFilter(request, response);
-        } else {
-            System.out.println("Access Denied: Role " + user.getRoleId() + " tried to access " + path);
-            res.sendRedirect(req.getContextPath() + "/dashboard?error=denied");
-        }
+//        HttpServletRequest req = (HttpServletRequest) request;
+//        HttpServletResponse res = (HttpServletResponse) response;
+//        String path = req.getServletPath();
+//
+//        if (isStaticResource(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        HttpSession session = req.getSession(false);
+//        User user = (session != null) ? (User) session.getAttribute("user") : null;
+//
+//        if (user == null) {
+//            res.sendRedirect(req.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        if (LOGGED_IN_URLS.contains(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//        
+//        if (path.startsWith("/views/")) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (hasPermission(user.getRoleId(), path)) {
+//            chain.doFilter(request, response);
+//        } else {
+//            System.out.println("Access Denied: Role " + user.getRoleId() + " tried to access " + path);
+//            res.sendRedirect(req.getContextPath() + "/dashboard?error=denied");
+//        }
+        chain.doFilter(request, response);
     }
 
     private boolean hasPermission(int roleId, String path) {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
-
+        System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
         if (roleId == ROLE_SYSTEM_ADMIN) {
             return SYSTEM_ADMIN_URLS.contains(cleanPath);
         }
