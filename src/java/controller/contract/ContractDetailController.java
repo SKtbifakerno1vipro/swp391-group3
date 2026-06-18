@@ -18,14 +18,16 @@ import service.ContractService;
 import service.CustomerService;
 import service.RoleService;
 import service.SignatureService;
+import service.UserService;
 
 @WebServlet("/contract-detail")
 public class ContractDetailController extends HttpServlet {
 
     private ContractService contractService = new ContractService();
     private SignatureService sService = new SignatureService();
-    private CustomerService cService = new CustomerService();
+    private UserService uService = new UserService();
     private RoleService rService = new RoleService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -37,7 +39,7 @@ public class ContractDetailController extends HttpServlet {
         }
 
         String idStr = request.getParameter("id");
-
+        boolean existSignature = false;
         if (idStr != null && !idStr.isEmpty()) {
             try {
                 int id = Integer.parseInt(idStr);
@@ -45,36 +47,50 @@ public class ContractDetailController extends HttpServlet {
 
                 if (contract != null) {
                     List<ContractHistory> historyList = contractService.getHistoriesByContractId(id);
-//nguyenkien begin
-                    CustomerDTO c = cService.getCustomerDTOByCusId(contract.getCustomerId());
-                    Signature sig = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
+//nguyenkien - begin
                     String finalHtml = contract.getContractContent();
-                    if (sig != null) {
-                        if (user.getUserId() == c.getUser().getUserId()) {
-                            String imgTag = "<div style=\"height: 100px;\" id=\"seller\">" + "<img src='File?name=" + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>" + "</div>";
-                            finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
-                        } else {
-                            String imgTag = "<div style=\"height: 100px;\" id=\"buyer\">" + "<img src='File?name=" + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>" + "</div>";
-                            finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"buyer\"></div>", imgTag);
+                    String status = contract.getContractStatus();
+                    boolean isApproved = "APPROVED".equals(status);
+                    if (isApproved) {
+                        Signature existSign = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
+                        existSignature = (existSign!=null);
+                        request.setAttribute("signed", existSignature);
+                        List<Signature> sigList = sService.getSignaturesByContractId(id);
+                        for (Signature sig : sigList) {
+                            if (sig == null || sig.getSignerUserId() == null) {
+                                continue;
+                            } 
+
+                            boolean isCustomerSigner = rService.getRoleIdByName("Customer")
+                                    == uService.getUserById(sig.getSignerUserId()).getRoleId();
+
+                            String imgTag = "<div style=\"height: 100px;\">"
+                                    + "<img src='File?name=" + sig.getFileName()
+                                    + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>"
+                                    + "</div>";
+
+                            if (isCustomerSigner) {
+                                finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"buyer\"></div>", imgTag);
+                            } else {
+                                finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
+                            }
                         }
+                        contractService.updateContractContent(id, finalHtml);
                     }
+
                     contract.setContractContent(finalHtml);
-//nguyen kien end
+//nguyen kien - end
                     request.setAttribute("contract", contract);
                     request.setAttribute("historyList", historyList);
-
-                    String status = contract.getContractStatus();
 
                     // clear the status of contract
                     boolean canRequestEdit = "DRAFT".equals(status)
                             || "PENDING_REVIEW".equals(status);
                     boolean canCustomerCheck = "CUSTOMER_CHECK".equals(status);
-                    boolean isApproved = "APPROVED".equals(status);
-
                     request.setAttribute("canRequestEdit", canRequestEdit);
                     request.setAttribute("canCustomerCheck", canCustomerCheck);
                     request.setAttribute("isApproved", isApproved);
-
+                    
                     request.getRequestDispatcher("views/contract/detail.jsp")
                             .forward(request, response);
                 } else {

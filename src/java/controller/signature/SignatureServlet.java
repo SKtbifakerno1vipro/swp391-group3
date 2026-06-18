@@ -20,11 +20,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Base64;
 import java.util.List;
+import model.Contract;
 import model.Signature;
 import model.User;
+import service.ContractService;
 import service.CustomerService;
 import service.RoleService;
 import service.SignatureService;
+import service.UserService;
 
 /**
  *
@@ -32,11 +35,13 @@ import service.SignatureService;
  */
 @WebServlet(urlPatterns = {"/Signature"})
 public class SignatureServlet extends HttpServlet {
-    
+
     private final SignatureService sService = new SignatureService();
     private final CustomerService cService = new CustomerService();
     private final RoleService rService = new RoleService();
-    
+    private final ContractService ctrService = new ContractService();
+    private final UserService uService = new UserService();
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -72,52 +77,59 @@ public class SignatureServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
+@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            response.sendRedirect("/login");
+            response.sendRedirect("login");
             return;
         }
-        String signerName = "";
+
         String contractIdRaw = request.getParameter("contractId");
         String signerIdRaw = request.getParameter("signerId");
-        String error = null;
+
         try {
             if (contractIdRaw == null || signerIdRaw == null
                     || contractIdRaw.trim().isEmpty() || signerIdRaw.trim().isEmpty()) {
-                throw new IllegalArgumentException("Thiếu thông tin hợp đồng hoặc người ký.");
+                throw new IllegalArgumentException();
             }
-            
+
             int contractId = Integer.parseInt(contractIdRaw.trim());
             int signerId = Integer.parseInt(signerIdRaw.trim());
-            
+
             if (contractId <= 0 || signerId <= 0) {
-                throw new IllegalArgumentException("ID phải là số nguyên dương.");
+                throw new IllegalArgumentException();
             }
+
+            String signerName = "";
             boolean isCustomer = (user.getRoleId() == rService.getRoleIdByName("Customer"));
             boolean isManager = (user.getRoleId() == rService.getRoleIdByName("Manager"));
-            if (isCustomer) {
-                signerName = cService.getCustomerDTOByUserId(signerId).getCustomer().getCompanyName();
-            } else if (isManager) {
+
+            if (isManager) {
                 signerName = user.getFullName();
+            } else if (isCustomer) {
+                CustomerDTO c = cService.getCustomerDTOByUserId(signerId);
+                if (c != null) {
+                    signerName = c.getCustomer().getCompanyName();
+                }
+            }
+
+            if (signerName.isEmpty()) {
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
             }
             
-            
-        } catch (NumberFormatException e) {
-            error = "Sai định dạng ID";
-        } catch (IllegalArgumentException e) {
-            error = e.getMessage();
-        }
-        if(error == null){
-            request.setAttribute("contractId", contractIdRaw);
-            request.setAttribute("signerId", signerIdRaw);
+            request.setAttribute("contractId", contractId);
+            request.setAttribute("signerId", signerId);
             request.setAttribute("signerName", signerName);
             request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
+            
+        } catch (Exception e) {
+            // Mọi lỗi đều redirect về detail không kèm thông báo
+            response.sendRedirect("contract-detail?id=" + contractIdRaw);
         }
-        
     }
 
     /**
@@ -131,43 +143,106 @@ public class SignatureServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login");
+            return;
+        }
+        boolean customerSigned = false;
+        boolean managerSigned = false;
         String signatureData = request.getParameter("signatureData");
-        File projectPath = new File(getServletContext().getRealPath("/")).getParentFile().getParentFile();
         String contractIdRaw = request.getParameter("contractId");
         String signerIdRaw = request.getParameter("signerId");
-        File uploadFile = new File(projectPath, "uploads");
-        if (!uploadFile.exists()) {
-            uploadFile.mkdir();
-        }
         
-        if (signatureData != null && !signatureData.isEmpty()) {
-            try {
-                int contractId = Integer.parseInt(contractIdRaw.trim());
-                int sigerId = Integer.parseInt(signerIdRaw.trim());
-                
-                CustomerDTO c = cService.getCustomerDTOByUserId(sigerId);
-                
-                String fileName = sService.editFileName(c.getCustomer().getCompanyName());
-                
-                fileName = fileName + System.currentTimeMillis() + ".png";
-                Signature s = new Signature();
-                s.setCustomerContractId(contractId);
-                s.setFileName(fileName);
-                s.setFileUrl(fileName);
-                s.setSignerUserId(c.getUser().getUserId());
-                s.setSignerName(c.getCompanyName());
-                s.setUploadedBy(c.getUser().getUserId());
-                sService.storeSignature(signatureData, uploadFile, fileName);
-                sService.insertSignature(s);
-                response.sendRedirect("contract-detail?id=" + contractId);
-            } catch (NumberFormatException ne) {
-                request.setAttribute("error", "Sai định dạng ID");
+        if (signatureData == null || signatureData.isEmpty()) {
+            request.setAttribute("error", "Vui lòng ký tên trước khi xác nhận.");
+            request.setAttribute("contractId", contractIdRaw);
+            request.setAttribute("signerId", signerIdRaw);
+            request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
+            return;
+        }
+        try {
+            int contractId = Integer.parseInt(contractIdRaw.trim());
+            int signerId = Integer.parseInt(signerIdRaw.trim());
+
+            if (contractId <= 0 || signerId <= 0) {
+                throw new IllegalArgumentException("ID phải là số nguyên dương.");
             }
-        } else {
-            request.setAttribute("error", "Vui lòng ký");
+            Contract ctr = ctrService.getContractById(contractId);
+            if (ctr == null) {
+                response.sendRedirect("contract-list");
+                return;
+            }
+            
+            File projectPath = new File(getServletContext().getRealPath("/")).getParentFile().getParentFile();
+            File uploadFile = new File(projectPath, "uploads");
+            if (!uploadFile.exists()) {
+                uploadFile.mkdir();
+            }
+
+            Signature s = new Signature();
+            s.setCustomerContractId(contractId);
+            s.setUploadedBy(user.getUserId());
+
+            String fileName = "";
+            boolean isCustomer = (user.getRoleId() == rService.getRoleIdByName("Customer"));
+            boolean isManager = (user.getRoleId() == rService.getRoleIdByName("Manager"));
+
+            if (isCustomer) {
+                CustomerDTO c = cService.getCustomerDTOByUserId(signerId);
+                if (c == null || user.getUserId() != c.getUser().getUserId()) {
+                    throw new IllegalArgumentException("Bạn không có quyền ký thay khách hàng này.");
+                }
+                fileName = c.getCustomer().getCompanyName() + "_" + ctr.getContractNumber();
+                s.setSignerUserId(c.getUser().getUserId());
+                s.setSignerName(c.getCustomer().getCompanyName());
+
+            } else if (isManager) {
+                fileName = "Manager_" + user.getFullName() + "_" + ctr.getContractNumber();
+                s.setSignerUserId(user.getUserId());
+                s.setSignerName(user.getFullName());
+            } else {
+                throw new IllegalArgumentException("Bạn không có quyền thực hiện ký tên.");
+            }
+
+            fileName = sService.standardFileName(fileName) + "_" + System.currentTimeMillis() + ".png";
+
+            s.setFileName(fileName);
+            s.setFileUrl(fileName);
+
+            sService.storeSignature(signatureData, uploadFile, fileName);
+            sService.insertSignature(s);
+            List<Signature> sigList = sService.getSignaturesByContractId(contractId);
+            for (Signature signature : sigList) {
+                if (signature.getSignerUserId() != null) {
+                    User signer = uService.getUserById(signature.getSignerUserId());
+                    if (signer.getRoleId() == rService.getRoleIdByName("Manager")) {
+                        managerSigned = true;
+                    } else if (signer.getRoleId() == rService.getRoleIdByName("Customer")) {
+                        customerSigned = true;
+                    }
+                }
+            }
+            if (managerSigned && customerSigned) {
+                ctrService.updateStatus(contractId, "SIGNED");
+            }
+            response.sendRedirect("contract-detail?id=" + contractId);
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Sai định dạng ID.");
+            request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Có lỗi xảy ra trong quá trình xử lý.");
             request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
         }
-        
     }
 
     /**

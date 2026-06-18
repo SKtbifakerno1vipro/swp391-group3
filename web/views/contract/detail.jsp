@@ -151,9 +151,19 @@
                     <%-- 3. TRẠNG THÁI: APPROVED --%>
                     <c:when test="${isApproved}">
                         <p style="color: green; text-align: center; font-weight: bold;">Contract Approved</p>
+                        <c:if test="${sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                            <c:if test="${not signed}">
+                                <form action="Signature" method="get">
+                                    <input type="hidden" name="contractId" value="${contract.contractId}">
+                                    <input type="hidden" name="signerId" value="${sessionScope.user.userId}">
+                                    <input class="btn btn-blue" type="submit" value="Sign Contract" />
+                                </form>
+                            </c:if>
+                           
+                        </c:if>
                     </c:when>
+                    <%-- 4. TRẠNG THÁI: SIGNED --%>
                 </c:choose>
-
                 <hr>
                 <a href="contract-list" style="color: #007bff; text-decoration: none;">⬅ Back to contract list</a>
             </div>
@@ -201,7 +211,7 @@
                     </c:when>
                     <c:otherwise><p style="color: #888;">Not have any history</p></c:otherwise>
                 </c:choose>
-                    <a href="Signature?contractId=${contract.contractId}&signerId=${sessionScope.user.userId}"><button>Sign Contract</button></a>
+
             </div>
         </div>
 

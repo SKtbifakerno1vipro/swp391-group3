@@ -73,17 +73,15 @@
 
     <table style="width: 100%; margin-top: 40px; border-collapse: collapse;">
     <tr>
-        <!-- Thêm style vertical-align: top; vào đây -->
         <td style="width: 40%; text-align: center; vertical-align: top;">
             <strong>ĐẠI DIỆN BÊN BÁN</strong>
-            <div style="height: 100px;" id="buyer"></div>
+            <div style="height: 100px;" id="seller"></div>
             <strong>{company_rep}</strong>
         </td>
         <td style="width: 20%;"></td>
-        <!-- Và cả ở đây -->
         <td style="width: 40%; text-align: center; vertical-align: top;">
             <strong>ĐẠI DIỆN BÊN MUA</strong><br>
-            <div style="height: 100px;" id="seller"></div>
+            <div style="height: 100px;" id="buyer"></div>
             <strong>{customer_name}</strong>
         </td>
     </tr>

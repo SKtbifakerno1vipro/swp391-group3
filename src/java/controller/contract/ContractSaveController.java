@@ -96,7 +96,7 @@ public class ContractSaveController extends HttpServlet {
 
         String templatePath = getServletContext().getRealPath("/views/contract/template.jsp");
         String template = new String(Files.readAllBytes(Paths.get(templatePath)), StandardCharsets.UTF_8);
-
+        
         return contractService.fillTemplate(quotation, customer, details, template, config);
     }
 
@@ -113,12 +113,12 @@ public class ContractSaveController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-
+        
         String contractIdStr = request.getParameter("contractId");
         String quotationIdStr = request.getParameter("quotationId");
         String contractContent = request.getParameter("contractContent");
         String action = request.getParameter("action");
-
+        
         if (contractContent == null || contractContent.trim().isEmpty()) {
             request.setAttribute("errorMsg", "Contract content cannot be empty!");
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);

@@ -142,4 +142,10 @@ public class ContractService {
         return contractDAO.getContractsByCustomerId(customerId);
     }
     // Xhieu - end
+    
+    // nguyen kien - begin
+    public boolean updateContractContent(int contractId, String contractContent) {
+        return contractDAO.updateContractContent(contractId, contractContent);
+    }
+    // nguyenkien - end
 }
