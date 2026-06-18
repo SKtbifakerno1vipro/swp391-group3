@@ -10,9 +10,9 @@ import dto.*;
 import dto.*;
 
 public class CustomerDAO extends DBContext {
-
+    
     String error = "";
-
+    
     private Customer mapCustomer(ResultSet rs) throws Exception {
         Customer c = new Customer();
         c.setCustomerId(rs.getInt("customer_id"));
@@ -21,17 +21,15 @@ public class CustomerDAO extends DBContext {
         c.setCustomerType(rs.getString("customer_type"));
         c.setCompanyName(rs.getString("company_name"));
         c.setAssignedToUserId((Integer) rs.getObject("assigned_to_user_id"));
-
+        
         return c;
     }
-
-
-
+    
     public List<Customer> getAllCustomers() {
         List<Customer> list = new ArrayList<>();
         String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
                 + "FROM customer";
-
+        
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
@@ -44,7 +42,7 @@ public class CustomerDAO extends DBContext {
         }
         return list;
     }
-
+    
     public Customer getCustomerByCusId(int id) {
         try {
             // Join with user table to get address and phone
@@ -108,33 +106,33 @@ public class CustomerDAO extends DBContext {
         }
         return null;
     }
-
+    
     public boolean updateCustomerDynamic(Customer customer) {
         // 1. Pre-condition check: user_id is mandatory for the WHERE clause
         if (customer.getUserId() == null || customer.getUserId() <= 0) {
             System.out.println("Error: Invalid user_id provided for the update condition!");
             return false;
         }
-
+        
         StringBuilder sql = new StringBuilder("UPDATE [customer] SET ");
-
+        
         List<Object> parameters = new ArrayList<>();
-
+        
         if (customer.getTaxCode() != null && !customer.getTaxCode().trim().isEmpty()) {
             sql.append("tax_code = ?, ");
             parameters.add(customer.getTaxCode());
         }
-
+        
         if (customer.getCustomerType() != null && !customer.getCustomerType().trim().isEmpty()) {
             sql.append("customer_type = ?, ");
             parameters.add(customer.getCustomerType());
         }
-
+        
         if (customer.getCompanyName() != null && !customer.getCompanyName().trim().isEmpty()) {
             sql.append("company_name = ?, ");
             parameters.add(customer.getCompanyName());
         }
-
+        
         if (customer.getAssignedToUserId() != null) {
             sql.append("assigned_to_user_id = ? ");
             parameters.add(customer.getAssignedToUserId());
@@ -145,7 +143,7 @@ public class CustomerDAO extends DBContext {
             System.out.println("Warning: No fields have changed. Update skipped!");
             return false;
         }
-
+        
         sql.append(" WHERE user_id = ?");
         parameters.add(customer.getUserId()); // Add user_id to the end of the parameters list
 
@@ -173,12 +171,12 @@ public class CustomerDAO extends DBContext {
         }
         return false;
     }
-
+    
     public boolean insertCustomer(Customer customer, Connection conn) {
-
+        
         String sql = "INSERT INTO [customer] (tax_code, customer_type, company_name, user_id, assigned_to_user_id) "
                 + "VALUES (?, ?, ?, ?, ?)";
-
+        
         try (PreparedStatement stm = conn.prepareStatement(sql)) {
 
             // 1. tax_code
@@ -207,18 +205,18 @@ public class CustomerDAO extends DBContext {
                 stm.setNull(5, java.sql.Types.INTEGER);
             }
             return stm.executeUpdate() > 0;
-
+            
         } catch (Exception e) {
             e.printStackTrace();
             this.error = "insertCustomer: " + e.getMessage();
         }
         return false;
     }
-
+    
     public String getLastError() {
         return error;
     }
-
+    
     public List<Customer> searchAndPaginateCustomers(String searchName, String searchSdt, String searchEmail, String searchMst,
             String typeCus, Integer assignedToUserId, int page, int pageSize) {
         List<Customer> list = new ArrayList<>();
@@ -239,7 +237,7 @@ public class CustomerDAO extends DBContext {
         boolean hasMst = (searchMst != null && !searchMst.isBlank());
         boolean hasType = (typeCus != null && !typeCus.isBlank());
         boolean hasAssigned = (assignedToUserId != null && assignedToUserId > 0);
-
+        
         if (hasName) {
             sql.append("AND u.full_name LIKE ? ");
             String strList[] = searchName.split("\\s+");
@@ -268,9 +266,9 @@ public class CustomerDAO extends DBContext {
 
         // 3. Ã„Â uoi phan trang co Ã„â€˜inh
         sql.append("ORDER BY c.customer_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
-
+        
         int offset = (page - 1) * pageSize;
-
+        
         try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
             int index = 1;
 
@@ -310,7 +308,7 @@ public class CustomerDAO extends DBContext {
         }
         return list;
     }
-
+    
     public int getTotalCustomersCount(String searchName, String searchSdt, String searchEmail, String searchMst,
             String typeCus, Integer assignedToUserId) {
 
@@ -329,7 +327,7 @@ public class CustomerDAO extends DBContext {
         boolean hasMst = (searchMst != null && !searchMst.isBlank());
         boolean hasType = (typeCus != null && !typeCus.isBlank());
         boolean hasAssigned = (assignedToUserId != null && assignedToUserId > 0);
-
+        
         if (hasName) {
             sql.append("AND u.full_name LIKE ? ");
         }
@@ -348,7 +346,7 @@ public class CustomerDAO extends DBContext {
         if (hasAssigned) {
             sql.append("AND c.assigned_to_user_id = ? ");
         }
-
+        
         try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
             int index = 1;
 
@@ -383,11 +381,11 @@ public class CustomerDAO extends DBContext {
         }
         return 0;
     }
-
+    
     public CustomerDTO getCustomerDTOById(int id) {
         try {
             String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, "
-                    + "u.address, u.phone, u.email "
+                    + "u.address, u.phone, u.email, u.full_name  "
                     + "FROM customer c "
                     + "LEFT JOIN [user] u ON c.user_id = u.user_id "
                     + "WHERE c.customer_id = ?";
@@ -398,6 +396,7 @@ public class CustomerDAO extends DBContext {
                 CustomerDTO dto = new CustomerDTO();
                 dto.setCustomerId(rs.getInt("customer_id"));
                 dto.setUserId((Integer) rs.getObject("user_id"));
+                dto.setFullName(rs.getString("full_name"));
                 dto.setTaxCode(rs.getString("tax_code"));
                 dto.setCustomerType(rs.getString("customer_type"));
                 dto.setCompanyName(rs.getString("company_name"));

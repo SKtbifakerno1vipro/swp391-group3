@@ -16,6 +16,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet(urlPatterns = {"/contract-save"})
 public class ContractSaveController extends HttpServlet {
@@ -26,8 +29,6 @@ public class ContractSaveController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setCharacterEncoding("UTF-8");
-        request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
@@ -36,12 +37,12 @@ public class ContractSaveController extends HttpServlet {
             return;
         }
 
-        String id = request.getParameter("id");
+        String contractIdRaw = request.getParameter("id");
         String quotationId = request.getParameter("quotationId");
 
         //check  contract exist by id?
-        if (id != null && !id.isEmpty()) {
-            int contractId = Integer.parseInt(id);
+        if (contractIdRaw != null && !contractIdRaw.isEmpty()) {
+            int contractId = Integer.parseInt(contractIdRaw);
             Contract contract = contractService.getContractById(contractId);
 
             if (contract == null) {
@@ -68,7 +69,7 @@ public class ContractSaveController extends HttpServlet {
             int qId = Integer.parseInt(quotationId);
             Quotation quotation = quotationService.getQuotationById(qId);
             if (quotation != null) {
-                String templateHtml = generateContractHtml(qId);
+                String templateHtml = generateContractHtml(quotation);
                 request.setAttribute("templateContent", templateHtml);
                 request.setAttribute("quotationId", qId);
                 request.setAttribute("customerId", quotation.getCustomerId());
@@ -78,14 +79,13 @@ public class ContractSaveController extends HttpServlet {
                 response.sendRedirect("quotation-list");
             }
         } else {
-            response.sendRedirect("contract-list");
+            response.sendRedirect(  "contract-list");
         }
     }
 
-    private String generateContractHtml(int quotationId) throws IOException {
-        Quotation quotation = quotationService.getQuotationById(quotationId);
+    private String generateContractHtml(Quotation quotation) throws IOException {
         CustomerDTO customer = customerService.getCustomerDTOById(quotation.getCustomerId());
-        List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotationId);
+        List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotation.getQuotationId());
 
         Properties config = new Properties();
         try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/config.properties")) {
@@ -95,7 +95,7 @@ public class ContractSaveController extends HttpServlet {
         }
 
         String templatePath = getServletContext().getRealPath("/views/contract/template.jsp");
-        String template = new String(Files.readAllBytes(Paths.get(templatePath)), java.nio.charset.StandardCharsets.UTF_8);
+        String template = new String(Files.readAllBytes(Paths.get(templatePath)), StandardCharsets.UTF_8);
 
         return contractService.fillTemplate(quotation, customer, details, template, config);
     }
@@ -164,8 +164,9 @@ public class ContractSaveController extends HttpServlet {
         }
 
         // Tạo mã hợp đồng ngay tại đây để gán vào object trước khi insert
-        String yearMonth = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMM"));
-        String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", quotationId);
+        String year = LocalDate.now()
+                .format(DateTimeFormatter.ofPattern("yyyy"));
+        String newContractNumber = String.format("%03d", quotationId) + "/" + year + "-HĐ";
 
         Contract c = new Contract();
         c.setCustomerId(customerId);

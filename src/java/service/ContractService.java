@@ -25,6 +25,10 @@ public class ContractService {
                 cust.getPhone() != null ? cust.getPhone() : "");
         template = template.replace("{customer_tax}",
                 cust.getTaxCode() != null ? cust.getTaxCode() : "");
+        template = template.replace("{user_full_name}",
+                cust.getFullName() != null ? cust.getFullName() : "");
+        template = template.replace("{tax_code_B}",
+                cust.getTaxCode()!= null ? cust.getTaxCode() : "");
 
         template = template.replace("{company_name}",
                 config.getProperty("company_name", ""));
@@ -38,10 +42,11 @@ public class ContractService {
                 config.getProperty("company_rep_name", ""));
         template = template.replace("{company_position}",
                 config.getProperty("company_position", ""));
+        template= template.replace("{tax_code_A}", 
+                config.getProperty("tax_code",""));
 
         StringBuilder productRows = new StringBuilder();
-        int stt = 1;
-        Locale locale = Locale.US;
+        int index = 1;
 
         if (details != null && !details.isEmpty()) {
             for (QuotationDetail item : details) {
@@ -51,15 +56,14 @@ public class ContractService {
                 BigDecimal subtotal = price.multiply(qty);
 
                 productRows.append("<tr>")
-                        .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(stt++).append("</td>")
-                        .append("<td style='border: 1px solid black; padding: 5px;'>").append(item.getProductName() != null ? item.getProductName() : "")
-                        .append("</td>")
-                        .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append("").append("</td>")
+                        .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(index++).append("</td>")
+                        .append("<td style='border: 1px solid black; padding: 5px;'>").append(item.getProductName() != null ? item.getProductName() : "").append("</td>")
+                        .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(item.getUnit() != null ? item.getUnit() : "").append("</td>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(item.getQuantity()).append("</td>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:right;'>")
-                        .append(String.format(locale, "%,.0f", price)).append("</td>")
+                        .append(String.format("%,.0f", price)).append("</td>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:right;'>")
-                        .append(String.format(locale, "%,.0f", subtotal)).append("</td>")
+                        .append(String.format("%,.0f", subtotal)).append("</td>")
                         .append("</tr>");
             }
         } else {
@@ -77,9 +81,9 @@ public class ContractService {
         template = template.replace("{effective_date}", effective.format(fmt));
         template = template.replace("{end_date}", effective.plusYears(1).format(fmt));
 
-        String year = java.time.LocalDate.now()
-                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy"));
-//        String newContractNumber = "HD" + yearMonth + "-" + String.format("%04d", q.getQuotationId());
+        //contract_number
+        String year = LocalDate.now()
+                .format(DateTimeFormatter.ofPattern("yyyy"));
         String newContractNumber = String.format("%03d", q.getQuotationId()) + "/" + year + "-HĐ";
         template = template.replace("{contract_number}",
                 newContractNumber);
@@ -87,7 +91,7 @@ public class ContractService {
         BigDecimal total = contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) != null
                 ? contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) : BigDecimal.ZERO;
         template = template.replace("{total_amount}",
-                String.format(locale, "%,.0f", total));
+                String.format("%,.0f", total));
 
         return template;
     }

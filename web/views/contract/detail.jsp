@@ -181,6 +181,10 @@
                                     <p style="margin: 0 0 5px 0; color: #666; font-size: 0.9em;">🕒 ${h.createdAt}</p>
                                     <p style="margin: 0 0 5px 0;"><strong>Status:</strong> ${h.toStatus}</p>
                                     <p style="margin: 0 0 10px 0;"><strong>By:</strong> ${h.changedByName}</p>
+                                    <!--Only admin officier can see NOTE-->
+                                    <c:if test="${sessionScope.user.roleId== 5}">
+                                        <p style="margin: 0 0 10px 0; color: red"><strong>Note:</strong> ${h.note}</p>
+                                    </c:if>
                                     <c:if test="${not empty h.revisionItems}">
                                         <button class="btn btn-blue" style="padding: 5px 10px; font-size: 0.85em; width: auto;" onclick="viewHistoryDetail(${h.historyId})">View detail</button>
                                         <div id="history-data-${h.historyId}" style="display:none;">

@@ -15,7 +15,7 @@ public class ContractDAO extends DBContext {
         String sql = "INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_status, contract_content, storage_type, created_by, created_at, updated_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, c.getCustomerId());
             ps.setInt(2, c.getQuotationId());
             ps.setString(3, c.getContractNumber());
