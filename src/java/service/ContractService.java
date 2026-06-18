@@ -42,7 +42,6 @@ public class ContractService {
         StringBuilder productRows = new StringBuilder();
         int index = 1;
 
-
         if (details != null && !details.isEmpty()) {
             for (QuotationDetail item : details) {
                 BigDecimal qty = new BigDecimal(item.getQuantity());
@@ -52,9 +51,8 @@ public class ContractService {
 
                 productRows.append("<tr>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(index++).append("</td>")
-                        .append("<td style='border: 1px solid black; padding: 5px;'>").append(item.getProductName() != null ? item.getProductName() : "")
-                        .append("</td>")
-                        .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append("").append("</td>")
+                        .append("<td style='border: 1px solid black; padding: 5px;'>").append(item.getProductName() != null ? item.getProductName() : "").append("</td>")
+                        .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(item.getUnit()!= null ? item.getUnit() : "").append("</td>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(item.getQuantity()).append("</td>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:right;'>")
                         .append(String.format("%,.0f", price)).append("</td>")
@@ -91,9 +89,6 @@ public class ContractService {
 
         return template;
     }
-    
-    
-    
 
     public List<Contract> searchContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId) {
