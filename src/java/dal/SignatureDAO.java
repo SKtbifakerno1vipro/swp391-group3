@@ -80,41 +80,19 @@ public class SignatureDAO extends DBContext {
         return null;
     }
 
-    public Signature getSignatureByContractId(int contractId) {
+    public List<Signature> getSignaturesByContractId(int contractId) {
         List<Signature> list = new ArrayList<>();
-        String sql = "SELECT TOP 2 signature_id, customer_contract_id, file_name, file_url, signer_user_id, signer_name, signed_at, uploaded_by, uploaded_at FROM signature WHERE customer_contract_id = ? ORDER BY uploaded_at DESC";
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, contractId);
-            ResultSet rs = st.executeQuery();
-
+        String sql = "SELECT * FROM signature WHERE customer_contract_id = ? ORDER BY signed_at ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contractId);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Signature s = new Signature();
-                s.setId(rs.getInt("signature_id"));
-                s.setCustomerContractId(rs.getInt("customer_contract_id"));
-                s.setFileName(rs.getString("file_name"));
-                s.setFileUrl(rs.getString("file_url"));
-
-                int signerUserId = rs.getInt("signer_user_id");
-                if (!rs.wasNull()) {
-                    s.setSignerUserId(signerUserId);
-                }
-
-                s.setSignerName(rs.getString("signer_name"));
-                s.setSignedAt(rs.getTimestamp("signed_at"));
-
-                int uploadedBy = rs.getInt("uploaded_by");
-                if (!rs.wasNull()) {
-                    s.setUploadedBy(uploadedBy);
-                }
-
-                s.setUploadedAt(rs.getTimestamp("uploaded_at"));
-                list.add(s);
+                list.add(mapResultSetToSignature(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return list;
     }
 
     public Signature getSignatureByContractIdAndSignerId(int contractId, int signerUserId) {

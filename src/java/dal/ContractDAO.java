@@ -81,7 +81,7 @@ public class ContractDAO extends DBContext {
 //              if (userId != 0 && userId > 0 && roleId == 3) {
 //                  ps.setInt(index++, userId);
 //              }
-            
+
             ps.setInt(index++, (pageIndex - 1) * pageSize);
             ps.setInt(index++, pageSize);
 
@@ -301,6 +301,21 @@ public class ContractDAO extends DBContext {
     }
     // Xhieu - end
 
+    //nguyenkien - begin
+    public boolean updateContractContent(int contractId, String contractContent) {
+        String sql = "UPDATE customer_contract SET contract_content = ?, updated_at = GETDATE() WHERE customer_contract_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, contractContent);
+            ps.setInt(2, contractId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("ContractDAO updateContractContent error: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    //nguyenkien - end
     public boolean updateContractNumber(Contract c) {
         String sql = "UPDATE customer_contract SET contract_number = ? WHERE customer_contract_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
