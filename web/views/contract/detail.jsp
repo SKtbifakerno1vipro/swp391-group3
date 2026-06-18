@@ -155,6 +155,9 @@
                 </c:choose>
 
                 <hr>
+                <a href="export-pdf?id=${contract.contractId}" class="btn btn-blue" style="background-color: #6c757d; margin-top: 10px;">
+                    📄 Xuất PDF
+                </a>
                 <a href="contract-list" style="color: #007bff; text-decoration: none;">⬅ Back to contract list</a>
             </div>
 
