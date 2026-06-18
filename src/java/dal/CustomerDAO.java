@@ -64,6 +64,35 @@ public class CustomerDAO extends DBContext {
         }
         return null;
     }
+    
+    public CustomerDTO getCustomerDTOByUserId(int id) {
+        try {
+            String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, "
+                    + "u.address, u.phone, u.email "
+                    + "FROM customer c "
+                    + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                    + "WHERE c.user_id = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, id);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                CustomerDTO dto = new CustomerDTO();
+                dto.setCustomerId(rs.getInt("customer_id"));
+                dto.setUserId((Integer) rs.getObject("user_id"));
+                dto.setTaxCode(rs.getString("tax_code"));
+                dto.setCustomerType(rs.getString("customer_type"));
+                dto.setCompanyName(rs.getString("company_name"));
+                dto.setAssignedToUserId((Integer) rs.getObject("assigned_to_user_id"));
+                dto.setAddress(rs.getString("address"));
+                dto.setPhone(rs.getString("phone"));
+                dto.setEmail(rs.getString("email"));
+                return dto;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public Integer getCustomerIdByTaxCode(String taxCode) {
         String sql = "SELECT customer_id FROM customer WHERE tax_code = ?";

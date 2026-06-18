@@ -98,22 +98,15 @@ public class CustomerService {
         return dtoList;
     }
 
+    //nguyenkiem - begin
+    public CustomerDTO getCustomerDTOByUserId(int userId) {
+        return customerDAO.getCustomerDTOByUserId(userId);
+    }
+    // nguyenkien - end
+    
     // new 
     public CustomerDTO getCustomerDTOByCusId(int customerId) {
-
-        Customer c = customerDAO.getCustomerByCusId(customerId);
-        if (c == null) {
-            return null;
-        }
-
-        int userId = c.getUserId();
-        User u = userService.getUserByIdFullParameter(userId);
-
-        if (u == null) {
-            return null;
-        }
-        CustomerDTO dto = new CustomerDTO(c, u);
-        return dto;
+        return customerDAO.getCustomerDTOById(customerId);
     }
 
     // new

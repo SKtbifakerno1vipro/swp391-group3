@@ -15,12 +15,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Base64;
 import java.util.List;
 import model.Signature;
+import model.User;
 import service.CustomerService;
+import service.RoleService;
 import service.SignatureService;
 
 /**
@@ -29,10 +32,11 @@ import service.SignatureService;
  */
 @WebServlet(urlPatterns = {"/Signature"})
 public class SignatureServlet extends HttpServlet {
-
-    SignatureService sService = new SignatureService();
-    CustomerService cService = new CustomerService();
-
+    
+    private final SignatureService sService = new SignatureService();
+    private final CustomerService cService = new CustomerService();
+    private final RoleService rService = new RoleService();
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -68,40 +72,52 @@ public class SignatureServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        List<Signature> list = sService.getAllSignature();
-
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("/login");
+            return;
+        }
+        String signerName = "";
         String contractIdRaw = request.getParameter("contractId");
-        String customerIdRaw = request.getParameter("customerId");
-
+        String signerIdRaw = request.getParameter("signerId");
+        String error = null;
         try {
-            if (contractIdRaw == null || customerIdRaw == null
-                    || contractIdRaw.trim().isEmpty() || customerIdRaw.trim().isEmpty()) {
+            if (contractIdRaw == null || signerIdRaw == null
+                    || contractIdRaw.trim().isEmpty() || signerIdRaw.trim().isEmpty()) {
                 throw new IllegalArgumentException("Thiếu thông tin hợp đồng hoặc người ký.");
             }
-
+            
             int contractId = Integer.parseInt(contractIdRaw.trim());
-            int customerId = Integer.parseInt(customerIdRaw.trim());
-
-            if (contractId <= 0 || customerId <= 0) {
+            int signerId = Integer.parseInt(signerIdRaw.trim());
+            
+            if (contractId <= 0 || signerId <= 0) {
                 throw new IllegalArgumentException("ID phải là số nguyên dương.");
             }
-
-            request.setAttribute("signatures", list);
-            request.setAttribute("contractId", contractId);
-            request.setAttribute("customer", cService.getCustomerDTOByCusId(customerId));
-            request.setAttribute("customerId", customerId);
-            request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
-
+            boolean isCustomer = (user.getRoleId() == rService.getRoleIdByName("Customer"));
+            boolean isManager = (user.getRoleId() == rService.getRoleIdByName("Manager"));
+            if (isCustomer) {
+                signerName = cService.getCustomerDTOByUserId(signerId).getCustomer().getCompanyName();
+            } else if (isManager) {
+                signerName = user.getFullName();
+            }
+            
+            
         } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Sai định dạng ID.");
+            error = "Sai định dạng ID";
         } catch (IllegalArgumentException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            error = e.getMessage();
         }
+        if(error == null){
+            request.setAttribute("contractId", contractIdRaw);
+            request.setAttribute("signerId", signerIdRaw);
+            request.setAttribute("signerName", signerName);
+            request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
+        }
+        
     }
 
     /**
@@ -118,21 +134,21 @@ public class SignatureServlet extends HttpServlet {
         String signatureData = request.getParameter("signatureData");
         File projectPath = new File(getServletContext().getRealPath("/")).getParentFile().getParentFile();
         String contractIdRaw = request.getParameter("contractId");
-        String customerIdRaw = request.getParameter("customerId");
+        String signerIdRaw = request.getParameter("signerId");
         File uploadFile = new File(projectPath, "uploads");
         if (!uploadFile.exists()) {
             uploadFile.mkdir();
         }
-
+        
         if (signatureData != null && !signatureData.isEmpty()) {
             try {
                 int contractId = Integer.parseInt(contractIdRaw.trim());
-                int customerId = Integer.parseInt(customerIdRaw.trim());
-
-                CustomerDTO c = cService.getCustomerDTOByCusId(customerId);
-
+                int sigerId = Integer.parseInt(signerIdRaw.trim());
+                
+                CustomerDTO c = cService.getCustomerDTOByUserId(sigerId);
+                
                 String fileName = sService.editFileName(c.getCustomer().getCompanyName());
-
+                
                 fileName = fileName + System.currentTimeMillis() + ".png";
                 Signature s = new Signature();
                 s.setCustomerContractId(contractId);
@@ -151,7 +167,6 @@ public class SignatureServlet extends HttpServlet {
             request.setAttribute("error", "Vui lòng ký");
             request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
         }
-
         
     }
 

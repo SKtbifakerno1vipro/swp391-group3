@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import service.ContractService;
 import service.CustomerService;
+import service.RoleService;
 import service.SignatureService;
 
 @WebServlet("/contract-detail")
@@ -24,7 +25,7 @@ public class ContractDetailController extends HttpServlet {
     private ContractService contractService = new ContractService();
     private SignatureService sService = new SignatureService();
     private CustomerService cService = new CustomerService();
-
+    private RoleService rService = new RoleService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -46,15 +47,17 @@ public class ContractDetailController extends HttpServlet {
                     List<ContractHistory> historyList = contractService.getHistoriesByContractId(id);
 //nguyenkien begin
                     CustomerDTO c = cService.getCustomerDTOByCusId(contract.getCustomerId());
-                    Signature sig = sService.getSignatureByContractIdAndSignerId(id, c.getCustomer().getUserId());
-
+                    Signature sig = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
                     String finalHtml = contract.getContractContent();
-
                     if (sig != null) {
-
-                        String imgTag = "<div style=\"height: 100px;\" id=\"seller\">" + "<img src='File?name=" + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>" + "</div>";
-                        finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
-                    } 
+                        if (user.getUserId() == c.getUser().getUserId()) {
+                            String imgTag = "<div style=\"height: 100px;\" id=\"seller\">" + "<img src='File?name=" + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>" + "</div>";
+                            finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
+                        } else {
+                            String imgTag = "<div style=\"height: 100px;\" id=\"buyer\">" + "<img src='File?name=" + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>" + "</div>";
+                            finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"buyer\"></div>", imgTag);
+                        }
+                    }
                     contract.setContractContent(finalHtml);
 //nguyen kien end
                     request.setAttribute("contract", contract);

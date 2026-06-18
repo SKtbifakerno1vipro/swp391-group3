@@ -87,10 +87,8 @@
             <h1>Ký tên xác nhận</h1>
             <form action="Signature" id="signatureForm" method="post">
                 <input type="hidden" name="contractId" value="${contractId}">
-                <input type="hidden" name="customerId" value="${customerId}">
-                <c:if test="${not empty customer}">
-                    <h2>Welcome ${customer.customer.companyName}</h2>
-                </c:if>
+                <input type="hidden" name="signerId" value="${signerId}">
+                    <h2>Welcome ${signerName}</h2>
                 <div class="signature-section">
                     <h3>Vui lòng ký vào khung bên dưới</h3>
                     <canvas id="signatureCanvas" width="400" height="200"></canvas>
