@@ -27,27 +27,7 @@ public class CustomerService {
     public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String searchSdt, String searchEmail, String searchMst,
             String typeCus, Integer assignedToUserId, int page, int pageSize) {
         
-        List<CustomerDTO> dtoList = new ArrayList<>();
-
-        List<Customer> customerList = customerDAO.searchAndPaginateCustomers(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId, page, pageSize);
-        if (customerList == null || customerList.isEmpty()) {
-            return dtoList; 
-        }
-        List<User> userList = userService.getAllUsersReturnUser();
-        Map<Integer, User> userMap = new HashMap<>();
-        if (userList != null) {
-            for (User u : userList) {
-                userMap.put(u.getUserId(), u);
-            }
-        }
-
-        for (Customer c : customerList) {
-            User u = userMap.get(c.getUserId());
-            if (u != null) {
-                dtoList.add(new CustomerDTO(c, u));
-            }
-        }
-        return dtoList;
+        return customerDAO.searchAndPaginateCustomers(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId, page, pageSize);
     }
     // new 
     public int getTotalPages(String searchName, String searchSdt, String searchEmail, String searchMst,
@@ -62,48 +42,11 @@ public class CustomerService {
     }
     // new
     public List<CustomerDTO> getAllCustomerDTOs() {
-        List<CustomerDTO> dtoList = new ArrayList<>();
-        List<Customer> customerList = customerDAO.getAllCustomers();
-
-        if (customerList == null || customerList.isEmpty()) {
-            return dtoList; 
-        }
-
-        List<User> userList = userService.getAllUsersReturnUser(); 
-
-        Map<Integer, User> userMap = new HashMap<>();
-        if (userList != null) {
-            for (User u : userList) {
-                userMap.put(u.getUserId(), u);
-            }
-        }
-
-        for (Customer c : customerList) {
-            User u = userMap.get(c.getUserId());
-
-            if (u != null) {
-                CustomerDTO dto = new CustomerDTO(c, u);
-                dtoList.add(dto);
-            }
-        }
-        return dtoList;
+        return customerDAO.getAllCustomerDTOs();
     }
     // new 
     public CustomerDTO getCustomerDTOByCusId(int customerId) {
-
-        Customer c = customerDAO.getCustomerByCusId(customerId);
-        if (c == null) {
-            return null;
-        }
-        
-        int userId = c.getUserId();
-        User u = userService.getUserByIdFullParameter(userId);
-
-        if (u == null) {
-            return null;
-        }
-        CustomerDTO dto = new CustomerDTO(c, u);
-        return dto;
+        return customerDAO.getCustomerDTOById(customerId);
     }
     // new
     public String isDuplicateCusFields(String userName, String phone, String email, String taxCode) {
