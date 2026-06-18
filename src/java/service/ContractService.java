@@ -25,6 +25,10 @@ public class ContractService {
                 cust.getPhone() != null ? cust.getPhone() : "");
         template = template.replace("{customer_tax}",
                 cust.getTaxCode() != null ? cust.getTaxCode() : "");
+        template = template.replace("{user_full_name}",
+                cust.getFullName() != null ? cust.getFullName() : "");
+        template = template.replace("{tax_code_B}",
+                cust.getTaxCode()!= null ? cust.getTaxCode() : "");
 
         template = template.replace("{company_name}",
                 config.getProperty("company_name", ""));
@@ -38,6 +42,8 @@ public class ContractService {
                 config.getProperty("company_rep_name", ""));
         template = template.replace("{company_position}",
                 config.getProperty("company_position", ""));
+        template= template.replace("{tax_code_A}", 
+                config.getProperty("tax_code",""));
 
         StringBuilder productRows = new StringBuilder();
         int index = 1;
@@ -52,7 +58,7 @@ public class ContractService {
                 productRows.append("<tr>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(index++).append("</td>")
                         .append("<td style='border: 1px solid black; padding: 5px;'>").append(item.getProductName() != null ? item.getProductName() : "").append("</td>")
-                        .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(item.getUnit()!= null ? item.getUnit() : "").append("</td>")
+                        .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(item.getUnit() != null ? item.getUnit() : "").append("</td>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(item.getQuantity()).append("</td>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:right;'>")
                         .append(String.format("%,.0f", price)).append("</td>")

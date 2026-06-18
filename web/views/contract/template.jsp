@@ -28,6 +28,7 @@
         <p style="margin: 0;">Giấy ủy quyền số:...........................(nếu có) ngày ................................................</p> 
         <p style="margin: 0;">Đại diện là Ông (bà): <strong>{company_rep}</strong></p>
         <p style="margin: 0;">Chức vụ: {company_position}</p>
+        <p style="margin: 0;">Mã số thuế: {tax_code_A}</p>
     </div>
 
     <div style="margin-top: 20px;">
@@ -38,8 +39,9 @@
         <p style="margin: 0;">Tài khoản số: ....................................................</p>
         <p style="margin: 0;">Mở tại ngân hàng: ................................................</p>
         <p style="margin: 0;">Giấy ủy quyền số:...........................(nếu có) ngày ................................................</p> 
-        <p style="margin: 0;">Đại diện là Ông (bà): ....................................................</p>
+        <p style="margin: 0;">Đại diện là Ông (bà): {user_full_name}</p>
         <p style="margin: 0;">Chức vụ: .........................................................</p>
+        <p style="margin: 0;">Mã số thuế: {tax_code_B}</p>
     </div>
 
     <p style="margin-top: 15px;">Hai bên thống nhất thỏa thuận nội dung hợp đồng như sau:</p>
