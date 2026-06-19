@@ -48,7 +48,8 @@
 
     <%-- Form them san pham moi vao quotation hien tai bang searchbar. --%>
     <h2>Add Product</h2>
-    <form action="${pageContext.request.contextPath}/quotation-detail" method="post">
+    <form action="${pageContext.request.contextPath}/quotation-detail" method="post" onsubmit="return validateAddProductForm()">
+        <input type="hidden" name="action" value="addProduct">
         <input type="hidden" name="quotationId" value="${quotation.quotationId}">
         <input type="hidden" name="productId" id="addProductId">
 
@@ -68,28 +69,19 @@
         <label>Selling Price:</label>
         <input type="number" id="addSellingPrice" name="sellingPrice" min="0" step="0.01" readonly>
 
-        <button type="submit" name="action" value="addProduct" onclick="return validateAddProductForm()">Add Product</button>
+        <label>Discount %:</label>
+        <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required>
+
+        <label>Tax %:</label>
+        <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required>
+
+        <button type="submit">Add Product</button>
     </form>
 
     <br>
 
     <%-- Khoi nay hien thi va cho sua danh sach san pham trong quotation. --%>
     <h2>Product Details</h2>
-
-    <div style="margin-bottom: 15px;">
-        <form action="${pageContext.request.contextPath}/quotation-detail" method="post" style="display:inline;">
-            <input type="hidden" name="action" value="applyAll">
-            <input type="hidden" name="quotationId" value="${quotation.quotationId}">
-            
-            <label><strong>Discount %:</strong></label>
-            <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required>
-            
-            <label style="margin-left: 10px;"><strong>Tax %:</strong></label>
-            <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required>
-            
-            <button type="submit" style="margin-left: 10px;">Apply to All Products</button>
-        </form>
-    </div>
 
     <table border="1" cellpadding="7" cellspacing="0" style="width: 100%;">
         <thead>
@@ -114,7 +106,6 @@
                         <td>
                             ${detail.productName}
                             <input type="hidden" name="productId" value="${detail.productId}">
-                            <input type="hidden" name="productName" value="${detail.productName}">
                         </td>
                         <td><input type="number" name="quantity" min="1" value="${detail.quantity}" required></td>
                         <td><input type="number" name="sellingPrice" min="0" step="0.01" value="${detail.sellingPrice}" readonly></td>

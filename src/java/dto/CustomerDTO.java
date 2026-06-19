@@ -105,7 +105,6 @@ public class CustomerDTO {
     public String getEmail() {
         return user.getEmail();
     }
-    
 
     public void setEmail(String email) {
         user.setEmail(email);

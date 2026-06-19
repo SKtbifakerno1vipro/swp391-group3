@@ -57,17 +57,16 @@
             .status-list { display:flex; flex-direction:column; gap:12px; }
             .status-item { display:flex; justify-content:space-between; align-items:center; padding:13px 14px; border-radius:16px; background:var(--surface-soft); color:var(--muted); font-weight:800; }
             .status-item strong { color:var(--text); font-size:18px; }
-            .metric-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:16px; margin-bottom:22px; }
+            .metric-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:16px; margin-bottom:22px; }
             .metric-card { padding:20px; transition:.2s ease; }
             .metric-card:hover { transform:translateY(-4px); }
             .metric-icon { width:42px; height:42px; display:grid; place-items:center; border-radius:15px; margin-bottom:18px; background:var(--primary-soft); color:var(--primary); }
             .metric-card.secondary .metric-icon { background:#f0e8db; color:var(--secondary); }
             .metric-card.tertiary .metric-icon { background:#f8e0a8; color:var(--tertiary); }
             .metric-card.danger .metric-icon { background:#ffdad8; color:var(--danger); }
-            .metric-card.info .metric-icon { background:#e0f2fe; color:#0369a1; }
-            .metric-value { margin:0; font-size:24px; font-family:'Literata',Georgia,serif; font-weight:700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .metric-value { margin:0; font-size:36px; font-family:'Literata',Georgia,serif; font-weight:700; }
             .metric-label { margin:3px 0 0; color:var(--muted); font-weight:700; }
-            .content-grid { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr); gap:20px; margin-bottom: 22px; }
+            .content-grid { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr); gap:20px; }
             .table-panel { padding:22px; overflow:hidden; }
             table { width:100%; border-collapse:collapse; }
             th,td { padding:14px 10px; text-align:left; border-bottom:1px solid var(--line); }
@@ -80,13 +79,10 @@
             .workflow-step h3 { margin:0 0 4px; font-size:15px; }
             .workflow-step p { margin:0; color:var(--muted); line-height:1.5; }
             .empty-state { padding:24px; border-radius:18px; background:var(--surface-soft); color:var(--muted); text-align:center; font-weight:700; }
-            .chart-container { position: relative; height: 300px; width: 100%; }
             @keyframes sidebarFadeIn { from { opacity:0; transform:translateX(-10px); } to { opacity:1; transform:translateX(0); } }
-            @media (max-width:1400px) { .metric-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
-            @media (max-width:1180px) { .hero,.content-grid { grid-template-columns:1fr; } }
+            @media (max-width:1180px) { .metric-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .hero,.content-grid { grid-template-columns:1fr; } }
             @media (max-width:820px) { .dashboard-shell { grid-template-columns:1fr; } .sidebar { position:static; height:auto; } .nav-group { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); } .main { padding:22px 16px; } .topbar { align-items:flex-start; flex-direction:column; } .metric-grid,.quick-grid { grid-template-columns:1fr; } }
         </style>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
     <body>
@@ -95,87 +91,11 @@
                 <jsp:param name="activeMenu" value="dashboard"/>
             </jsp:include>
             <main class="main">
-                <section class="topbar">
-                    <div><p class="eyebrow">Sales Performance Dashboard</p><h1>Welcome back, <c:out value="${user.fullName}"/>.</h1><p>Overview of sales activity, revenue trends, and key performance indicators.</p></div><div class="top-actions"><a class="button" href="${pageContext.request.contextPath}/product-list"><span class="material-symbols-outlined">inventory_2</span>Products</a><a class="button primary" href="${pageContext.request.contextPath}/customer-order-list"><span class="material-symbols-outlined">shopping_cart</span>Orders</a></div></section>
-                
-                <section class="metric-grid" aria-label="Dashboard metrics">
-                    <div class="metric-card info">
-                        <div class="metric-icon"><span class="material-symbols-outlined">payments</span></div>
-                        <p class="metric-value"><fmt:formatNumber value="${totalRevenue}" pattern="#,##0"/> ₫</p>
-                        <p class="metric-label">Total Revenue</p>
-                    </div>
-                    <a class="metric-card" href="${pageContext.request.contextPath}/customer/list">
-                        <div class="metric-icon"><span class="material-symbols-outlined">groups</span></div>
-                        <p class="metric-value"><c:out value="${totalCustomers}"/></p>
-                        <p class="metric-label">Customers</p>
-                    </a>
-                    <a class="metric-card danger" href="${pageContext.request.contextPath}/customer-order-list">
-                        <div class="metric-icon"><span class="material-symbols-outlined">local_shipping</span></div>
-                        <p class="metric-value"><c:out value="${totalOrders}"/></p>
-                        <p class="metric-label">Total Orders</p>
-                    </a>
-                    <a class="metric-card secondary" href="${pageContext.request.contextPath}/product-list">
-                        <div class="metric-icon"><span class="material-symbols-outlined">inventory_2</span></div>
-                        <p class="metric-value"><c:out value="${totalProducts}"/></p>
-                        <p class="metric-label">Products</p>
-                    </a>
-                    <a class="metric-card tertiary" href="${pageContext.request.contextPath}/quotation-list">
-                        <div class="metric-icon"><span class="material-symbols-outlined">request_quote</span></div>
-                        <p class="metric-value"><c:out value="${totalQuotations}"/></p>
-                        <p class="metric-label">Quotations</p>
-                    </a>
-                    <a class="metric-card" href="${pageContext.request.contextPath}/contract-list">
-                        <div class="metric-icon"><span class="material-symbols-outlined">description</span></div>
-                        <p class="metric-value"><c:out value="${totalContracts}"/></p>
-                        <p class="metric-label">Contracts</p>
-                    </a>
-                </section>
-
-                <section class="hero">
-                    <div class="panel status-panel" style="grid-column: span 2;">
-                        <div class="panel-title"><h2>Order Status</h2><span class="badge"><c:out value="${totalOrders}"/> total</span></div>
-                        <div class="status-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-                            <c:forEach var="entry" items="${orderStatusCounts}">
-                                <div class="status-item"><span><c:out value="${entry.key}"/></span><strong><c:out value="${entry.value}"/></strong></div>
-                            </c:forEach>
-                            <c:if test="${empty orderStatusCounts}">
-                                <div class="empty-state">No order data yet.</div>
-                            </c:if>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="content-grid" style="grid-template-columns: 1fr;">
-                    <div class="panel table-panel">
-                        <div class="panel-title"><h2>Recent Orders</h2><a class="badge" href="${pageContext.request.contextPath}/customer-order-list">View all</a></div>
-                        <c:choose>
-                            <c:when test="${empty recentOrders}">
-                                <div class="empty-state">No recent orders found.</div>
-                            </c:when>
-                            <c:otherwise>
-                                <table>
-                                    <thead><tr><th>ID</th><th>Customer</th><th>Status</th><th>Date</th><th></th></tr></thead>
-                                    <tbody>
-                                        <c:forEach var="order" items="${recentOrders}">
-                                            <tr>
-                                                <td>#<c:out value="${order.id}"/></td>
-                                                <td><c:out value="${not empty order.companyName ? order.companyName : order.customerName}" default="Unknown"/></td>
-                                                <td><span class="badge"><c:out value="${order.status}"/></span></td>
-                                                <td><fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy"/></td>
-                                                <td><a class="badge" href="${pageContext.request.contextPath}/customer-order-detail?id=${order.id}">Details</a></td>
-                                            </tr>
-                                        </c:forEach>
-                                    </tbody>
-                                </table>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-                </section>
+                <section class="topbar"><div><p class="eyebrow">Enterprise Dashboard</p><h1>Welcome back, <c:out value="${user.fullName}"/>.</h1><p>Overview of customers, products, quotations, contracts and customer orders in your sales workflow.</p></div><div class="top-actions"><a class="button" href="${pageContext.request.contextPath}/create-product"><span class="material-symbols-outlined">add_box</span>New product</a><a class="button primary" href="${pageContext.request.contextPath}/quotation-create"><span class="material-symbols-outlined">post_add</span>Create quotation</a></div></section>
+                <section class="hero"><div class="panel hero-card"><p class="eyebrow">Sales workflow</p><h2>Manage B2B bread sales from quotation to delivery.</h2><p>This dashboard uses real JSP/Servlet context, project routes, JSTL data binding and SQL Server-backed statistics.</p><div class="quick-grid"><a class="quick-link" href="${pageContext.request.contextPath}/customer/list">Customer CRM<span>Profiles, tax code, contacts</span></a><a class="quick-link" href="${pageContext.request.contextPath}/quotation-list">Quotation center<span>Pricing proposals and approval</span></a><a class="quick-link" href="${pageContext.request.contextPath}/customer-order-list">Order tracking<span>Status and fulfillment history</span></a></div></div><div class="panel status-panel"><div class="panel-title"><h2>Order Status</h2><span class="badge"><c:out value="${totalOrders}"/> total</span></div><div class="status-list"><c:forEach var="entry" items="${orderStatusCounts}"><div class="status-item"><span><c:out value="${entry.key}"/></span><strong><c:out value="${entry.value}"/></strong></div></c:forEach><c:if test="${empty orderStatusCounts}"><div class="empty-state">No order data yet.</div></c:if></div></div></section>
+                <section class="metric-grid" aria-label="Dashboard metrics"><a class="metric-card" href="${pageContext.request.contextPath}/customer/list"><div class="metric-icon"><span class="material-symbols-outlined">groups</span></div><p class="metric-value"><c:out value="${totalCustomers}"/></p><p class="metric-label">Customers</p></a><a class="metric-card secondary" href="${pageContext.request.contextPath}/product-list"><div class="metric-icon"><span class="material-symbols-outlined">inventory_2</span></div><p class="metric-value"><c:out value="${totalProducts}"/></p><p class="metric-label">Active products</p></a><a class="metric-card tertiary" href="${pageContext.request.contextPath}/quotation-list"><div class="metric-icon"><span class="material-symbols-outlined">request_quote</span></div><p class="metric-value"><c:out value="${totalQuotations}"/></p><p class="metric-label">Quotations</p></a><a class="metric-card" href="${pageContext.request.contextPath}/contract-list"><div class="metric-icon"><span class="material-symbols-outlined">contract</span></div><p class="metric-value"><c:out value="${totalContracts}"/></p><p class="metric-label">Contracts</p></a><a class="metric-card danger" href="${pageContext.request.contextPath}/customer-order-list"><div class="metric-icon"><span class="material-symbols-outlined">local_shipping</span></div><p class="metric-value"><c:out value="${totalOrders}"/></p><p class="metric-label">Customer orders</p></a></section>
+                <section class="content-grid"><div class="panel table-panel"><div class="panel-title"><h2>Recent Orders</h2><a class="badge" href="${pageContext.request.contextPath}/customer-order-list">View all</a></div><c:choose><c:when test="${empty recentOrders}"><div class="empty-state">No recent orders found.</div></c:when><c:otherwise><table><thead><tr><th>ID</th><th>Customer</th><th>Status</th><th>Created At</th><th></th></tr></thead><tbody><c:forEach var="order" items="${recentOrders}"><tr><td>#<c:out value="${order.id}"/></td><td><c:out value="${not empty order.companyName ? order.companyName : order.customerName}" default="Unknown"/></td><td><span class="badge"><c:out value="${order.status}"/></span></td><td><fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td><td><a class="badge" href="${pageContext.request.contextPath}/customer-order-detail?id=${order.id}">Details</a></td></tr></c:forEach></tbody></table></c:otherwise></c:choose></div><div class="panel workflow-panel"><div class="panel-title"><h2>Process Snapshot</h2></div><div class="workflow-step"><div class="step-number">1</div><div><h3>Quotation statuses</h3><p><c:forEach var="entry" items="${quotationStatusCounts}"><c:out value="${entry.key}"/>: <strong><c:out value="${entry.value}"/></strong> </c:forEach><c:if test="${empty quotationStatusCounts}">No quotation data.</c:if></p></div></div><div class="workflow-step"><div class="step-number">2</div><div><h3>Contract statuses</h3><p><c:forEach var="entry" items="${contractStatusCounts}"><c:out value="${entry.key}"/>: <strong><c:out value="${entry.value}"/></strong> </c:forEach><c:if test="${empty contractStatusCounts}">No contract data.</c:if></p></div></div><div class="workflow-step"><div class="step-number">3</div><div><h3>Operational modules</h3><p>Use Customers, Products, Quotations, Contracts and Orders from the sidebar to continue each sales process step.</p></div></div></div></section>
             </main>
         </div>
-
-        <script>
-            // Dashboard scripts
-        </script>
     </body>
 </html>

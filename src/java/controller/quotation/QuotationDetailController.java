@@ -70,18 +70,8 @@ public class QuotationDetailController extends HttpServlet {
             Integer userId = getCurrentUserId(request);
 
             if ("accept".equals(action)) {
-                quotationService.updateStatus(quotationId, "ACCEPTED", userId);
+                quotationService.updateStatus(quotationId, "ACCEPTED");
                 response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=accepted");
-                return;
-            }
-
-            if ("applyAll".equals(action)) {
-                BigDecimal discount = new BigDecimal(request.getParameter("discountPercent"));
-                BigDecimal tax = new BigDecimal(request.getParameter("taxPercent"));
-                
-                boolean success = quotationService.applyDiscountAndTaxToAll(quotationId, discount, tax, userId);
-                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId 
-                        + (success ? "&message=saveSuccess" : "&message=saveFailed"));
                 return;
             }
 
@@ -97,25 +87,22 @@ public class QuotationDetailController extends HttpServlet {
 
             if ("deleteProduct".equals(action)) {
                 int quotationDetailId = Integer.parseInt(request.getParameter("quotationDetailId"));
-                String productName = request.getParameter("productName");
 
-                boolean success = quotationService.deleteProductFromQuotation(quotationId, quotationDetailId, productName, userId);
+                boolean success = quotationService.deleteProductFromQuotation(quotationId, quotationDetailId, userId);
                 response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
                         + (success ? "&message=deleteSuccess" : "&message=deleteFailed"));
                 return;
             }
 
-            if ("updateDetail".equals(action)) {
-                int quotationDetailId = Integer.parseInt(request.getParameter("quotationDetailId"));
-                QuotationDetail detail = buildDetailFromRequest(request);
-                detail.setQuotationDetailId(quotationDetailId);
-                detail.setQuotationId(quotationId);
+            // Mac dinh la update 1 dong product detail.
+            int quotationDetailId = Integer.parseInt(request.getParameter("quotationDetailId"));
+            QuotationDetail detail = buildDetailFromRequest(request);
+            detail.setQuotationDetailId(quotationDetailId);
+            detail.setQuotationId(quotationId);
 
-                boolean success = quotationService.updateQuotationDetail(detail, userId);
-                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
-                        + (success ? "&message=saveSuccess" : "&message=saveFailed"));
-                return;
-            }
+            boolean success = quotationService.updateQuotationDetail(detail, userId);
+            response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
+                    + (success ? "&message=saveSuccess" : "&message=saveFailed"));
 
         } catch (Exception e) {
             if (quotationId > 0) {
@@ -132,18 +119,10 @@ public class QuotationDetailController extends HttpServlet {
     private QuotationDetail buildDetailFromRequest(HttpServletRequest request) {
         QuotationDetail detail = new QuotationDetail();
         detail.setProductId(Integer.parseInt(request.getParameter("productId")));
-        detail.setProductName(request.getParameter("productName"));
         detail.setQuantity(Integer.parseInt(request.getParameter("quantity")));
-        
-        String priceParam = request.getParameter("sellingPrice");
-        detail.setSellingPrice(priceParam != null && !priceParam.isEmpty() ? new BigDecimal(priceParam) : BigDecimal.ZERO);
-        
-        String discountParam = request.getParameter("discountPercent");
-        detail.setDiscountPercent(discountParam != null && !discountParam.isEmpty() ? new BigDecimal(discountParam) : BigDecimal.ZERO);
-        
-        String taxParam = request.getParameter("taxPercent");
-        detail.setTaxPercent(taxParam != null && !taxParam.isEmpty() ? new BigDecimal(taxParam) : BigDecimal.ZERO);
-        
+        detail.setSellingPrice(new BigDecimal(request.getParameter("sellingPrice")));
+        detail.setDiscountPercent(new BigDecimal(request.getParameter("discountPercent")));
+        detail.setTaxPercent(new BigDecimal(request.getParameter("taxPercent")));
         return detail;
     }
 
