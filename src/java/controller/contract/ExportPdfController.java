@@ -20,7 +20,7 @@ public class ExportPdfController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // 1. Ép UTF-8 cho Request & Response
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
@@ -30,31 +30,25 @@ public class ExportPdfController extends HttpServlet {
             response.getWriter().write("Missing id parameter");
             return;
         }
-        
+
         int contractId = 0;
         try {
             contractId = Integer.parseInt(idParam);
-        } catch(Exception e) {
+        } catch (Exception e) {
             response.getWriter().write("Invalid id");
             return;
         }
-        
+
         Contract contract = contractDAO.getContractById(contractId);
-        if(contract == null) {
+        if (contract == null) {
             response.getWriter().write("Contract not found");
             return;
         }
 
-        // Dữ liệu từ DB hoàn toàn chuẩn!
         String rawContent = contract.getContractContent() != null ? contract.getContractContent() : "";
 
-        // 2. Build HTML với CSS ép Times New Roman bằng !important
-        String html = "<html><head><meta charset=\"UTF-8\"/>"
-                + "<style>* { font-family: 'Times New Roman', Times, serif !important; } body { line-height: 1.6; }</style>"
-                + "</head><body>"
-                + "<div>" + rawContent + "</div>"
-                + "</body></html>";
-        
+        String html = rawContent;
+
         // 3. Chuẩn hóa XHTML cho openhtmltopdf
         String xhtml = html.replaceAll("<(br|hr|img|input|meta|link)([^>]*?)(?<!/)>", "<$1$2/>");
 
@@ -65,7 +59,7 @@ public class ExportPdfController extends HttpServlet {
             // --- FIX FONT: Dùng font Times New Roman (hỗ trợ tiếng Việt) ---
             try {
                 String[] fontPaths = {
-                    "assets/fonts/times.ttf",  // Relative to web root (runtime)
+                    "assets/fonts/times.ttf", // Relative to web root (runtime)
                     "d:/Desktop/swp_project/SWP_Group3/web/assets/fonts/times.ttf" // Absolute (IDE)
                 };
                 for (String path : fontPaths) {
@@ -79,7 +73,7 @@ public class ExportPdfController extends HttpServlet {
                 // ignore, will use default font
             }
             builder.withHtmlContent(xhtml, "/");
-            
+
             builder.toStream(baos);
             builder.run();
         } catch (Exception e) {

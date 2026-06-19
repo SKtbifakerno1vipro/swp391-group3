@@ -105,8 +105,6 @@
                             <td><input type="text" name="update_by" value="${update_by}" readonly></td>
                         </tr>
                         </c:if>
-
-                        <td><input type="hidden" name="update_by" value="${update_by}" readonly></td>
                     </table>
                     <div>
                         <c:if test="${action != 'detail'}">
