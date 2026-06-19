@@ -23,7 +23,7 @@ public class EditRolePermissionsController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        
+        response.setCharacterEncoding("UTF-8");
         String roleIdParam = request.getParameter("roleId");
         if (roleIdParam == null || roleIdParam.isBlank()) {
             response.sendRedirect(request.getContextPath() + "/role-list");

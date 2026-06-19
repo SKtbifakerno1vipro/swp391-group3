@@ -7,6 +7,19 @@ GO
 USE SWP_Sales_Process;
 GO
 
+USE SWP_Sales_Process;
+GO
+
+CREATE TABLE email_log (
+    log_id INT IDENTITY(1,1) PRIMARY KEY,
+    recipient NVARCHAR(255) NOT NULL,
+    subject NVARCHAR(255) NOT NULL,
+    content NVARCHAR(MAX) NOT NULL,
+    sent_at DATETIME DEFAULT GETDATE(),
+    status VARCHAR(20) NOT NULL
+);
+
+
 -- 1. Role
 CREATE TABLE role (
     role_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -220,7 +233,7 @@ CREATE TABLE signature (
     file_url NVARCHAR(1000),
     signer_user_id INT NULL,
     signer_name NVARCHAR(255),
-    --signer_type VARCHAR(50), DROP COLUMN
+    signer_type VARCHAR(50),
     signed_at DATETIME,
     uploaded_by INT,
     uploaded_at DATETIME DEFAULT GETDATE(),

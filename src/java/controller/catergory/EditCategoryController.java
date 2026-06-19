@@ -60,7 +60,7 @@ public class EditCategoryController extends HttpServlet {
             }
 
             if (categoryName == null || categoryName.trim().isEmpty()) {
-                request.setAttribute("error", "Vui lòng nhập tên danh mục!");
+                request.setAttribute("error", "Please enter the category name!");
                 request.setAttribute("category", category);
                 request.getRequestDispatcher("/views/category/category_edit.jsp").forward(request, response);
                 return;
@@ -69,7 +69,7 @@ public class EditCategoryController extends HttpServlet {
             categoryName = categoryName.trim();
 
             if (categoryService.isCategoryNameExists(categoryName, categoryId)) {
-                request.setAttribute("error", "Tên danh mục này đã tồn tại!");
+                request.setAttribute("error", "This category name already exists!");
                 category.setCategoryName(categoryName);
                 request.setAttribute("category", category);
                 request.getRequestDispatcher("/views/category/category_edit.jsp").forward(request, response);
@@ -80,7 +80,7 @@ public class EditCategoryController extends HttpServlet {
             if (categoryService.updateCategory(category)) {
                 response.sendRedirect(request.getContextPath() + "/category/list?status=edit_success");
             } else {
-                request.setAttribute("error", "Lỗi khi cập nhật danh mục!");
+                request.setAttribute("error", "Failed to update category!");
                 request.setAttribute("category", category);
                 request.getRequestDispatcher("/views/category/category_edit.jsp").forward(request, response);
             }

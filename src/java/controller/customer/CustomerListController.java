@@ -37,21 +37,22 @@ public class CustomerListController extends HttpServlet {
             return;
         }
         // one user one ability
-        if (user.getRoleId() == ROLE_SALE_STAFF) {
-            
-        }
         Integer assignedToUserId = null;
+
+        if (user.getRoleId() == ROLE_SALE_STAFF) {
+            // chi lay customer thuoc sale
+            assignedToUserId = user.getUserId();
+        } else{
+            try {
+                assignedToUserId = Integer.parseInt(request.getParameter("assignedToUserId"));
+            } catch (NumberFormatException e){
+                assignedToUserId = null;
+            }
+        }
         String searchName = request.getParameter("searchName");
         String searchSdt = request.getParameter("searchSdt");
         String searchEmail = request.getParameter("searchEmail");
         String searchMst = request.getParameter("searchMst");
-
-        try {
-            assignedToUserId = Integer.parseInt(request.getParameter("searchAssignedTo"));
-        } catch (NumberFormatException e){
-            assignedToUserId = null;
-        }
-        
         String typeCus = request.getParameter("type");
         String pageRaw = request.getParameter("page");
 

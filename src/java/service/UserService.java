@@ -67,7 +67,7 @@ public class UserService {
     }
 
     // password
-    public User checkCorrectEmailAndPhone(String phone, String email) {
+    public User checkCorrectEmailAndUsername(String username, String email) {
         List<User> uList = userDAO.searchUserFieldsByOR(null, null, email.trim(), null);
 
         if (uList == null || uList.isEmpty()) {
@@ -77,10 +77,10 @@ public class UserService {
 
         User u = uList.get(0);
 
-        if (u.getPhone() != null && u.getPhone().trim().contentEquals(phone.trim())) {
+        if (u.getUserName() != null && u.getUserName().trim().equalsIgnoreCase(username.trim())) {
             return u;
         }
-        System.out.println(" tim thay user nhng ko khop sdt");
+        System.out.println(" tim thay user nhng ko khop username");
         return null;
     }
 

@@ -6,12 +6,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import service.CategoryService;
+import service.*;
 
 @WebServlet(name = "DeleteCategoryController", urlPatterns = {"/category/delete"})
 public class DeleteCategoryController extends HttpServlet {
 
     private final CategoryService categoryService = new CategoryService();
+    private final ProductService productService = new ProductService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,7 +32,7 @@ public class DeleteCategoryController extends HttpServlet {
                 return;
             }
 
-            if (categoryService.countProductsByCategoryId(categoryId) > 0) {
+            if (productService.countProduct(null, categoryId, null) > 0) {
                 response.sendRedirect(request.getContextPath() + "/category/list?status=delete_in_use");
                 return;
             }

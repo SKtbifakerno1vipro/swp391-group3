@@ -1,5 +1,6 @@
 package dal;
 
+
 import dto.UserRoleDTO;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.PreparedStatement;
@@ -328,7 +329,6 @@ public class UserDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(list);
         return list;
     }
 /// end - Xhieu
@@ -412,6 +412,7 @@ public class UserDAO extends DBContext {
     /*
     created by vu trong phu
      */
+    
     public User findUserByUsername(String username) {
         String sql = "SELECT * FROM [user] WHERE user_name = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
