@@ -119,14 +119,14 @@ public class SignatureServlet extends HttpServlet {
                 signerName = user.getFullName();
             } else if (isCustomer) {
                 CustomerDTO c = cService.getCustomerDTOByUserId(signerId);
-                if (c != null && user.getUserId() == c.getUser().getUserId()) {
+                if (c != null && ctrService.getContractById(contractId).getCustomerId() == c.getCustomer().getCustomerId()) {
                     signerName = c.getCustomer().getCompanyName();
-                }
-                else {
+                } else {
                     session.setAttribute("errorSig", "Bạn không được thao tác với hợp đồng này");
                     response.sendRedirect("contract-list");
                     return;
                 }
+
             }
 
             request.setAttribute("contractId", contractId);
@@ -213,7 +213,7 @@ public class SignatureServlet extends HttpServlet {
                 fileName = "Manager_" + user.getFullName() + "_" + ctr.getContractNumber();
                 s.setSignerUserId(user.getUserId());
                 s.setSignerName(user.getFullName());
-            } 
+            }
 
             fileName = sService.standardFileName(fileName) + "_" + System.currentTimeMillis() + ".png";
 
