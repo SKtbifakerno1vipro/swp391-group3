@@ -48,7 +48,7 @@ public class QuotationDAO extends DBContext {
         return list;
     }
 
-    public List<Quotation> searchQuotations(String searchText, String status) {
+    public List<Quotation> searchQuotations(String searchText, String status, Integer cusID) {
         List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
                 + "quotation.quotation_status, quotation.created_by, quotation.created_at, "
@@ -65,6 +65,9 @@ public class QuotationDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql += " AND quotation.quotation_status = ? "; // Them dau cach
         }
+        if (cusID != null) {
+            sql += " AND quotation.customer_id = ? ";
+        }
         sql += " ORDER BY quotation.quotation_id ASC";
 
         try {
@@ -76,6 +79,9 @@ public class QuotationDAO extends DBContext {
             }
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(paramIndex++, status); // Dung ++ de tang vi tri
+            }
+            if (cusID != null) {
+                ps.setInt(paramIndex++, cusID);
             }
 
             ResultSet rs = ps.executeQuery();

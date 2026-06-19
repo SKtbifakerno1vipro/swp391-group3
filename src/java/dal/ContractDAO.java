@@ -39,7 +39,7 @@ public class ContractDAO extends DBContext {
         return -1;
     }
 
-    public List<Contract> searchContracts(String contractNumber, String customerName, String status, String storageType, int pageIndex, int pageSize) {
+    public List<Contract> searchContracts(String contractNumber, String customerName, String status, String storageType, Integer cusID, int pageIndex, int pageSize) {
         List<Contract> list = new ArrayList<>();
         String sql = "SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type, "
                 + "c.effective_date, c.end_date, c.created_at, cust.company_name "
@@ -58,6 +58,9 @@ public class ContractDAO extends DBContext {
         if (storageType != null && !storageType.trim().isEmpty()) {
             sql += " AND c.storage_type = ? ";
         }
+        if (cusID != null) {
+            sql += " AND c.customer_id = ? ";
+        }
 
         sql += " ORDER BY c.created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
@@ -74,6 +77,9 @@ public class ContractDAO extends DBContext {
             }
             if (storageType != null && !storageType.trim().isEmpty()) {
                 ps.setString(index++, storageType);
+            }
+            if (cusID != null) {
+                ps.setInt(index++, cusID);
             }
             ps.setInt(index++, (pageIndex - 1) * pageSize);
             ps.setInt(index++, pageSize);
@@ -103,7 +109,7 @@ public class ContractDAO extends DBContext {
         return list;
     }
 
-    public int getTotalContracts(String contractNumber, String customerName, String status, String storageType) {
+    public int getTotalContracts(String contractNumber, String customerName, String status, String storageType, Integer cusID) {
         String sql = "SELECT COUNT(*) FROM customer_contract c LEFT JOIN customer cust ON c.customer_id = cust.customer_id WHERE 1=1 ";
         if (contractNumber != null && !contractNumber.trim().isEmpty()) {
             sql += " AND c.contract_number LIKE ? ";
@@ -116,6 +122,9 @@ public class ContractDAO extends DBContext {
         }
         if (storageType != null && !storageType.trim().isEmpty()) {
             sql += " AND c.storage_type = ? ";
+        }
+        if (cusID != null) {
+            sql += " AND c.customer_id = ? ";
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -131,6 +140,9 @@ public class ContractDAO extends DBContext {
             }
             if (storageType != null && !storageType.trim().isEmpty()) {
                 ps.setString(index++, storageType);
+            }
+            if (cusID != null) {
+                ps.setInt(index++, cusID);
             }
 
             try (ResultSet rs = ps.executeQuery()) {

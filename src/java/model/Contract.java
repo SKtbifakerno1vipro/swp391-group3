@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Contract {
 
@@ -168,10 +169,26 @@ public class Contract {
     // XHieu-begin - delete contact me
     public String getFormattedSignDate() {
         if (this.signDate != null) {
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             return this.signDate.format(formatter);
         }
         return "N/A";
+    }
+
+    public String getFormattedEffectiveDate() {
+        if (this.effectiveDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return this.effectiveDate.format(formatter);
+        }
+        return "N/A";
+    }
+
+    public String getFormattedSignDateOnly() {
+        if (this.signDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return this.signDate.format(formatter);
+        }
+        return "Chưa ký";
     }
 
 }
