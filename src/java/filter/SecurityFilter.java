@@ -83,7 +83,7 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/Invoice",
             "/invoice",
-            "/email/logs"
+            "/email/logs",
             "/revenue-report",
             "/Signature"
     );
@@ -96,8 +96,7 @@ public class SecurityFilter implements Filter {
             "/contract-list",
             "/contract-detail",
             "/quotation-list",
-            "/quotation-detail",
-
+            "/quotation-detail"
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(
