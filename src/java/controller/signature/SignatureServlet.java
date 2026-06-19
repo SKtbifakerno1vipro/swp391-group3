@@ -77,7 +77,7 @@ public class SignatureServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-@Override
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
@@ -93,14 +93,22 @@ public class SignatureServlet extends HttpServlet {
         try {
             if (contractIdRaw == null || signerIdRaw == null
                     || contractIdRaw.trim().isEmpty() || signerIdRaw.trim().isEmpty()) {
-                throw new IllegalArgumentException();
+                session.setAttribute("errorSig", "Không tìm thấy Contract ID hoặc Signer ID");
+                response.sendRedirect("contract-list");
+                return;
             }
 
             int contractId = Integer.parseInt(contractIdRaw.trim());
             int signerId = Integer.parseInt(signerIdRaw.trim());
 
             if (contractId <= 0 || signerId <= 0) {
-                throw new IllegalArgumentException();
+                session.setAttribute("errorSig", "ID phải khác 0");
+                response.sendRedirect("contract-list");
+                return;
+            } else if (ctrService.getContractById(contractId) == null || uService.getUserById(signerId) == null) {
+                session.setAttribute("errorSig", "Không tìm thấy Contract hoặc Signer");
+                response.sendRedirect("contract-list");
+                return;
             }
 
             String signerName = "";
@@ -111,24 +119,24 @@ public class SignatureServlet extends HttpServlet {
                 signerName = user.getFullName();
             } else if (isCustomer) {
                 CustomerDTO c = cService.getCustomerDTOByUserId(signerId);
-                if (c != null) {
+                if (c != null && user.getUserId() == c.getUser().getUserId()) {
                     signerName = c.getCustomer().getCompanyName();
+                }
+                else {
+                    session.setAttribute("errorSig", "Bạn không được thao tác với hợp đồng này");
+                    response.sendRedirect("contract-list");
+                    return;
                 }
             }
 
-            if (signerName.isEmpty()) {
-                response.sendRedirect("contract-detail?id=" + contractId);
-                return;
-            }
-            
             request.setAttribute("contractId", contractId);
             request.setAttribute("signerId", signerId);
             request.setAttribute("signerName", signerName);
             request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
-            
-        } catch (Exception e) {
-            // Mọi lỗi đều redirect về detail không kèm thông báo
-            response.sendRedirect("contract-detail?id=" + contractIdRaw);
+
+        } catch (NumberFormatException e) {
+            session.setAttribute("errorSig", "Sai định dạng ID");
+            response.sendRedirect("contract-list");
         }
     }
 
@@ -157,9 +165,9 @@ public class SignatureServlet extends HttpServlet {
         String signatureData = request.getParameter("signatureData");
         String contractIdRaw = request.getParameter("contractId");
         String signerIdRaw = request.getParameter("signerId");
-        
+
         if (signatureData == null || signatureData.isEmpty()) {
-            request.setAttribute("error", "Vui lòng ký tên trước khi xác nhận.");
+            request.setAttribute("errorSig", "Vui lòng ký tên trước khi xác nhận.");
             request.setAttribute("contractId", contractIdRaw);
             request.setAttribute("signerId", signerIdRaw);
             request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
@@ -177,7 +185,7 @@ public class SignatureServlet extends HttpServlet {
                 response.sendRedirect("contract-list");
                 return;
             }
-            
+
             File projectPath = new File(getServletContext().getRealPath("/")).getParentFile().getParentFile();
             File uploadFile = new File(projectPath, "uploads");
             if (!uploadFile.exists()) {
@@ -205,9 +213,7 @@ public class SignatureServlet extends HttpServlet {
                 fileName = "Manager_" + user.getFullName() + "_" + ctr.getContractNumber();
                 s.setSignerUserId(user.getUserId());
                 s.setSignerName(user.getFullName());
-            } else {
-                throw new IllegalArgumentException("Bạn không có quyền thực hiện ký tên.");
-            }
+            } 
 
             fileName = sService.standardFileName(fileName) + "_" + System.currentTimeMillis() + ".png";
 
@@ -233,14 +239,13 @@ public class SignatureServlet extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "Sai định dạng ID.");
+            request.setAttribute("errorSig", "Sai định dạng ID.");
             request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
         } catch (IllegalArgumentException e) {
-            request.setAttribute("error", e.getMessage());
+            request.setAttribute("errorSig", e.getMessage());
             request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Có lỗi xảy ra trong quá trình xử lý.");
+            request.setAttribute("errorSig", "Có lỗi xảy ra trong quá trình xử lý.");
             request.getRequestDispatcher("/views/signature/signature.jsp").forward(request, response);
         }
     }

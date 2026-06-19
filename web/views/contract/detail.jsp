@@ -159,7 +159,7 @@
                                     <input class="btn btn-blue" type="submit" value="Sign Contract" />
                                 </form>
                             </c:if>
-                           
+
                         </c:if>
                     </c:when>
                     <%-- 4. TRẠNG THÁI: SIGNED --%>
@@ -269,6 +269,12 @@
                 document.getElementById('viewHistoryBody').innerHTML = document.getElementById('history-data-' + historyId).innerHTML;
                 document.getElementById('modalOverlay').style.display = 'block';
                 document.getElementById('viewHistoryModal').style.display = 'block';
+            }
+
+            let errorSig = "${errorSig}";
+
+            if (errorSig !== "") {
+                alert("${errorSig}");
             }
         </script>
     </body>

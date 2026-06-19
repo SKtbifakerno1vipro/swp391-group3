@@ -87,5 +87,12 @@
                 </c:if>
             </main>
         </div>
+                <script>
+                        let errorSig = "${errorSig}";
+    
+                     if(errorSig !== ""){
+                alert("${errorSig}");
+            }
+                </script>
     </body>
 </html>

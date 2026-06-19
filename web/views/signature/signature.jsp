@@ -88,7 +88,7 @@
             <form action="Signature" id="signatureForm" method="post">
                 <input type="hidden" name="contractId" value="${contractId}">
                 <input type="hidden" name="signerId" value="${signerId}">
-                    <h2>Welcome ${signerName} ${signerId}</h2>
+                <h2>Welcome ${signerName} ${signerId}</h2>
                 <div class="signature-section">
                     <h3>Vui lòng ký vào khung bên dưới</h3>
                     <canvas id="signatureCanvas" width="400" height="200"></canvas>
@@ -100,9 +100,6 @@
                 <div class="submit-container">
                     <button type="submit" class="btn btn-submit">Xác nhận ký tên</button>
                 </div>
-                    <c:if test="${not empty error}">
-                    ${error}
-                </c:if>
             </form>
         </div>
 
@@ -161,9 +158,9 @@
 //                
 //                signatureDataInput.value = canvas.toDataURL('image/png');
 //            };
-            
-            
-            
+
+
+
             function setupCanvas(canvasId, clearBtnId) {
                 var canvas = document.getElementById(canvasId);
                 var clearBtn = document.getElementById(clearBtnId);
@@ -229,6 +226,11 @@
             document.getElementById("signatureForm").onsubmit = function () {
                 storeCanvas("signatureCanvas", "signatureData");
             };
+            let errorSig = "${errorSig}";
+
+            if (errorSig !== "") {
+                alert("${errorSig}");
+            }
         </script>
     </body>
 </html>
