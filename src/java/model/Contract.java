@@ -7,15 +7,6 @@ public class Contract {
     private int contractId;
     private int customerId;
     private String customerName;
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
     private int quotationId;
     private String contractNumber;
     private String contractFileUrl;
@@ -24,12 +15,22 @@ public class Contract {
     private LocalDateTime effectiveDate;
     private LocalDateTime endDate;
     private LocalDateTime signDate;
-
+        private int createdBy;
+    private int updatedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String contractContent;
     private String storageType;
 
     public String getContractContent() {
         return contractContent;
+    }
+        public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     public void setContractContent(String contractContent) {
@@ -44,10 +45,7 @@ public class Contract {
         this.storageType = storageType;
     }
 
-    private int createdBy;
-    private int updatedBy;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
 
     public int getContractId() {
         return contractId;

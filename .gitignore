@@ -42,6 +42,10 @@ nbproject/private/
 web/WEB-INF/EmailConfig.properties
 EmailConfig.properties
 
+# DBContext
+web/WEB-INF/ConnectDB.properties
+ConnectDB.properties
+
 # intellij
 .idea
 .smarttomcat

@@ -13,37 +13,53 @@ import java.sql.Connection;
 import utils.*;
 
 public class CustomerService {
+
     private final CustomerDAO customerDAO = new CustomerDAO();
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
-    
-    private List<String> cusTypeList = Arrays.asList("CUSTOMER", "LOYAL CUSTOMER"); 
-    
+
+    public CustomerDTO getCustomerDTOById(int id) {
+        return customerDAO.getCustomerDTOById(id);
+    }
+
+    private List<String> cusTypeList = Arrays.asList("CUSTOMER", "LOYAL CUSTOMER");
+
     public List<String> getCusTypeList() {
         return cusTypeList;
     }
     // new
-    
+
     public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String searchSdt, String searchEmail, String searchMst,
             String typeCus, Integer assignedToUserId, int page, int pageSize) {
         
         return customerDAO.searchAndPaginateCustomers(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId, page, pageSize);
     }
+
     // new 
     public int getTotalPages(String searchName, String searchSdt, String searchEmail, String searchMst,
             String typeCus, Integer assignedToUserId, int pageSize) {
         // Goi ham đem tong so dong thoa man đieu kien loc duoi DAO
         int totalRecords = customerDAO.getTotalCustomersCount(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId);
-        
-        if (totalRecords == 0) return 1;
-        
+
+        if (totalRecords == 0) {
+            return 1;
+        }
+
         // tinh tong so trang lam tron len
         return (int) Math.ceil((double) totalRecords / pageSize);
     }
+
     // new
     public List<CustomerDTO> getAllCustomerDTOs() {
         return customerDAO.getAllCustomerDTOs();
     }
+
+    //nguyenkiem - begin
+    public CustomerDTO getCustomerDTOByUserId(int userId) {
+        return customerDAO.getCustomerDTOByUserId(userId);
+    }
+    // nguyenkien - end
+    
     // new 
     public CustomerDTO getCustomerDTOByCusId(int customerId) {
         return customerDAO.getCustomerDTOById(customerId);
@@ -74,7 +90,7 @@ public class CustomerService {
         }
         return "SUCCESS";
     }
-    
+
     public boolean updateCustomerDTO(User u, Customer c) {
         boolean userUpdated = userService.updateUser(u);
         boolean customerUpdated = customerDAO.updateCustomerDynamic(c);
@@ -82,23 +98,23 @@ public class CustomerService {
     }
 
     public String createCustomerDTO(User user, Customer customer) {
-        
+
         String validate = isDuplicateCusFields(user.getUserName(), user.getPhone(), user.getEmail(), customer.getTaxCode());
         if (!validate.contentEquals("SUCCESS")) {
             return validate;
         }
-        
+
         String pass = PasswordUtils.generateRandomText();
         user.setPassword(pass);
-        
-        Connection conn = userService.getConnection(); 
-        
+
+        Connection conn = userService.getConnection();
+
         try {
             //tat che do tu dong luu cua database sql
             conn.setAutoCommit(false);
 
-            int generatedUserId = userService.createUserFullParameter(user,conn);
-            
+            int generatedUserId = userService.createUserFullParameter(user, conn);
+
             if (generatedUserId == -1) {
                 System.out.println("Cannot create user account");
                 conn.rollback(); // huy bo neu loi
@@ -107,8 +123,8 @@ public class CustomerService {
 
             customer.setUserId(generatedUserId);
 
-            boolean isCustomerInserted = customerDAO.insertCustomer(customer,conn);
-            
+            boolean isCustomerInserted = customerDAO.insertCustomer(customer, conn);
+
             if (isCustomerInserted) {
                 int customerRoleId = roleService.getRoleIdByName("Customer");
                 if (user.getRoleId() == customerRoleId) {
@@ -161,32 +177,39 @@ public class CustomerService {
             } else {
                 // Buoc 3 loi -> Rollback đe xoa luon tai khoan User vua tao o Buoc 1
                 System.out.println("Lỗi: Tạo Customer thất bại! Tiến hành khôi phục dữ liệu.");
-                conn.rollback(); 
+                conn.rollback();
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             try {
-                if (conn != null) conn.rollback(); // Dính exception là hủy hết
+                if (conn != null) {
+                    conn.rollback(); // Dính exception là hủy hết
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         } finally {
             try {
-                if (conn != null) conn.setAutoCommit(true); // Trả lại trạng thái ban đầu cho Connection
+                if (conn != null) {
+                    conn.setAutoCommit(true); // Trả lại trạng thái ban đầu cho Connection
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        return null; 
+        return null;
     }
-    
+
     public String getLastError() {
         return customerDAO.getLastError();
     }
     
     public Customer getCustomerByUserId(int userId) {
         return customerDAO.getCustomerByUserId(userId);
+
+    public Customer getCustomerByCusId(int userId) {
+        return customerDAO.getCustomerByCusId(userId);
     }
 
     public List<User> getAllSalesExecutiveUsers() {

@@ -64,20 +64,21 @@ public class DashboardController extends HttpServlet {
             request.getRequestDispatcher("/views/customer-dashboard.jsp").forward(request, response);
             return;
         }
+        service.DashboardService dashboardService = new service.DashboardService();
+        dal.DashboardDAO dashboardDAO = new dal.DashboardDAO();
 
-        request.setAttribute("totalCustomers", dashboardDAO.count("customer"));
-        request.setAttribute("totalProducts", dashboardDAO.countWhere("product", "product_status", "ACTIVE"));
+        request.setAttribute("user", user);
+        request.setAttribute("totalCustomers", dashboardService.getTotalCustomers());
+        request.setAttribute("totalProducts", dashboardService.getTotalProducts());
         request.setAttribute("totalQuotations", dashboardDAO.count("quotation"));
         request.setAttribute("totalContracts", dashboardDAO.count("customer_contract"));
-        request.setAttribute("totalOrders", dashboardDAO.count("customer_order"));
+        request.setAttribute("totalOrders", dashboardService.getTotalOrders());
+        request.setAttribute("totalRevenue", dashboardService.getTotalRevenue());
+        
         request.setAttribute("quotationStatusCounts", dashboardDAO.countByStatus("quotation", "quotation_status"));
         request.setAttribute("contractStatusCounts", dashboardDAO.countByStatus("customer_contract", "contract_status"));
-        request.setAttribute("orderStatusCounts", dashboardDAO.countByStatus("customer_order", "order_status"));
-        request.setAttribute("draftContracts", dashboardDAO.countWhere("customer_contract", "contract_status", "DRAFT"));
-        request.setAttribute("pendingContracts", dashboardDAO.countWhere("customer_contract", "contract_status", "CUSTOMER_REQUESTED_REVISION"));
-        request.setAttribute("paymentPendingOrders", dashboardDAO.countWhere("customer_order", "order_status", "Pending"));
-        request.setAttribute("inProgressContracts", dashboardDAO.countWhere("customer_contract", "contract_status", "ACTIVE"));
-        request.setAttribute("completedOrders", dashboardDAO.countWhere("customer_order", "order_status", "Completed") + dashboardDAO.countWhere("customer_order", "order_status", "DELIVERED"));
+        request.setAttribute("orderStatusCounts", dashboardService.getOrderStatusStats());
+        
         request.setAttribute("recentContracts", dashboardDAO.getRecentContracts(5));
         request.setAttribute("recentOrders", dashboardDAO.getRecentOrders(5));
         request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);

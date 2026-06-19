@@ -84,7 +84,7 @@ public class QuotationService {
         boolean updated = quotationDAO.updateQuotationDetail(detail);
 
         if (updated) {
-            String note = "Cap nhat detail: quantity=" + detail.getQuantity()
+            String note = "Cap nhat san pham " + detail.getProductName() + ": quantity=" + detail.getQuantity()
                     + ", sellingPrice=" + detail.getSellingPrice()
                     + ", discount=" + detail.getDiscountPercent()
                     + ", tax=" + detail.getTaxPercent();
@@ -126,10 +126,31 @@ public class QuotationService {
      * Them 1 san pham moi vao quotation dang co va ghi lich su.
      */
     public boolean addProductToQuotation(QuotationDetail detail, Integer userId) {
+        QuotationDetail oldDetail = quotationDAO.getQuotationDetailByProduct(detail.getQuotationId(), detail.getProductId());
+
+        if (oldDetail != null) {
+            int oldQuantity = oldDetail.getQuantity();
+            int newQuantity = oldQuantity + detail.getQuantity();
+
+            oldDetail.setQuantity(newQuantity);
+            oldDetail.setSellingPrice(detail.getSellingPrice());
+            oldDetail.setDiscountPercent(detail.getDiscountPercent());
+            oldDetail.setTaxPercent(detail.getTaxPercent());
+
+            boolean updated = quotationDAO.updateQuotationDetail(oldDetail);
+
+            if (updated) {
+                quotationDAO.addQuotationHistory(detail.getQuotationId(), userId,
+                        "Cap nhat san pham " + detail.getProductName() + " da co: quantity tu " + oldQuantity + " thanh " + newQuantity);
+            }
+
+            return updated;
+        }
+
         boolean added = quotationDAO.addQuotationDetail(detail);
 
         if (added) {
-            quotationDAO.addQuotationHistory(detail.getQuotationId(), userId, "Them san pham vao quotation");
+            quotationDAO.addQuotationHistory(detail.getQuotationId(), userId, "Them san pham " + detail.getProductName() + " vao quotation");
         }
 
         return added;
@@ -138,18 +159,30 @@ public class QuotationService {
     /*
      * Xoa 1 san pham khoi quotation dang co va ghi lich su.
      */
-    public boolean deleteProductFromQuotation(int quotationId, int quotationDetailId, Integer userId) {
+    public boolean deleteProductFromQuotation(int quotationId, int quotationDetailId, String productName, Integer userId) {
         boolean deleted = quotationDAO.deleteQuotationDetail(quotationDetailId);
 
         if (deleted) {
-            quotationDAO.addQuotationHistory(quotationId, userId, "Xoa san pham khoi quotation");
+            quotationDAO.addQuotationHistory(quotationId, userId, "Xoa san pham " + productName + " khoi quotation");
         }
 
         return deleted;
     }
 
-    public void updateStatus(int quotationId, String status) {
+    /*
+     * Cap nhat discount va tax cho toan bo quotation_detail hien co.
+     */
+    public boolean applyDiscountAndTaxToAll(int quotationId, java.math.BigDecimal discount, java.math.BigDecimal tax, Integer userId) {
+        boolean updated = quotationDAO.updateDiscountAndTaxForAll(quotationId, discount, tax);
+        if (updated) {
+            quotationDAO.addQuotationHistory(quotationId, userId, "Ap dung discount " + discount + "% va tax " + tax + "% cho toan bo san pham");
+        }
+        return updated;
+    }
+
+    public void updateStatus(int quotationId, String status, Integer userId) {
         quotationDAO.updateStatus(quotationId, status);
+        quotationDAO.addQuotationHistory(quotationId, userId, "Cap nhat trang thai thanh: " + status);
     }
 
     // XHieu-begin - delete contact me

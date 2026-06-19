@@ -1,30 +1,57 @@
 package service;
 
-
+import dal.SignatureDAO;
+import model.Signature;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-/**
- *
- * @author ADMIN
- */
 public class SignatureService {
-    public void storeSignature(String file, File parentFile, String customer) throws IOException{
-           String base64 = file.split(",")[1].replace(" ", "+");
-            byte[] bytes = Base64.getDecoder().decode(base64);
-            
-            File fileA = new File(parentFile,customer);
-            
-            try (FileOutputStream newFile = new FileOutputStream(fileA)){
-                newFile.write(bytes);
-            } 
-            
+
+    private SignatureDAO signatureDAO = new SignatureDAO();
+
+    public boolean insertSignature(Signature signature) {
+        return signatureDAO.insertSignature(signature);
+    }
+
+    public List<Signature> getAllSignature() {
+        return signatureDAO.getAllSignature();
+    }
+
+    public Signature getSignatureById(int id) {
+        return signatureDAO.getSignatureById(id);
+    }
+
+    public Signature getSignatureByContractIdAndSignerId(int contractId, int signerUserId) {
+        return signatureDAO.getSignatureByContractIdAndSignerId(contractId, signerUserId);
+    }
+
+    public String standardFileName(String value) {
+        if (value == null) {
+            return "signature_";
+        }
+        String result = value.trim().replaceAll("[\\s+]", "_");
+        result = result.replaceAll("[\\\\/:*?\"<>|]", "");
+
+        return result;
+    }
+    
+    public List<Signature> getSignaturesByContractId(int contractId) {
+        return signatureDAO.getSignaturesByContractId(contractId);
+    }
+
+    // Logic cũ
+    public void storeSignature(String data, File parentFile, String nameFile) throws IOException {
+        String base64 = data.split(",")[1].replace(" ", "+");
+        byte[] bytes = Base64.getDecoder().decode(base64);
+
+        File fileA = new File(parentFile, nameFile);
+
+        try (FileOutputStream newFile = new FileOutputStream(fileA)) {
+            newFile.write(bytes);
+            newFile.close();
+        }
     }
 }

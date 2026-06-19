@@ -8,7 +8,6 @@ import model.Quotation;
 import model.Role;
 
 public class RoleDAO extends DBContext {
-
     public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {

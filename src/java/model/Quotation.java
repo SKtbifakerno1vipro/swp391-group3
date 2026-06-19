@@ -11,25 +11,17 @@ public class Quotation {
     private String quotationStatus;
     private Integer createdBy;
     private LocalDateTime createdAt;
+    private Integer updatedBy;
+    private LocalDateTime updatedAt;
 
-    // Field phu đe hien thi
-    private String customerName;    //hien thi ten khach hang thay vi chi customer_id
-    private String createdByName;   //hien thi ten nhan vien bao gia thi vi chi created_by
-    private BigDecimal totalAmount; //hien thi tong tien cua bao gia
+    // Field phu hien thi
+    private String customerName;    
+    private String createdByName;   
+    private String updatedByName;
+    private BigDecimal totalAmount; 
+    private boolean hasContract;
 
     public Quotation() {
-    }
-
-    public Quotation(int quotationId, int customerId, LocalDateTime quotationDate, String quotationStatus, Integer createdBy, LocalDateTime createdAt, String customerName, String createdByName, BigDecimal totalAmount) {
-        this.quotationId = quotationId;
-        this.customerId = customerId;
-        this.quotationDate = quotationDate;
-        this.quotationStatus = quotationStatus;
-        this.createdBy = createdBy;
-        this.createdAt = createdAt;
-        this.customerName = customerName;
-        this.createdByName = createdByName;
-        this.totalAmount = totalAmount;
     }
 
     public int getQuotationId() {
@@ -80,6 +72,22 @@ public class Quotation {
         this.createdAt = createdAt;
     }
 
+    public Integer getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Integer updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public String getCustomerName() {
         return customerName;
     }
@@ -96,6 +104,14 @@ public class Quotation {
         this.createdByName = createdByName;
     }
 
+    public String getUpdatedByName() {
+        return updatedByName;
+    }
+
+    public void setUpdatedByName(String updatedByName) {
+        this.updatedByName = updatedByName;
+    }
+
     public BigDecimal getTotalAmount() {
         return totalAmount;
     }
@@ -104,7 +120,6 @@ public class Quotation {
         this.totalAmount = totalAmount;
     }
 
-    // XHieu-begin - delete contact me
     public String getFormattedQuotationDate() {
         if (this.quotationDate != null) {
             java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
@@ -112,5 +127,12 @@ public class Quotation {
         }
         return "";
     }
-    // Xhieu - end
+
+    public boolean isHasContract() {
+        return hasContract;
+    }
+
+    public void setHasContract(boolean hasContract) {
+        this.hasContract = hasContract;
+    }
 }

@@ -7,13 +7,18 @@
         <meta charset="UTF-8">
         <title>Create Customer Order</title>
         <script>
-            // Store selected products in localStorage: { productId: { name: string, price: number, quantity: number } }
+            // Store selected products in localStorage: { productId: quantity }
             let selectedProducts = JSON.parse(localStorage.getItem('selectedOrderProducts')) || {};
+            
+            function saveToStorage() {
+                localStorage.setItem('selectedOrderProducts', JSON.stringify(selectedProducts));
+            }
+
             function toggleQty(checkbox, productId) {
                 var qtyInput = document.getElementById('qty_' + productId);
                 if (checkbox.checked) {
                     qtyInput.disabled = false;
-                    if (qtyInput.value == 0)
+                    if (qtyInput.value == 0 || qtyInput.value == "")
                         qtyInput.value = 1;
                     selectedProducts[productId] = qtyInput.value;
                 } else {
@@ -23,20 +28,18 @@
                 }
                 saveToStorage();
             }
+
             function updateQty(productId, value) {
-                if (selectedProducts[productId]) {
+                if (selectedProducts[productId] !== undefined) {
                     selectedProducts[productId] = value;
                     saveToStorage();
                 }
-
-                function saveToStorage() {
-                    localStorage.setItem('selectedOrderProducts', JSON.stringify(selectedProducts));
-                }
             }
+
             // Khi trang load, phuc hoi trang thai cac checkbox tu localStorage
             window.onload = function () {
                 for (let pid in selectedProducts) {
-                    let checkbox = document.querySelector(`input[name="productIds"][value="${pid}"]`);
+                    let checkbox = document.querySelector(`input[data-pid="${pid}"]`);
                     let qtyInput = document.getElementById('qty_' + pid);
                     if (checkbox) {
                         checkbox.checked = true;
@@ -55,7 +58,7 @@
 
                 let count = 0;
                 for (let pid in selectedProducts) {
-                    let qty = selectedProducts[pid];
+                    let qty = parseInt(selectedProducts[pid]);
                     if (qty > 0) {
                         // Tao hidden input cho productId
                         let inputId = document.createElement('input');
@@ -81,8 +84,8 @@
                     return false;
                 }
 
-                // Xoa localStorage sau khi submit thanh cong (co the thuc hien o trang ket qua hoac tai đay)
-                // localStorage.removeItem('selectedOrderProducts');
+                // Xoa localStorage sau khi submit thanh cong
+                localStorage.removeItem('selectedOrderProducts');
                 return true;
             }
         </script>
@@ -169,13 +172,13 @@
                         <tr>
 
                             <td>
-                                <input type="checkbox" name="productIds" value="${p.productId}" onchange="toggleQty(this, ${p.productId})" />
+                                <input type="checkbox" data-pid="${p.productId}" onchange="toggleQty(this, ${p.productId})" />
                             </td>
                             <td>${p.productName}</td>
                             <td><fmt:formatNumber value="${p.sellingPrice}" type="currency" currencySymbol="₫"  maxFractionDigits="0"/></td>
                             <td>${p.unit}</td>
                             <td>
-                                <input type="number" id="qty_${p.productId}" name="qty_${p.productId}" min="0" value="0" style="width: 60px;" disabled />
+                                <input type="number" id="qty_${p.productId}" min="1" value="0" style="width: 60px;" disabled oninput="updateQty(${p.productId}, this.value)" />
                             </td>
                         </tr>
                     </c:forEach>
