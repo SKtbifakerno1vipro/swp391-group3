@@ -92,7 +92,12 @@ public class SecurityFilter implements Filter {
             "/dashboard",
             "/quotation-detail",
             "/contract-detail",
-            "/customer/detail"
+            "/customer/detail",
+            "/contract-list",
+            "/contract-detail",
+            "/quotation-list",
+            "/quotation-detail",
+
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(

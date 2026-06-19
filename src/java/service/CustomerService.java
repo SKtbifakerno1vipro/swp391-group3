@@ -207,7 +207,7 @@ public class CustomerService {
     
     public Customer getCustomerByUserId(int userId) {
         return customerDAO.getCustomerByUserId(userId);
-
+    }
     public Customer getCustomerByCusId(int userId) {
         return customerDAO.getCustomerByCusId(userId);
     }
