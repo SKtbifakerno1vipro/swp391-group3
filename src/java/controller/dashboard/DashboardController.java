@@ -3,6 +3,7 @@ package controller.dashboard;
 
 
 import dal.DashboardDAO;
+import dto.CustomerDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +37,7 @@ public class DashboardController extends HttpServlet {
 
         if (user.getRoleId() == 3) { // ROLE_CUSTOMER
 
-            Customer customer = customerService.getCustomerByUserId(user.getUserId());
+            CustomerDTO customer = customerService.getCustomerDTOByUserId(user.getUserId());
             if (customer == null) {
                 response.sendRedirect(request.getContextPath() + "/login?error=customer_not_found");
                 return;
@@ -65,7 +66,6 @@ public class DashboardController extends HttpServlet {
             return;
         }
         service.DashboardService dashboardService = new service.DashboardService();
-        dal.DashboardDAO dashboardDAO = new dal.DashboardDAO();
 
         request.setAttribute("user", user);
         request.setAttribute("totalCustomers", dashboardService.getTotalCustomers());

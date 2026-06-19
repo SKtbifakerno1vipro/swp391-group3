@@ -18,10 +18,6 @@ public class CustomerService {
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
 
-    public CustomerDTO getCustomerDTOById(int id) {
-        return customerDAO.getCustomerDTOById(id);
-    }
-
     private List<String> cusTypeList = Arrays.asList("CUSTOMER", "LOYAL CUSTOMER");
 
     public List<String> getCusTypeList() {
@@ -59,7 +55,7 @@ public class CustomerService {
         return customerDAO.getCustomerDTOByUserId(userId);
     }
     // nguyenkien - end
-    
+
     // new 
     public CustomerDTO getCustomerDTOByCusId(int customerId) {
         return customerDAO.getCustomerDTOById(customerId);
@@ -205,13 +201,6 @@ public class CustomerService {
         return customerDAO.getLastError();
     }
     
-    public Customer getCustomerByUserId(int userId) {
-        return customerDAO.getCustomerByUserId(userId);
-    }
-    public Customer getCustomerByCusId(int userId) {
-        return customerDAO.getCustomerByCusId(userId);
-    }
-
     public List<User> getAllSalesExecutiveUsers() {
         int salesExecutiveRoleId = roleService.getRoleIdByName("Sale Staff");
 
