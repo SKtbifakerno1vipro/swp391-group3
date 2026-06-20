@@ -23,8 +23,6 @@ public class ExportPdfController extends HttpServlet {
     private final ContractDAO contractDAO = new ContractDAO();
     private final SignatureService sService = new SignatureService();
 
-    
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -76,7 +74,9 @@ public class ExportPdfController extends HttpServlet {
         UserService uService = new UserService();
         List<Signature> sigList = sService.getSignaturesByContractId(contractId);
         for (Signature sig : sigList) {
-            if (sig == null || sig.getFileName() == null) continue;
+            if (sig == null || sig.getFileName() == null) {
+                continue;
+            }
             // Determine if signer is Customer or Manager to choose placeholder
             boolean isCustomerSigner = rService.getRoleIdByName("Customer")
                     == uService.getUserById(sig.getSignerUserId()).getRoleId();
@@ -91,16 +91,7 @@ public class ExportPdfController extends HttpServlet {
         // --------------------------------------------------------
         // 3. Chuẩn hóa XHTML cho openhtmltopdf
         String xhtml = html.replaceAll("<(br|hr|img|input|meta|link)([^>]*?)(?<!/)>", "<$1$2/>");
-        // --------------------------------------------------------
 
-        // ====== DEBUG: In ra HTML trước khi tạo PDF ======
-        System.out.println("===== ExportPdfController DEBUG START =====");
-        System.out.println("UploadDir: " + uploadDir);
-        System.out.println("UploadsUrl (file URI): " + uploadsUrl);
-        System.out.println("RawContent length: " + rawContent.length());
-        System.out.println("HTML after replaceAll length: " + html.length());
-        System.out.println("XHTML (first 3000 chars): " + xhtml.substring(0, Math.min(3000, xhtml.length())));
-        System.out.println("===== ExportPdfController DEBUG END =====");
 
         java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
 
