@@ -37,6 +37,10 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        if((String) session.getAttribute("errorSig") != null){
+            request.setAttribute("errorSig", (String) session.getAttribute("errorSig"));
+            session.removeAttribute("errorSig");
+        }
 
         String idStr = request.getParameter("id");
         boolean existSignature = false;
