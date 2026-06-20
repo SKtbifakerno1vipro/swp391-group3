@@ -57,6 +57,10 @@ public class ContractDetailController extends HttpServlet {
                     boolean isApproved = "APPROVED".equals(status);
                     boolean isSigned = "SIGNED".equals(status);
                     if (isApproved || isSigned) {
+        // Replace custom image src with web-accessible URL
+        String uploadsUrl = request.getContextPath() + "/uploads/";
+        finalHtml = finalHtml.replaceAll("(src=[\\\"']?)File\\?name=([^\\\"'>]+)([\\\"']?)",
+                "$1" + uploadsUrl + "$2$3");
                         Signature existSign = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
                         existSignature = (existSign!=null);
                         request.setAttribute("signed", existSignature);
@@ -65,13 +69,11 @@ public class ContractDetailController extends HttpServlet {
                             if (sig == null || sig.getSignerUserId() == null) {
                                 continue;
                             } 
-
                             boolean isCustomerSigner = rService.getRoleIdByName("Customer")
                                     == uService.getUserById(sig.getSignerUserId()).getRoleId();
 
-                            String imgTag = "<div style=\"height: 100px;\">"
-                                    + "<img src='File?name=" + sig.getFileName()
-                                    + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>"
+                        String imgTag = "<div style=\"height: 100px;\">"
+                                    + "<img src='" + uploadsUrl + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>"
                                     + "</div>";
 
                             if (isCustomerSigner) {
@@ -80,7 +82,6 @@ public class ContractDetailController extends HttpServlet {
                                 finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
                             }
                         }
-                        contractService.updateContractContent(id, finalHtml);
                     }
 
                     contract.setContractContent(finalHtml);

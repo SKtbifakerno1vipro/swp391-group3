@@ -10,12 +10,20 @@ import model.Contract;
 import dal.ContractDAO;
 import java.io.File;
 import java.io.IOException;
+import service.SignatureService;
+import service.RoleService;
+import service.UserService;
+import model.Signature;
+import java.util.List;
 import java.io.OutputStream;
 
 @WebServlet(name = "ExportPdfController", urlPatterns = {"/export-pdf"})
 public class ExportPdfController extends HttpServlet {
 
     private final ContractDAO contractDAO = new ContractDAO();
+    private final SignatureService sService = new SignatureService();
+
+    
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -47,10 +55,52 @@ public class ExportPdfController extends HttpServlet {
 
         String rawContent = contract.getContractContent() != null ? contract.getContractContent() : "";
 
-        String html = rawContent;
+        // 2. Convert custom image src to real URL for signature images
+        String uploadDir = getServletContext().getRealPath("/uploads/");
+        // Ensure path ends with separator
+        if (!uploadDir.endsWith(File.separator)) {
+            uploadDir += File.separator;
+        }
+        String uploadsUrl = "file:///" + uploadDir.replace("\\", "/");
+        String html = rawContent.replaceAll("(src=[\\\"']?)File\\?name=([^\\\"'>]+)([\\\"']?)",
+                "$1" + uploadsUrl + "$2$3");
+        // Also replace any already‑converted /uploads/ URLs to file URIs for PDF rendering
+        html = html.replaceAll("(src=[\\\"']?)(?:.*/)?uploads/([^\\\"'>]+)([\\\"']?)",
+                "$1" + uploadsUrl + "$2$3");
 
+        // --------------------------------------------------------
+        // 2.3 Insert signature images into the HTML (same logic as the web view)
+        // --------------------------------------------------------
+        // Services needed
+        RoleService rService = new RoleService();
+        UserService uService = new UserService();
+        List<Signature> sigList = sService.getSignaturesByContractId(contractId);
+        for (Signature sig : sigList) {
+            if (sig == null || sig.getFileName() == null) continue;
+            // Determine if signer is Customer or Manager to choose placeholder
+            boolean isCustomerSigner = rService.getRoleIdByName("Customer")
+                    == uService.getUserById(sig.getSignerUserId()).getRoleId();
+            String imgTag = "<img src='" + uploadsUrl + sig.getFileName() + "'"
+                    + " style='width:auto;height:80px;max-width:100%;object-fit:contain;'/>";
+            if (isCustomerSigner) {
+                html = html.replace("<div style=\"height: 100px;\" id=\"buyer\"></div>", imgTag);
+            } else {
+                html = html.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
+            }
+        }
+        // --------------------------------------------------------
         // 3. Chuẩn hóa XHTML cho openhtmltopdf
         String xhtml = html.replaceAll("<(br|hr|img|input|meta|link)([^>]*?)(?<!/)>", "<$1$2/>");
+        // --------------------------------------------------------
+
+        // ====== DEBUG: In ra HTML trước khi tạo PDF ======
+        System.out.println("===== ExportPdfController DEBUG START =====");
+        System.out.println("UploadDir: " + uploadDir);
+        System.out.println("UploadsUrl (file URI): " + uploadsUrl);
+        System.out.println("RawContent length: " + rawContent.length());
+        System.out.println("HTML after replaceAll length: " + html.length());
+        System.out.println("XHTML (first 3000 chars): " + xhtml.substring(0, Math.min(3000, xhtml.length())));
+        System.out.println("===== ExportPdfController DEBUG END =====");
 
         java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
 
@@ -72,10 +122,15 @@ public class ExportPdfController extends HttpServlet {
             } catch (Exception fontEx) {
                 // ignore, will use default font
             }
-            builder.withHtmlContent(xhtml, "/");
+            // Fix base URI to be a proper HTTP URL for openhtmltopdf
+            String baseUri = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
+            System.out.println("Base URI for PDF: " + baseUri);
+            builder.withHtmlContent(xhtml, baseUri);
 
             builder.toStream(baos);
+            System.out.println("Starting builder.run()...");
             builder.run();
+            System.out.println("builder.run() completed successfully.");
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("LỖI KHI TẠO PDF:\n\n");
