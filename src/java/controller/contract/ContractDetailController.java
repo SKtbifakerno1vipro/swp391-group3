@@ -37,6 +37,10 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        if((String) session.getAttribute("errorSig") != null){
+            request.setAttribute("errorSig", (String) session.getAttribute("errorSig"));
+            session.removeAttribute("errorSig");
+        }
 
         String idStr = request.getParameter("id");
         boolean existSignature = false;
@@ -51,7 +55,8 @@ public class ContractDetailController extends HttpServlet {
                     String finalHtml = contract.getContractContent();
                     String status = contract.getContractStatus();
                     boolean isApproved = "APPROVED".equals(status);
-                    if (isApproved) {
+                    boolean isSigned = "SIGNED".equals(status);
+                    if (isApproved || isSigned) {
                         Signature existSign = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
                         existSignature = (existSign!=null);
                         request.setAttribute("signed", existSignature);

@@ -31,6 +31,10 @@ public class ContractListController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        if((String) session.getAttribute("errorSig") != null){
+            request.setAttribute("errorSig", (String) session.getAttribute("errorSig"));
+            session.removeAttribute("errorSig");
+        }
 
         // 1. Take value to filter
         String contractNumber = request.getParameter("contractNumber");
