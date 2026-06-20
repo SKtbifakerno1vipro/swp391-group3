@@ -30,7 +30,6 @@ public class UserService {
         user.setStatus("ACTIVE");
         return userDAO.createUser(user);
     }
-
     public boolean updateUser(User user) {
         return userDAO.updateUser(user);
     }
