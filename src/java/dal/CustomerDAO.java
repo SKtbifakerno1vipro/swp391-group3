@@ -363,15 +363,19 @@ public class CustomerDAO extends DBContext {
         return 0;
     }
 
-    public Customer getCustomerByUserId(int userId) {
+    public CustomerDTO getCustomerDTOByUserId(int userId) {
         try {
-            String sql = "SELECT customer_id, tax_code, customer_type, company_name, user_id, assigned_to_user_id "
-                    + "FROM customer WHERE user_id = ?";
+            String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, "
+                    + "u.user_name, u.email, u.full_name, u.phone, u.gender, u.address, u.account_status, u.role_id, "
+                    + "u.created_at, u.updated_at, u.created_by, u.updated_by "
+                    + "FROM customer c "
+                    + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                    + "WHERE c.user_id = ?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, userId);
             ResultSet rs = stm.executeQuery();
             if (rs.next()) {
-                return mapCustomer(rs);
+                return mapCustomerDTO(rs);
             }
         } catch (Exception e) {
             e.printStackTrace();

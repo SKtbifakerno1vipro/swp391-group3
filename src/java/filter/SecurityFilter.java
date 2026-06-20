@@ -83,7 +83,7 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/Invoice",
             "/invoice",
-            "/email/logs"
+            "/email/logs",
             "/revenue-report",
             "/Signature"
     );

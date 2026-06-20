@@ -204,13 +204,6 @@ public class CustomerService {
     public String getLastError() {
         return customerDAO.getLastError();
     }
-    
-    public Customer getCustomerByUserId(int userId) {
-        return customerDAO.getCustomerByUserId(userId);
-
-    public Customer getCustomerByCusId(int userId) {
-        return customerDAO.getCustomerByCusId(userId);
-    }
 
     public List<User> getAllSalesExecutiveUsers() {
         int salesExecutiveRoleId = roleService.getRoleIdByName("Sale Staff");
