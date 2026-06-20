@@ -27,6 +27,30 @@ public class DetailCustomerController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = request.getParameter("action");
+        // check deactive customer truoc 
+        if ("deactivate".equals(action)) {
+            try {
+                int idCus = Integer.parseInt(request.getParameter("id_cus"));
+                customerService.deactivateCustomer(idCus);
+                response.sendRedirect(request.getContextPath() + "/customer/detail?id_cus=" + idCus);
+                return;
+            } catch (NumberFormatException e) {
+                response.sendRedirect(request.getContextPath() + "/customer/list");
+                return;
+            }
+        } else if ("activate".equals(action)) {
+            try {
+                int idCus = Integer.parseInt(request.getParameter("id_cus"));
+                customerService.activateCustomer(idCus);
+                response.sendRedirect(request.getContextPath() + "/customer/detail?id_cus=" + idCus);
+                return;
+            } catch (NumberFormatException e) {
+                response.sendRedirect(request.getContextPath() + "/customer/list");
+                return;
+            }
+        }
+
         try {
             int idCus = Integer.parseInt(request.getParameter("id_cus"));
             CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(idCus);

@@ -205,6 +205,21 @@ public class CustomerService {
         return customerDAO.getLastError();
     }
 
+    public void deactivateCustomer(int customerId) {
+        CustomerDTO customer = getCustomerDTOByCusId(customerId);
+        if (customer != null) {
+            userService.banUser(customer.getUserId(), "INACTIVE");
+        }
+    }
+
+    public void activateCustomer(int customerId) {
+        CustomerDTO customer = getCustomerDTOByCusId(customerId);
+        if (customer != null) {
+            userService.banUser(customer.getUserId(), "ACTIVE");
+        }
+    }
+
+
     public List<User> getAllSalesExecutiveUsers() {
         int salesExecutiveRoleId = roleService.getRoleIdByName("Sale Staff");
 
