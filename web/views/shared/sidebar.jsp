@@ -29,6 +29,12 @@
                         <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
                             href="${pageContext.request.contextPath}/contract-list"><span
                                 class="material-symbols-outlined">contract</span>Contracts</a>
+                        <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/payment-list"><span
+                                class="material-symbols-outlined">payments</span>My Payments</a>
+                        <a class="nav-link ${param.activeMenu == 'paymentTest' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/payment-test"><span
+                                class="material-symbols-outlined">build</span>Test Payment</a>
                     </c:when>
                     <c:otherwise>
                         <a class="nav-link ${param.activeMenu == 'customers' ? 'active' : ''}"
@@ -49,6 +55,12 @@
                         <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
                             href="${pageContext.request.contextPath}/contract-list"><span
                                 class="material-symbols-outlined">contract</span>Contracts</a>
+                        <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/payment-list"><span
+                                class="material-symbols-outlined">payments</span>Payments</a>
+                        <a class="nav-link ${param.activeMenu == 'paymentTest' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/payment-test"><span
+                                class="material-symbols-outlined">build</span>Test Payment</a>
                         <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"
                             href="${pageContext.request.contextPath}/user-list"><span
                                 class="material-symbols-outlined">manage_accounts</span>Users</a>
