@@ -36,7 +36,7 @@ public class ForgotPassController extends HttpServlet {
         
         String action = request.getParameter("action");
         String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
+        String username = request.getParameter("username");
 
         if ("sendOtp".equals(action)) {
             // ---- LUONG 1: BAM NUT GUI MA QUA AJAX ----
@@ -45,7 +45,7 @@ public class ForgotPassController extends HttpServlet {
             response.setContentType("text/plain");
             response.setCharacterEncoding("UTF-8");
 
-            User u = userService.checkCorrectEmailAndPhone(phone, email); 
+            User u = userService.checkCorrectEmailAndUsername(username, email); 
 
             if (u != null) {
                 // 2. Tạo mã OTP ngẫu nhiên
@@ -80,7 +80,7 @@ public class ForgotPassController extends HttpServlet {
                     response.getWriter().write("Không thể gửi Email. Vui lòng thử lại!");
                 }
             } else {
-                response.getWriter().write("Email hoặc Số điện thoại không khớp với hệ thống!");
+                response.getWriter().write("Email hoặc Tên đăng nhập không khớp với hệ thống!");
             }
             return; 
 

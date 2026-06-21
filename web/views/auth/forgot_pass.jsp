@@ -136,16 +136,16 @@
             <input type="hidden" name="isForgot" value="true">
 
             <div class="form-group">
+                <label for="username">Tên đăng nhập:</label>
+                <input type="text" id="username" name="username" value="${username}" required>
+            </div>
+
+            <div class="form-group">
                 <label for="email">Email đăng ký:</label>
                 <div class="input-group">
                     <input type="email" id="email" name="email" value="${email}" required>
                     <button type="button" id="btnSendOtp" name="action" onclick="sendOtpAjax()" class="btn-send">Gửi mã</button>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label for="phone">Số điện thoại:</label>
-                <input type="text" id="phone" name="phone" value="${phone}" required>
             </div>
 
             <div class="form-group">
@@ -162,11 +162,11 @@
 <script>
     function sendOtpAjax() {
         const email = document.getElementById("email").value;
-        const phone = document.getElementById("phone").value;
+        const username = document.getElementById("username").value;
         const btn = document.getElementById("btnSendOtp");
 
-        if (!email || !phone) {
-            alert("Vui lòng nhập đầy đủ Email và Số điện thoại trước khi nhận mã!");
+        if (!email || !username) {
+            alert("Vui lòng nhập đầy đủ Tên đăng nhập và Email trước khi nhận mã!");
             return;
         }
 
@@ -177,7 +177,7 @@
         params.append("action", "sendOtp");
         params.append("isForgot", "true");
         params.append("email", email);
-        params.append("phone", phone);
+        params.append("username", username);
 
         fetch("${pageContext.request.contextPath}/auth/forgot", {
             method: "POST",
