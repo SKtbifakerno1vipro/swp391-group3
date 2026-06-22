@@ -88,6 +88,7 @@ public class UserListController extends HttpServlet {
         try {
             int userId = Integer.parseInt(request.getParameter("userId"));
             String currentStatus = request.getParameter("status");
+            String newStatus = "ACTIVE".equals(currentStatus) ? "INACTIVE" : "ACTIVE";
 
             if ("ACTIVE".equals(currentStatus)) {
                 userService.banUser(userId, "INACTIVE");
@@ -95,7 +96,13 @@ public class UserListController extends HttpServlet {
                 userService.banUser(userId, "ACTIVE");
             } else {
                 userService.banUser(userId, currentStatus);
+                newStatus = currentStatus;
             }
+
+            User targetUser = userService.getUserById(userId);
+            String targetUsername = targetUser != null ? targetUser.getUserName() : String.valueOf(userId);
+            String action = "ACTIVE".equals(newStatus) ? "Mở khóa tài khoản" : "Khóa tài khoản";
+            service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", action + ": " + targetUsername + " (ID: " + userId + ")");
         } catch (NumberFormatException e) {
 
         }

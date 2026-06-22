@@ -316,6 +316,18 @@ CREATE TABLE stock_transaction (
 );
 GO
 
+-- 20. System Audit Log
+CREATE TABLE system_audit_log (
+    log_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NULL,
+    action_type NVARCHAR(50) NOT NULL,
+    affected_object NVARCHAR(255) NOT NULL,
+    description NVARCHAR(MAX) NOT NULL,
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES [user](user_id) ON DELETE SET NULL
+);
+GO
+
 
 -- 1. TAO ROLE (GIU NGUYEN)
 INSERT INTO role (role_name, status) VALUES 

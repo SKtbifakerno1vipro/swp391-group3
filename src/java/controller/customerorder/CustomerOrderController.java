@@ -216,6 +216,7 @@ public class CustomerOrderController extends HttpServlet {
             }
 
             if (customerOrderService.createOrder(order, details)) {
+                service.AuditLogService.log(currentUser.getUserId(), "CREATE", "Order", "Tạo đơn hàng mới cho khách hàng ID: " + customerId + " (Số mặt hàng: " + details.size() + ")");
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
             } else {
                 request.setAttribute("error", "Failed to create order.");
@@ -232,6 +233,12 @@ public class CustomerOrderController extends HttpServlet {
         int orderId = Integer.parseInt(request.getParameter("orderId"));
         String status = request.getParameter("status");
         customerOrderService.updateOrderStatus(orderId, status);
+        
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+        Integer currentUserId = currentUser != null ? currentUser.getUserId() : null;
+        service.AuditLogService.log(currentUserId, "UPDATE", "Order", "Cập nhật trạng thái đơn hàng ID " + orderId + " thành: " + status);
+        
         response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
     }
 
@@ -252,6 +259,12 @@ public class CustomerOrderController extends HttpServlet {
         int orderId = Integer.parseInt(request.getParameter("orderId"));
         int detailId = Integer.parseInt(request.getParameter("detailId"));
         customerOrderService.deleteOrderDetail(detailId);
+        
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+        Integer currentUserId = currentUser != null ? currentUser.getUserId() : null;
+        service.AuditLogService.log(currentUserId, "DELETE", "Order", "Xóa mặt hàng (Detail ID: " + detailId + ") khỏi đơn hàng ID " + orderId);
+        
         response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
     }
 }

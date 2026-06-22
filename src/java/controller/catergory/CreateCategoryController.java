@@ -43,6 +43,9 @@ public class CreateCategoryController extends HttpServlet {
 
         int newCategoryId = categoryService.createCategory(categoryName);
         if (newCategoryId > 0) {
+            model.User loggedInUser = (model.User) request.getSession().getAttribute("user");
+            Integer userId = loggedInUser != null ? loggedInUser.getUserId() : null;
+            service.AuditLogService.log(userId, "CREATE", "Category", "Tạo danh mục mới: " + categoryName + " (ID: " + newCategoryId + ")");
             response.sendRedirect(request.getContextPath() + "/category/list?status=add_success");
         } else {
             request.setAttribute("error", "Failed to add category to the database!");

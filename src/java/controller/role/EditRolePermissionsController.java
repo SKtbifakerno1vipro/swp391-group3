@@ -62,7 +62,13 @@ public class EditRolePermissionsController extends HttpServlet {
             }
         }
 
+        model.User currentUser = (model.User) request.getSession().getAttribute("user");
+        Integer currentUserId = currentUser != null ? currentUser.getUserId() : null;
+        Role role = roleService.getRoleDetail(roleId);
+        String roleName = role != null ? role.getRoleName() : String.valueOf(roleId);
+
         roleService.updateRolePermissions(roleId, permissionIds);
+        service.AuditLogService.log(currentUserId, "UPDATE", "Role", "Chỉnh sửa danh sách quyền cho vai trò: " + roleName + " (ID: " + roleId + ")");
         response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
     }
 }

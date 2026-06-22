@@ -133,6 +133,7 @@ public class CreateProduct extends HttpServlet {
             p.setProductStatus(status);
             boolean create = pService.createProduct(p);
             if (create) {
+                service.AuditLogService.log(u.getUserId(), "CREATE", "Product", "Tạo sản phẩm mới: " + name + " (Giá vốn: " + costRaw + ", Giá bán: " + sellRaw + ")");
                 response.sendRedirect(request.getContextPath() + "/product-list");
             } else {
                 error = "Create Product Failed";

@@ -68,8 +68,9 @@ public class CreateQuotationController extends HttpServlet {
             quotation.setQuotationDate(LocalDateTime.now());
             quotation.setQuotationStatus("DRAFT");
 
-            // Tam thoi de la 1. Sau nay noi login/session thi lay userId tu session.
-            quotation.setCreatedBy(1);
+            model.User u = (model.User) request.getSession().getAttribute("user");
+            int creatorId = u != null ? u.getUserId() : 1;
+            quotation.setCreatedBy(creatorId);
 
             // Tao danh sach detail de luu nhieu dong quotation_detail.
             List<QuotationDetail> details = new ArrayList<>();
@@ -101,6 +102,7 @@ public class CreateQuotationController extends HttpServlet {
             boolean success = quotationService.createQuotation(quotation, details);
 
             if (success) {
+                service.AuditLogService.log(creatorId, "CREATE", "Quotation", "Tạo báo giá mới (Draft) cho khách hàng ID: " + customerId);
                 // Thanh cong thi quay ve trang danh sach
                 response.sendRedirect("quotation-list");
             } else {

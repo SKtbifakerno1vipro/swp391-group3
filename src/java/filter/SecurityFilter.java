@@ -65,7 +65,8 @@ public class SecurityFilter implements Filter {
             "/payment",
             "/payment-test",
             "/payment-list",
-            "/payment-detail"
+            "/payment-detail",
+            "/admin/audit-logs"
     );
 
     private static final List<String> MANAGER_URLS = List.of(

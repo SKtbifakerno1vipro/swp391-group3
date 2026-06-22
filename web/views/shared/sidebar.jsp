@@ -76,6 +76,9 @@
                     <a class="nav-link ${param.activeMenu == 'emailLogs' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/email/logs"><span
                             class="material-symbols-outlined">mail</span>Email Logs</a>
+                    <a class="nav-link ${param.activeMenu == 'auditLogs' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/admin/audit-logs"><span
+                            class="material-symbols-outlined">history</span>System Audit Logs</a>
                     </c:if>
                 </c:otherwise>
             </c:choose>

@@ -76,8 +76,12 @@ public class EditCategoryController extends HttpServlet {
                 return;
             }
 
+            String oldName = category.getCategoryName();
             category.setCategoryName(categoryName);
             if (categoryService.updateCategory(category)) {
+                model.User loggedInUser = (model.User) request.getSession().getAttribute("user");
+                Integer userId = loggedInUser != null ? loggedInUser.getUserId() : null;
+                service.AuditLogService.log(userId, "UPDATE", "Category", "Chỉnh sửa danh mục ID: " + categoryId + " (Từ \"" + oldName + "\" thành \"" + categoryName + "\")");
                 response.sendRedirect(request.getContextPath() + "/category/list?status=edit_success");
             } else {
                 request.setAttribute("error", "Failed to update category!");
