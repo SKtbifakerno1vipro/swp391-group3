@@ -58,13 +58,13 @@ public class ContractSaveController extends HttpServlet {
                 return;
             }
 
-            // Chuyển trạng thái hiển thị cho JSP
+            
             boolean editable = "DRAFT".equals(status) || "PENDING_REVIEW".equals(status);
             request.setAttribute("editable", editable);
             request.setAttribute("contract", contract);
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
 
-            // --- Tạo mới hợp đồng từ quotation ---
+            // Create new contract with quotation
         } else if (quotationId != null && !quotationId.isEmpty()) {
             int qId = Integer.parseInt(quotationId);
             Quotation quotation = quotationService.getQuotationById(qId);
