@@ -51,7 +51,7 @@ public class QuotationDAO extends DBContext {
         return list;
     }
 
-    public List<Quotation> searchQuotations(String searchText, String status) {
+    public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate) {
         List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
                 + "quotation.quotation_status, quotation.created_by, quotation.created_at, "
@@ -70,7 +70,16 @@ public class QuotationDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql += " AND quotation.quotation_status = ? "; // Them dau cach
         }
-        sql += " ORDER BY quotation.quotation_id ASC";
+
+        if (fromDate != null && !fromDate.trim().isEmpty()) {
+            sql += " AND quotation.quotation_date >= ? ";
+        }
+
+        if (toDate != null && !toDate.trim().isEmpty()) {
+            sql += " AND quotation.quotation_date <= ? ";
+        }
+
+        sql += " ORDER BY quotation.quotation_date DESC";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -81,6 +90,12 @@ public class QuotationDAO extends DBContext {
             }
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(paramIndex++, status); // Dung ++ de tang vi tri
+            }
+            if (fromDate != null && !fromDate.trim().isEmpty()) {
+                ps.setString(paramIndex++, fromDate + " 00:00:00");
+            }
+            if (toDate != null && !toDate.trim().isEmpty()) {
+                ps.setString(paramIndex++, toDate + " 23:59:59");
             }
 
             ResultSet rs = ps.executeQuery();
@@ -461,6 +476,21 @@ public class QuotationDAO extends DBContext {
             System.out.println("deleteQuotationDetail error: " + e.getMessage());
         }
 
+        return false;
+    }
+
+    public boolean hasDraftQuotation(int customerId) {
+        String sql = "SELECT COUNT(*) FROM quotation WHERE customer_id = ? AND quotation_status = 'DRAFT'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("hasDraftQuotation error: " + e.getMessage());
+        }
         return false;
     }
 }

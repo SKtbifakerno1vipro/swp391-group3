@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>`n<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -11,6 +11,12 @@
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
+        <style>
+            .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px; }
+            .page-link, .page-current { min-width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; font-weight: 900; text-decoration: none; }
+            .page-link { background: var(--surface-soft, #f0ece4); color: var(--muted, #646b66); }
+            .page-link:hover, .page-current { background: var(--primary, #4a7c59); color: #fff; }
+        </style>
     </head>
     <body>
         <div class="dashboard-shell">
@@ -32,6 +38,13 @@
                 <option value="ACCEPTED" ${status == 'ACCEPTED' ? 'selected' : ''}>ACCEPTED</option>
                 <option value="REJECTED" ${status == 'REJECTED' ? 'selected' : ''}>REJECTED</option>
             </select>
+
+            From Date:
+            <input type="date" name="fromDate" value="${fromDate}">
+
+            To Date:
+            <input type="date" name="toDate" value="${toDate}">
+
             <button type="submit">Search</button>
             <a href="quotation-list"><button type="button">Reset</button></a>
         </form>
@@ -84,6 +97,26 @@
                 </c:forEach>
             </tbody>
         </table>
+
+<!--         Thanh phân trang giống Role module 
+        <div class="pagination" style="margin-top: 20px;">
+            <c:if test="${currentPage > 1}">
+                <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${currentPage - 1}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">&lt;</a>
+            </c:if>
+            <c:forEach begin="1" end="${totalPages}" var="i">
+                <c:choose>
+                    <c:when test="${i == currentPage}">
+                        <span class="page-current">${i}</span>
+                    </c:when>
+                    <c:otherwise>
+                        <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${i}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">${i}</a>
+                    </c:otherwise>
+                </c:choose>
+            </c:forEach>
+            <c:if test="${currentPage < totalPages}">
+                <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${currentPage + 1}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">&gt;</a>
+            </c:if>
+        </div>-->
 
             </main>
         </div>

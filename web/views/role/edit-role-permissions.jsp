@@ -17,7 +17,11 @@
             a { color:inherit; text-decoration:none; }
             .material-symbols-outlined { font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; font-size:22px; line-height:1; letter-spacing:normal; text-transform:none; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; word-wrap:normal; direction:ltr; -webkit-font-feature-settings:'liga'; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24; width:1em; min-width:1em; overflow:hidden; }
             .role-shell { display:grid; grid-template-columns:260px minmax(0,1fr); min-height:100vh; }
-            .sidebar { position:sticky; top:0; height:100vh; padding:28px 18px; background:linear-gradient(180deg,#f7f2eb 0%,#f2ede5 100%); border-right:1px solid var(--line); display:flex; flex-direction:column; gap:28px; overflow:hidden; }
+            .sidebar { position:sticky; top:0; height:100vh; padding:28px 18px; background:linear-gradient(180deg,#f7f2eb 0%,#f2ede5 100%); border-right:1px solid var(--line); display:flex; flex-direction:column; gap:28px; overflow-y:auto; }
+            .sidebar::-webkit-scrollbar { width:6px; }
+            .sidebar::-webkit-scrollbar-track { background:transparent; }
+            .sidebar::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.08); border-radius:3px; }
+            .sidebar::-webkit-scrollbar-thumb:hover { background:rgba(0,0,0,0.16); }
             .sidebar::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at top left,rgba(142,207,158,.2),transparent 28%); pointer-events:none; }
             .brand,.nav-group,.sidebar-footer { position:relative; z-index:1; }
             .brand { display:flex; align-items:center; gap:12px; padding:0 8px; }

@@ -43,68 +43,76 @@ public class ContractDetailController extends HttpServlet {
         }
 
         String idStr = request.getParameter("id");
-        boolean existSignature = false;
+        String quotationIdStr = request.getParameter("quotationId");
+        int id = -1;
+        Contract contract = null;
+
         if (idStr != null && !idStr.isEmpty()) {
             try {
-                int id = Integer.parseInt(idStr);
-                Contract contract = contractService.getContractById(id);
-
+                id = Integer.parseInt(idStr);
+                contract = contractService.getContractById(id);
+            } catch (NumberFormatException ignored) {}
+        } else if (quotationIdStr != null && !quotationIdStr.isEmpty()) {
+            try {
+                int qId = Integer.parseInt(quotationIdStr);
+                contract = contractService.getContractByQuotationId(qId);
                 if (contract != null) {
-                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(id);
-//nguyenkien - begin
-                    String finalHtml = contract.getContractContent();
-                    String status = contract.getContractStatus();
-                    boolean isApproved = "APPROVED".equals(status);
-                    boolean isSigned = "SIGNED".equals(status);
-                    if (isApproved || isSigned) {
-        // Replace custom image src with web-accessible URL
-        String uploadsUrl = request.getContextPath() + "/uploads/";
-        finalHtml = finalHtml.replaceAll("(src=[\\\"']?)File\\?name=([^\\\"'>]+)([\\\"']?)",
-                "$1" + uploadsUrl + "$2$3");
-                        Signature existSign = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
-                        existSignature = (existSign!=null);
-                        request.setAttribute("signed", existSignature);
-                        List<Signature> sigList = sService.getSignaturesByContractId(id);
-                        for (Signature sig : sigList) {
-                            if (sig == null || sig.getSignerUserId() == null) {
-                                continue;
-                            } 
-                            boolean isCustomerSigner = rService.getRoleIdByName("Customer")
-                                    == uService.getUserById(sig.getSignerUserId()).getRoleId();
-
-                        String imgTag = "<div style=\"height: 100px;\">"
-                                    + "<img src='" + uploadsUrl + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>"
-                                    + "</div>";
-
-                            if (isCustomerSigner) {
-                                finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"buyer\"></div>", imgTag);
-                            } else {
-                                finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
-                            }
-                        }
-                    }
-
-                    contract.setContractContent(finalHtml);
-//nguyen kien - end
-                    request.setAttribute("contract", contract);
-                    request.setAttribute("historyList", historyList);
-
-                    // clear the status of contract
-                    boolean canRequestEdit = "DRAFT".equals(status)
-                            || "PENDING_REVIEW".equals(status);
-                    boolean canCustomerCheck = "CUSTOMER_CHECK".equals(status);
-                    request.setAttribute("canRequestEdit", canRequestEdit);
-                    request.setAttribute("canCustomerCheck", canCustomerCheck);
-                    request.setAttribute("isApproved", isApproved);
-                    
-                    request.getRequestDispatcher("views/contract/detail.jsp")
-                            .forward(request, response);
-                } else {
-                    response.sendRedirect("contract-list");
+                    id = contract.getContractId();
                 }
-            } catch (NumberFormatException e) {
-                response.sendRedirect("contract-list");
+            } catch (NumberFormatException ignored) {}
+        }
+
+        boolean existSignature = false;
+        if (contract != null) {
+            List<ContractHistory> historyList = contractService.getHistoriesByContractId(id);
+            //nguyenkien - begin
+            String finalHtml = contract.getContractContent();
+            String status = contract.getContractStatus();
+            boolean isApproved = "APPROVED".equals(status);
+            boolean isSigned = "SIGNED".equals(status);
+            if (isApproved || isSigned) {
+                // Replace custom image src with web-accessible URL
+                String uploadsUrl = request.getContextPath() + "/uploads/";
+                finalHtml = finalHtml.replaceAll("(src=[\\\"']?)File\\?name=([^\\\"'>]+)([\\\"']?)",
+                        "$1" + uploadsUrl + "$2$3");
+                Signature existSign = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
+                existSignature = (existSign!=null);
+                request.setAttribute("signed", existSignature);
+                List<Signature> sigList = sService.getSignaturesByContractId(id);
+                for (Signature sig : sigList) {
+                    if (sig == null || sig.getSignerUserId() == null) {
+                        continue;
+                    } 
+                    boolean isCustomerSigner = rService.getRoleIdByName("Customer")
+                            == uService.getUserById(sig.getSignerUserId()).getRoleId();
+
+                    String imgTag = "<div style=\"height: 100px;\">"
+                                + "<img src='" + uploadsUrl + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>"
+                                + "</div>";
+
+                    if (isCustomerSigner) {
+                        finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"buyer\"></div>", imgTag);
+                    } else {
+                        finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
+                    }
+                }
             }
+
+            contract.setContractContent(finalHtml);
+            //nguyen kien - end
+            request.setAttribute("contract", contract);
+            request.setAttribute("historyList", historyList);
+
+            // clear the status of contract
+            boolean canRequestEdit = "DRAFT".equals(status)
+                    || "PENDING_REVIEW".equals(status);
+            boolean canCustomerCheck = "CUSTOMER_CHECK".equals(status);
+            request.setAttribute("canRequestEdit", canRequestEdit);
+            request.setAttribute("canCustomerCheck", canCustomerCheck);
+            request.setAttribute("isApproved", isApproved);
+            
+            request.getRequestDispatcher("views/contract/detail.jsp")
+                    .forward(request, response);
         } else {
             response.sendRedirect("contract-list");
         }
