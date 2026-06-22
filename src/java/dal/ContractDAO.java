@@ -15,7 +15,7 @@ public class ContractDAO extends DBContext {
         String sql = "INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_status, contract_content, storage_type, created_by, created_at, updated_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, c.getCustomerId());
             ps.setInt(2, c.getQuotationId());
             ps.setString(3, c.getContractNumber());
@@ -81,7 +81,7 @@ public class ContractDAO extends DBContext {
               if (userId != 0 && userId > 0 && roleId == 3) {
                   ps.setInt(index++, userId);
               }
-            
+
             ps.setInt(index++, (pageIndex - 1) * pageSize);
             ps.setInt(index++, pageSize);
 
@@ -203,7 +203,7 @@ public class ContractDAO extends DBContext {
         return null;
     }
 
-    public List<model.Contract> getSignedContractsByCustomerId(int customerId) {
+    public List<Contract> getSignedContractsByCustomerId(int customerId) {
         List<model.Contract> list = new ArrayList<>();
         // Truy vấn các hợp đồng đã Ký (SIGNED) của khách hàng
         String sql = "SELECT * FROM customer_contract WHERE customer_id = ? AND contract_status = 'SIGNED'";
@@ -301,6 +301,21 @@ public class ContractDAO extends DBContext {
     }
     // Xhieu - end
 
+    //nguyenkien - begin
+    public boolean updateContractContent(int contractId, String contractContent) {
+        String sql = "UPDATE customer_contract SET contract_content = ?, updated_at = GETDATE() WHERE customer_contract_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, contractContent);
+            ps.setInt(2, contractId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("ContractDAO updateContractContent error: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    //nguyenkien - end
     public boolean updateContractNumber(Contract c) {
         String sql = "UPDATE customer_contract SET contract_number = ? WHERE customer_contract_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -317,7 +332,12 @@ public class ContractDAO extends DBContext {
     // Lấy lịch sử và danh sách item liên quan
     public List<ContractHistory> getHistoriesByContractId(int contractId) {
         List<ContractHistory> list = new ArrayList<>();
-        String sql = "SELECT h.*, u.user_name FROM contract_edit_history h LEFT JOIN [user] u ON h.changed_by = u.user_id WHERE h.contract_id = ? ORDER BY h.created_at DESC";
+        String sql = "SELECT h.*, u.user_name "
+                + "FROM contract_edit_history h "
+                + "LEFT JOIN [user] u "
+                + "ON h.changed_by = u.user_id "
+                + "WHERE h.contract_id = ? "
+                + "ORDER BY h.created_at DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
             ResultSet rs = ps.executeQuery();
@@ -407,7 +427,7 @@ public class ContractDAO extends DBContext {
         return items;
     }
 
-    public java.math.BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
+    public BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
 
         String sql = """
                      SELECT SUM(

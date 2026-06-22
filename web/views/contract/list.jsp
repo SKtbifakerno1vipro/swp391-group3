@@ -26,10 +26,10 @@
                     <select name="status">
                         <option value="">-- All statuses --</option>
                         <option value="DRAFT" ${status == 'DRAFT' ? 'selected' : ''}>Draft</option>
+                        <option value="PENDING_REVIEW" ${status == 'PENDING_REVIEW' ? 'selected' : ''}>Pending Review</option>
+                        <option value="CUSTOMER_CHECK" ${status == 'CUSTOMER_CHECK' ? 'selected' : ''}>Customer Check</option>
+                        <option value="APPROVED" ${status == 'APPROVED' ? 'selected' : ''}>Approved</option>
                         <option value="SIGNED" ${status == 'SIGNED' ? 'selected' : ''}>Signed</option>
-                        <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Active</option>
-                        <option value="CUSTOMER_REQUESTED_REVISION" ${status == 'CUSTOMER_REQUESTED_REVISION' ? 'selected' : ''}>Customer Requested Revision</option>
-                        <option value="CANCELLED" ${status == 'CANCELLED' ? 'selected' : ''}>Cancelled</option>
                     </select>
                     <select name="storageType">
                         <option value="">-- Storage type --</option>
@@ -63,7 +63,9 @@
                                 <td>${c.contractStatus}</td>
                                 <td>${c.storageType}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |
+                                    <c:if test="${sessionScope.user.roleId==5}">
+                                        <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |
+                                    </c:if>
                                     <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">Details</a>
                                 </td>
                             </tr>
@@ -85,5 +87,12 @@
                 </c:if>
             </main>
         </div>
+        <script>
+                    let errorSig = "${errorSig}";
+
+                    if (errorSig !== "") {
+                        alert("${errorSig}");
+                    }
+        </script>
     </body>
 </html>

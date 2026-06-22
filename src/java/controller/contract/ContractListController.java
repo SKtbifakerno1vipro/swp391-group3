@@ -13,13 +13,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 import model.*;
-import dal.*;
+import service.*;
 import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/contract-list")
 public class ContractListController extends HttpServlet {
 
-    private ContractDAO dao = new ContractDAO();
+    private ContractService contractService = new ContractService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,14 +31,18 @@ public class ContractListController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        if((String) session.getAttribute("errorSig") != null){
+            request.setAttribute("errorSig", (String) session.getAttribute("errorSig"));
+            session.removeAttribute("errorSig");
+        }
 
-        // 1. LAY THAM SO TIM KIEM
+        // 1. Take value to filter
         String contractNumber = request.getParameter("contractNumber");
         String customerName = request.getParameter("customerName");
         String status = request.getParameter("status");
         String storageType = request.getParameter("storageType");
 
-        // 2. VALIDATE PAGE INDEX (Tranh loi NumberFormatException)
+        // 2. validate page index
         int pageIndex = 1;
         try {
             String pageRaw = request.getParameter("page");
@@ -54,9 +58,10 @@ public class ContractListController extends HttpServlet {
 
         int pageSize = 10;
 
-        List<Contract> list = dao.searchContracts(contractNumber, customerName, status, storageType, pageIndex, 
+        List<Contract> list = contractService.searchContracts(contractNumber, customerName, status, storageType, pageIndex,
                 pageSize, currentUser.getUserId(), currentUser.getRoleId());
-        int totalRecord = dao.getTotalContracts(contractNumber, customerName, status, storageType);
+        
+        int totalRecord = contractService.getTotalContracts(contractNumber, customerName, status, storageType);
 
         // Tinh toan trang cuoi
         int endPage = (int) Math.ceil((double) totalRecord / pageSize);

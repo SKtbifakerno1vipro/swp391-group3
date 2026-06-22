@@ -64,6 +64,18 @@
 
                 <%-- Bang nay chua cac san pham da duoc add vao quotation. --%>
                 <h3>Selected Products</h3>
+                <div style="background-color: #f9f9f9; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; max-width: 600px;">
+                    <strong>Apply Discount & Tax to ALL products:</strong>
+                    <br><br>
+                    <label>Discount %:</label>
+                    <input type="number" id="bulkDiscount" min="0" max="100" step="0.01" value="0">
+                    
+                    <label style="margin-left: 15px;">Tax %:</label>
+                    <input type="number" id="bulkTax" min="0" max="100" step="0.01" value="0">
+                    
+                    <button type="button" onclick="applyBulkDiscountAndTax()" style="margin-left: 15px; padding: 5px 10px; background-color: #008CBA; color: white; border: none; cursor: pointer;">Apply All</button>
+                </div>
+
                 <table border="1" cellpadding="7" cellspacing="0" id="productTable" style="width: 100%;">
                     <thead>
                         <tr>
@@ -173,6 +185,26 @@
                     }
 
                     const tbody = document.getElementById('productRows');
+                    const existingProductInputs = tbody.querySelectorAll('input[name="productId"]');
+
+                    // Neu san pham da co trong bang thi chi tang quantity, khong them dong moi.
+                    for (let i = 0; i < existingProductInputs.length; i++) {
+                        if (existingProductInputs[i].value === productId) {
+                            const existingRow = existingProductInputs[i].closest('tr');
+                            const quantityInput = existingRow.querySelector('input[name="quantity"]');
+                            quantityInput.value = (parseInt(quantityInput.value) || 0) + 1;
+
+                            document.getElementById('productSearch').value = '';
+                            document.getElementById('selectedProductId').value = '';
+                            document.getElementById('selectedProductName').value = '';
+                            document.getElementById('selectedProductPrice').value = '';
+                            document.getElementById('selectedProductText').textContent = '';
+
+                            calculateTotals();
+                            return;
+                        }
+                    }
+
                     const row = document.createElement('tr');
 
                     row.innerHTML =
@@ -205,9 +237,9 @@
                 }
 
                 // Tinh line total va grand total.
-                function calculateTotals() {
-                    const rows = document.querySelectorAll('#productRows tr');
-                    let grandTotal = 0;
+                    function calculateTotals() {
+                        const rows = document.querySelectorAll('#productRows tr');
+                        let grandTotal = 0;
 
                     rows.forEach(function(row) {
                         const quantity = parseFloat(row.querySelector('input[name="quantity"]').value) || 0;
@@ -236,6 +268,27 @@
                         return false;
                     }
                     return true;
+                }
+
+                // Set cung muc discount va tax cho tat ca dong hien co
+                function applyBulkDiscountAndTax() {
+                    const discount = document.getElementById('bulkDiscount').value || 0;
+                    const tax = document.getElementById('bulkTax').value || 0;
+                    const rows = document.querySelectorAll('#productRows tr');
+                    
+                    if(rows.length === 0) {
+                        alert("Please add at least one product first.");
+                        return;
+                    }
+
+                    rows.forEach(function(row) {
+                        const discountInput = row.querySelector('input[name="discountPercent"]');
+                        const taxInput = row.querySelector('input[name="taxPercent"]');
+                        if(discountInput) discountInput.value = discount;
+                        if(taxInput) taxInput.value = tax;
+                    });
+
+                    calculateTotals();
                 }
             </script>
 

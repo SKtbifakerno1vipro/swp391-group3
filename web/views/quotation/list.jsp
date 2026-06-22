@@ -70,8 +70,14 @@
 
                             <%-- Chi hien nut tao hop dong neu trang thai la ACCEPTED. --%>
                             <c:if test="${quotation.quotationStatus == 'ACCEPTED'}">
-                                | <a href="contract-save?quotationId=${quotation.quotationId}"
-                                     style="color: green; font-weight: bold;">Create Contract</a>
+                                <c:choose>
+                                    <c:when test="${quotation.hasContract}">
+                                        | <a href="contract-detail?quotationId=${quotation.quotationId}" style="color: blue; font-weight: bold;">View Contract</a>
+                                    </c:when>
+                                    <c:otherwise>
+                                        | <a href="contract-save?quotationId=${quotation.quotationId}" style="color: green; font-weight: bold;">Create Contract</a>
+                                    </c:otherwise>
+                                </c:choose>
                             </c:if>
                         </td>
                     </tr>

@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Category;
+import model.User;
 import service.ProductService;
 import utils.Validation;
 
@@ -65,6 +66,12 @@ public class ProductList extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login");
+            return;
+        }
         List<Category> categories = pService.getAllCategory();
         String id = request.getParameter("id");
         String sort = request.getParameter("sort");
