@@ -138,8 +138,7 @@ public class ContractDetailController extends HttpServlet {
 
         // 2. Xử lý các Action từ contract list
         if ("request_edit".equals(action)) {
-            String[] types = request.getParameterValues("revision_type[]");
-            String[] details = request.getParameterValues("revision_detail[]");
+            String note = request.getParameter("revision_note");
 
             // Tạo history record
             ContractHistory h = new ContractHistory();
@@ -149,19 +148,13 @@ public class ContractDetailController extends HttpServlet {
             h.setChangedBy(user.getUserId());
             int historyId = contractService.insertHistory(h);
 
-            if (types != null && historyId > 0) {
-                for (int i = 0; i < types.length; i++) {
-
-                    if (types[i] == null || types[i].trim().isEmpty()) {
-                        continue;
-                    }
-                    ContractRevisionItem item = new ContractRevisionItem();
-                    item.setHistoryId(historyId);
-                    item.setContractId(contractId);
-                    item.setRevisionType(types[i]);
-                    item.setRevisionDetail(details[i]);
-                    contractService.insertRevisionItem(item);
-                }
+            if (note != null && !note.trim().isEmpty() && historyId > 0) {
+                ContractRevisionItem item = new ContractRevisionItem();
+                item.setHistoryId(historyId);
+                item.setContractId(contractId);
+                item.setRevisionType("");
+                item.setRevisionDetail(note);
+                contractService.insertRevisionItem(item);
             }
 
             // Cập nhật status hợp đồng
