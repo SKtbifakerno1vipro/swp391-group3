@@ -233,7 +233,6 @@ CREATE TABLE signature (
     file_url NVARCHAR(1000),
     signer_user_id INT NULL,
     signer_name NVARCHAR(255),
-    --signer_type VARCHAR(50), DROP COLUMN
     signed_at DATETIME,
     uploaded_by INT,
     uploaded_at DATETIME DEFAULT GETDATE(),
@@ -387,8 +386,8 @@ INSERT INTO contract_edit_history (contract_id, from_status, to_status, contract
 (@C1, 'SENT_TO_CUSTOMER', 'SIGNED', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 
 -- Chu ky
-INSERT INTO signature (customer_contract_id, file_name, file_url, signer_user_id, signer_name, signer_type, signed_at, uploaded_by) VALUES 
-(@C1, 'sign_kh.png', '/sig/kh.png', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'), N'Nguyễn Văn Một', 'CUSTOMER', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
+INSERT INTO signature (customer_contract_id, file_name, file_url, signer_user_id, signer_name, signed_at, uploaded_by) VALUES 
+(@C1, 'sign_kh.png', '/sig/kh.png', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'), N'Nguyễn Văn Một', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 
 -- Đon hang & Thanh toan
 INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by) VALUES (1, @C1, 'DELIVERED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));

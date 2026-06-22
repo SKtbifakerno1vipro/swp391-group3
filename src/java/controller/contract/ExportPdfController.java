@@ -81,7 +81,7 @@ public class ExportPdfController extends HttpServlet {
             boolean isCustomerSigner = rService.getRoleIdByName("Customer")
                     == uService.getUserById(sig.getSignerUserId()).getRoleId();
             String imgTag = "<img src='" + uploadsUrl + sig.getFileName() + "'"
-                    + " style='width:auto;height:80px;max-width:100%;object-fit:contain;'/>";
+                    + " style='width:auto;height:80px;max-width:100%;object-fit:contain;'/> <br>";
             if (isCustomerSigner) {
                 html = html.replace("<div style=\"height: 100px;\" id=\"buyer\"></div>", imgTag);
             } else {
