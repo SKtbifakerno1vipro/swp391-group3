@@ -57,6 +57,10 @@ public class ContractDetailController extends HttpServlet {
                     boolean isApproved = "APPROVED".equals(status);
                     boolean isSigned = "SIGNED".equals(status);
                     if (isApproved || isSigned) {
+        // Replace custom image src with web-accessible URL
+        String uploadsUrl = request.getContextPath() + "/uploads/";
+        finalHtml = finalHtml.replaceAll("(src=[\\\"']?)File\\?name=([^\\\"'>]+)([\\\"']?)",
+                "$1" + uploadsUrl + "$2$3");
                         Signature existSign = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
                         existSignature = (existSign!=null);
                         request.setAttribute("signed", existSignature);
@@ -65,13 +69,11 @@ public class ContractDetailController extends HttpServlet {
                             if (sig == null || sig.getSignerUserId() == null) {
                                 continue;
                             } 
-
                             boolean isCustomerSigner = rService.getRoleIdByName("Customer")
                                     == uService.getUserById(sig.getSignerUserId()).getRoleId();
 
-                            String imgTag = "<div style=\"height: 100px;\">"
-                                    + "<img src='File?name=" + sig.getFileName()
-                                    + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>"
+                        String imgTag = "<div style=\"height: 100px;\">"
+                                    + "<img src='" + uploadsUrl + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>"
                                     + "</div>";
 
                             if (isCustomerSigner) {
@@ -80,7 +82,6 @@ public class ContractDetailController extends HttpServlet {
                                 finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
                             }
                         }
-                        contractService.updateContractContent(id, finalHtml);
                     }
 
                     contract.setContractContent(finalHtml);
@@ -137,30 +138,30 @@ public class ContractDetailController extends HttpServlet {
 
         // 2. Xử lý các Action từ contract list
         if ("request_edit".equals(action)) {
-            String[] types = request.getParameterValues("revision_type[]");
-            String[] details = request.getParameterValues("revision_detail[]");
+            // BR: only DRAFT or CUSTOMER_CHECK can request edit
+            String currentStatus = contract.getContractStatus();
+            if (!"DRAFT".equals(currentStatus) && !"CUSTOMER_CHECK".equals(currentStatus)) {
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+
+            String note = request.getParameter("revision_note");
 
             // Tạo history record
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
-            h.setFromStatus(contract.getContractStatus());
+            h.setFromStatus(currentStatus);
             h.setToStatus("PENDING_REVIEW");
             h.setChangedBy(user.getUserId());
             int historyId = contractService.insertHistory(h);
 
-            if (types != null && historyId > 0) {
-                for (int i = 0; i < types.length; i++) {
-
-                    if (types[i] == null || types[i].trim().isEmpty()) {
-                        continue;
-                    }
-                    ContractRevisionItem item = new ContractRevisionItem();
-                    item.setHistoryId(historyId);
-                    item.setContractId(contractId);
-                    item.setRevisionType(types[i]);
-                    item.setRevisionDetail(details[i]);
-                    contractService.insertRevisionItem(item);
-                }
+            if (note != null && !note.trim().isEmpty() && historyId > 0) {
+                ContractRevisionItem item = new ContractRevisionItem();
+                item.setHistoryId(historyId);
+                item.setContractId(contractId);
+                item.setRevisionType("");
+                item.setRevisionDetail(note);
+                contractService.insertRevisionItem(item);
             }
 
             // Cập nhật status hợp đồng
@@ -168,6 +169,11 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("approve".equals(action)) {
+            // BR: only PENDING_REVIEW can be approved by Manager
+            if (!"PENDING_REVIEW".equals(contract.getContractStatus())) {
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
             // Manager Approve: Chuyển sang cho khách hàng kiểm tra
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
 
@@ -180,12 +186,14 @@ public class ContractDetailController extends HttpServlet {
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
 
-            // TODO: Bổ sung logic gửi Email cho Khách hàng tại đây
-            // NotificationService notificationService = new NotificationService();
-            // notificationService.sendContractReadyMail(contractId);
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("customer_approve".equals(action)) {
+            // BR: only CUSTOMER_CHECK can be approved by Customer
+            if (!"CUSTOMER_CHECK".equals(contract.getContractStatus())) {
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
             // Khách hàng đồng ý: Chuyển trạng thái sang APPROVED
             contractService.updateStatus(contractId, "APPROVED");
 
@@ -201,6 +209,11 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("send_to_manager".equals(action)) {
+            // BR: only DRAFT can send_to_manager
+            if (!"DRAFT".equals(contract.getContractStatus())) {
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
             // Cập nhật status
             contractService.updateStatus(contractId, "PENDING_REVIEW");
 

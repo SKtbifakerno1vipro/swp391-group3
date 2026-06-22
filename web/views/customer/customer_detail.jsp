@@ -265,6 +265,46 @@
                         background-color: var(--surface-strong);
                         transform: translateY(-2px);
                     }
+
+                    .btn-remove {
+                        display: inline-block;
+                        color: #fff !important;
+                        background-color: var(--danger, #dc3545);
+                        padding: 10px 24px;
+                        font-size: 14px;
+                        font-weight: 800;
+                        border-radius: 999px;
+                        text-decoration: none;
+                        box-shadow: var(--shadow);
+                        transition: all 0.2s ease;
+                        border: none;
+                        cursor: pointer;
+                    }
+
+                    .btn-remove:hover {
+                        transform: translateY(-2px);
+                        filter: brightness(1.1);
+                    }
+
+                    .btn-activate {
+                        display: inline-block;
+                        color: #fff !important;
+                        background-color: var(--primary, #28a745);
+                        padding: 10px 24px;
+                        font-size: 14px;
+                        font-weight: 800;
+                        border-radius: 999px;
+                        text-decoration: none;
+                        box-shadow: var(--shadow);
+                        transition: all 0.2s ease;
+                        border: none;
+                        cursor: pointer;
+                    }
+
+                    .btn-activate:hover {
+                        transform: translateY(-2px);
+                        filter: brightness(1.1);
+                    }
                 </style>
             </head>
 
@@ -553,6 +593,16 @@
                             <div class="btn-group">
                                 <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customerId}"
                                     class="btn-edit">Edit Profile</a>
+                                <c:if test="${cusDTO.status == 'ACTIVE'}">
+                                    <a href="${pageContext.request.contextPath}/customer/detail?action=deactivate&id_cus=${cusDTO.customerId}"
+                                        class="btn-remove"
+                                        onclick="return confirm('Are you sure you want to deactivate this customer?');">Remove</a>
+                                </c:if>
+                                <c:if test="${cusDTO.status == 'INACTIVE'}">
+                                    <a href="${pageContext.request.contextPath}/customer/detail?action=activate&id_cus=${cusDTO.customerId}"
+                                        class="btn-activate"
+                                        onclick="return confirm('Are you sure you want to activate this customer?');">Activate</a>
+                                </c:if>
                                 <a href="${pageContext.request.contextPath}/customer/list" class="btn-back">Back to
                                     List</a>
                             </div>

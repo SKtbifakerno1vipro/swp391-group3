@@ -1,4 +1,5 @@
-<div style="font-family: 'Times New Roman', Times, serif; font-size: 13pt; line-height: 1.5; padding: 40px; background-color: white; color: black; max-width: 800px; margin: 0 auto; border: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+<div
+    style="font-family: 'Times New Roman', Times, serif; font-size: 13pt; line-height: 1.5; padding: 40px; background-color: white; color: black; max-width: 800px; margin: 0 auto; border: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
     <div style="text-align: center; font-weight: bold;">
         <p style="margin: 0;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
         <p style="margin: 0;">Độc lập - Tự do - Hạnh phúc</p>
@@ -24,8 +25,9 @@
         <p style="margin: 0;">Địa chỉ trụ sở chính: {company_address}</p>
         <p style="margin: 0;">Điện thoại: {company_phone}</p>
         <p style="margin: 0;">Tài khoản số: ....................................................</p>
-        <p style="margin: 0;">Mở tại ngân hàng: ................................................</p> 
-        <p style="margin: 0;">Giấy ủy quyền số:...........................(nếu có) ngày ................................................</p> 
+        <p style="margin: 0;">Mở tại ngân hàng: ................................................</p>
+        <p style="margin: 0;">Giấy ủy quyền số:...........................(nếu có) ngày
+            ................................................</p>
         <p style="margin: 0;">Đại diện là Ông (bà): <strong>{company_rep}</strong></p>
         <p style="margin: 0;">Chức vụ: {company_position}</p>
         <p style="margin: 0;">Mã số thuế: {tax_code_A}</p>
@@ -38,7 +40,8 @@
         <p style="margin: 0;">Điện thoại: {customer_phone}</p>
         <p style="margin: 0;">Tài khoản số: ....................................................</p>
         <p style="margin: 0;">Mở tại ngân hàng: ................................................</p>
-        <p style="margin: 0;">Giấy ủy quyền số:...........................(nếu có) ngày ................................................</p> 
+        <p style="margin: 0;">Giấy ủy quyền số:...........................(nếu có) ngày
+            ................................................</p>
         <p style="margin: 0;">Đại diện là Ông (bà): {user_full_name}</p>
         <p style="margin: 0;">Chức vụ: .........................................................</p>
         <p style="margin: 0;">Mã số thuế: {tax_code_B}</p>
@@ -69,21 +72,23 @@
     <p style="margin: 0;">Chất lượng mặt hàng ................. được quy định theo...........................</p>
 
     <p style="font-weight: bold; margin-top: 10px;">Điều 11: Hiệu lực của hợp đồng</p>
-    <p style="margin: 0;">Hợp đồng có hiệu lực từ ngày <strong>{effective_date}</strong> đến ngày <strong>{end_date}</strong>.</p>
+    <p style="margin: 0;">Hợp đồng có hiệu lực từ ngày <strong>{effective_date}</strong> đến ngày
+        <strong>{end_date}</strong>.
+    </p>
 
     <table style="width: 100%; margin-top: 40px; border-collapse: collapse;">
-    <tr>
-        <td style="width: 40%; text-align: center; vertical-align: top;">
-            <strong>ĐẠI DIỆN BÊN BÁN</strong>
-            <div style="height: 100px;" id="seller"></div>
-            <strong>{company_rep}</strong>
-        </td>
-        <td style="width: 20%;"></td>
-        <td style="width: 40%; text-align: center; vertical-align: top;">
-            <strong>ĐẠI DIỆN BÊN MUA</strong><br>
-            <div style="height: 100px;" id="buyer"></div>
-            <strong>{customer_name}</strong>
-        </td>
-    </tr>
-</table>
+        <tr>
+            <td style="width: 40%; text-align: center; vertical-align: top;">
+                <strong>ĐẠI DIỆN BÊN BÁN</strong>
+                <div style="height: 100px;" id="seller"></div>
+                <strong>{company_rep}</strong>
+            </td>
+            <td style="width: 20%;"></td>
+            <td style="width: 40%; text-align: center; vertical-align: top;">
+                <strong>ĐẠI DIỆN BÊN MUA</strong><br>
+                <div style="height: 100px;" id="buyer"></div>
+                <strong>{customer_name}</strong>
+            </td>
+        </tr>
+    </table>
 </div>

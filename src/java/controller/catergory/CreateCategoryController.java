@@ -26,7 +26,7 @@ public class CreateCategoryController extends HttpServlet {
         String categoryName = request.getParameter("categoryName");
 
         if (categoryName == null || categoryName.trim().isEmpty()) {
-            request.setAttribute("error", "Vui lòng nhập tên danh mục!");
+            request.setAttribute("error", "Please enter the category name!");
             request.setAttribute("categoryName", categoryName);
             request.getRequestDispatcher("/views/category/category_create.jsp").forward(request, response);
             return;
@@ -35,7 +35,7 @@ public class CreateCategoryController extends HttpServlet {
         categoryName = categoryName.trim();
 
         if (categoryService.isCategoryNameExists(categoryName)) {
-            request.setAttribute("error", "Tên danh mục này đã tồn tại!");
+            request.setAttribute("error", "This category name already exists!");
             request.setAttribute("categoryName", categoryName);
             request.getRequestDispatcher("/views/category/category_create.jsp").forward(request, response);
             return;
@@ -45,7 +45,7 @@ public class CreateCategoryController extends HttpServlet {
         if (newCategoryId > 0) {
             response.sendRedirect(request.getContextPath() + "/category/list?status=add_success");
         } else {
-            request.setAttribute("error", "Lỗi khi thêm danh mục vào database!");
+            request.setAttribute("error", "Failed to add category to the database!");
             request.setAttribute("categoryName", categoryName);
             request.getRequestDispatcher("/views/category/category_create.jsp").forward(request, response);
         }
