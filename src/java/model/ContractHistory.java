@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ContractHistory {
@@ -104,4 +105,12 @@ public class ContractHistory {
         this.revisionItems = revisionItems;
     }
 
+    public String getCreateTimeString() {
+        if (this.getCreatedAt() == null) {
+            return "N/A";
+        }
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        return this.getCreatedAt().format(fmt);
+    }
+    
 }
