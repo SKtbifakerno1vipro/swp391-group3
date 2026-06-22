@@ -205,6 +205,9 @@
 
             <!-- COT 2: CONTENT -->
             <div class="content">
+                <c:if test="${errorSig != null}">
+                    <p style="color: red">${errorSig}</p>
+                </c:if>
                 <h3>Content Details</h3>
                 <div
                     style="background: #fdfdfd; padding: 15px; border: 1px solid #eee; margin-bottom: 15px; border-radius: 4px;">
@@ -219,18 +222,20 @@
 
             <!-- COT 3: TYPE NOTE + HISTORY -->
             <div class="right-panel">
-                <c:if test="${(canRequestEdit && sessionScope.user.roleId == 2) || (canCustomerCheck && sessionScope.user.roleId == 3)}">
-                    <div class="type-note-section">
-                        <h3 style="margin-top:0;">Type note</h3>
-                        <form method="POST" action="contract-detail" id="requestEditForm">
-                            <input type="hidden" name="action" value="request_edit" />
-                            <input type="hidden" name="contractId" value="${contract.contractId}" />
-                            <textarea name="revision_note" class="note-textarea" placeholder="Ex:&#10;price: change to 10000&#10;name: change to vtp neee" required></textarea>
-                            <button type="submit" class="btn btn-submit-note">Send note</button>
-                        </form>
-                    </div>
-                    <hr style="margin:10px 0;">
+                <c:if test="${(( sessionScope.user.roleId == 2) || ( sessionScope.user.roleId == 3)) 
+                              && (contract.contractStatus== 'PENDING_REVIEW' ||contract.contractStatus== 'CUSTOMER_CHECK' ) }">
+                      <div class="type-note-section">
+                          <h3 style="margin-top:0;">Type note</h3>
+                          <form method="POST" action="contract-detail" id="requestEditForm">
+                              <input type="hidden" name="action" value="request_edit" />
+                              <input type="hidden" name="contractId" value="${contract.contractId}" />
+                              <textarea name="revision_note" class="note-textarea" placeholder="Ex:&#10;price: change to 10000&#10;name: change to vtp neee" required></textarea>
+                              <button type="submit" class="btn btn-submit-note">Send note</button>
+                          </form>
+                      </div>
+                      <hr style="margin:10px 0;">
                 </c:if>
+
                 <div class="history-section">
                     <h3 style="margin-top:0;">History request edit</h3>
                     <c:choose>
