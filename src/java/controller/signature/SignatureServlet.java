@@ -4,12 +4,8 @@ package controller.signature;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-import service.SignatureService;
-import dal.SignatureDAO;
 import dto.CustomerDTO;
-import jakarta.servlet.ServletContext;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,8 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Base64;
 import java.util.List;
 import model.Contract;
 import model.Signature;
@@ -86,12 +80,11 @@ public class SignatureServlet extends HttpServlet {
                 CustomerDTO c = cService.getCustomerDTOByUserId(signerId);
                 if (c != null && ctrService.getContractById(contractId).getCustomerId() == c.getCustomer().getCustomerId()) {
                     signerName = c.getCustomer().getCompanyName();
-                } else {
-                    session.setAttribute("errorSig", "Bạn không được thao tác với hợp đồng này");
-                    response.sendRedirect("contract-list");
-                    return;
                 }
-
+            } else {
+                session.setAttribute("errorSig", "Bạn không được thao tác với hợp đồng này");
+                response.sendRedirect("contract-list");
+                return;
             }
 
             request.setAttribute("contractId", contractId);
@@ -151,10 +144,18 @@ public class SignatureServlet extends HttpServlet {
                 return;
             }
 
-            String uploadDir = getServletContext().getRealPath("/uploads");
-            File uploadFile = new File(uploadDir);
-            if (!uploadFile.exists()) {
-                uploadFile.mkdirs();
+            String uploadBuild = getServletContext().getRealPath("/uploads");
+            File uploadBuildFile = new File(uploadBuild);
+            if (!uploadBuildFile.exists()) {
+                uploadBuildFile.mkdirs();
+            }
+            
+            
+            File webFile = new File(new File(getServletContext().getRealPath("/")).getParentFile().getParentFile(), "web");
+            
+            File uploadWebFile = new File(webFile, "uploads");
+            if (!uploadWebFile.exists()) {
+                uploadWebFile.mkdirs();
             }
 
             Signature s = new Signature();
@@ -185,7 +186,8 @@ public class SignatureServlet extends HttpServlet {
             s.setFileName(fileName);
             s.setFileUrl(fileName);
 
-            sService.storeSignature(signatureData, uploadFile, fileName);
+            sService.storeSignature(signatureData, uploadWebFile, fileName);
+            sService.storeSignature(signatureData, uploadBuildFile, fileName);
             sService.insertSignature(s);
             List<Signature> sigList = sService.getSignaturesByContractId(contractId);
             for (Signature signature : sigList) {
