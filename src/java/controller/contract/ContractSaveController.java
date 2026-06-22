@@ -140,8 +140,13 @@ public class ContractSaveController extends HttpServlet {
 
             if (ok) {
                 if ("submit_for_review".equals(action)) {
-                    contractService.updateStatus(contractId, "PENDING_REVIEW");
-                    insertHistory(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
+                    // BR: only DRAFT can submit_for_review
+                    if ("DRAFT".equals(c.getContractStatus())) {
+                        contractService.updateStatus(contractId, "PENDING_REVIEW");
+                        insertHistory(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
+                    } else {
+                        // Status not DRAFT, cannot submit
+                    }
                 } else {
                     insertHistory(c, c.getContractStatus(), "User saved contract content.", user.getUserId());
                 }
@@ -183,8 +188,11 @@ public class ContractSaveController extends HttpServlet {
             insertHistory(c, "DRAFT", "Contract created in DRAFT status.", user.getUserId());
 
             if ("submit_for_review".equals(action)) {
-                contractService.updateStatus(newId, "PENDING_REVIEW");
-                insertHistory(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
+                // Guard: only DRAFT can submit_for_review
+                if ("DRAFT".equals(c.getContractStatus())) {
+                    contractService.updateStatus(newId, "PENDING_REVIEW");
+                    insertHistory(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
+                }
             }
             response.sendRedirect("contract-detail?id=" + newId);
         } else {

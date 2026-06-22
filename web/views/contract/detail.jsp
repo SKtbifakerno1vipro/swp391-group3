@@ -188,18 +188,19 @@
                                     <input type="hidden" name="signerId"
                                            value="${sessionScope.user.userId}">
                                     <input class="btn btn-blue" type="submit" value="Sign Contract" />
+                                    <hr>
                                 </form>
                             </c:if>
                         </c:if>
                     </c:when>
                     <%-- 4. TRANG THAI: SIGNED --%>
                 </c:choose>
-                <hr>
+
                 <a href="export-pdf?id=${contract.contractId}" class="btn btn-blue"
                    style="background-color: #6c757d; margin-top: 10px;">
                     Xuất PDF
                 </a>
-                <a href="contract-list" style="color: #007bff; text-decoration: none;">⬅ Back to contract list</a>
+                <a href="contract-list" style="color: #007bff; text-decoration: none;">Back to contract list</a>
             </div>
 
             <!-- COT 2: CONTENT -->
@@ -236,7 +237,7 @@
                         <c:when test="${not empty historyList}">
                             <c:forEach var="h" items="${historyList}">
                                 <div style="border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 10px;">
-                                    <p style="margin: 0 0 3px 0; color: #666; font-size: 0.85em;">${h.createdAt}</p>
+                                    <p style="margin: 0 0 3px 0; color: #666; font-size: 0.85em;">${h.getCreateTimeString()}</p>
                                     <p style="margin: 0 0 3px 0; font-size: 0.9em;"><strong>Status:</strong> ${h.toStatus}</p>
                                     <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>By:</strong> ${h.changedByName}</p>
                                     <c:if test="${sessionScope.user.roleId == 5}">
