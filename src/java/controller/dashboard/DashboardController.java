@@ -28,13 +28,18 @@ public class DashboardController extends HttpServlet {
         service.DashboardService dashboardService = new service.DashboardService();
         dal.DashboardDAO dashboardDAO = new dal.DashboardDAO();
 
+        Integer filterUserId = null;
+        if (user.getRoleId() == 4) {
+            filterUserId = user.getUserId();
+        }
+
         request.setAttribute("user", user);
         request.setAttribute("totalCustomers", dashboardService.getTotalCustomers());
         request.setAttribute("totalProducts", dashboardService.getTotalProducts());
         request.setAttribute("totalQuotations", dashboardDAO.count("quotation"));
         request.setAttribute("totalContracts", dashboardDAO.count("customer_contract"));
         request.setAttribute("totalOrders", dashboardService.getTotalOrders());
-        request.setAttribute("totalRevenue", dashboardService.getTotalRevenue());
+        request.setAttribute("totalRevenue", dashboardService.getTotalRevenue(filterUserId));
         
         request.setAttribute("quotationStatusCounts", dashboardDAO.countByStatus("quotation", "quotation_status"));
         request.setAttribute("contractStatusCounts", dashboardDAO.countByStatus("customer_contract", "contract_status"));

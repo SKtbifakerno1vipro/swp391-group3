@@ -162,7 +162,7 @@
                                                 <td><c:out value="${not empty order.companyName ? order.companyName : order.customerName}" default="Unknown"/></td>
                                                 <td><span class="badge"><c:out value="${order.status}"/></span></td>
                                                 <td><fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy"/></td>
-                                                <td><a class="badge" href="${pageContext.request.contextPath}/customer-order-detail?id=${order.id}">Details</a></td>
+                                                <td><a class="badge" href="${pageContext.request.contextPath}/customer-order?id=${order.id}">Details</a></td>
                                             </tr>
                                         </c:forEach>
                                     </tbody>

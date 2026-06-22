@@ -67,8 +67,7 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/contract-save",
             "/customer-order-list",
-            "/customer-order-detail",
-            "/create-customer-order",
+            "/customer-order",
             "/Invoice",
             "/invoice",
             "/revenue-report"
@@ -83,7 +82,7 @@ public class SecurityFilter implements Filter {
             "/customer/list",
             "/customer/detail",
             "/customer-order-list",
-            "/customer-order-detail",
+            "/customer-order",
             "/product-list",
             "/category/list",
             "/quotation-list",
@@ -113,8 +112,8 @@ public class SecurityFilter implements Filter {
             "/contract-list",
             "/contract-detail",
             "/customer-order-list",
-            "/customer-order-detail",
-            "/create-customer-order",
+            "/customer-order",
+            "/customer-order",
             "/product-list",
             "/category/list",
             "/revenue-report"
@@ -126,7 +125,7 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/contract-save",
             "/customer-order-list",
-            "/customer-order-detail",
+            "/customer-order",
             "/Invoice",
             "/invoice"
     );

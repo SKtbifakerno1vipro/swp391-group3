@@ -503,7 +503,7 @@
                                                             <td><span class="badge"
                                                                     style="background-color: #e2e3e5; color: #383d41;">${o.customerOrder.orderStatus}</span>
                                                             </td>
-                                                            <td><a href="${pageContext.request.contextPath}/customer-order-detail?id=${o.customerOrder.customerOrderId}"
+                                                            <td><a href="${pageContext.request.contextPath}/customer-order?id=${o.customerOrder.customerOrderId}"
                                                                     class="btn-action-sm">View
                                                                     Details
                                                                 </a></td>

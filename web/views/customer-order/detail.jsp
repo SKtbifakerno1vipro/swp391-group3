@@ -23,7 +23,7 @@
 
 
         <h3>Order Information</h3>
-        <form action="${pageContext.request.contextPath}/customer-order-detail" method="POST">
+        <form action="${pageContext.request.contextPath}/customer-order" method="POST">
             <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
             <input type="hidden" name="action" value="update_status">
             <ul>
@@ -66,7 +66,7 @@
                         <td>${item.product.productId}</td>
                         <td>${item.product.productName}</td>
                         <td>
-                            <form action="${pageContext.request.contextPath}/customer-order-detail" method="POST" style="display:inline;">
+                            <form action="${pageContext.request.contextPath}/customer-order" method="POST" style="display:inline;">
                                 <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
                                 <input type="hidden" name="detailId" value="${item.detail.customerOrderDetailId}">
                                 <input type="hidden" name="action" value="update_quantity">
@@ -78,7 +78,7 @@
                         <td><fmt:formatNumber value="${item.detail.sellingPrice}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
                         <td><fmt:formatNumber value="${itemTotal}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
                         <td>
-                            <form action="${pageContext.request.contextPath}/customer-order-detail" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                            <form action="${pageContext.request.contextPath}/customer-order" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
                                 <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
                                 <input type="hidden" name="detailId" value="${item.detail.customerOrderDetailId}">
                                 <input type="hidden" name="action" value="delete_item">
