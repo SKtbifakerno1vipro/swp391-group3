@@ -2,12 +2,14 @@ package dal;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.Quotation;
 import model.Role;
 
 public class RoleDAO extends DBContext {
+
     public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {
@@ -143,30 +145,65 @@ public class RoleDAO extends DBContext {
         return list;
     }
 
-    public void updateRolePermissions(int roleId, java.util.List<Integer> permissionIds) {
+    public void updateRolePermissions(
+            int roleId,
+            List<Integer> permissionIds) {
+
         try {
-            //chua luu ngay vao dtb
+
             connection.setAutoCommit(false);
 
-            String sqlDelete = "DELETE FROM role_permission WHERE role_id = ?";
-            java.sql.PreparedStatement stDel = connection.prepareStatement(sqlDelete);
+            String sqlDelete
+                    = "DELETE FROM role_permission WHERE role_id = ?";
+
+            PreparedStatement stDel
+                    = connection.prepareStatement(sqlDelete);
+
             stDel.setInt(1, roleId);
+
             stDel.executeUpdate();
 
-            if (permissionIds != null && !permissionIds.isEmpty()) {
-                String sqlInsert = "INSERT INTO role_permission (role_id, permission_id) VALUES (?, ?)";
-                java.sql.PreparedStatement stIns = connection.prepareStatement(sqlInsert);
+            if (permissionIds != null
+                    && !permissionIds.isEmpty()) {
+
+                String sqlInsert
+                        = "INSERT INTO role_permission "
+                        + "(role_id, permission_id) "
+                        + "VALUES (?, ?)";
+
+                PreparedStatement stIns
+                        = connection.prepareStatement(sqlInsert);
+
                 for (Integer pId : permissionIds) {
+
                     stIns.setInt(1, roleId);
                     stIns.setInt(2, pId);
+
                     stIns.addBatch();
                 }
+
                 stIns.executeBatch();
             }
+
             connection.commit();
-            connection.setAutoCommit(true);
-        } catch (java.sql.SQLException e) {
-            System.out.println("RoleDAO updateRolePermissions error: " + e.getMessage());
+
+        } catch (SQLException e) {
+
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            e.printStackTrace();
+
+        } finally {
+
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -271,14 +308,14 @@ public class RoleDAO extends DBContext {
 
         return list;
     }
-    
-    public int countRoles(){
-        String sql ="SELECT COUNT(*) FROM role";
+
+    public int countRoles() {
+        String sql = "SELECT COUNT(*) FROM role";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()){
+
+            if (rs.next()) {
                 return rs.getInt(1);
             }
         } catch (Exception e) {
