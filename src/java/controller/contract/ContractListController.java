@@ -55,7 +55,7 @@ public class ContractListController extends HttpServlet {
         } catch (NumberFormatException e) {
             pageIndex = 1;
         }
-
+        //defaul page size is 10
         int pageSize = 10;
 
         List<Contract> list = contractService.searchContracts(contractNumber, customerName, status, storageType, pageIndex,
@@ -63,14 +63,14 @@ public class ContractListController extends HttpServlet {
         
         int totalRecord = contractService.getTotalContracts(contractNumber, customerName, status, storageType);
 
-        // Tinh toan trang cuoi
+        // calculate to the end page
         int endPage = (int) Math.ceil((double) totalRecord / pageSize);
 
         if (pageIndex > endPage && endPage > 0) {
             pageIndex = endPage;
         }
 
-        // 4. GIU TRANG THAI (State Preservation)
+       
         request.setAttribute("list", list);
         request.setAttribute("endPage", endPage);
         request.setAttribute("currentPage", pageIndex);
@@ -79,12 +79,8 @@ public class ContractListController extends HttpServlet {
         request.setAttribute("status", status);
         request.setAttribute("storageType", storageType);
 
-        // 5. CHUYEN HUONG TOI VIEW
+
         request.getRequestDispatcher("views/contract/list.jsp").forward(request, response);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-    }
 }

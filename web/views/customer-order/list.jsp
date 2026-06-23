@@ -21,7 +21,7 @@
             <main class="main legacy-page">
     <h2>Customer Order List</h2>
     <hr>
-    <a href="${pageContext.request.contextPath}/create-customer-order">Create Order</a>
+    <a href="${pageContext.request.contextPath}/customer-order">Create Order</a>
     <hr>
     <form action="customer-order-list" method="GET" >
         <input type="hidden" name="search" value="search">
@@ -53,7 +53,7 @@
                         <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
                     </td>
                     <td>
-                        <a href="${pageContext.request.contextPath}/customer-order-detail?id=${item.customerOrder.customerOrderId}">View Details</a>
+                        <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">View</a>
                     </td>
                 </tr>
             </c:forEach>

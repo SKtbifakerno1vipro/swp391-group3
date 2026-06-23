@@ -144,6 +144,11 @@ public class EditUserController extends HttpServlet {
         boolean success = isEdit ? userService.updateUser(u) : userService.createUser(u);
 
         if (success) {
+            if (isEdit) {
+                service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", "Cập nhật thông tin tài khoản: " + u.getUserName() + " (ID: " + u.getUserId() + ", Tên: " + u.getFullName() + ")");
+            } else {
+                service.AuditLogService.log(currentUser.getUserId(), "CREATE", "User", "Tạo tài khoản mới: " + u.getUserName() + " (Email: " + u.getEmail() + ", Tên: " + u.getFullName() + ")");
+            }
             response.sendRedirect(request.getContextPath() + "/user-list");
         } else {
             request.setAttribute("error", "Database error!");

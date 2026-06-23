@@ -32,6 +32,12 @@ public class EditRolePermissionsController extends HttpServlet {
 
         int roleId = Integer.parseInt(roleIdParam); // chuyẻn đổi từ string sang dạng int 
         Role role = roleService.getRoleDetail(roleId);
+        //nếu role bị xóa (role == null) thì jsp lỗi 
+        if(role == null){
+            response.sendRedirect(request.getContextPath() + "/role-list");
+            return;
+        }
+        
         List<RolePermission> permissionList = roleService.getAllPermissions();// lấy toàn bộ danh sách permissions từ service và lưu vào list tên là permission list
 
         Set<Integer> selectedPermissionIds = new HashSet<>();
@@ -62,7 +68,13 @@ public class EditRolePermissionsController extends HttpServlet {
             }
         }
 
+        model.User currentUser = (model.User) request.getSession().getAttribute("user");
+        Integer currentUserId = currentUser != null ? currentUser.getUserId() : null;
+        Role role = roleService.getRoleDetail(roleId);
+        String roleName = role != null ? role.getRoleName() : String.valueOf(roleId);
+
         roleService.updateRolePermissions(roleId, permissionIds);
+        service.AuditLogService.log(currentUserId, "UPDATE", "Role", "Chỉnh sửa danh sách quyền cho vai trò: " + roleName + " (ID: " + roleId + ")");
         response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
     }
 }

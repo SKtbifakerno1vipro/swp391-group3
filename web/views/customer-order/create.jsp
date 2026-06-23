@@ -118,19 +118,20 @@
             <p style="color: red;">${error}</p>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/create-customer-order" method="post" onsubmit="return validateForm()">
+        <form action="${pageContext.request.contextPath}/customer-order" method="post" onsubmit="return validateForm()">
+            <input type="hidden" name="action" value="create">
             <c:choose>
                 <c:when test="${not empty customer}">
                     <input type="hidden" name="customerId" value="${customer.customer.customerId}" />
                     <p>
                         <strong>Customer:</strong> ${customer.user.fullName} (${customer.user.userName})
-                        <a href="${pageContext.request.contextPath}/create-customer-order" style="margin-left: 10px; text-decoration: none; color: blue; font-size: 0.9em;">[Change Customer]</a>
+                        <a href="${pageContext.request.contextPath}/customer-order" style="margin-left: 10px; text-decoration: none; color: blue; font-size: 0.9em;">[Change Customer]</a>
                     </p>
                 </c:when>
                 <c:otherwise>
                     <div>
                         <label for="customerId"><strong>Select Customer:</strong></label>
-                        <select name="customerId" id="customerId" required onchange="location.href = '${pageContext.request.contextPath}/create-customer-order?customerId=' + this.value">
+                        <select name="customerId" id="customerId" required onchange="location.href = '${pageContext.request.contextPath}/customer-order?customerId=' + this.value">
                             <option value="">-- Choose Customer --</option>
                             <c:forEach var="c" items="${customers}">
                                 <option value="${c.customer.customerId}" ${param.customerId == c.customer.customerId ? 'selected' : ''}>${c.user.fullName} (${c.user.userName})</option>

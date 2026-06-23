@@ -11,8 +11,8 @@ public class DashboardService {
         dashboardDAO = new DashboardDAO();
     }
 
-    public double getTotalRevenue() {
-        return dashboardDAO.getTotalRevenue();
+    public double getTotalRevenue(Integer userId) {
+        return dashboardDAO.getTotalRevenue(userId);
     }
 
     public int getTotalOrders() {

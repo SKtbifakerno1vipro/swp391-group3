@@ -220,12 +220,18 @@ public class DashboardDAO extends DBContext {
 
 
 
-    public double getTotalRevenue() {
+    public double getTotalRevenue(Integer userId) {
         String sql = "SELECT SUM(cod.quantity * cod.selling_price) as total_revenue " +
                      "FROM customer_order_detail cod " +
                      "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id " +
-                     "WHERE co.order_status IN ('Completed', 'DELIVERED')";
+                     "WHERE co.order_status IN ('Completed', 'DELIVERED') ";
+        if (userId != null) {
+            sql += "AND co.created_by = ? ";
+        }
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            if (userId != null) {
+                ps.setInt(1, userId);
+            }
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getDouble("total_revenue");

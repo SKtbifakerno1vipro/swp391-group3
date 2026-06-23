@@ -34,7 +34,6 @@ GO
 CREATE TABLE permission (
     permission_id INT IDENTITY(1,1) PRIMARY KEY,
     permission_name NVARCHAR(100) NOT NULL,
-    url_pattern NVARCHAR(255) NULL,
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE()
 );
@@ -233,7 +232,6 @@ CREATE TABLE signature (
     file_url NVARCHAR(1000),
     signer_user_id INT NULL,
     signer_name NVARCHAR(255),
-    --signer_type VARCHAR(50), DROP COLUMN
     signed_at DATETIME,
     uploaded_by INT,
     uploaded_at DATETIME DEFAULT GETDATE(),
@@ -317,6 +315,18 @@ CREATE TABLE stock_transaction (
 );
 GO
 
+-- 20. System Audit Log
+CREATE TABLE system_audit_log (
+    log_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NULL,
+    action_type NVARCHAR(50) NOT NULL,
+    affected_object NVARCHAR(255) NOT NULL,
+    description NVARCHAR(MAX) NOT NULL,
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES [user](user_id) ON DELETE SET NULL
+);
+GO
+
 
 -- 1. TAO ROLE (GIU NGUYEN)
 INSERT INTO role (role_name, status) VALUES 
@@ -387,8 +397,8 @@ INSERT INTO contract_edit_history (contract_id, from_status, to_status, contract
 (@C1, 'SENT_TO_CUSTOMER', 'SIGNED', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 
 -- Chu ky
-INSERT INTO signature (customer_contract_id, file_name, file_url, signer_user_id, signer_name, signer_type, signed_at, uploaded_by) VALUES 
-(@C1, 'sign_kh.png', '/sig/kh.png', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'), N'Nguyễn Văn Một', 'CUSTOMER', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
+INSERT INTO signature (customer_contract_id, file_name, file_url, signer_user_id, signer_name, signed_at, uploaded_by) VALUES 
+(@C1, 'sign_kh.png', '/sig/kh.png', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'), N'Nguyễn Văn Một', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 
 -- Đon hang & Thanh toan
 INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by) VALUES (1, @C1, 'DELIVERED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
@@ -422,55 +432,39 @@ GO
 
 -- 10. DONG BO PERMISSION CHO SECURITY FILTER
 -- Danh sach nay phai khop voi cac @WebServlet hien co trong src/java/controller.
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('permission') AND name = 'url_pattern')
-BEGIN
-    ALTER TABLE permission ADD url_pattern NVARCHAR(255) NULL;
-END
-GO
 
-DELETE FROM role_permission;
-DELETE FROM permission;
-DBCC CHECKIDENT ('permission', RESEED, 0);
-GO
 
-INSERT INTO permission (permission_name, url_pattern) VALUES
-('View Dashboard', '/dashboard'),
-('View User List', '/user-list'),
-('View User Detail', '/user-detail'),
-('Create User', '/create-user'),
-('Edit User', '/edit-user'),
-('View Role List', '/role-list'),
-('View Role Detail', '/role-detail'),
-('Add Role', '/add-role'),
-('Edit Role Permissions', '/edit-role-permissions'),
-('View Category List', '/category/list'),
-('Create Category', '/category/create'),
-('Edit Category', '/category/edit'),
-('Delete Category', '/category/delete'),
-('View Product List', '/product-list'),
-('Create Product', '/create-product'),
-('Edit Product', '/edit-product'),
-('Delete Product', '/product-delete'),
-('View Customer List', '/customer/list'),
-('View Customer Detail', '/customer/detail'),
-('Create Customer', '/customer/create'),
-('Edit Customer', '/customer/edit'),
-('View Quotation List', '/quotation-list'),
-('View Contract List', '/contract-list'),
-('Save Contract', '/contract-save'),
-('View Order List', '/customer-order-list'),
-('View Order Detail', '/customer-order-detail'),
-('Create Order', '/create-customer-order'),
-('Issue Invoice', '/invoice');
-GO
-INSERT INTO permission (permission_name, url_pattern)
-VALUES ('Create Quotation', '/quotation-create');
-
--- Admin/System Admin mac dinh co toan quyen de team vua dung DB la dang nhap dung duoc ngay.
-INSERT INTO role_permission (role_id, permission_id)
-SELECT 1, permission_id
-FROM permission
-WHERE url_pattern = '/quotation-create';
+INSERT INTO permission (permission_name)
+VALUES
+('View Dashboard'),
+('View User List'),
+('View User Detail'),
+('Create User'),
+('Edit User'),
+('View Role List'),
+('View Role Detail'),
+('Add Role'),
+('Edit Role Permissions'),
+('View Category List'),
+('Create Category'),
+('Edit Category'),
+('Delete Category'),
+('View Product List'),
+('Create Product'),
+('Edit Product'),
+('Delete Product'),
+('View Customer List'),
+('View Customer Detail'),
+('Create Customer'),
+('Edit Customer'),
+('View Quotation List'),
+('Create Quotation'),
+('View Contract List'),
+('Save Contract'),
+('View Order List'),
+('View Order Detail'),
+('Create Order'),
+('Issue Invoice');
 
 -- ==========================================================
 -- PHAN DU LIEU MOI TU MAIN

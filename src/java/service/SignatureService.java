@@ -51,7 +51,7 @@ public class SignatureService {
 
         try (FileOutputStream newFile = new FileOutputStream(fileA)) {
             newFile.write(bytes);
-            newFile.close();
+            newFile.flush();
         }
     }
 }

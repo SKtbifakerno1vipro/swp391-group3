@@ -10,9 +10,17 @@ import jakarta.servlet.annotation.WebFilter;
 import java.io.IOException;
 import java.util.List;
 import model.User;
+import model.Role;
+import model.RolePermission;
+import dal.RoleDAO;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebFilter(filterName = "SecurityFilter", urlPatterns = {"/*"})
 public class SecurityFilter implements Filter {
+
+    private final RoleDAO roleDAO = new RoleDAO();
 
     private static final int ROLE_SYSTEM_ADMIN = 1;
     private static final int ROLE_MANAGER = 2;
@@ -58,15 +66,15 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/contract-save",
             "/customer-order-list",
-            "/customer-order-detail",
-            "/create-customer-order",
-            "/Invoice",
+            "/customer-order",
+            //"/Invoice",
             "/invoice",
             "/revenue-report",
             "/payment",
             "/payment-test",
             "/payment-list",
-            "/payment-detail"
+            "/payment-detail",
+            "/admin/audit-logs"
     );
 
     private static final List<String> MANAGER_URLS = List.of(
@@ -80,14 +88,14 @@ public class SecurityFilter implements Filter {
             "/customer/create",
             "/customer/edit",
             "/customer-order-list",
-            "/customer-order-detail",
+            "/customer-order",
             "/product-list",
             "/category/list",
             "/quotation-list",
             "/quotation-detail",
             "/contract-list",
             "/contract-detail",
-            "/Invoice",
+            //"/Invoice",
             "/invoice",
             "/email/logs",
             "/revenue-report",
@@ -121,8 +129,8 @@ public class SecurityFilter implements Filter {
             "/contract-list",
             "/contract-detail",
             "/customer-order-list",
-            "/customer-order-detail",
-            "/create-customer-order",
+            "/customer-order",
+            "/customer-order",
             "/product-list",
             "/category/list",
             "/revenue-report"
@@ -134,8 +142,8 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/contract-save",
             "/customer-order-list",
-            "/customer-order-detail",
-            "/Invoice",
+            "/customer-order",
+            //"/Invoice",
             "/invoice",
             "/payment",
             "/payment-list",
@@ -159,50 +167,71 @@ public class SecurityFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-//        HttpServletRequest req = (HttpServletRequest) request;
-//        HttpServletResponse res = (HttpServletResponse) response;
-//        String path = req.getServletPath();
-//
-//        if (isStaticResource(path)) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        HttpSession session = req.getSession(false);
-//        User user = (session != null) ? (User) session.getAttribute("user") : null;
-//
-//        if (user == null) {
-//            res.sendRedirect(req.getContextPath() + "/login");
-//            return;
-//        }
-//
-//        if (LOGGED_IN_URLS.contains(path)) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//        
-//        if (path.startsWith("/views/")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (hasPermission(user.getRoleId(), path)) {
-//            chain.doFilter(request, response);
-//        } else {
-//            System.out.println("Access Denied: Role " + user.getRoleId() + " tried to access " + path);
-//            res.sendRedirect(req.getContextPath() + "/dashboard?error=denied");
-//        }
-        chain.doFilter(request, response);
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        String path = req.getServletPath();
+
+        if (isStaticResource(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        if (LOGGED_IN_URLS.contains(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (path.startsWith("/views/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (hasPermission(user.getRoleId(), path, req)) {
+            chain.doFilter(request, response);
+        } else {
+            System.out.println("Access Denied: Role "
+                    + user.getRoleId()
+                    + " tried to access "
+                    + path);
+
+            res.sendRedirect(req.getContextPath()
+                    + "/dashboard?error=denied");
+        }
     }
 
-    private boolean hasPermission(int roleId, String path) {
+    private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
         System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
+
+        String requiredPermission = getRequiredPermission(cleanPath, req);
+        if (requiredPermission != null) {
+            Role role = roleDAO.getRoleDetail(roleId);
+            if (role != null && role.getPermissions() != null) {
+                for (RolePermission p : role.getPermissions()) {
+                    if (p.getPermissionName() != null && p.getPermissionName().equalsIgnoreCase(requiredPermission)) {
+                        System.out.println("Role " + roleId + " HAS database permission: " + requiredPermission);
+                        return true;
+                    }
+                }
+                System.out.println("Role " + roleId + " DOES NOT HAVE database permission: " + requiredPermission);
+                return false;
+            }
+        }
+
+        // Fallback for URLs not mapped to a specific permission in the database
         if (roleId == ROLE_SYSTEM_ADMIN) {
             return SYSTEM_ADMIN_URLS.contains(cleanPath);
         }
@@ -223,6 +252,90 @@ public class SecurityFilter implements Filter {
         }
 
         return false;
+    }
+
+    private String getRequiredPermission(String path, HttpServletRequest req) {
+        String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
+        switch (cleanPath) {
+            case "/dashboard":
+                return "View Dashboard";
+            case "/revenue-report":
+                return "View Dashboard";
+            case "/user-list":
+                return "View User List";
+            case "/edit-user":
+                String idParam = req.getParameter("id");
+                if (idParam == null || idParam.trim().isEmpty()) {
+                    return "Create User";
+                } else {
+                    if ("POST".equalsIgnoreCase(req.getMethod())) {
+                        return "Edit User";
+                    } else {
+                        return "View User Detail";
+                    }
+                }
+            case "/user-detail":
+                return "View User Detail";
+            case "/create-user":
+                return "Create User";
+            case "/role-list":
+                return "View Role List";
+            case "/role-detail":
+                return "View Role Detail";
+            case "/add-role":
+                return "Add Role";
+            case "/edit-role-permissions":
+                return "Edit Role Permissions";
+            case "/category/list":
+                return "View Category List";
+            case "/category/create":
+                return "Create Category";
+            case "/category/edit":
+                return "Edit Category";
+            case "/category/delete":
+                return "Delete Category";
+            case "/product-list":
+                return "View Product List";
+            case "/create-product":
+                return "Create Product";
+            case "/edit-product":
+                return "Edit Product";
+            case "/product-delete":
+                return "Delete Product";
+            case "/customer/list":
+            case "/customer-list":
+                return "View Customer List";
+            case "/customer/detail":
+            case "/customer-detail":
+                return "View Customer Detail";
+            case "/customer/create":
+                return "Create Customer";
+            case "/customer/edit":
+                return "Edit Customer";
+            case "/quotation-list":
+                return "View Quotation List";
+            case "/quotation-create":
+                return "Create Quotation";
+            case "/quotation-detail":
+                return "View Quotation List";
+            case "/contract-list":
+                return "View Contract List";
+            case "/contract-detail":
+                return "View Contract List";
+            case "/contract-save":
+                return "Save Contract";
+            case "/export-pdf":
+                return "View Contract List";
+            case "/customer-order-list":
+                return "View Order List";
+            case "/customer-order":
+                return "View Order Detail";
+            case "/invoice":
+            case "/Invoice":
+                return "Issue Invoice";
+            default:
+                return null;
+        }
     }
 
     private boolean isStaticResource(String path) {

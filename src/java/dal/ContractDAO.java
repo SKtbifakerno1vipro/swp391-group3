@@ -58,9 +58,9 @@ public class ContractDAO extends DBContext {
         if (storageType != null && !storageType.trim().isEmpty()) {
             sql += " AND c.storage_type = ? ";
         }
-//        if (userId != 0 && userId > 0 && roleId == 3) {
-//            sql += " and cust.user_id= ? ";
-//        }
+        if (userId != 0 && userId > 0 && roleId == 3) {
+            sql += " and cust.user_id= ? ";
+        }
 
         sql += " ORDER BY c.created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
@@ -78,9 +78,9 @@ public class ContractDAO extends DBContext {
             if (storageType != null && !storageType.trim().isEmpty()) {
                 ps.setString(index++, storageType);
             }
-//              if (userId != 0 && userId > 0 && roleId == 3) {
-//                  ps.setInt(index++, userId);
-//              }
+              if (userId != 0 && userId > 0 && roleId == 3) {
+                  ps.setInt(index++, userId);
+              }
 
             ps.setInt(index++, (pageIndex - 1) * pageSize);
             ps.setInt(index++, pageSize);

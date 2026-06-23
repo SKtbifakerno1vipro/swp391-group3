@@ -1,7 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
+
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>${contract == null ? 'Create' : 'Edit'} Contract</title>
@@ -11,6 +12,7 @@
                 padding: 20px;
                 background-color: #f8f9fa;
             }
+
             #contract-body {
                 border: 1px solid #ccc;
                 padding: 20px;
@@ -19,6 +21,7 @@
                 margin-top: 10px;
                 border-radius: 4px;
             }
+
             .btn {
                 padding: 10px 20px;
                 margin-right: 10px;
@@ -27,20 +30,24 @@
                 border-radius: 4px;
                 font-weight: bold;
             }
+
             .btn-save {
                 background: #007bff;
                 color: white;
             }
+
             .btn-approve {
                 background: #28a745;
                 color: white;
             }
+
             .btn-review {
                 background: #0056b3;
                 color: white;
             }
         </style>
     </head>
+
     <body>
         <c:if test="${not empty errorMsg}">
             <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;">${errorMsg}</div>
@@ -60,8 +67,7 @@
             </c:if>
 
             <label style="font-weight:bold;">Contract Content:</label>
-            <div id="contract-body" 
-                 contenteditable="${editable ? 'true' : 'false'}"
+            <div id="contract-body" contenteditable="${editable ? 'true' : 'false'}"
                  style="border: 1px solid #ccc; padding: 20px; min-height: 500px; background: ${editable ? 'white' : '#f9f9f9'}; margin-top: 10px;">
                 ${not empty contract.contractContent ? contract.contractContent : templateContent}
             </div>
@@ -71,13 +77,10 @@
                 <button type="button" class="btn btn-save" onclick="submitForm('save')">Save Changes</button>
 
                 <c:if test="${contract != null}">
-
-                    <c:if test="${sessionScope.user.roleId == 2}">
-                        <button type="button" class="btn btn-approve" onclick="submitForm('manager_approve')">Lưu & Duyệt (Approve)</button>
-                    </c:if>
-
+       
+                    <!--officier-->
                     <c:if test="${sessionScope.user.roleId == 5}">
-                        <button type="button" class="btn btn-review" onclick="submitForm('submit_for_review')">Gửi duyệt lại</button>
+                        <button type="button" class="btn btn-review" onclick="submitForm('submit_for_review')">Send to review</button>
                     </c:if>
                 </c:if>
             </c:if>
@@ -86,14 +89,13 @@
 
             <script>
                 function submitForm(action) {
-                    // Copy nội dung từ div contenteditable vào input ẩn
+        
                     document.getElementById('contractContentInput').value = document.getElementById('contract-body').innerHTML;
-                    // Thiết lập action
                     document.getElementById('actionInput').value = action;
-                    // Submit form
                     document.getElementById('contractForm').submit();
                 }
             </script>
         </form>
     </body>
+
 </html>

@@ -148,6 +148,27 @@ public class EditProduct extends HttpServlet {
             p1.setProductId(id);
             boolean update = pService.updateProduct(p1);
             if (update) {
+                StringBuilder changes = new StringBuilder();
+                if (p.getProductName() != null && !p.getProductName().equals(p1.getProductName())) {
+                    changes.append("Tên: '").append(p.getProductName()).append("' -> '").append(p1.getProductName()).append("'; ");
+                }
+                if (p.getCostPrice() != p1.getCostPrice()) {
+                    changes.append("Giá vốn: ").append(p.getCostPrice()).append(" -> ").append(p1.getCostPrice()).append("; ");
+                }
+                if (p.getSellingPrice() != p1.getSellingPrice()) {
+                    changes.append("Giá bán: ").append(p.getSellingPrice()).append(" -> ").append(p1.getSellingPrice()).append("; ");
+                }
+                if (p.getQuantityAvailable() != p1.getQuantityAvailable()) {
+                    changes.append("Số lượng: ").append(p.getQuantityAvailable()).append(" -> ").append(p1.getQuantityAvailable()).append("; ");
+                }
+                if (p.getProductStatus() != null && !p.getProductStatus().equals(p1.getProductStatus())) {
+                    changes.append("Trạng thái: '").append(p.getProductStatus()).append("' -> '").append(p1.getProductStatus()).append("'; ");
+                }
+                String desc = "Chỉnh sửa sản phẩm " + p.getProductName() + " (ID: " + id + ")";
+                if (changes.length() > 0) {
+                    desc += ": " + changes.toString();
+                }
+                service.AuditLogService.log(u.getUserId(), "UPDATE", "Product", desc);
                 response.sendRedirect(request.getContextPath() + "/edit-product?id=" + id+"&action=detail");
             } else {
                 error = "Update Product Failed";
