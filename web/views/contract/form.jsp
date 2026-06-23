@@ -77,11 +77,7 @@
                 <button type="button" class="btn btn-save" onclick="submitForm('save')">Save Changes</button>
 
                 <c:if test="${contract != null}">
-                    <!--manager-->
-                    <c:if test="${sessionScope.user.roleId == 2}">
-                        <button type="button" class="btn btn-approve" onclick="submitForm('manager_approve')">
-                            Approve</button>
-                        </c:if>
+       
                     <!--officier-->
                     <c:if test="${sessionScope.user.roleId == 5}">
                         <button type="button" class="btn btn-review" onclick="submitForm('submit_for_review')">Send to review</button>
@@ -93,11 +89,9 @@
 
             <script>
                 function submitForm(action) {
-                    // Copy nội dung từ div contenteditable vào input ẩn
+        
                     document.getElementById('contractContentInput').value = document.getElementById('contract-body').innerHTML;
-                    // Thiết lập action
                     document.getElementById('actionInput').value = action;
-                    // Submit form
                     document.getElementById('contractForm').submit();
                 }
             </script>

@@ -88,6 +88,7 @@ public class ContractDetailController extends HttpServlet {
 
                     contract.setContractContent(finalHtml);
                     //nguyen kien - end
+
                     request.setAttribute("contract", contract);
                     request.setAttribute("historyList", historyList);
 
@@ -115,14 +116,9 @@ public class ContractDetailController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-
-        // 1. Khai báo các biến cần thiết từ Session/Request
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-
-        // Nếu user chưa đăng nhập, redirect về trang login
+        //user not login then return to login page
         if (user == null) {
             response.sendRedirect("login");
             return;
@@ -131,25 +127,25 @@ public class ContractDetailController extends HttpServlet {
         String action = request.getParameter("action");
         int contractId = Integer.parseInt(request.getParameter("contractId"));
 
-        // Lấy object Contract hiện tại để biết trạng thái cũ
+        // take contract with the id
         Contract contract = contractService.getContractById(contractId);
         if (contract == null) {
             response.sendRedirect("contract-list");
             return;
         }
 
-        // 2. Xử lý các Action từ contract list
-        if ("request_edit".equals(action)) {
-            // BR: only DRAFT or CUSTOMER_CHECK can request edit
+        //solve all of action request edit
+        if ("request_edit".equals(action)) {// when manager and customer request edit 
+            // BR : only PENDING_REVIEW or CUSTOMER_CHECK status  can request edit
             String currentStatus = contract.getContractStatus();
-            if (!"DRAFT".equals(currentStatus) && !"CUSTOMER_CHECK".equals(currentStatus)) {
+            if (!"PENDING_REVIEW".equals(currentStatus) && !"CUSTOMER_CHECK".equals(currentStatus)) {
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
 
             String note = request.getParameter("revision_note");
 
-            // Tạo history record
+            // create history  with PENDING_REVIEW
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
             h.setFromStatus(currentStatus);
@@ -157,6 +153,7 @@ public class ContractDetailController extends HttpServlet {
             h.setChangedBy(user.getUserId());
             int historyId = contractService.insertHistory(h);
 
+            //if have the content request edit then create revision history
             if (note != null && !note.trim().isEmpty() && historyId > 0) {
                 ContractRevisionItem item = new ContractRevisionItem();
                 item.setHistoryId(historyId);
@@ -166,17 +163,18 @@ public class ContractDetailController extends HttpServlet {
                 contractService.insertRevisionItem(item);
             }
 
-            // Cập nhật status hợp đồng
+            // update status of contract
             contractService.updateStatus(contractId, "PENDING_REVIEW");
             response.sendRedirect("contract-detail?id=" + contractId);
 
-        } else if ("approve".equals(action)) {
-            // BR: only PENDING_REVIEW can be approved by Manager
+        } else if ("approve".equals(action)) { //when manager approve that contract
+            // BR: only PENDING_REVIEW status + approved by Manager
             if (!"PENDING_REVIEW".equals(contract.getContractStatus())) {
+                session.setAttribute("errorSig", "Manager could be Admin officier check first");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
-            // Manager Approve: Chuyển sang cho khách hàng kiểm tra
+            // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
 
             // Lưu lịch sử
@@ -193,6 +191,7 @@ public class ContractDetailController extends HttpServlet {
         } else if ("customer_approve".equals(action)) {
             // BR: only CUSTOMER_CHECK can be approved by Customer
             if (!"CUSTOMER_CHECK".equals(contract.getContractStatus())) {
+                session.setAttribute("errorSig", "Contract must be in CUSTOMER_CHECK status before Customer can approve.");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
@@ -211,11 +210,15 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("send_to_manager".equals(action)) {
-            // BR: only DRAFT can send_to_manager
-            if (!"DRAFT".equals(contract.getContractStatus())) {
+            // BR: only DRAFT or PENDING_REVIEW can be sent to Manager
+            String curStatus = contract.getContractStatus();
+            if (!"DRAFT".equals(curStatus) && !"PENDING_REVIEW".equals(curStatus)) {
+                session.setAttribute("errorSig",
+                        "Contract must be in DRAFT or PENDING_REVIEW status before sending to Manager.");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
+
             // Cập nhật status
             contractService.updateStatus(contractId, "PENDING_REVIEW");
 
