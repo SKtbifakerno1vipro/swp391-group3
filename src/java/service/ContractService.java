@@ -28,7 +28,7 @@ public class ContractService {
         template = template.replace("{user_full_name}",
                 cust.getFullName() != null ? cust.getFullName() : "");
         template = template.replace("{tax_code_B}",
-                cust.getTaxCode()!= null ? cust.getTaxCode() : "");
+                cust.getTaxCode() != null ? cust.getTaxCode() : "");
 
         template = template.replace("{company_name}",
                 config.getProperty("company_name", ""));
@@ -42,8 +42,8 @@ public class ContractService {
                 config.getProperty("company_rep_name", ""));
         template = template.replace("{company_position}",
                 config.getProperty("company_position", ""));
-        template= template.replace("{tax_code_A}", 
-                config.getProperty("tax_code",""));
+        template = template.replace("{tax_code_A}",
+                config.getProperty("tax_code", ""));
 
         StringBuilder productRows = new StringBuilder();
         int index = 1;
@@ -96,13 +96,19 @@ public class ContractService {
         return template;
     }
 
-    public List<Contract> searchContracts(String contractNumber, String customerName, String status,
-            String storageType, int pageIndex, int pageSize, int userId, int roleId) {
-        return contractDAO.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize, userId, roleId);
+    public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
+            String storageType, int pageIndex, int pageSize, int userId, int roleId,
+            String fromDate, String toDate, String taxCode, String phone, String email) {
+        return contractDAO.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize, userId, roleId,
+                fromDate, toDate, taxCode, phone, email);
     }
 
-    public int getTotalContracts(String contractNumber, String customerName, String status, String storageType) {
-        return contractDAO.getTotalContracts(contractNumber, customerName, status, storageType);
+    public int getTotalContracts(String contractNumber, String customerName, String status,
+            String storageType, int pageIndex, int pageSize, int userId, int roleId,
+            String fromDate, String toDate, String taxCode, String phone, String email) {
+        
+        return contractDAO.getTotalContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize, userId, roleId,
+                fromDate, toDate, taxCode, phone, email);
     }
 
     public Contract getContractById(int id) {
@@ -142,7 +148,7 @@ public class ContractService {
         return contractDAO.getContractsByCustomerId(customerId);
     }
     // Xhieu - end
-    
+
     // nguyen kien - begin
     public boolean updateContractContent(int contractId, String contractContent) {
         return contractDAO.updateContractContent(contractId, contractContent);
