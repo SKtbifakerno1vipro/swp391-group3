@@ -58,7 +58,7 @@ public class ContractSaveController extends HttpServlet {
                 return;
             }
 
-            
+            //define status to edit contract
             boolean editable = "DRAFT".equals(status) || "PENDING_REVIEW".equals(status);
             request.setAttribute("editable", editable);
             request.setAttribute("contract", contract);
@@ -79,7 +79,7 @@ public class ContractSaveController extends HttpServlet {
                 response.sendRedirect("quotation-list");
             }
         } else {
-            response.sendRedirect(  "contract-list");
+            response.sendRedirect("contract-list");
         }
     }
 
@@ -96,7 +96,7 @@ public class ContractSaveController extends HttpServlet {
 
         String templatePath = getServletContext().getRealPath("/views/contract/template.jsp");
         String template = new String(Files.readAllBytes(Paths.get(templatePath)), StandardCharsets.UTF_8);
-        
+
         return contractService.fillTemplate(quotation, customer, details, template, config);
     }
 
@@ -104,8 +104,7 @@ public class ContractSaveController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
+
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
@@ -113,12 +112,12 @@ public class ContractSaveController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-        
+
         String contractIdStr = request.getParameter("contractId");
         String quotationIdStr = request.getParameter("quotationId");
         String contractContent = request.getParameter("contractContent");
         String action = request.getParameter("action");
-        
+
         if (contractContent == null || contractContent.trim().isEmpty()) {
             request.setAttribute("errorMsg", "Contract content cannot be empty!");
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
@@ -136,12 +135,12 @@ public class ContractSaveController extends HttpServlet {
 
             c.setContractContent(contractContent);
             c.setUpdatedBy(user.getUserId());
-            boolean ok = contractService.update(c);
+            boolean updatecontractSucessful = contractService.update(c);
 
-            if (ok) {
+            if (updatecontractSucessful) {
                 if ("submit_for_review".equals(action)) {
-                    // BR: only DRAFT can submit_for_review
-                    if ("DRAFT".equals(c.getContractStatus())) {
+                    // Guard: only DRAFT and PENDING_REVIEW can submit_for_review
+                    if ("DRAFT".equals(c.getContractStatus()) || "PENDING_REVIEW".equals(c.getContractStatus())) {
                         contractService.updateStatus(contractId, "PENDING_REVIEW");
                         insertHistory(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
                         service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + c.getContractNumber() + " (ID: " + contractId + ")");
@@ -188,14 +187,14 @@ public class ContractSaveController extends HttpServlet {
         if (newId > 0) {
             c.setContractId(newId);
             insertHistory(c, "DRAFT", "Contract created in DRAFT status.", user.getUserId());
-            service.AuditLogService.log(user.getUserId(), "CREATE", "Contract", "Tạo dự thảo hợp đồng mới: " + newContractNumber + " (ID: " + newId + ")");
+            service.AuditLogService.log(user.getUserId(), "CREATE", "Contract", "Tạo dự thảo hợp đồng mới: " + newContractNumber + " (ID: " + newId + ")");// from giang
 
             if ("submit_for_review".equals(action)) {
-                // Guard: only DRAFT can submit_for_review
-                if ("DRAFT".equals(c.getContractStatus())) {
+                // Guard: only DRAFT and PENDING_REVIEW can submit_for_review
+                if ("DRAFT".equals(c.getContractStatus()) || "PENDING_REVIEW".equals(c.getContractStatus())) {
                     contractService.updateStatus(newId, "PENDING_REVIEW");
                     insertHistory(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
-                    service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + newContractNumber + " (ID: " + newId + ")");
+                    service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + newContractNumber + " (ID: " + newId + ")");//from giang
                 }
             }
             response.sendRedirect("contract-detail?id=" + newId);

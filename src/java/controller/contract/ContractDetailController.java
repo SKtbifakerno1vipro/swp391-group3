@@ -134,7 +134,7 @@ public class ContractDetailController extends HttpServlet {
             return;
         }
 
-        //solve all of action request
+        //solve all of action request edit
         if ("request_edit".equals(action)) {// when manager and customer request edit 
             // BR : only PENDING_REVIEW or CUSTOMER_CHECK status  can request edit
             String currentStatus = contract.getContractStatus();
