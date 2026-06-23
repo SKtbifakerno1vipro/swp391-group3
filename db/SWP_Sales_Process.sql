@@ -1,14 +1,14 @@
-IF DB_ID('SWP_Sales_Process') IS NULL
-BEGIN
-    CREATE DATABASE SWP_Sales_Process;
-END
-GO
+--IF DB_ID('SWP_Sales_Process') IS NULL
+--BEGIN
+--    CREATE DATABASE SWP_Sales_Process;
+--END
+--GO
 
-USE SWP_Sales_Process;
-GO
+--USE SWP_Sales_Process;
+--GO
 
-USE SWP_Sales_Process;
-GO
+--USE SWP_Sales_Process;
+--GO
 
 CREATE TABLE email_log (
     log_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -34,6 +34,7 @@ GO
 CREATE TABLE permission (
     permission_id INT IDENTITY(1,1) PRIMARY KEY,
     permission_name NVARCHAR(100) NOT NULL,
+    url_pattern NVARCHAR(255) NULL,
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE()
 );
@@ -121,6 +122,10 @@ CREATE TABLE quotation (
     customer_id INT NOT NULL,
     quotation_date DATETIME,
     quotation_status VARCHAR(20),
+	--DRAFT
+--PENDING
+--ACCEPTED
+--REJECTED
     created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
@@ -133,8 +138,11 @@ CREATE TABLE quotation_detail (
     quotation_detail_id INT IDENTITY(1,1) PRIMARY KEY,
     quotation_id INT NOT NULL,
     product_id INT NOT NULL,
+    product_name NVARCHAR(255) NULL,                       -- Added to store frozen product name
+    unit NVARCHAR(50) NULL,                                -- Added to store frozen unit
     quantity INT CHECK (quantity > 0),
-    selling_price DECIMAL(18,2) CHECK (selling_price >= 0),
+	cost_price DECIMAL(18,2) CHECK (cost_price >= 0),-- Added to store frozen 
+    selling_price DECIMAL(18,2) CHECK (selling_price >= 0),-- Added to store frozen 
     discount_percent DECIMAL(5,2) CHECK (discount_percent BETWEEN 0 AND 100),
     tax_percent DECIMAL(5,2) CHECK (tax_percent BETWEEN 0 AND 100),
     FOREIGN KEY (quotation_id) REFERENCES quotation(quotation_id),
@@ -162,7 +170,6 @@ CREATE TABLE customer_contract (
     contract_number NVARCHAR(100) unique,
     contract_file_url NVARCHAR(1000),
     contract_status VARCHAR(50) DEFAULT 'DRAFT',
-    contract_version NVARCHAR(50) DEFAULT '1.0.0',
 
     effective_date DATETIME,
 	end_date DATETIME,
@@ -184,12 +191,11 @@ CREATE TABLE customer_contract (
 GO
 
 --DRAFT
---PENDING_INTERNAL_REVIEW
+--PENDING_REVIEW
 --INTERNAL_REVISION
 --INTERNAL_APPROVED
---SENT_TO_CUSTOMER
---CUSTOMER_REQUESTED_REVISION
---CUSTOMER_CONFIRMED
+--CUSTOMER_CHECK
+--APPROVE
 --SIGNED
 --ACTIVE
 --COMPLETED
@@ -247,6 +253,10 @@ CREATE TABLE customer_order (
     customer_id INT NOT NULL,
     customer_contract_id INT NOT NULL,
     order_status VARCHAR(20),
+	
+--PENDING
+--SHIPPING
+--COMPLETED
     created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
@@ -259,12 +269,12 @@ GO
 CREATE TABLE customer_order_detail (
     customer_order_detail_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_order_id INT NOT NULL,
-    product_id INT NOT NULL,
+    quotation_detail_id INT NOT NULL,                      -- Replaced product_id with quotation_detail_id
     quantity INT CHECK (quantity > 0),
     cost_price DECIMAL(18,2) CHECK (cost_price >= 0),
     selling_price DECIMAL(18,2) CHECK (selling_price >= 0),
     FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id),
-    FOREIGN KEY (product_id) REFERENCES product(product_id)
+    FOREIGN KEY (quotation_detail_id) REFERENCES quotation_detail(quotation_detail_id)
 );
 GO
 
@@ -276,6 +286,25 @@ CREATE TABLE invoice (
     invoice_no NVARCHAR(100) UNIQUE,
     issue_date DATETIME,
     invoice_status VARCHAR(20),
+    invoice_type VARCHAR(20) NOT NULL DEFAULT 'SALES',      -- 'VAT' or 'SALES'
+    template_code VARCHAR(20) NOT NULL DEFAULT '2',          -- '1' (VAT), '2' (SALES)
+    invoice_symbol VARCHAR(20) NOT NULL DEFAULT 'K26TYY',     -- E-invoice code without tax code
+    
+    -- Seller info snapshot
+    seller_name NVARCHAR(255) NULL,
+    seller_tax_code VARCHAR(20) NULL,
+    seller_address NVARCHAR(255) NULL,
+    
+    -- Buyer info snapshot
+    buyer_name NVARCHAR(255) NULL,
+    buyer_tax_code VARCHAR(20) NULL,
+    buyer_address NVARCHAR(255) NULL,
+    
+    -- Financial summary snapshot
+    sub_total DECIMAL(18,2) DEFAULT 0,
+    tax_amount DECIMAL(18,2) DEFAULT 0,
+    total_amount DECIMAL(18,2) DEFAULT 0,
+    
     created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),
@@ -315,20 +344,8 @@ CREATE TABLE stock_transaction (
 );
 GO
 
--- 20. System Audit Log
-CREATE TABLE system_audit_log (
-    log_id INT IDENTITY(1,1) PRIMARY KEY,
-    user_id INT NULL,
-    action_type NVARCHAR(50) NOT NULL,
-    affected_object NVARCHAR(255) NOT NULL,
-    description NVARCHAR(MAX) NOT NULL,
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (user_id) REFERENCES [user](user_id) ON DELETE SET NULL
-);
-GO
 
-
--- 1. TAO ROLE (GIU NGUYEN)
+-- 1. TAO ROLE
 INSERT INTO role (role_name, status) VALUES 
 (N'System Admin', 'Active'),
 (N'Manager', 'Active'),
@@ -338,21 +355,21 @@ INSERT INTO role (role_name, status) VALUES
 (N'Warehouse Staff', 'Active');
 GO
 
--- 2. TAO TAI KHOAN NHAN VIEN (Pass: 123 - Ma hoa bcrypt mau)
+-- 2. TAO TAI KHOAN NHAN VIEN
 INSERT INTO [user] (user_name, password_hash, email, gender, full_name, phone, account_status, role_id) VALUES 
-('admin_01', '123', 'admin@bakery.com', 'M', N'Trần Quản Trị', '0901000001', 'ACTIVE', 1),
-('manager_01', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'manager@bakery.com', 'F', N'Lê Quản Lý', '0901000002', 'ACTIVE', 2),
-('sale_01', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'sale1@bakery.com', 'M', N'Nguyễn Sale Một', '0901000003', 'ACTIVE', 4),
-('sale_02', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'sale2@bakery.com', 'F', N'Phạm Sale Hai', '0901000004', 'ACTIVE', 4),
-('officer_01', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'officer1@bakery.com', 'F', N'Võ Chứng Từ', '0901000005', 'ACTIVE', 5),
-('warehouse_01', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'warehouse@bakery.com', 'M', N'Đinh Thủ Kho', '0901000006', 'ACTIVE', 6);
+('admin_01', '123', 'admin@bakery.com', 'M', N'Trần Quản Trị', '0901000001', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'System Admin')),
+('manager_01', '1234', 'manager@bakery.com', 'F', N'Lê Quản Lý', '0901000002', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Manager')),
+('sale_01', '1234', 'sale1@bakery.com', 'M', N'Nguyễn Sale Một', '0901000003', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Sale Staff')),
+('sale_02', '1234', 'sale2@bakery.com', 'F', N'Phạm Sale Hai', '0901000004', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Sale Staff')),
+('officer_01', '1234', 'officer1@bakery.com', 'F', N'Võ Chứng Từ', '0901000005', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Admin Officer')),
+('warehouse_01', '1234', 'warehouse@bakery.com', 'M', N'Đinh Thủ Kho', '0901000006', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Warehouse Staff'));
 GO
 
 -- 3. TAO TAI KHOAN KHACH HANG
 INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, full_name, address, phone, account_status, role_id) VALUES 
-('khachhang_01', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'khach1@gmail.com', 'M', '1990-01-01', N'Nguyễn Văn Một', N'1 Đại Cồ Việt, Hà Nội', '0981000001', 'ACTIVE', 3),
-('khachhang_02', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'khach2@gmail.com', 'F', '1991-02-02', N'Trần Thị Hai', N'2 Lê Thanh Nghị, Hà Nội', '0981000002', 'ACTIVE', 3),
-('khachhang_03', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'khach3@gmail.com', 'M', '1992-03-03', N'Phạm Văn Ba', N'3 Giải Phóng, Hà Nội', '0981000003', 'ACTIVE', 3);
+('khachhang_01', '1234', 'khach1@gmail.com', 'M', '1990-01-01', N'Nguyễn Văn Một', N'1 Đại Cồ Việt, Hà Nội', '0981000001', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer')),
+('khachhang_02', '1234', 'khach2@gmail.com', 'F', '1991-02-02', N'Trần Thị Hai', N'2 Lê Thanh Nghị, Hà Nội', '0981000002', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer')),
+('khachhang_03', '1234', 'khach3@gmail.com', 'M', '1992-03-03', N'Phạm Văn Ba', N'3 Giải Phóng, Hà Nội', '0981000003', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer'));
 GO
 
 -- 4. HO SO KHACH HANG (CUSTOMER)
@@ -367,52 +384,105 @@ INSERT INTO category (category_name) VALUES (N'Bột Mì'), (N'Đường'), (N'B
 GO
 
 INSERT INTO product (product_name, cost_price, selling_price, description, unit, product_status, reorder_level, quantity_available, updated_by, category_id) VALUES 
-(N'Bột Mì Meizan', 15000, 22000, N'Bột mì đa dụng', N'Kg', 'ACTIVE', 50, 500, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 1),
-(N'Đường Biên Hòa', 18000, 24000, N'Đường tinh luyện', N'Kg', 'ACTIVE', 100, 1000, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 2),
-(N'Bơ Lạt Anchor', 150000, 185000, N'Bơ New Zealand', N'Khối 5kg', 'ACTIVE', 10, 50, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 3),
-(N'Men Khô Mauri', 80000, 110000, N'Men làm bánh', N'Gói 500g', 'ACTIVE', 30, 200, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 4);
+(N'Bột Mì Meizan', 15000, 22000, N'Bột mì đa dụng', N'Kg', 'ACTIVE', 50, 500, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), (SELECT category_id FROM category WHERE category_name = N'Bột Mì')),
+(N'Đường Biên Hòa', 18000, 24000, N'Đường tinh luyện', N'Kg', 'ACTIVE', 100, 1000, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), (SELECT category_id FROM category WHERE category_name = N'Đường')),
+(N'Bơ Lạt Anchor', 150000, 185000, N'Bơ New Zealand', N'Khối 5kg', 'ACTIVE', 10, 50, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), (SELECT category_id FROM category WHERE category_name = N'Bơ & Phô Mai')),
+(N'Men Khô Mauri', 80000, 110000, N'Men làm bánh', N'Gói 500g', 'ACTIVE', 30, 200, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), (SELECT category_id FROM category WHERE category_name = N'Men & Phụ gia'));
 GO
 
 -- 6. PHAN QUYEN (PERMISSION)
 -- Permission seed is centralized below to match SecurityFilter url_pattern.
 
--- 7. QUY TRINH HOP ĐONG 01: KHACH HANG 01 (LAM TRON BO TOI THANH TOAN)
+-- 7. QUY TRINH HOP DONG 01: KHACH HANG 01 (LAM TRON BO TOI THANH TOAN)
 -- Bao gia
-INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) VALUES (1, DATEADD(DAY, -20, GETDATE()), 'ACCEPTED', (SELECT user_id FROM [user] WHERE user_name = 'sale_01'));
+INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) VALUES (
+    (SELECT customer_id FROM customer WHERE tax_code = '0390000001'), 
+    DATEADD(DAY, -20, GETDATE()), 
+    'ACCEPTED', 
+    (SELECT user_id FROM [user] WHERE user_name = 'sale_01')
+);
 DECLARE @Q1 INT = SCOPE_IDENTITY();
-INSERT INTO quotation_detail (quotation_id, product_id, quantity, selling_price, discount_percent, tax_percent) VALUES (@Q1, 1, 100, 22000, 5, 10);
+DECLARE @QD1 INT;
+INSERT INTO quotation_detail (quotation_id, product_id, product_name, unit, quantity, cost_price, selling_price, discount_percent, tax_percent) VALUES (
+    @Q1, 
+    (SELECT product_id FROM product WHERE product_name = N'Bột Mì Meizan'), 
+    N'Bột Mì Meizan', 
+    N'Kg', 
+    100, 
+    15000, 
+    22000, 
+    5, 
+    10
+);
+SET @QD1 = SCOPE_IDENTITY();
 INSERT INTO quotation_history (quotation_id, created_by, edit_history) VALUES (@Q1, (SELECT user_id FROM [user] WHERE user_name = 'sale_01'), N'Tạo báo giá và khách đã duyệt.');
 
--- Hop đong (Trang thai SIGNED -> ACTIVE)
-INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, contract_version, created_by) VALUES 
-(1, @Q1, 'HD-2026-001', '/uploads/HD-001.pdf', 'SIGNED', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+-- Hop dong (Trang thai SIGNED -> ACTIVE)
+INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, created_by) VALUES (
+    (SELECT customer_id FROM customer WHERE tax_code = '0390000001'), 
+    @Q1, 
+    'HD-2026-001', 
+    '/uploads/HD-001.pdf', 
+    'SIGNED', 
+    (SELECT user_id FROM [user] WHERE user_name = 'officer_01')
+);
 DECLARE @C1 INT = SCOPE_IDENTITY();
 
--- Lich su hop đong C1
-INSERT INTO contract_edit_history (contract_id, from_status, to_status, contract_version, changed_by) VALUES 
-(@C1, NULL, 'DRAFT', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-(@C1, 'DRAFT', 'PENDING_INTERNAL_REVIEW', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-(@C1, 'PENDING_INTERNAL_REVIEW', 'INTERNAL_APPROVED', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'manager_01')),
-(@C1, 'INTERNAL_APPROVED', 'SENT_TO_CUSTOMER', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-(@C1, 'SENT_TO_CUSTOMER', 'SIGNED', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
+-- Lich su hop dong C1
+INSERT INTO contract_edit_history (contract_id, from_status, to_status, changed_by) VALUES 
+(@C1, NULL, 'DRAFT', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+(@C1, 'DRAFT', 'PENDING_REVIEW', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+(@C1, 'PENDING_REVIEW', 'INTERNAL_APPROVED', (SELECT user_id FROM [user] WHERE user_name = 'manager_01')),
+(@C1, 'PENDING_REVIEW', 'CUSTOMER_CHECK', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+(@C1, 'CUSTOMER_CHECK', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 
 -- Chu ky
 INSERT INTO signature (customer_contract_id, file_name, file_url, signer_user_id, signer_name, signed_at, uploaded_by) VALUES 
 (@C1, 'sign_kh.png', '/sig/kh.png', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'), N'Nguyễn Văn Một', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 
--- Đon hang & Thanh toan
-INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by) VALUES (1, @C1, 'DELIVERED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+-- Don hang & Thanh toan
+INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by) VALUES (
+    (SELECT customer_id FROM customer WHERE tax_code = '0390000001'), 
+    @C1, 
+    'DELIVERED', 
+    (SELECT user_id FROM [user] WHERE user_name = 'officer_01')
+);
 DECLARE @O1 INT = SCOPE_IDENTITY();
-INSERT INTO customer_order_detail (customer_order_id, product_id, quantity, cost_price, selling_price) VALUES (@O1, 1, 100, 15000, 22000);
-INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, created_by) VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
-INSERT INTO payment (customer_contract_id, invoice_id, amount, payment_type, payment_status, paid_at, created_by) VALUES (@C1, SCOPE_IDENTITY(), 2200000, 'BANK_TRANSFER', 'COMPLETED', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
+INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (@O1, @QD1, 100, 15000, 22000);
+INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, template_code, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, sub_total, tax_amount, total_amount, created_by) 
+VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', '1', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2090000.00, 209000.00, 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+INSERT INTO payment (customer_contract_id, invoice_id, amount, payment_type, payment_status, paid_at, created_by) VALUES (@C1, SCOPE_IDENTITY(), 2299000.00, 'BANK_TRANSFER', 'COMPLETED', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 GO
 
--- 8. QUY TRINH HOP ĐONG 02: KHACH HANG 02 (ĐANG TRANG THAI KHACH YEU CAU SUA - REVISION)
-INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) VALUES (2, DATEADD(DAY, -5, GETDATE()), 'ACCEPTED', (SELECT user_id FROM [user] WHERE user_name = 'sale_01'));
+-- 8. QUY TRINH HOP DONG 02: KHACH HANG 02 (ĐANG TRANG THAI KHACH YEU CAU SUA - REVISION)
+INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) VALUES (
+    (SELECT customer_id FROM customer WHERE tax_code = '0390000002'), 
+    DATEADD(DAY, -5, GETDATE()), 
+    'ACCEPTED', 
+    (SELECT user_id FROM [user] WHERE user_name = 'sale_01')
+);
 DECLARE @Q2 INT = SCOPE_IDENTITY();
-INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, contract_version, created_by) VALUES 
-(2, @Q2, 'HD-2026-002', '/uploads/HD-002.pdf', 'CUSTOMER_REQUESTED_REVISION', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+DECLARE @QD2 INT;
+INSERT INTO quotation_detail (quotation_id, product_id, product_name, unit, quantity, cost_price, selling_price, discount_percent, tax_percent) VALUES (
+    @Q2, 
+    (SELECT product_id FROM product WHERE product_name = N'Đường Biên Hòa'), 
+    N'Đường Biên Hòa', 
+    N'Kg', 
+    50, 
+    18000, 
+    24000, 
+    0, 
+    10
+);
+SET @QD2 = SCOPE_IDENTITY();
+INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, created_by) VALUES (
+    (SELECT customer_id FROM customer WHERE tax_code = '0390000002'), 
+    @Q2, 
+    'HD-2026-002', 
+    '/uploads/HD-002.pdf', 
+    'CUSTOMER_REQUESTED_REVISION', 
+    (SELECT user_id FROM [user] WHERE user_name = 'officer_01')
+);
 DECLARE @C2 INT = SCOPE_IDENTITY();
 
 -- Ghi lich su yeu cau sua
@@ -426,45 +496,60 @@ GO
 
 -- 9. KHO (GIAO DICH NHAP KHO BAN ĐAU)
 INSERT INTO stock_transaction (product_id, transaction_type, quantity_in, quantity_out, transaction_date) VALUES 
-(1, 'INITIAL_STOCK', 500, 0, GETDATE()),
-(2, 'INITIAL_STOCK', 1000, 0, GETDATE());
+((SELECT product_id FROM product WHERE product_name = N'Bột Mì Meizan'), 'INITIAL_STOCK', 500, 0, GETDATE()),
+((SELECT product_id FROM product WHERE product_name = N'Đường Biên Hòa'), 'INITIAL_STOCK', 1000, 0, GETDATE());
 GO
 
 -- 10. DONG BO PERMISSION CHO SECURITY FILTER
--- Danh sach nay phai khop voi cac @WebServlet hien co trong src/java/controller.
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('permission') AND name = 'url_pattern')
+BEGIN
+    ALTER TABLE permission ADD url_pattern NVARCHAR(255) NULL;
+END
+GO
 
+DELETE FROM role_permission;
+DELETE FROM permission;
+DBCC CHECKIDENT ('permission', RESEED, 0);
+GO
 
-INSERT INTO permission (permission_name)
-VALUES
-('View Dashboard'),
-('View User List'),
-('View User Detail'),
-('Create User'),
-('Edit User'),
-('View Role List'),
-('View Role Detail'),
-('Add Role'),
-('Edit Role Permissions'),
-('View Category List'),
-('Create Category'),
-('Edit Category'),
-('Delete Category'),
-('View Product List'),
-('Create Product'),
-('Edit Product'),
-('Delete Product'),
-('View Customer List'),
-('View Customer Detail'),
-('Create Customer'),
-('Edit Customer'),
-('View Quotation List'),
-('Create Quotation'),
-('View Contract List'),
-('Save Contract'),
-('View Order List'),
-('View Order Detail'),
-('Create Order'),
-('Issue Invoice');
+INSERT INTO permission (permission_name, url_pattern) VALUES
+('View Dashboard', '/dashboard'),
+('View User List', '/user-list'),
+('View User Detail', '/user-detail'),
+('Create User', '/create-user'),
+('Edit User', '/edit-user'),
+('View Role List', '/role-list'),
+('View Role Detail', '/role-detail'),
+('Add Role', '/add-role'),
+('Edit Role Permissions', '/edit-role-permissions'),
+('View Category List', '/category/list'),
+('Create Category', '/category/create'),
+('Edit Category', '/category/edit'),
+('Delete Category', '/category/delete'),
+('View Product List', '/product-list'),
+('Create Product', '/create-product'),
+('Edit Product', '/edit-product'),
+('Delete Product', '/product-delete'),
+('View Customer List', '/customer/list'),
+('View Customer Detail', '/customer/detail'),
+('Create Customer', '/customer/create'),
+('Edit Customer', '/customer/edit'),
+('View Quotation List', '/quotation-list'),
+('View Contract List', '/contract-list'),
+('Save Contract', '/contract-save'),
+('View Order List', '/customer-order-list'),
+('View Order Detail', '/customer-order-detail'),
+('Create Order', '/create-customer-order'),
+('Issue Invoice', '/invoice');
+GO
+INSERT INTO permission (permission_name, url_pattern)
+VALUES ('Create Quotation', '/quotation-create');
+
+-- Admin/System Admin mac dinh co toan quyen de team vua dung DB la dang nhap dung duoc ngay.
+INSERT INTO role_permission (role_id, permission_id)
+SELECT (SELECT role_id FROM role WHERE role_name = N'System Admin'), permission_id
+FROM permission
+WHERE url_pattern = '/quotation-create';
 
 -- ==========================================================
 -- PHAN DU LIEU MOI TU MAIN
@@ -473,34 +558,86 @@ USE SWP_Sales_Process;
 GO
 
 -- ==========================================================
--- BUOC ĐEM: CHEN THEM DU LIEU ĐE TRANH LOI KHOA NGOAI (FOREIGN KEY)
+-- BUOC DEM: CHEN THEM DU LIEU DE TRANH LOI KHOA NGOAI (FOREIGN KEY)
 -- ==========================================================
 
 -- 1. Them 2 tai khoan User cho khach hang 4 va 5
 INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, full_name, address, phone, account_status, role_id) VALUES 
-('khachhang_04', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'khach4@gmail.com', 'F', '1993-04-04', N'Hoàng Thị Bốn', N'4 Trần Đại Nghĩa, Hà Nội', '0981000004', 'ACTIVE', 3),
-('khachhang_05', '$2a$10$wT/p0LgXn7T6mF9x7Q1UCOY5N/K2uW/1lO1hD/E8lB5vU5xV5xU5y', 'khach5@gmail.com', 'M', '1994-05-05', N'Vũ Văn Năm', N'5 Chùa Bộc, Hà Nội', '0981000005', 'ACTIVE', 3);
+('khachhang_04', '1234', 'khach4@gmail.com', 'F', '1993-04-04', N'Hoàng Thị Bốn', N'4 Trần Đại Nghĩa, Hà Nội', '0981000004', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer')),
+('khachhang_05', '1234', 'khach5@gmail.com', 'M', '1994-05-05', N'Vũ Văn Năm', N'5 Chùa Bộc, Hà Nội', '0981000005', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer'));
 
--- 2. Them ho so cho Customer 4 va 5 (Bay gio he thong se co đu customer_id tu 1 đen 5)
+-- 2. Them ho so cho Customer 4 va 5 (Bay gio he thong se co du customer_id tu 1 den 5)
 INSERT INTO customer (tax_code, customer_type, company_name, user_id, assigned_to_user_id) VALUES 
 ('0390000004', 'LOYAL CUSTOMER', N'Tiệm Bánh Ngọt Homie', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_04'), (SELECT user_id FROM [user] WHERE user_name = 'sale_01')),
 ('0390000005', 'LOYAL CUSTOMER', N'Nhà Hàng Tiệc Cưới Golden', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_05'), (SELECT user_id FROM [user] WHERE user_name = 'sale_02'));
 
--- 3. Them 1 san pham mau ID = 5 đe khop voi customer_order_detail
+-- 3. Them 1 san pham mau de khop voi customer_order_detail
 INSERT INTO product (product_name, cost_price, selling_price, description, unit, product_status, reorder_level, quantity_available, updated_by, category_id) VALUES 
-(N'Hộp Phô Mai Tươi', 25000, 38000, N'Phô mai tươi làm bánh kem', N'Hộp', 'ACTIVE', 20, 150, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 3);
+(N'Hộp Phô Mai Tươi', 25000, 38000, N'Phô mai tươi làm bánh kem', N'Hộp', 'ACTIVE', 20, 150, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), (SELECT category_id FROM category WHERE category_name = N'Bơ & Phô Mai'));
 
--- 4. Them 3 bao gia bo sung cho khop quy trinh tao hop đong
-INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) VALUES 
-(3, GETDATE(), 'ACCEPTED', (SELECT user_id FROM [user] WHERE user_name = 'sale_02')),
-(4, GETDATE(), 'ACCEPTED', (SELECT user_id FROM [user] WHERE user_name = 'sale_01')),
-(5, GETDATE(), 'ACCEPTED', (SELECT user_id FROM [user] WHERE user_name = 'sale_02'));
+-- 4. Them 3 bao gia bo sung cho khop quy trinh tao hop dong
+INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) VALUES (
+    (SELECT customer_id FROM customer WHERE tax_code = '0390000003'), 
+    GETDATE(), 
+    'ACCEPTED', 
+    (SELECT user_id FROM [user] WHERE user_name = 'sale_02')
+);
+DECLARE @Q3 INT = SCOPE_IDENTITY();
+INSERT INTO quotation_detail (quotation_id, product_id, product_name, unit, quantity, cost_price, selling_price, discount_percent, tax_percent) VALUES (
+    @Q3, 
+    (SELECT product_id FROM product WHERE product_name = N'Bơ Lạt Anchor'), 
+    N'Bơ Lạt Anchor', 
+    N'Khối 5kg', 
+    10, 
+    150000, 
+    185000, 
+    2, 
+    10
+);
 
--- 5. Them 3 hop đong mau (Đe he thong co đu customer_contract_id tu 1 đen 5)
-INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, contract_version, created_by) VALUES 
-(3, 3, 'HD-2026-003', '/uploads/HD-003.pdf', 'ACTIVE', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-(4, 4, 'HD-2026-004', '/uploads/HD-004.pdf', 'ACTIVE', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-(5, 5, 'HD-2026-005', '/uploads/HD-005.pdf', 'ACTIVE', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) VALUES (
+    (SELECT customer_id FROM customer WHERE tax_code = '0390000004'), 
+    GETDATE(), 
+    'ACCEPTED', 
+    (SELECT user_id FROM [user] WHERE user_name = 'sale_01')
+);
+DECLARE @Q4 INT = SCOPE_IDENTITY();
+INSERT INTO quotation_detail (quotation_id, product_id, product_name, unit, quantity, cost_price, selling_price, discount_percent, tax_percent) VALUES (
+    @Q4, 
+    (SELECT product_id FROM product WHERE product_name = N'Men Khô Mauri'), 
+    N'Men Khô Mauri', 
+    N'Gói 500g', 
+    20, 
+    80000, 
+    110000, 
+    0, 
+    10
+);
+
+INSERT INTO quotation (customer_id, quotation_date, quotation_status, created_by) VALUES (
+    (SELECT customer_id FROM customer WHERE tax_code = '0390000005'), 
+    GETDATE(), 
+    'ACCEPTED', 
+    (SELECT user_id FROM [user] WHERE user_name = 'sale_02')
+);
+DECLARE @Q5 INT = SCOPE_IDENTITY();
+INSERT INTO quotation_detail (quotation_id, product_id, product_name, unit, quantity, cost_price, selling_price, discount_percent, tax_percent) VALUES (
+    @Q5, 
+    (SELECT product_id FROM product WHERE product_name = N'Hộp Phô Mai Tươi'), 
+    N'Hộp Phô Mai Tươi', 
+    N'Hộp', 
+    15, 
+    25000, 
+    38000, 
+    5, 
+    10
+);
+
+-- 5. Them 3 hop dong mau (De he thong co du customer_contract_id tu 1 den 5)
+INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, created_by) VALUES 
+((SELECT customer_id FROM customer WHERE tax_code = '0390000003'), @Q3, 'HD-2026-003', '/uploads/HD-003.pdf', 'ACTIVE', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+((SELECT customer_id FROM customer WHERE tax_code = '0390000004'), @Q4, 'HD-2026-004', '/uploads/HD-004.pdf', 'ACTIVE', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+((SELECT customer_id FROM customer WHERE tax_code = '0390000005'), @Q5, 'HD-2026-005', '/uploads/HD-005.pdf', 'ACTIVE', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
 GO
 
 
@@ -508,7 +645,7 @@ USE SWP_Sales_Process;
 GO
 
 -- ==========================================================
--- SU DUNG VONG LAP ĐE CHEN ĐONG 30 ĐON HANG KHONG LO LOI ID
+-- SU DUNG VONG LAP DE CHEN DONG 30 DON HANG KHONG LO LOI ID
 -- ==========================================================
 DECLARE @Loop INT = 1;
 DECLARE @RandomCustomerID INT;
@@ -520,11 +657,11 @@ DECLARE @Status VARCHAR(20);
 
 WHILE @Loop <= 30
 BEGIN
-    -- 1. Lay ngau nhien 1 customer_id va customer_contract_id thuoc ve customer đo
+    -- 1. Lay ngau nhien 1 customer_id va customer_contract_id thuoc ve customer do
     SELECT TOP 1 @RandomCustomerID = customer_id 
     FROM customer ORDER BY NEWID();
 
-    -- Tim hop đong cua khach hang đo, neu khach chua co hop đong thi lay đai 1 hop đong bat ky co san
+    -- Tim hop dong cua khach hang do, neu khach chua co hop dong thi lay dai 1 hop dong bat ky co san
     SELECT TOP 1 @RandomContractID = customer_contract_id 
     FROM customer_contract 
     WHERE customer_id = @RandomCustomerID;
@@ -534,8 +671,8 @@ BEGIN
         SELECT TOP 1 @RandomContractID = customer_contract_id FROM customer_contract ORDER BY NEWID();
     END
 
-    -- 2. Lay ngau nhien 1 nhan vien tao đon (Role Admin/Manager/Sale...)
-    SELECT TOP 1 @RandomUserID = user_id FROM [user] WHERE role_id IN (1, 2, 4, 5) ORDER BY NEWID();
+    -- 2. Lay ngau nhien 1 nhan vien tao don (Role Admin/Manager/Sale...)
+    SELECT TOP 1 @RandomUserID = user_id FROM [user] WHERE role_id IN (SELECT role_id FROM role WHERE role_name IN (N'System Admin', N'Manager', N'Sale Staff', N'Admin Officer')) ORDER BY NEWID();
 
     -- 3. Gan trang thai ngau nhien
     SET @Status = CASE WHEN @Loop % 4 = 0 THEN 'Completed'
@@ -553,45 +690,47 @@ BEGIN
         DATEADD(MINUTE, -@Loop * 30, GETDATE())
     );
 
-    -- Lay ID cua đon hang vua chen đe dung cho bang chi tiet
+    -- Lay ID cua don hang vua chen de dung cho bang chi tiet
     SET @NewOrderID = SCOPE_IDENTITY();
 
-    -- 5. Chen tu 1 đen 2 san pham chi tiet cho đon hang nay
-    DECLARE @ProdLoop INT = 1;
-    DECLARE @NumOfProducts INT = CASE WHEN @Loop % 3 = 0 THEN 2 ELSE 1 END;
+    -- Tìm quotation_id tương ứng với contract của đơn hàng
+    DECLARE @QID INT;
+    SELECT @QID = quotation_id FROM customer_contract WHERE customer_contract_id = @RandomContractID;
 
-    WHILE @ProdLoop <= @NumOfProducts
-    BEGIN
-        -- Lay ngau nhien 1 san pham thuc te đang co trong bang product
-        SELECT TOP 1 
-            @RandomProductID = product_id,
-            @RandomUserID = updated_by -- Tạm mượn biến để đỡ tạo nhiều, thực tế lấy cost/selling price
-        FROM product 
-        WHERE product_id NOT IN (
-            -- Tranh trung san pham trong cung 1 đon hang
-            SELECT product_id FROM customer_order_detail WHERE customer_order_id = @NewOrderID
-        )
-        ORDER BY NEWID();
-
-        -- Neu tim thay san pham hop le thi chen vao chi tiet
-        IF @RandomProductID IS NOT NULL
-        BEGIN
-            INSERT INTO customer_order_detail (customer_order_id, product_id, quantity, cost_price, selling_price)
-            SELECT 
-                @NewOrderID, 
-                product_id, 
-                (CASE WHEN @Loop % 2 = 0 THEN 2 ELSE 5 END), -- Số lượng ngẫu nhiên 2 hoặc 5
-                cost_price, 
-                selling_price
-            FROM product 
-            WHERE product_id = @RandomProductID;
-        END
-
-        SET @ProdLoop = @ProdLoop + 1;
-    END
+    -- Chèn chi tiết cho đơn hàng lấy từ quotation_detail của báo giá đó
+    INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price)
+    SELECT 
+        @NewOrderID, 
+        qd.quotation_detail_id, 
+        (CASE WHEN @Loop % 2 = 0 THEN 2 ELSE 5 END), -- Số lượng ngẫu nhiên 2 hoặc 5
+        p.cost_price, 
+        qd.selling_price
+    FROM quotation_detail qd
+    JOIN product p ON qd.product_id = p.product_id
+    WHERE qd.quotation_id = @QID;
 
     SET @Loop = @Loop + 1;
 END;
 GO
 
+-- Kiem tra lai xem đa đu 30 dong chua
+SELECT 'Tổng số đơn hàng' AS [Bảng], COUNT(*) AS [Số lượng] FROM customer_order
+UNION ALL
+SELECT 'Tổng số chi tiết đơn' AS [Bảng], COUNT(*) AS [Số lượng] FROM customer_order_detail;
+GO
 
+select * from [customer_order]
+select * from [user]
+select * from [Customer]
+select * from [role]
+UPDATE customer
+SET customer_type = 'LOYAL CUSTOMER'
+WHERE customer_type = 'B2B';
+GO
+
+USE SWP_Sales_Process;
+GO
+
+SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name
+                , address, phone, account_status, created_at, updated_at, role_id 
+                FROM [user] WHERE 1=2 or role_id = 4
