@@ -66,7 +66,7 @@ public class VNPAYReturn extends HttpServlet {
         boolean isSignValid = signValue.equalsIgnoreCase(vnp_SecureHash);
 
         String vnp_ResponseCode = req.getParameter("vnp_ResponseCode");
-        String vnp_TxnRef = req.getParameter("vnp_TxnRef"); 
+        String vnp_TxnRef = req.getParameter("vnp_TxnRef");
         String vnp_Amount = req.getParameter("vnp_Amount");
 
         HttpSession session = req.getSession();
@@ -77,7 +77,7 @@ public class VNPAYReturn extends HttpServlet {
 
         int contractId = -1;
         if (vnp_TxnRef != null) {
-            List<Contract> contracts = contractDAO.searchContracts(vnp_TxnRef, null, null, null, 1, 1, 0, 0);
+            List<Contract> contracts = null;
             if (contracts != null && !contracts.isEmpty()) {
                 contractId = contracts.get(0).getContractId();
             }
