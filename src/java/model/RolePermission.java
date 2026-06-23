@@ -8,7 +8,6 @@ public class RolePermission {
     private String permissionName;
     private Timestamp createAt;
     private Timestamp updateAt;
-    private String urlPattern;
 
     public RolePermission() {
     }
@@ -18,7 +17,6 @@ public class RolePermission {
         this.permissionName = permissionName;
         this.createAt = createAt;
         this.updateAt = updateAt;
-        this.urlPattern = urlPattern;
     }
 
     public int getPermissionId() {
@@ -52,13 +50,4 @@ public class RolePermission {
     public void setUpdateAt(Timestamp updateAt) {
         this.updateAt = updateAt;
     }
-
-    public String getUrlPattern() {
-        return urlPattern;
-    }
-
-    public void setUrlPattern(String urlPattern) {
-        this.urlPattern = urlPattern;
-    }
-
 }

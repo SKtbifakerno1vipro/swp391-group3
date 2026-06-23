@@ -46,6 +46,13 @@ public class CreateQuotationController extends HttpServlet {
             // Lay customer cua quotation.
             int customerId = Integer.parseInt(request.getParameter("customerId"));
 
+            QuotationService quotationService = new QuotationService();
+            if (quotationService.hasDraftQuotation(customerId)) {
+                request.setAttribute("error", "This customer already has a quotation in DRAFT status.");
+                doGet(request, response);
+                return;
+            }
+
             /*
              * Cac input san pham co cung name nen dung getParameterValues.
              * Moi mang se chua nhieu gia tri tu nhieu dong san pham.
@@ -62,14 +69,18 @@ public class CreateQuotationController extends HttpServlet {
                 return;
             }
 
+            model.User u = (model.User) request.getSession().getAttribute("user");
+            if (u == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+            int creatorId = u.getUserId();
+
             // Tao object de luu bang quotation
             Quotation quotation = new Quotation();
             quotation.setCustomerId(customerId);
             quotation.setQuotationDate(LocalDateTime.now());
             quotation.setQuotationStatus("DRAFT");
-
-            model.User u = (model.User) request.getSession().getAttribute("user");
-            int creatorId = u != null ? u.getUserId() : 1;
             quotation.setCreatedBy(creatorId);
 
             // Tao danh sach detail de luu nhieu dong quotation_detail.
@@ -98,7 +109,6 @@ public class CreateQuotationController extends HttpServlet {
             }
 
             // Goi service de xu ly logic tao quotation + nhieu detail
-            QuotationService quotationService = new QuotationService();
             boolean success = quotationService.createQuotation(quotation, details);
 
             if (success) {
