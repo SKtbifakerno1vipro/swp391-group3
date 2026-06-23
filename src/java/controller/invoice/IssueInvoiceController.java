@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author XHieu
  */
-@WebServlet(name = "IssueInvoiceController", urlPatterns = {"/Invoice"})
+@WebServlet(name = "IssueInvoiceController", urlPatterns = {"/invoice"})
 public class IssueInvoiceController extends HttpServlet {
 
     @Override

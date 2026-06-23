@@ -34,7 +34,6 @@ GO
 CREATE TABLE permission (
     permission_id INT IDENTITY(1,1) PRIMARY KEY,
     permission_name NVARCHAR(100) NOT NULL,
-    url_pattern NVARCHAR(255) NULL,
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE()
 );
@@ -433,55 +432,39 @@ GO
 
 -- 10. DONG BO PERMISSION CHO SECURITY FILTER
 -- Danh sach nay phai khop voi cac @WebServlet hien co trong src/java/controller.
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('permission') AND name = 'url_pattern')
-BEGIN
-    ALTER TABLE permission ADD url_pattern NVARCHAR(255) NULL;
-END
-GO
 
-DELETE FROM role_permission;
-DELETE FROM permission;
-DBCC CHECKIDENT ('permission', RESEED, 0);
-GO
 
-INSERT INTO permission (permission_name, url_pattern) VALUES
-('View Dashboard', '/dashboard'),
-('View User List', '/user-list'),
-('View User Detail', '/user-detail'),
-('Create User', '/create-user'),
-('Edit User', '/edit-user'),
-('View Role List', '/role-list'),
-('View Role Detail', '/role-detail'),
-('Add Role', '/add-role'),
-('Edit Role Permissions', '/edit-role-permissions'),
-('View Category List', '/category/list'),
-('Create Category', '/category/create'),
-('Edit Category', '/category/edit'),
-('Delete Category', '/category/delete'),
-('View Product List', '/product-list'),
-('Create Product', '/create-product'),
-('Edit Product', '/edit-product'),
-('Delete Product', '/product-delete'),
-('View Customer List', '/customer/list'),
-('View Customer Detail', '/customer/detail'),
-('Create Customer', '/customer/create'),
-('Edit Customer', '/customer/edit'),
-('View Quotation List', '/quotation-list'),
-('View Contract List', '/contract-list'),
-('Save Contract', '/contract-save'),
-('View Order List', '/customer-order-list'),
-('View Order Detail', '/customer-order-detail'),
-('Create Order', '/create-customer-order'),
-('Issue Invoice', '/invoice');
-GO
-INSERT INTO permission (permission_name, url_pattern)
-VALUES ('Create Quotation', '/quotation-create');
-
--- Admin/System Admin mac dinh co toan quyen de team vua dung DB la dang nhap dung duoc ngay.
-INSERT INTO role_permission (role_id, permission_id)
-SELECT 1, permission_id
-FROM permission
-WHERE url_pattern = '/quotation-create';
+INSERT INTO permission (permission_name)
+VALUES
+('View Dashboard'),
+('View User List'),
+('View User Detail'),
+('Create User'),
+('Edit User'),
+('View Role List'),
+('View Role Detail'),
+('Add Role'),
+('Edit Role Permissions'),
+('View Category List'),
+('Create Category'),
+('Edit Category'),
+('Delete Category'),
+('View Product List'),
+('Create Product'),
+('Edit Product'),
+('Delete Product'),
+('View Customer List'),
+('View Customer Detail'),
+('Create Customer'),
+('Edit Customer'),
+('View Quotation List'),
+('Create Quotation'),
+('View Contract List'),
+('Save Contract'),
+('View Order List'),
+('View Order Detail'),
+('Create Order'),
+('Issue Invoice');
 
 -- ==========================================================
 -- PHAN DU LIEU MOI TU MAIN
@@ -611,24 +594,4 @@ BEGIN
 END;
 GO
 
--- Kiem tra lai xem đa đu 30 dong chua
-SELECT 'Tổng số đơn hàng' AS [Bảng], COUNT(*) AS [Số lượng] FROM customer_order
-UNION ALL
-SELECT 'Tổng số chi tiết đơn' AS [Bảng], COUNT(*) AS [Số lượng] FROM customer_order_detail;
-GO
 
-select * from [customer_order]
-select * from [user]
-select * from [Customer]
-select * from [role]
-UPDATE customer
-SET customer_type = 'LOYAL CUSTOMER'
-WHERE customer_type = 'B2B';
-GO
-
-USE SWP_Sales_Process;
-GO
-
-SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name
-                , address, phone, account_status, created_at, updated_at, role_id 
-                FROM [user] WHERE 1=2 or role_id = 4
