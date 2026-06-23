@@ -23,6 +23,9 @@
                 <form action="contract-list" method="GET">
                     <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Contract number">
                     <input type="text" name="customerName" value="${customerName}" placeholder="Customer name">
+                    <input type="text" name="customerTaxCode" value="${customerTaxCode}" placeholder="Customer tax code">
+                    <input type="text" name="customerPhone" value="${customerPhone}" placeholder="Customer phone">
+                    <input type="text" name="customerEmail" value="${customerEmail}" placeholder="Customer email">
                     <select name="status">
                         <option value="">-- All statuses --</option>
                         <option value="DRAFT" ${status == 'DRAFT' ? 'selected' : ''}>Draft</option>
@@ -36,6 +39,11 @@
                         <option value="TEXT" ${storageType == 'TEXT' ? 'selected' : ''}>Text</option>
                         <option value="IMAGE" ${storageType == 'IMAGE' ? 'selected' : ''}>Image scan</option>
                     </select>
+                    <br>
+                    <label>From date</label>
+                    <input type="date" name="fromDate" value="${fromDate}">
+                    <label>To date</label>
+                    <input type="date" name="toDate" value="${toDate}">
                     <button type="submit">Search</button>
                     <a href="${pageContext.request.contextPath}/contract-list">Reset filters</a>
                 </form>
@@ -48,12 +56,15 @@
                             <th>Customer</th>
                             <th>Status</th>
                             <th>Storage Type</th>
+                            <th>Tax Code</th>
+                            <th>Phone</th>
+                            <th>Email</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:if test="${empty list}">
-                            <tr><td colspan="6" style="text-align:center;">No contracts found.</td></tr>
+                            <tr><td colspan="9" style="text-align:center;">No contracts found.</td></tr>
                         </c:if>
                         <c:forEach items="${list}" var="c">
                             <tr>
@@ -62,6 +73,9 @@
                                 <td>${c.customerName}</td>
                                 <td>${c.contractStatus}</td>
                                 <td>${c.storageType}</td>
+                                <td>${c.taxCode}</td>
+                                <td>${c.phone}</td>
+                                <td>${c.email}</td>
                                 <td>
                                     <c:if test="${sessionScope.user.roleId==5}">
                                         <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |
@@ -74,7 +88,7 @@
                 </table>
 
                 <c:if test="${endPage > 1}">
-                    <c:set var="params" value="contractNumber=${contractNumber}&customerName=${customerName}&status=${status}&storageType=${storageType}" />
+                    <c:set var="params" value="contractNumber=${contractNumber}&customerName=${customerName}&status=${status}&storageType=${storageType}&fromDate=${fromDate}&toDate=${toDate}&customerTaxCode=${customerTaxCode}&customerPhone=${customerPhone}&customerEmail=${customerEmail}" />
                     <div>
                         <a href="contract-list?page=1&${params}" ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&laquo;</a>
                         <a href="contract-list?page=${currentPage - 1}&${params}" ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&lsaquo;</a>
@@ -87,12 +101,5 @@
                 </c:if>
             </main>
         </div>
-        <script>
-                    let errorSig = "${errorSig}";
-
-                    if (errorSig !== "") {
-                        alert("${errorSig}");
-                    }
-        </script>
     </body>
 </html>

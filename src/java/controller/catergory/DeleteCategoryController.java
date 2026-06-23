@@ -37,12 +37,7 @@ public class DeleteCategoryController extends HttpServlet {
                 return;
             }
 
-            model.Category cat = categoryService.getCategoryById(categoryId);
             if (categoryService.deleteCategory(categoryId)) {
-                model.User loggedInUser = (model.User) request.getSession().getAttribute("user");
-                Integer userId = loggedInUser != null ? loggedInUser.getUserId() : null;
-                String catName = cat != null ? cat.getCategoryName() : "Unknown";
-                service.AuditLogService.log(userId, "DELETE", "Category", "Xóa danh mục: " + catName + " (ID: " + categoryId + ")");
                 response.sendRedirect(request.getContextPath() + "/category/list?status=delete_success");
             } else {
                 response.sendRedirect(request.getContextPath() + "/category/list?status=delete_failed");

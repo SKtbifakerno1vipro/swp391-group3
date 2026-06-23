@@ -15,6 +15,14 @@ public class EmailUtils {
     // Helper method to load email configuration from properties file
     private static Properties loadEmailProperties() {
         Properties props = new Properties();
+        try (InputStream input = EmailUtils.class.getClassLoader().getResourceAsStream("resources/EmailConfig.properties")) {
+            if (input != null) {
+                props.load(input);
+                return props;
+            }
+        } catch (Exception ignored) {
+        }
+
         try (InputStream input = EmailUtils.class.getClassLoader().getResourceAsStream("../../WEB-INF/EmailConfig.properties")) {
             if (input != null) {
                 props.load(input);

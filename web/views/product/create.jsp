@@ -27,7 +27,7 @@
         <div>
             <h1>Create Product</h1>
             <div>
-                <form action="create-product" method="post">
+                <form action="edit-product" method="post">
                     <table>
                         <tr>
                             <td>Product Name</td>
@@ -82,7 +82,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="2"><input type="submit" name="Create" value="Create">
+                        <input type="hidden" name="action" value="${action}">
+                            <td colspan="2"><input type="submit"  value="Create">
                                 <a href="${pageContext.request.contextPath}/product-list">Cancel</a></td>
                         </tr>
 

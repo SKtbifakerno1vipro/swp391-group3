@@ -26,6 +26,9 @@ public class DBContext {
             String password = props.getProperty("password");
 
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            System.out.println("URL = " + url);
+            System.out.println("USER = " + username);
+            System.out.println("PASS = " + password);
             connection = DriverManager.getConnection(url, username, password);
         } catch (Exception e) {
             e.printStackTrace();
@@ -34,7 +37,12 @@ public class DBContext {
 
     private InputStream findConfigInputStream() {
         try {
-            InputStream input = DBContext.class.getClassLoader().getResourceAsStream("ConnectDB.properties");
+            InputStream input = DBContext.class.getClassLoader().getResourceAsStream("resources/ConnectDB.properties");
+            if (input != null) {
+                return input;
+            }
+
+            input = DBContext.class.getClassLoader().getResourceAsStream("ConnectDB.properties");
             if (input != null) {
                 return input;
             }

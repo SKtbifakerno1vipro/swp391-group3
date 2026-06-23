@@ -41,7 +41,6 @@ public class ForgotPassController extends HttpServlet {
         if ("sendOtp".equals(action)) {
             // ---- LUONG 1: BAM NUT GUI MA QUA AJAX ----
 
-            // CAU HINH AU RA: Tra ve chu thuan (text) chu khong tra ve trang HTML
             response.setContentType("text/plain");
             response.setCharacterEncoding("UTF-8");
 
