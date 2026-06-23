@@ -29,6 +29,9 @@
                         <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
                             href="${pageContext.request.contextPath}/contract-list"><span
                                 class="material-symbols-outlined">contract</span>Contracts</a>
+                        <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/customer-order-list"><span
+                                class="material-symbols-outlined">receipt_long</span>My Orders</a>
                         <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                             href="${pageContext.request.contextPath}/payment-list"><span
                                 class="material-symbols-outlined">payments</span>My Payments</a>

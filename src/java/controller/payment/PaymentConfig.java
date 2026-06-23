@@ -14,19 +14,33 @@ public class PaymentConfig {
 
     static {
         Properties props = new Properties();
-        try (InputStream input = PaymentConfig.class.getClassLoader().getResourceAsStream("../../WEB-INF/PaymentConfig.properties")) {
+        boolean loaded = false;
+        try (InputStream input = PaymentConfig.class.getClassLoader().getResourceAsStream("resources/PaymentConfig.properties")) {
             if (input != null) {
                 props.load(input);
                 vnp_PayUrl = props.getProperty("vnp_PayUrl");
                 vnp_TmnCode = props.getProperty("vnp_TmnCode");
                 vnp_HashSecret = props.getProperty("vnp_HashSecret");
-            } else {
-                System.out.println("[ERROR] PaymentConfig.properties file not found! Using defaults.");
+                loaded = true;
+            }
+        } catch (Exception ignored) {
+        }
+
+        if (!loaded) {
+            try (InputStream input = PaymentConfig.class.getClassLoader().getResourceAsStream("../../WEB-INF/PaymentConfig.properties")) {
+                if (input != null) {
+                    props.load(input);
+                    vnp_PayUrl = props.getProperty("vnp_PayUrl");
+                    vnp_TmnCode = props.getProperty("vnp_TmnCode");
+                    vnp_HashSecret = props.getProperty("vnp_HashSecret");
+                } else {
+                    System.out.println("[ERROR] PaymentConfig.properties file not found! Using defaults.");
+                    useDefaults();
+                }
+            } catch (Exception e) {
+                System.out.println("[ERROR] Failed to load PaymentConfig.properties: " + e.getMessage());
                 useDefaults();
             }
-        } catch (Exception e) {
-            System.out.println("[ERROR] Failed to load PaymentConfig.properties: " + e.getMessage());
-            useDefaults();
         }
     }
 
