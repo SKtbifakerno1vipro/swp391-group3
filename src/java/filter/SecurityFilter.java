@@ -161,7 +161,6 @@ public class SecurityFilter implements Filter {
             "/category/edit",
             "/category/delete"
     );
-//update security bo comment di 
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

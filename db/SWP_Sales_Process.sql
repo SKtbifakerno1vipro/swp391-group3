@@ -728,6 +728,60 @@ SET customer_type = 'LOYAL CUSTOMER'
 WHERE customer_type = 'B2B';
 GO
 
+-- ==========================================================
+-- GÁN QUYỀN MẶC ĐỊNH CHO CÁC ROLE BAN ĐẦU
+-- ==========================================================
+USE SWP_Sales_Process;
+GO
+
+-- 1. System Admin (role_id = 1)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 1, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View User List', N'View User Detail', N'Create User', N'Edit User',
+    N'View Role List', N'View Role Detail', N'Add Role', N'Edit Role Permissions',
+    N'View Product List', N'Create Product', N'Edit Product', N'Delete Product',
+    N'View Quotation List', N'Create Quotation', N'View Contract List', N'Save Contract',
+    N'View Order List', N'View Order Detail', N'Issue Invoice'
+);
+
+-- 2. Manager (role_id = 2)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 2, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View User List', N'View User Detail', N'View Role List', N'View Role Detail',
+    N'View Customer List', N'View Customer Detail', N'Create Customer', N'Edit Customer',
+    N'View Order List', N'View Order Detail', N'View Product List', N'View Category List',
+    N'View Quotation List', N'View Contract List', N'Issue Invoice'
+);
+
+-- 3. Customer (role_id = 3)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 3, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View Customer Detail', N'View Quotation List', N'View Contract List'
+);
+
+-- 4. Sale Staff (role_id = 4)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 4, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View Customer List', N'View Customer Detail', N'Create Customer', N'Edit Customer',
+    N'View Quotation List', N'Create Quotation', N'View Contract List',
+    N'View Order List', N'View Order Detail', N'View Product List', N'View Category List'
+);
+
+-- 5. Admin Officer (role_id = 5)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 5, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View Contract List', N'Save Contract',
+    N'View Order List', N'View Order Detail', N'Issue Invoice'
+);
+
+-- 6. Warehouse Staff (role_id = 6)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 6, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View Product List', N'Create Product', N'Edit Product', N'Delete Product',
+    N'View Category List', N'Create Category', N'Edit Category', N'Delete Category'
+);
+GO
+
 USE SWP_Sales_Process;
 GO
 

@@ -13,7 +13,7 @@ public class RoleDAO extends DBContext {
     public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {
-            String sql = "SELECT role_id, role_name, created_at, updated_at FROM role ORDER BY role_id";
+            String sql = "SELECT role_id, role_name, created_at, updated_at = GETDATE() FROM role ORDER BY role_id";
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
@@ -184,6 +184,11 @@ public class RoleDAO extends DBContext {
 
                 stIns.executeBatch();
             }
+
+            String sqlUpdateRole = "UPDATE role SET updated_at = GETDATE() WHERE role_id = ?";
+            PreparedStatement stUpd = connection.prepareStatement(sqlUpdateRole);
+            stUpd.setInt(1, roleId);
+            stUpd.executeUpdate();
 
             connection.commit();
 
