@@ -36,8 +36,10 @@
                         <p>${error}</p>
                     </c:if>
                     <div>
-                        <form action="edit-product?id=${product.productId}" method="post">
+                        <form action="edit-product" method="post">
                             <table border="1">
+                                <input type="hidden" name="id" value="${product.productId}">
+                                <input type="hidden" name="action" value="${action}">
                                 <tr>
                                     <td>Product Name</td>
                                     <td><input type="text" name="name" value="${product.productName}" ${action != 'detail' ? ' ' : 'readonly'} required></td>
@@ -99,25 +101,27 @@
 
                                     </tr>
                                     <tr>
-                                        <td>Update At</td>
-                                        <td><fmt:formatDate value="${product.updatedAt}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+                                    <input type="hidden" name="update_at" value="${product.updatedAt}">
+                                    <td>Update At</td>
+                                    <td><fmt:formatDate value="${product.updatedAt}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 
                                     </tr>
-                                    <tr>
-                                        <td>Update By</td>
-                                        <td><input type="text" name="update_by" value="${update_by}" readonly></td>
-                                    </tr>
                                 </c:if>
+                                <tr>
+                                    <td>Update By</td>
+                                    <td><input type="text" name="update_by" value="${product.updatedBy}" readonly></td>
+                                </tr>
                             </table>
+
                             <div>
-                                <c:if test="${action != 'detail'}">
-                                    <input type="submit" name="action" value="Save">
-                                </c:if>
                                 <c:if test="${action == 'detail'}">
-                                    <a href="${pageContext.request.contextPath}/edit-product?id=${product.productId}"><button type="button">Edit</button></a>
+                                    <a href="pageContext.request.contextPath/edit - product?id ={product.productId}&action=edit"><button type="button">Edit</button></a>
+                                </c:if> 
+                                <c:if test="${action == 'edit'}">
+                                    <input type="submit" value="Save">
                                 </c:if>
-                                <a href="${pageContext.request.contextPath}/product-list">Cancel</a>
-                            </div>
+
+                                <a href="${pageContext.request.contextPath}/product-list">Cancel</a></div>
                         </form>
                     </div>
                 </div>

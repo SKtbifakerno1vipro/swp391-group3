@@ -4,6 +4,7 @@
  */
 package controller.product;
 
+import jakarta.mail.Session;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -26,7 +27,7 @@ import utils.Validation;
 public class ProductList extends HttpServlet {
 
     private ProductService pService = new ProductService();
-    private final int PAGE_SIZE = 10;
+    private final int PAGE_SIZE = 1;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -73,7 +74,6 @@ public class ProductList extends HttpServlet {
             return;
         }
         List<Category> categories = pService.getAllCategory();
-        String id = request.getParameter("id");
         String sort = request.getParameter("sort");
         String searchText = request.getParameter("searchText");
         String pageRaw = request.getParameter("page");
@@ -88,9 +88,14 @@ public class ProductList extends HttpServlet {
         int totalRow = pService.countProduct(searchText, categoryId, "ACTIVE");
         totalPage = pService.calculateTotalPage(totalRow, PAGE_SIZE);
         page = pService.nomalizePage(page, totalPage);
-        
+        if (searchText != null) {
+            searchText = searchText.trim();
+        }
+        String error = (String) session.getAttribute("errorProduct");
+        session.removeAttribute("errorProduct");
         request.setAttribute("categoryId", categoryId);
         request.setAttribute("searchText", searchText);
+        request.setAttribute("errorProduct", error);
         request.setAttribute("sort", sort);
         request.setAttribute("products", pService.searchProduct(searchText, categoryId, sort, "ACTIVE", totalRow, page, totalPage, PAGE_SIZE));
         request.setAttribute("totalPage", totalPage);
