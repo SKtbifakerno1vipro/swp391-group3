@@ -208,18 +208,21 @@ public class QuotationDAO extends DBContext {
     }
 
     public boolean addQuotationDetail(QuotationDetail detail) {
-        String sql = "INSERT INTO quotation_detail (quotation_id, product_id, quantity, selling_price, discount_percent, tax_percent) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO quotation_detail (quotation_id, product_id, product_name, unit, cost_price, selling_price, quantity, discount_percent, tax_percent) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
 
             // Gan tung gia tri vao tung dau ? theo dung thu tu.
             ps.setInt(1, detail.getQuotationId());
             ps.setInt(2, detail.getProductId());
-            ps.setInt(3, detail.getQuantity());
-            ps.setBigDecimal(4, detail.getSellingPrice());
-            ps.setBigDecimal(5, detail.getDiscountPercent());
-            ps.setBigDecimal(6, detail.getTaxPercent());
+            ps.setString(3, detail.getProductName());
+            ps.setString(4, detail.getUnit());
+            ps.setBigDecimal(5, detail.getCostPrice());
+            ps.setBigDecimal(6, detail.getSellingPrice());
+            ps.setInt(7, detail.getQuantity());
+            ps.setBigDecimal(8, detail.getDiscountPercent());
+            ps.setBigDecimal(9, detail.getTaxPercent());
 
             int affectedRows = ps.executeUpdate();
             return affectedRows > 0;
@@ -234,10 +237,15 @@ public class QuotationDAO extends DBContext {
      * Dung de tranh them trung 2 dong cung product.
      */
     public QuotationDetail getQuotationDetailByProduct(int quotationId, int productId) {
-        String sql = "SELECT quotation_detail_id, quotation_id, product_id, quantity, "
-                + "selling_price, discount_percent, tax_percent "
-                + "FROM quotation_detail "
-                + "WHERE quotation_id = ? AND product_id = ?";
+        String sql = "SELECT qd.quotation_detail_id, qd.quotation_id, qd.product_id, qd.quantity, "
+                + "qd.discount_percent, qd.tax_percent, "
+                + "COALESCE(qd.product_name, p.product_name) AS product_name, "
+                + "COALESCE(qd.unit, p.unit) AS unit, "
+                + "COALESCE(qd.cost_price, p.cost_price) AS cost_price, "
+                + "COALESCE(qd.selling_price, p.selling_price) AS selling_price "
+                + "FROM quotation_detail qd "
+                + "LEFT JOIN product p ON qd.product_id = p.product_id "
+                + "WHERE qd.quotation_id = ? AND qd.product_id = ?";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -252,6 +260,9 @@ public class QuotationDAO extends DBContext {
                 detail.setQuotationId(rs.getInt("quotation_id"));
                 detail.setProductId(rs.getInt("product_id"));
                 detail.setQuantity(rs.getInt("quantity"));
+                detail.setProductName(rs.getString("product_name"));
+                detail.setUnit(rs.getString("unit"));
+                detail.setCostPrice(rs.getBigDecimal("cost_price"));
                 detail.setSellingPrice(rs.getBigDecimal("selling_price"));
                 detail.setDiscountPercent(rs.getBigDecimal("discount_percent"));
                 detail.setTaxPercent(rs.getBigDecimal("tax_percent"));
@@ -276,18 +287,19 @@ public class QuotationDAO extends DBContext {
          * Neu chi lay quotation_detail thi chi co product_id, nguoi dung kho hieu.
          */
         String sql = """
-                     SELECT quotation_detail.quotation_detail_id,
-                                   quotation_detail.quotation_id, 
-                                  quotation_detail.product_id, 
-                                    quotation_detail.quantity, 
-                                    quotation_detail.selling_price, 
-                                   quotation_detail.discount_percent, 
-                                   product.unit,
-                                   quotation_detail.tax_percent, 
-                                    product.product_name 
-                                     FROM quotation_detail 
-                                   JOIN product ON quotation_detail.product_id = product.product_id 
-                                     WHERE quotation_detail.quotation_id = ?""";
+                     SELECT qd.quotation_detail_id,
+                            qd.quotation_id, 
+                            qd.product_id, 
+                            qd.quantity, 
+                            qd.discount_percent, 
+                            qd.tax_percent, 
+                            COALESCE(qd.product_name, p.product_name) AS product_name,
+                            COALESCE(qd.unit, p.unit) AS unit,
+                            COALESCE(qd.cost_price, p.cost_price) AS cost_price,
+                            COALESCE(qd.selling_price, p.selling_price) AS selling_price
+                     FROM quotation_detail qd
+                     LEFT JOIN product p ON qd.product_id = p.product_id 
+                     WHERE qd.quotation_id = ?""";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -304,6 +316,7 @@ public class QuotationDAO extends DBContext {
                 detail.setProductId(rs.getInt("product_id"));
                 detail.setQuantity(rs.getInt("quantity"));
                 detail.setUnit(rs.getString("unit"));
+                detail.setCostPrice(rs.getBigDecimal("cost_price"));
                 detail.setSellingPrice(rs.getBigDecimal("selling_price"));
                 detail.setDiscountPercent(rs.getBigDecimal("discount_percent"));
                 detail.setTaxPercent(rs.getBigDecimal("tax_percent"));
