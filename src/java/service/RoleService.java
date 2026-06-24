@@ -33,6 +33,7 @@ public class RoleService {
         roleDAO.updateRole(role);
     }
 
+
     public void updateRolePermissions(int roleId, List<Integer> permissionIds) {
         roleDAO.updateRolePermissions(roleId, permissionIds);
     }

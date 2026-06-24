@@ -13,7 +13,7 @@ public class RoleDAO extends DBContext {
     public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {
-            String sql = "SELECT role_id, role_name, created_at, updated_at = GETDATE() FROM role ORDER BY role_id";
+            String sql = "SELECT role_id, role_name, created_at, updated_at, status FROM role ORDER BY role_id";
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
@@ -22,6 +22,7 @@ public class RoleDAO extends DBContext {
                 role.setRoleName(rs.getString("role_name"));
                 role.setCreateAt(rs.getTimestamp("created_at"));
                 role.setUpdateAt(rs.getTimestamp("updated_at"));
+                role.setStatus(rs.getString("status"));
 
                 roles.add(role);
             }
@@ -65,6 +66,9 @@ public class RoleDAO extends DBContext {
                 model.Role role = new model.Role();
                 role.setRoleId(rs.getInt("role_id"));
                 role.setRoleName(rs.getString("role_name"));
+                role.setCreateAt(rs.getTimestamp("created_at"));
+                role.setUpdateAt(rs.getTimestamp("updated_at"));
+                role.setStatus(rs.getString("status"));
                 return role;
             }
         } catch (java.sql.SQLException e) {
@@ -86,13 +90,14 @@ public class RoleDAO extends DBContext {
         return false;
     }
 
+
     public model.Role getRoleDetail(int id) {
         model.Role role = null;
         //join 1: dung đe lay danh sach cac permission đuoc gan cho role.
         //join 2: dung đe lay ten permission tu bang permission.
         //dung left join đe ngay ca chua co quyen van lay ra đuoc
         String sql = """
-                     SELECT r.role_id, r.role_name, r.created_at, r.updated_at,p.permission_id, p.permission_name
+                     SELECT r.role_id, r.role_name, r.created_at, r.updated_at, r.status, p.permission_id, p.permission_name
                      FROM role r
                      LEFT JOIN role_permission rp ON r.role_id = rp.role_id
                      LEFT JOIN permission p ON rp.permission_id = p.permission_id
@@ -110,6 +115,7 @@ public class RoleDAO extends DBContext {
                     role.setRoleName(rs.getString("role_name"));
                     role.setCreateAt(rs.getTimestamp("created_at"));
                     role.setUpdateAt(rs.getTimestamp("updated_at"));
+                    role.setStatus(rs.getString("status"));
 
                 }
                 int permissionId = rs.getInt("permission_id");
@@ -248,7 +254,7 @@ public class RoleDAO extends DBContext {
 
     public List<Role> searchRole(String searchText) {
         List<Role> list = new ArrayList<>();
-        String sql = "SELECT role_id, role_name, created_at, updated_at FROM role "
+        String sql = "SELECT role_id, role_name, created_at, updated_at, status FROM role "
                 + "WHERE 1=1 "; // Có dấu cách ở cuối
 
         if (searchText != null && !searchText.trim().isEmpty()) {
@@ -270,6 +276,7 @@ public class RoleDAO extends DBContext {
                 role.setRoleName(rs.getString("role_name"));
                 role.setCreateAt(rs.getTimestamp("created_at"));
                 role.setUpdateAt(rs.getTimestamp("updated_at"));
+                role.setStatus(rs.getString("status"));
 
                 list.add(role);
             }
@@ -283,7 +290,7 @@ public class RoleDAO extends DBContext {
         List<Role> list = new ArrayList<>();
 
         String sql = """
-             SELECT role_id, role_name, created_at, updated_at 
+             SELECT role_id, role_name, created_at, updated_at, status 
              FROM role 
              ORDER BY role_id 
              OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
@@ -304,6 +311,7 @@ public class RoleDAO extends DBContext {
                 role.setRoleName(rs.getString("role_name"));
                 role.setCreateAt(rs.getTimestamp("created_at"));
                 role.setUpdateAt(rs.getTimestamp("updated_at"));
+                role.setStatus(rs.getString("status"));
 
                 list.add(role);
             }

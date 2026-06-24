@@ -50,7 +50,7 @@
             .panel-head { padding:22px 24px; border-bottom:1px solid var(--line); background:linear-gradient(135deg,#fffaf3,#f0ece4); display:flex; justify-content:space-between; align-items:center; gap:16px; }
             .panel-head h2 { margin:0; font-size:22px; }
             .panel-body { padding:24px; }
-            .info-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:22px; }
+            .info-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; margin-bottom:22px; }
             .info-card { padding:16px; border-radius:18px; background:var(--surface-soft); border:1px solid rgba(221,213,201,.75); }
             .info-label { margin:0 0 7px; color:var(--muted); font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; }
             .info-value { margin:0; font-weight:900; color:var(--text); }
@@ -93,6 +93,7 @@
                             <div class="info-card"><p class="info-label">Role Name</p><p class="info-value"><c:out value="${role.roleName}"/></p></div>
                             <div class="info-card"><p class="info-label">Created At</p><p class="info-value"><fmt:formatDate value="${role.createAt}" pattern="dd/MM/yyyy HH:mm"/></p></div>
                             <div class="info-card"><p class="info-label">Updated At</p><p class="info-value"><fmt:formatDate value="${role.updateAt}" pattern="dd/MM/yyyy HH:mm"/></p></div>
+                            <div class="info-card"><p class="info-label">Status</p><p class="info-value" style="color: ${role.status == 'Active' || empty role.status ? 'var(--primary)' : 'var(--danger)'};"><c:out value="${empty role.status ? 'Active' : role.status}"/></p></div>
                         </div>
                         <div class="panel-head" style="border:1px solid var(--line); border-radius:20px; margin-bottom:16px;"><h2>Permissions</h2><span class="button"><span class="material-symbols-outlined">key</span><c:out value="${empty role.permissions ? 0 : role.permissions.size()}"/> enabled</span></div>
                         <c:choose>

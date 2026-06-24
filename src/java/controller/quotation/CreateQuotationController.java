@@ -86,16 +86,26 @@ public class CreateQuotationController extends HttpServlet {
             // Tao danh sach detail de luu nhieu dong quotation_detail.
             List<QuotationDetail> details = new ArrayList<>();
 
+            dal.ProductDAO productDAO = new dal.ProductDAO();
             for (int i = 0; i < productIds.length; i++) {
                 // Bo qua dong san pham bi rong.
                 if (productIds[i] == null || productIds[i].trim().isEmpty()) {
                     continue;
                 }
 
+                int productId = Integer.parseInt(productIds[i]);
+                Product prod = productDAO.getProductById(productId);
+                if (prod == null) {
+                    continue;
+                }
+
                 QuotationDetail detail = new QuotationDetail();
-                detail.setProductId(Integer.parseInt(productIds[i]));
+                detail.setProductId(productId);
+                detail.setProductName(prod.getProductName());
+                detail.setUnit(prod.getUnit());
+                detail.setCostPrice(BigDecimal.valueOf(prod.getCostPrice()));
+                detail.setSellingPrice(BigDecimal.valueOf(prod.getSellingPrice()));
                 detail.setQuantity(Integer.parseInt(quantities[i]));
-                detail.setSellingPrice(new BigDecimal(sellingPrices[i]));
                 detail.setDiscountPercent(new BigDecimal(discountPercents[i]));
                 detail.setTaxPercent(new BigDecimal(taxPercents[i]));
 

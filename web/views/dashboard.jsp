@@ -179,7 +179,13 @@
         </div>
 
         <script>
-            // Dashboard scripts
+            // Hiển thị thông báo khi bị từ chối truy cập
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('error') === 'denied') {
+                alert('Bạn không có quyền truy cập vào chức năng này!');
+                // Xóa parameter trên URL để khi reload không hiển thị lại alert
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         </script>
     </body>
 </html>

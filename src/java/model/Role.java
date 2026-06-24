@@ -10,6 +10,7 @@ public class Role {
     private String roleName;
     private Timestamp createAt;
     private Timestamp updateAt;
+    private String status;
     
     private List<RolePermission> permissions = new ArrayList<>();
 
@@ -21,7 +22,14 @@ public class Role {
         this.roleName = roleName;
         this.createAt = createAt;
         this.updateAt = updateAt;
-        
+    }
+
+    public Role(int roleId, String roleName, Timestamp createAt, Timestamp updateAt, String status) {
+        this.roleId = roleId;
+        this.roleName = roleName;
+        this.createAt = createAt;
+        this.updateAt = updateAt;
+        this.status = status;
     }
 
     public int getRoleId() {
@@ -65,6 +73,12 @@ public class Role {
         this.permissions = permissions;
     }
 
-    
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
 
