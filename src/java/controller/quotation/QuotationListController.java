@@ -22,13 +22,51 @@ public class QuotationListController extends HttpServlet {
         }
                
         String status = request.getParameter("status");
+        String fromDate = request.getParameter("fromDate");
+        String toDate = request.getParameter("toDate");
         
         QuotationService quotationService = new QuotationService();
-        List<Quotation> quotationList = quotationService.searchQuotations(searchText, status);
+        List<Quotation> quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate);
+
+        // Pagination
+        int page = 1;
+        int pageSize = 10;
+        String pageParam = request.getParameter("page");
+
+        if (pageParam != null && !pageParam.isBlank()) {
+            try {
+                page = Integer.parseInt(pageParam);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        int totalQuotations = quotationList.size();
+        int totalPages = (int) Math.ceil((double) totalQuotations / pageSize);
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+        if (page > totalPages) {
+            page = totalPages;
+        }
+
+        int fromIndex = Math.min((page - 1) * pageSize, totalQuotations);
+        int toIndex = Math.min(fromIndex + pageSize, totalQuotations);
+        List<Quotation> pagedQuotationList = totalQuotations == 0 
+                ? java.util.Collections.emptyList() 
+                : quotationList.subList(fromIndex, toIndex);
        
         request.setAttribute("searchText", searchText);
         request.setAttribute("status", status);
-        request.setAttribute("quotationList", quotationList);
+        request.setAttribute("fromDate", fromDate);
+        request.setAttribute("toDate", toDate);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalQuotations", totalQuotations);
+        request.setAttribute("quotationList", pagedQuotationList);
         request.getRequestDispatcher("/views/quotation/list.jsp").forward(request, response);
     } 
 }

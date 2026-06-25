@@ -62,12 +62,25 @@
 
         <br><br>
 
-        <label>Quantity:</label>
-        <input type="number" name="quantity" min="1" value="1" required>
-
-        <label>Selling Price:</label>
-        <input type="number" id="addSellingPrice" name="sellingPrice" min="0" step="0.01" readonly>
-
+        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+            <div>
+                <label>Unit:</label>
+                <input type="text" id="addUnit" readonly style="width: 75px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
+            </div>
+            <div>
+                <label>Cost Price:</label>
+                <input type="number" id="addCostPrice" readonly style="width: 110px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
+            </div>
+            <div>
+                <label>Selling Price:</label>
+                <input type="number" id="addSellingPrice" readonly style="width: 110px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
+            </div>
+            <div>
+                <label>Quantity:</label>
+                <input type="number" name="quantity" min="1" value="1" required style="width: 70px; padding: 4px;">
+            </div>
+        </div>
+        <br>
         <button type="submit" name="action" value="addProduct" onclick="return validateAddProductForm()">Add Product</button>
     </form>
 
@@ -95,8 +108,10 @@
         <thead>
             <tr>
                 <th>Product</th>
-                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Cost Price</th>
                 <th>Selling Price</th>
+                <th>Quantity</th>
                 <th>Discount %</th>
                 <th>Tax %</th>
                 <th>Amount</th>
@@ -105,7 +120,7 @@
         </thead>
         <tbody>
             <c:if test="${empty details}">
-                <tr><td colspan="7" style="text-align: center;">No product details found.</td></tr>
+                <tr><td colspan="9" style="text-align: center;">No product details found.</td></tr>
             </c:if>
 
             <c:forEach items="${details}" var="detail">
@@ -116,10 +131,16 @@
                             <input type="hidden" name="productId" value="${detail.productId}">
                             <input type="hidden" name="productName" value="${detail.productName}">
                         </td>
-                        <td><input type="number" name="quantity" min="1" value="${detail.quantity}" required></td>
-                        <td><input type="number" name="sellingPrice" min="0" step="0.01" value="${detail.sellingPrice}" readonly></td>
-                        <td><input type="number" name="discountPercent" min="0" max="100" step="0.01" value="${detail.discountPercent}" required></td>
-                        <td><input type="number" name="taxPercent" min="0" max="100" step="0.01" value="${detail.taxPercent}" required></td>
+                        <td>
+                            ${detail.unit}
+                        </td>
+                        <td>
+                            <fmt:formatNumber value="${detail.costPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                        </td>
+                        <td><input type="number" name="sellingPrice" min="0" step="0.01" value="${detail.sellingPrice}" required style="width: 100px;"></td>
+                        <td><input type="number" name="quantity" min="1" value="${detail.quantity}" required style="width: 70px;"></td>
+                        <td><input type="number" name="discountPercent" min="0" max="100" step="0.01" value="${detail.discountPercent}" required style="width: 70px;"></td>
+                        <td><input type="number" name="taxPercent" min="0" max="100" step="0.01" value="${detail.taxPercent}" required style="width: 70px;"></td>
                         <td><fmt:formatNumber value="${detail.amount}" type="number" minFractionDigits="2" maxFractionDigits="2" /></td>
                         <td>
                             <input type="hidden" name="quotationId" value="${quotation.quotationId}">
@@ -184,7 +205,9 @@
                 {
                     id: '${product.productId}',
                     name: '${product.productName}',
-                    price: '${product.sellingPrice}'
+                    price: '${product.sellingPrice}',
+                    costPrice: '${product.costPrice}',
+                    unit: '${product.unit}'
                 }${status.last ? '' : ','}
             </c:forEach>
         ];
@@ -196,6 +219,9 @@
 
             document.getElementById('addProductId').value = '';
             document.getElementById('selectedProductName').textContent = '';
+            document.getElementById('addUnit').value = '';
+            document.getElementById('addCostPrice').value = '';
+            document.getElementById('addSellingPrice').value = '';
 
             if (keyword === '') {
                 box.style.display = 'none';
@@ -216,7 +242,7 @@
             let html = '';
             matchedProducts.forEach(function(product) {
                 html += '<div style="padding: 8px; cursor: pointer; border-bottom: 1px solid #eee;" '
-                    + 'onclick="selectProduct(\'' + product.id + '\', \'' + escapeSingleQuote(product.name) + '\', \'' + product.price + '\')">'
+                    + 'onclick="selectProduct(\'' + product.id + '\', \'' + escapeSingleQuote(product.name) + '\', \'' + product.price + '\', \'' + product.costPrice + '\', \'' + escapeSingleQuote(product.unit) + '\')">'
                     + product.name + ' - ' + product.price
                     + '</div>';
             });
@@ -226,11 +252,13 @@
         }
 
         // Chon 1 san pham tu goi y.
-        function selectProduct(productId, productName, productPrice) {
+        function selectProduct(productId, productName, productPrice, productCost, productUnit) {
             document.getElementById('addProductId').value = productId;
             document.getElementById('addProductSearch').value = productName;
             document.getElementById('selectedProductName').textContent = 'Selected: ' + productName;
             document.getElementById('addSellingPrice').value = productPrice;
+            document.getElementById('addCostPrice').value = productCost;
+            document.getElementById('addUnit').value = productUnit;
             document.getElementById('productSuggestions').style.display = 'none';
         }
 

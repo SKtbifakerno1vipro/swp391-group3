@@ -77,7 +77,7 @@ public class VNPAYIPN extends HttpServlet {
                         checkOrderId = true;
                         contractId = paymentDAO.getAnyContractId();
                     } else {
-                        List<Contract> contracts = contractDAO.searchContracts(vnp_TxnRef, null, null, null, 1, 1, 0, 0);
+                        List<Contract> contracts = null;
                         if (contracts != null && !contracts.isEmpty()) {
                             checkOrderId = true;
                             contractId = contracts.get(0).getContractId();

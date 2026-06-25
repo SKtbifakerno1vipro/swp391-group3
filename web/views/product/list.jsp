@@ -92,7 +92,7 @@
                     </div>
                     <div>
                         <h3>Product List</h3>
-                        <div><a href="${pageContext.request.contextPath}/create-product">Create Product</a></div>
+                        <div><a href="${pageContext.request.contextPath}/edit-product?action=create">Create Product</a></div>
                         <div>
                             <table border="1">
                                 <tr>
@@ -122,7 +122,7 @@
                                         <td>${p.categoryName}</td>
                                         <td>${p.productStatus}</td>
                                         <td>
-                                            <a href="${pageContext.request.contextPath}/edit-product?id=${p.productId}&action=detail">View</a> |
+                                            <a href="${pageContext.request.contextPath}/edit-product?id=${p.productId}&action=edit">Edit</a> |
                                             <form action="product-list" method="post" style="display: inline">
                                                 <input type="submit" value="Delete">
                                                 <input type="hidden" name="id" value="${p.productId}">
@@ -156,5 +156,11 @@
 
             </main>
         </div>
+        <script>
+            let error = "${errorProduct}";
+            if (error !== "") {
+                alert(error);
+            }
+        </script>
     </body>
 </html>

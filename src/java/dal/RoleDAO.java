@@ -2,16 +2,18 @@ package dal;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.Quotation;
 import model.Role;
 
 public class RoleDAO extends DBContext {
+
     public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {
-            String sql = "SELECT role_id, role_name, created_at, updated_at FROM role ORDER BY role_id";
+            String sql = "SELECT role_id, role_name, created_at, updated_at, status FROM role ORDER BY role_id";
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
@@ -20,6 +22,7 @@ public class RoleDAO extends DBContext {
                 role.setRoleName(rs.getString("role_name"));
                 role.setCreateAt(rs.getTimestamp("created_at"));
                 role.setUpdateAt(rs.getTimestamp("updated_at"));
+                role.setStatus(rs.getString("status"));
 
                 roles.add(role);
             }
@@ -63,6 +66,9 @@ public class RoleDAO extends DBContext {
                 model.Role role = new model.Role();
                 role.setRoleId(rs.getInt("role_id"));
                 role.setRoleName(rs.getString("role_name"));
+                role.setCreateAt(rs.getTimestamp("created_at"));
+                role.setUpdateAt(rs.getTimestamp("updated_at"));
+                role.setStatus(rs.getString("status"));
                 return role;
             }
         } catch (java.sql.SQLException e) {
@@ -84,13 +90,14 @@ public class RoleDAO extends DBContext {
         return false;
     }
 
+
     public model.Role getRoleDetail(int id) {
         model.Role role = null;
         //join 1: dung đe lay danh sach cac permission đuoc gan cho role.
         //join 2: dung đe lay ten permission tu bang permission.
         //dung left join đe ngay ca chua co quyen van lay ra đuoc
         String sql = """
-                     SELECT r.role_id, r.role_name, r.created_at, r.updated_at,p.permission_id, p.permission_name
+                     SELECT r.role_id, r.role_name, r.created_at, r.updated_at, r.status, p.permission_id, p.permission_name
                      FROM role r
                      LEFT JOIN role_permission rp ON r.role_id = rp.role_id
                      LEFT JOIN permission p ON rp.permission_id = p.permission_id
@@ -108,6 +115,7 @@ public class RoleDAO extends DBContext {
                     role.setRoleName(rs.getString("role_name"));
                     role.setCreateAt(rs.getTimestamp("created_at"));
                     role.setUpdateAt(rs.getTimestamp("updated_at"));
+                    role.setStatus(rs.getString("status"));
 
                 }
                 int permissionId = rs.getInt("permission_id");
@@ -143,30 +151,70 @@ public class RoleDAO extends DBContext {
         return list;
     }
 
-    public void updateRolePermissions(int roleId, java.util.List<Integer> permissionIds) {
+    public void updateRolePermissions(
+            int roleId,
+            List<Integer> permissionIds) {
+
         try {
-            //chua luu ngay vao dtb
+
             connection.setAutoCommit(false);
 
-            String sqlDelete = "DELETE FROM role_permission WHERE role_id = ?";
-            java.sql.PreparedStatement stDel = connection.prepareStatement(sqlDelete);
+            String sqlDelete
+                    = "DELETE FROM role_permission WHERE role_id = ?";
+
+            PreparedStatement stDel
+                    = connection.prepareStatement(sqlDelete);
+
             stDel.setInt(1, roleId);
+
             stDel.executeUpdate();
 
-            if (permissionIds != null && !permissionIds.isEmpty()) {
-                String sqlInsert = "INSERT INTO role_permission (role_id, permission_id) VALUES (?, ?)";
-                java.sql.PreparedStatement stIns = connection.prepareStatement(sqlInsert);
+            if (permissionIds != null
+                    && !permissionIds.isEmpty()) {
+
+                String sqlInsert
+                        = "INSERT INTO role_permission "
+                        + "(role_id, permission_id) "
+                        + "VALUES (?, ?)";
+
+                PreparedStatement stIns
+                        = connection.prepareStatement(sqlInsert);
+
                 for (Integer pId : permissionIds) {
+
                     stIns.setInt(1, roleId);
                     stIns.setInt(2, pId);
+
                     stIns.addBatch();
                 }
+
                 stIns.executeBatch();
             }
+
+            String sqlUpdateRole = "UPDATE role SET updated_at = GETDATE() WHERE role_id = ?";
+            PreparedStatement stUpd = connection.prepareStatement(sqlUpdateRole);
+            stUpd.setInt(1, roleId);
+            stUpd.executeUpdate();
+
             connection.commit();
-            connection.setAutoCommit(true);
-        } catch (java.sql.SQLException e) {
-            System.out.println("RoleDAO updateRolePermissions error: " + e.getMessage());
+
+        } catch (SQLException e) {
+
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            e.printStackTrace();
+
+        } finally {
+
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -206,7 +254,7 @@ public class RoleDAO extends DBContext {
 
     public List<Role> searchRole(String searchText) {
         List<Role> list = new ArrayList<>();
-        String sql = "SELECT role_id, role_name, created_at, updated_at FROM role "
+        String sql = "SELECT role_id, role_name, created_at, updated_at, status FROM role "
                 + "WHERE 1=1 "; // Có dấu cách ở cuối
 
         if (searchText != null && !searchText.trim().isEmpty()) {
@@ -228,6 +276,7 @@ public class RoleDAO extends DBContext {
                 role.setRoleName(rs.getString("role_name"));
                 role.setCreateAt(rs.getTimestamp("created_at"));
                 role.setUpdateAt(rs.getTimestamp("updated_at"));
+                role.setStatus(rs.getString("status"));
 
                 list.add(role);
             }
@@ -241,7 +290,7 @@ public class RoleDAO extends DBContext {
         List<Role> list = new ArrayList<>();
 
         String sql = """
-             SELECT role_id, role_name, created_at, updated_at 
+             SELECT role_id, role_name, created_at, updated_at, status 
              FROM role 
              ORDER BY role_id 
              OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
@@ -262,6 +311,7 @@ public class RoleDAO extends DBContext {
                 role.setRoleName(rs.getString("role_name"));
                 role.setCreateAt(rs.getTimestamp("created_at"));
                 role.setUpdateAt(rs.getTimestamp("updated_at"));
+                role.setStatus(rs.getString("status"));
 
                 list.add(role);
             }
@@ -271,14 +321,14 @@ public class RoleDAO extends DBContext {
 
         return list;
     }
-    
-    public int countRoles(){
-        String sql ="SELECT COUNT(*) FROM role";
+
+    public int countRoles() {
+        String sql = "SELECT COUNT(*) FROM role";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()){
+
+            if (rs.next()) {
                 return rs.getInt(1);
             }
         } catch (Exception e) {

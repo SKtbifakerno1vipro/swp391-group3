@@ -1,6 +1,6 @@
 package controller.role;
 
-import service.RoleService;
+import dal.RoleDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +14,7 @@ import model.Role;
 @WebServlet(name = "RoleListController", urlPatterns = {"/role-list"})
 public class RoleListController extends HttpServlet {
 
-    private final RoleService roleService = new RoleService();
+    private final RoleDAO roleDAO = new RoleDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -26,7 +26,12 @@ public class RoleListController extends HttpServlet {
             searchText = searchText.trim().replaceAll("\\s+", " ");
         }
 
-        List<Role> roles = roleService.searchRoles(searchText);
+        List<Role> roles;
+        if (searchText != null && !searchText.isBlank()) {
+            roles = roleDAO.searchRole(searchText);
+        } else {
+            roles = roleDAO.getAllRoles();
+        }
 
         int page = 1;
         int pageSize = 5;

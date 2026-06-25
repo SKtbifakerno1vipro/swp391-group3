@@ -299,8 +299,8 @@
     </div>
 
     <!-- Modal for showing full content -->
-    <div id="emailModal" class="modal">
-        <div class="modal-content">
+    <div id="emailModal" class="modal"> <!-- 100% man hinh -->
+        <div class="modal-content">     <!-- chiem 1 phan man hinh -->
             <span class="close-btn" onclick="closeModal()">&times;</span>
             <h3 style="font-family: 'Literata', Georgia, serif; margin-top: 0;">Email Content Details</h3>
             <hr style="border: 0; border-top: 1px solid var(--line); margin: 15px 0;">

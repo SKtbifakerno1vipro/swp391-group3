@@ -18,7 +18,11 @@
             a { color:inherit; text-decoration:none; }
             .material-symbols-outlined { font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; font-size:22px; line-height:1; letter-spacing:normal; text-transform:none; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; word-wrap:normal; direction:ltr; -webkit-font-feature-settings:'liga'; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24; width:1em; min-width:1em; overflow:hidden; }
             .role-shell { display:grid; grid-template-columns:260px minmax(0,1fr); min-height:100vh; }
-            .sidebar { position:sticky; top:0; height:100vh; padding:28px 18px; background:linear-gradient(180deg,#f7f2eb 0%,#f2ede5 100%); border-right:1px solid var(--line); display:flex; flex-direction:column; gap:28px; overflow:hidden; }
+            .sidebar { position:sticky; top:0; height:100vh; padding:28px 18px; background:linear-gradient(180deg,#f7f2eb 0%,#f2ede5 100%); border-right:1px solid var(--line); display:flex; flex-direction:column; gap:28px; overflow-y:auto; }
+            .sidebar::-webkit-scrollbar { width:6px; }
+            .sidebar::-webkit-scrollbar-track { background:transparent; }
+            .sidebar::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.08); border-radius:3px; }
+            .sidebar::-webkit-scrollbar-thumb:hover { background:rgba(0,0,0,0.16); }
             .sidebar::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at top left,rgba(142,207,158,.2),transparent 28%); pointer-events:none; }
             .brand,.nav-group,.sidebar-footer { position:relative; z-index:1; }
             .brand { display:flex; align-items:center; gap:12px; padding:0 8px; animation:sidebarFadeIn .5s ease-out; }
@@ -102,19 +106,29 @@
                     </div>
                     <div class="role-table-wrap">
                         <table>
-                            <thead><tr><th>Role ID</th><th>Role Name</th><th>Created At</th><th>Updated At</th><th>Actions</th></tr></thead>
-                            <tbody>
-                                <c:if test="${empty roleList}"><tr><td colspan="5"><div class="empty-state">No roles found.</div></td></tr></c:if>
-                                <c:forEach var="role" items="${roleList}">
-                                    <tr>
-                                        <td><span class="role-id">R-<c:out value="${role.roleId}"/></span></td>
-                                        <td><div class="role-name"><span class="role-badge"><span class="material-symbols-outlined">shield_person</span></span><strong><c:out value="${role.roleName}"/></strong></div></td>
-                                        <td class="date-muted"><fmt:formatDate value="${role.createAt}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                        <td class="date-muted"><fmt:formatDate value="${role.updateAt}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                        <td><div class="row-actions"><a class="chip primary" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">visibility</span>View</a><a class="chip" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Permissions</a></div></td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
+                             <thead><tr><th>Role ID</th><th>Role Name</th><th>Created At</th><th>Updated At</th><th>Status</th><th>Actions</th></tr></thead>
+                             <tbody>
+                                 <c:if test="${empty roleList}"><tr><td colspan="6"><div class="empty-state">No roles found.</div></td></tr></c:if>
+                                 <c:forEach var="role" items="${roleList}">
+                                     <tr>
+                                         <td><span class="role-id">R-<c:out value="${role.roleId}"/></span></td>
+                                         <td><div class="role-name"><span class="role-badge"><span class="material-symbols-outlined">shield_person</span></span><strong><c:out value="${role.roleName}"/></strong></div></td>
+                                         <td class="date-muted"><fmt:formatDate value="${role.createAt}" pattern="dd/MM/yyyy HH:mm"/></td>
+                                         <td class="date-muted"><fmt:formatDate value="${role.updateAt}" pattern="dd/MM/yyyy HH:mm"/></td>
+                                         <td>
+                                             <c:choose>
+                                                 <c:when test="${role.status == 'Active' || empty role.status}">
+                                                     <span class="chip primary">Active</span>
+                                                 </c:when>
+                                                 <c:otherwise>
+                                                     <span class="chip">Inactive</span>
+                                                 </c:otherwise>
+                                             </c:choose>
+                                         </td>
+                                         <td><div class="row-actions"><a class="chip primary" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">visibility</span>View</a><a class="chip" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Permissions</a></div></td>
+                                     </tr>
+                                 </c:forEach>
+                             </tbody>
                         </table>
                     </div>
                     <div class="pagination">

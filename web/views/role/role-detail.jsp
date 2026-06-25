@@ -18,7 +18,11 @@
             a { color:inherit; text-decoration:none; }
             .material-symbols-outlined { font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; font-size:22px; line-height:1; letter-spacing:normal; text-transform:none; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; word-wrap:normal; direction:ltr; -webkit-font-feature-settings:'liga'; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24; width:1em; min-width:1em; overflow:hidden; }
             .role-shell { display:grid; grid-template-columns:260px minmax(0,1fr); min-height:100vh; }
-            .sidebar { position:sticky; top:0; height:100vh; padding:28px 18px; background:linear-gradient(180deg,#f7f2eb 0%,#f2ede5 100%); border-right:1px solid var(--line); display:flex; flex-direction:column; gap:28px; overflow:hidden; }
+            .sidebar { position:sticky; top:0; height:100vh; padding:28px 18px; background:linear-gradient(180deg,#f7f2eb 0%,#f2ede5 100%); border-right:1px solid var(--line); display:flex; flex-direction:column; gap:28px; overflow-y:auto; }
+            .sidebar::-webkit-scrollbar { width:6px; }
+            .sidebar::-webkit-scrollbar-track { background:transparent; }
+            .sidebar::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.08); border-radius:3px; }
+            .sidebar::-webkit-scrollbar-thumb:hover { background:rgba(0,0,0,0.16); }
             .sidebar::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at top left,rgba(142,207,158,.2),transparent 28%); pointer-events:none; }
             .brand,.nav-group,.sidebar-footer { position:relative; z-index:1; }
             .brand { display:flex; align-items:center; gap:12px; padding:0 8px; }
@@ -46,7 +50,7 @@
             .panel-head { padding:22px 24px; border-bottom:1px solid var(--line); background:linear-gradient(135deg,#fffaf3,#f0ece4); display:flex; justify-content:space-between; align-items:center; gap:16px; }
             .panel-head h2 { margin:0; font-size:22px; }
             .panel-body { padding:24px; }
-            .info-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:22px; }
+            .info-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; margin-bottom:22px; }
             .info-card { padding:16px; border-radius:18px; background:var(--surface-soft); border:1px solid rgba(221,213,201,.75); }
             .info-label { margin:0 0 7px; color:var(--muted); font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; }
             .info-value { margin:0; font-weight:900; color:var(--text); }
@@ -89,6 +93,7 @@
                             <div class="info-card"><p class="info-label">Role Name</p><p class="info-value"><c:out value="${role.roleName}"/></p></div>
                             <div class="info-card"><p class="info-label">Created At</p><p class="info-value"><fmt:formatDate value="${role.createAt}" pattern="dd/MM/yyyy HH:mm"/></p></div>
                             <div class="info-card"><p class="info-label">Updated At</p><p class="info-value"><fmt:formatDate value="${role.updateAt}" pattern="dd/MM/yyyy HH:mm"/></p></div>
+                            <div class="info-card"><p class="info-label">Status</p><p class="info-value" style="color: ${role.status == 'Active' || empty role.status ? 'var(--primary)' : 'var(--danger)'};"><c:out value="${empty role.status ? 'Active' : role.status}"/></p></div>
                         </div>
                         <div class="panel-head" style="border:1px solid var(--line); border-radius:20px; margin-bottom:16px;"><h2>Permissions</h2><span class="button"><span class="material-symbols-outlined">key</span><c:out value="${empty role.permissions ? 0 : role.permissions.size()}"/> enabled</span></div>
                         <c:choose>

@@ -86,7 +86,28 @@ public class QuotationDetailController extends HttpServlet {
             }
 
             if ("addProduct".equals(action)) {
-                QuotationDetail detail = buildDetailFromRequest(request);
+                int productId = Integer.parseInt(request.getParameter("productId"));
+                dal.ProductDAO productDAO = new dal.ProductDAO();
+                Product prod = productDAO.getProductById(productId);
+
+                QuotationDetail detail = new QuotationDetail();
+                if (prod != null) {
+                    detail.setProductId(productId);
+                    detail.setProductName(prod.getProductName());
+                    detail.setUnit(prod.getUnit());
+                    detail.setCostPrice(BigDecimal.valueOf(prod.getCostPrice()));
+                    detail.setSellingPrice(BigDecimal.valueOf(prod.getSellingPrice()));
+                }
+
+                String qtyParam = request.getParameter("quantity");
+                detail.setQuantity(qtyParam != null && !qtyParam.isEmpty() ? Integer.parseInt(qtyParam) : 1);
+                
+                String discountParam = request.getParameter("discountPercent");
+                detail.setDiscountPercent(discountParam != null && !discountParam.isEmpty() ? new BigDecimal(discountParam) : BigDecimal.ZERO);
+                
+                String taxParam = request.getParameter("taxPercent");
+                detail.setTaxPercent(taxParam != null && !taxParam.isEmpty() ? new BigDecimal(taxParam) : BigDecimal.ZERO);
+                
                 detail.setQuotationId(quotationId);
 
                 boolean success = quotationService.addProductToQuotation(detail, userId);
