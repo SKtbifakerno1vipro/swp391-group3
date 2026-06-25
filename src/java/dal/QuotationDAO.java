@@ -239,12 +239,8 @@ public class QuotationDAO extends DBContext {
     public QuotationDetail getQuotationDetailByProduct(int quotationId, int productId) {
         String sql = "SELECT qd.quotation_detail_id, qd.quotation_id, qd.product_id, qd.quantity, "
                 + "qd.discount_percent, qd.tax_percent, "
-                + "COALESCE(qd.product_name, p.product_name) AS product_name, "
-                + "COALESCE(qd.unit, p.unit) AS unit, "
-                + "COALESCE(qd.cost_price, p.cost_price) AS cost_price, "
-                + "COALESCE(qd.selling_price, p.selling_price) AS selling_price "
+                + "qd.product_name, qd.unit, qd.cost_price, qd.selling_price "
                 + "FROM quotation_detail qd "
-                + "LEFT JOIN product p ON qd.product_id = p.product_id "
                 + "WHERE qd.quotation_id = ? AND qd.product_id = ?";
 
         try {
@@ -293,12 +289,11 @@ public class QuotationDAO extends DBContext {
                             qd.quantity, 
                             qd.discount_percent, 
                             qd.tax_percent, 
-                            COALESCE(qd.product_name, p.product_name) AS product_name,
-                            COALESCE(qd.unit, p.unit) AS unit,
-                            COALESCE(qd.cost_price, p.cost_price) AS cost_price,
-                            COALESCE(qd.selling_price, p.selling_price) AS selling_price
+                            qd.product_name,
+                            qd.unit,
+                            qd.cost_price,
+                            qd.selling_price
                      FROM quotation_detail qd
-                     LEFT JOIN product p ON qd.product_id = p.product_id 
                      WHERE qd.quotation_id = ?""";
 
         try {
