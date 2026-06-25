@@ -67,10 +67,12 @@
                 <label>Unit:</label>
                 <input type="text" id="addUnit" readonly style="width: 75px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
             </div>
-            <div>
-                <label>Cost Price:</label>
-                <input type="number" id="addCostPrice" readonly style="width: 110px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
-            </div>
+            <c:if test="${sessionScope.user.roleId != 3}">
+                <div>
+                    <label>Cost Price:</label>
+                    <input type="number" id="addCostPrice" readonly style="width: 110px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
+                </div>
+            </c:if>
             <div>
                 <label>Selling Price:</label>
                 <input type="number" id="addSellingPrice" readonly style="width: 110px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
@@ -109,7 +111,9 @@
             <tr>
                 <th>Product</th>
                 <th>Unit</th>
-                <th>Cost Price</th>
+                <c:if test="${sessionScope.user.roleId != 3}">
+                    <th>Cost Price</th>
+                </c:if>
                 <th>Selling Price</th>
                 <th>Quantity</th>
                 <th>Discount %</th>
@@ -120,7 +124,7 @@
         </thead>
         <tbody>
             <c:if test="${empty details}">
-                <tr><td colspan="9" style="text-align: center;">No product details found.</td></tr>
+                <tr><td colspan="${sessionScope.user.roleId != 3 ? 9 : 8}" style="text-align: center;">No product details found.</td></tr>
             </c:if>
 
             <c:forEach items="${details}" var="detail">
@@ -134,9 +138,11 @@
                         <td>
                             ${detail.unit}
                         </td>
-                        <td>
-                            <fmt:formatNumber value="${detail.costPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
-                        </td>
+                        <c:if test="${sessionScope.user.roleId != 3}">
+                            <td>
+                                <fmt:formatNumber value="${detail.costPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                            </td>
+                        </c:if>
                         <td><input type="number" name="sellingPrice" min="0" step="0.01" value="${detail.sellingPrice}" required style="width: 100px;"></td>
                         <td><input type="number" name="quantity" min="1" value="${detail.quantity}" required style="width: 70px;"></td>
                         <td><input type="number" name="discountPercent" min="0" max="100" step="0.01" value="${detail.discountPercent}" required style="width: 70px;"></td>
@@ -206,7 +212,7 @@
                     id: '${product.productId}',
                     name: '${product.productName}',
                     price: '${product.sellingPrice}',
-                    costPrice: '${product.costPrice}',
+                    costPrice: '${sessionScope.user.roleId != 3 ? product.costPrice : 0}',
                     unit: '${product.unit}'
                 }${status.last ? '' : ','}
             </c:forEach>
@@ -220,7 +226,8 @@
             document.getElementById('addProductId').value = '';
             document.getElementById('selectedProductName').textContent = '';
             document.getElementById('addUnit').value = '';
-            document.getElementById('addCostPrice').value = '';
+            const addCostPriceElem = document.getElementById('addCostPrice');
+            if (addCostPriceElem) addCostPriceElem.value = '';
             document.getElementById('addSellingPrice').value = '';
 
             if (keyword === '') {
@@ -257,7 +264,8 @@
             document.getElementById('addProductSearch').value = productName;
             document.getElementById('selectedProductName').textContent = 'Selected: ' + productName;
             document.getElementById('addSellingPrice').value = productPrice;
-            document.getElementById('addCostPrice').value = productCost;
+            const addCostPriceElem = document.getElementById('addCostPrice');
+            if (addCostPriceElem) addCostPriceElem.value = productCost;
             document.getElementById('addUnit').value = productUnit;
             document.getElementById('productSuggestions').style.display = 'none';
         }
