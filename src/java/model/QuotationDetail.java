@@ -8,10 +8,19 @@ public class QuotationDetail {
     private int quotationId;
     private int productId;
     private Integer quantity;
+    private BigDecimal costPrice;
     private BigDecimal sellingPrice;
     private BigDecimal discountPercent;
     private BigDecimal taxPercent;
     private String unit;
+
+    public BigDecimal getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(BigDecimal costPrice) {
+        this.costPrice = costPrice;
+    }
 
     public String getUnit() {
         return unit;

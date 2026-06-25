@@ -1,11 +1,11 @@
---IF DB_ID('SWP_Sales_Process') IS NULL
---BEGIN
---    CREATE DATABASE SWP_Sales_Process;
---END
---GO
+IF DB_ID('SWP_Sales_Process') IS NULL
+BEGIN
+    CREATE DATABASE SWP_Sales_Process;
+END
+GO
 
---USE SWP_Sales_Process;
---GO
+USE SWP_Sales_Process;
+GO
 
 --USE SWP_Sales_Process;
 --GO
@@ -34,7 +34,6 @@ GO
 CREATE TABLE permission (
     permission_id INT IDENTITY(1,1) PRIMARY KEY,
     permission_name NVARCHAR(100) NOT NULL,
-    url_pattern NVARCHAR(255) NULL,
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE()
 );
@@ -391,6 +390,38 @@ GO
 
 -- 6. PHAN QUYEN (PERMISSION)
 -- Permission seed is centralized below to match SecurityFilter url_pattern.
+INSERT INTO permission (permission_name)
+VALUES
+(N'View Dashboard'),
+(N'View User List'),
+(N'View User Detail'),
+(N'Create User'),
+(N'Edit User'),
+(N'View Role List'),
+(N'View Role Detail'),
+(N'Add Role'),
+(N'Edit Role Permissions'),
+(N'View Category List'),
+(N'Create Category'),
+(N'Edit Category'),
+(N'Delete Category'),
+(N'View Product List'),
+(N'Create Product'),
+(N'Edit Product'),
+(N'Delete Product'),
+(N'View Customer List'),
+(N'View Customer Detail'),
+(N'Create Customer'),
+(N'Edit Customer'),
+(N'View Quotation List'),
+(N'Create Quotation'),
+(N'View Quotation Detail'),
+(N'View Contract List'),
+(N'Save Contract'),
+(N'View Order List'),
+(N'View Order Detail'),
+(N'Issue Invoice');
+GO
 
 -- 7. QUY TRINH HOP DONG 01: KHACH HANG 01 (LAM TRON BO TOI THANH TOAN)
 -- Bao gia
@@ -499,56 +530,6 @@ INSERT INTO stock_transaction (product_id, transaction_type, quantity_in, quanti
 ((SELECT product_id FROM product WHERE product_name = N'Đường Biên Hòa'), 'INITIAL_STOCK', 1000, 0, GETDATE());
 GO
 
--- 10. DONG BO PERMISSION CHO SECURITY FILTER
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('permission') AND name = 'url_pattern')
-BEGIN
-    ALTER TABLE permission ADD url_pattern NVARCHAR(255) NULL;
-END
-GO
-
-DELETE FROM role_permission;
-DELETE FROM permission;
-DBCC CHECKIDENT ('permission', RESEED, 0);
-GO
-
-INSERT INTO permission (permission_name, url_pattern) VALUES
-('View Dashboard', '/dashboard'),
-('View User List', '/user-list'),
-('View User Detail', '/user-detail'),
-('Create User', '/create-user'),
-('Edit User', '/edit-user'),
-('View Role List', '/role-list'),
-('View Role Detail', '/role-detail'),
-('Add Role', '/add-role'),
-('Edit Role Permissions', '/edit-role-permissions'),
-('View Category List', '/category/list'),
-('Create Category', '/category/create'),
-('Edit Category', '/category/edit'),
-('Delete Category', '/category/delete'),
-('View Product List', '/product-list'),
-('Create Product', '/create-product'),
-('Edit Product', '/edit-product'),
-('Delete Product', '/product-delete'),
-('View Customer List', '/customer/list'),
-('View Customer Detail', '/customer/detail'),
-('Create Customer', '/customer/create'),
-('Edit Customer', '/customer/edit'),
-('View Quotation List', '/quotation-list'),
-('View Contract List', '/contract-list'),
-('Save Contract', '/contract-save'),
-('View Order List', '/customer-order-list'),
-('View Order Detail', '/customer-order-detail'),
-('Create Order', '/create-customer-order'),
-('Issue Invoice', '/invoice');
-GO
-INSERT INTO permission (permission_name, url_pattern)
-VALUES ('Create Quotation', '/quotation-create');
-
--- Admin/System Admin mac dinh co toan quyen de team vua dung DB la dang nhap dung duoc ngay.
-INSERT INTO role_permission (role_id, permission_id)
-SELECT (SELECT role_id FROM role WHERE role_name = N'System Admin'), permission_id
-FROM permission
-WHERE url_pattern = '/quotation-create';
 
 -- ==========================================================
 -- PHAN DU LIEU MOI TU MAIN
@@ -727,9 +708,71 @@ SET customer_type = 'LOYAL CUSTOMER'
 WHERE customer_type = 'B2B';
 GO
 
+-- ==========================================================
+-- GÁN QUYỀN MẶC ĐỊNH CHO CÁC ROLE BAN ĐẦU
+-- ==========================================================
+USE SWP_Sales_Process;
+GO
+select * from role_permission
+-- 1. System Admin (role_id = 1)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 1, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View User List', N'View User Detail', N'Create User', N'Edit User',
+    N'View Role List', N'View Role Detail', N'Add Role', N'Edit Role Permissions',
+    N'View Product List', N'Create Product', N'Edit Product', N'Delete Product',
+    N'View Quotation List', N'Create Quotation', N'View Contract List', N'Save Contract',
+    N'View Order List', N'View Order Detail', N'Issue Invoice'
+);
+
+-- 2. Manager (role_id = 2)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 2, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View User List', N'View User Detail', N'View Role List', N'View Role Detail',
+    N'View Customer List', N'View Customer Detail', N'Create Customer', N'Edit Customer',
+    N'View Order List', N'View Order Detail', N'View Product List', N'View Category List',
+    N'View Quotation List', N'View Contract List', N'Issue Invoice'
+);
+
+-- 3. Customer (role_id = 3)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 3, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View Customer Detail', N'View Quotation List', N'View Contract List'
+);
+
+-- 4. Sale Staff (role_id = 4)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 4, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View Customer List', N'View Customer Detail', N'Create Customer', N'Edit Customer',
+    N'View Quotation List', N'Create Quotation', N'View Contract List',
+    N'View Order List', N'View Order Detail', N'View Product List', N'View Category List'
+);
+
+-- 5. Admin Officer (role_id = 5)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 5, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View Contract List', N'Save Contract',
+    N'View Order List', N'View Order Detail', N'Issue Invoice'
+);
+
+-- 6. Warehouse Staff (role_id = 6)
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 6, permission_id FROM permission WHERE permission_name IN (
+    N'View Dashboard', N'View Product List', N'Create Product', N'Edit Product', N'Delete Product',
+    N'View Category List', N'Create Category', N'Edit Category', N'Delete Category'
+);
+GO
+
 USE SWP_Sales_Process;
 GO
 
 SELECT user_id, user_name, password_hash, email, gender, date_of_birth, full_name
                 , address, phone, account_status, created_at, updated_at, role_id 
                 FROM [user] WHERE 1=2 or role_id = 4
+SELECT *
+FROM permission
+ORDER BY permission_id;
+
+--thêm permission (nếu cần)
+--INSERT INTO permission(permission_name)
+--VALUES
+--('View Dashboard')

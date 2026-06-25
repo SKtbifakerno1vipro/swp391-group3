@@ -13,6 +13,7 @@ import model.User;
 import model.Role;
 import model.RolePermission;
 import dal.RoleDAO;
+import dal.UserDAO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -21,6 +22,7 @@ import jakarta.servlet.http.HttpSession;
 public class SecurityFilter implements Filter {
 
     private final RoleDAO roleDAO = new RoleDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     private static final int ROLE_SYSTEM_ADMIN = 1;
     private static final int ROLE_MANAGER = 2;
@@ -161,56 +163,66 @@ public class SecurityFilter implements Filter {
             "/category/edit",
             "/category/delete"
     );
-//update security bo comment di 
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-//        HttpServletRequest req = (HttpServletRequest) request;
-//        HttpServletResponse res = (HttpServletResponse) response;
-//        String path = req.getServletPath();
-//
-//        if (isStaticResource(path)) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        HttpSession session = req.getSession(false);
-//        User user = (session != null) ? (User) session.getAttribute("user") : null;
-//
-//        if (user == null) {
-//            res.sendRedirect(req.getContextPath() + "/login");
-//            return;
-//        }
-//
-//        if (LOGGED_IN_URLS.contains(path)) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (path.startsWith("/views/")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (hasPermission(user.getRoleId(), path, req)) {
-//            chain.doFilter(request, response);
-//        } else {
-//            System.out.println("Access Denied: Role "
-//                    + user.getRoleId()
-//                    + " tried to access "
-//                    + path);
-//
-//            res.sendRedirect(req.getContextPath()
-//                    + "/dashboard?error=denied");
-//        }
-        chain.doFilter(request, response);
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        String path = req.getServletPath();
+
+        if (isStaticResource(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        // Check if user has been banned/deactivated (INACTIVE status)
+        User dbUser = userDAO.getUserById(user.getUserId());
+        if (dbUser == null || "INACTIVE".equalsIgnoreCase(dbUser.getStatus())) {
+            if (session != null) {
+                session.invalidate();
+            }
+            res.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        if (LOGGED_IN_URLS.contains(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (path.startsWith("/views/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (hasPermission(user.getRoleId(), path, req)) {
+            chain.doFilter(request, response);
+            return;
+        } else {
+            System.out.println("Access Denied: Role "
+                    + user.getRoleId()
+                    + " tried to access "
+                    + path);
+
+            res.sendRedirect(req.getContextPath()
+                    + "/dashboard?error=denied");
+            return;
+        }
     }
 
     private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
@@ -318,7 +330,7 @@ public class SecurityFilter implements Filter {
             case "/quotation-create":
                 return "Create Quotation";
             case "/quotation-detail":
-                return "View Quotation List";
+                return "View Quotation Detail";
             case "/contract-list":
                 return "View Contract List";
             case "/contract-detail":

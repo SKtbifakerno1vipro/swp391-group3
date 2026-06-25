@@ -52,6 +52,8 @@
                     <input type="hidden" id="selectedProductId">
                     <input type="hidden" id="selectedProductName">
                     <input type="hidden" id="selectedProductPrice">
+                    <input type="hidden" id="selectedProductCostPrice">
+                    <input type="hidden" id="selectedProductUnit">
 
                     <button type="button" onclick="addSelectedProduct()">Add</button>
                     <span id="selectedProductText" style="font-weight: bold; color: green;"></span>
@@ -80,8 +82,10 @@
                     <thead>
                         <tr>
                             <th>Product</th>
-                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Cost Price</th>
                             <th>Selling Price</th>
+                            <th>Quantity</th>
                             <th>Discount %</th>
                             <th>Tax %</th>
                             <th>Line Total</th>
@@ -93,7 +97,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="5" style="text-align: right;">Grand Total:</th>
+                            <th colspan="7" style="text-align: right;">Grand Total:</th>
                             <th id="grandTotal">0</th>
                             <th></th>
                         </tr>
@@ -113,7 +117,9 @@
                         {
                             id: '${product.productId}',
                             name: '${product.productName}',
-                            price: '${product.sellingPrice}'
+                            price: '${product.sellingPrice}',
+                            costPrice: '${product.costPrice}',
+                            unit: '${product.unit}'
                         }${status.last ? '' : ','}
                     </c:forEach>
                 ];
@@ -126,6 +132,8 @@
                     document.getElementById('selectedProductId').value = '';
                     document.getElementById('selectedProductName').value = '';
                     document.getElementById('selectedProductPrice').value = '';
+                    document.getElementById('selectedProductCostPrice').value = '';
+                    document.getElementById('selectedProductUnit').value = '';
                     document.getElementById('selectedProductText').textContent = '';
 
                     if (keyword === '') {
@@ -158,16 +166,18 @@
                     suggestionItems.forEach(function(item, index) {
                         item.onclick = function() {
                             const product = matchedProducts[index];
-                            selectCreateProduct(product.id, product.name, product.price);
+                            selectCreateProduct(product.id, product.name, product.price, product.costPrice, product.unit);
                         };
                     });
                 }
 
                 // Chon 1 san pham tu goi y.
-                function selectCreateProduct(productId, productName, productPrice) {
+                function selectCreateProduct(productId, productName, productPrice, productCostPrice, productUnit) {
                     document.getElementById('selectedProductId').value = productId;
                     document.getElementById('selectedProductName').value = productName;
                     document.getElementById('selectedProductPrice').value = productPrice;
+                    document.getElementById('selectedProductCostPrice').value = productCostPrice;
+                    document.getElementById('selectedProductUnit').value = productUnit;
                     document.getElementById('productSearch').value = productName;
                     document.getElementById('selectedProductText').textContent = 'Selected: ' + productName;
                     document.getElementById('createProductSuggestions').style.display = 'none';
@@ -178,6 +188,8 @@
                     const productId = document.getElementById('selectedProductId').value;
                     const productName = document.getElementById('selectedProductName').value;
                     const sellingPrice = document.getElementById('selectedProductPrice').value;
+                    const costPrice = document.getElementById('selectedProductCostPrice').value;
+                    const unit = document.getElementById('selectedProductUnit').value;
 
                     if (!productId) {
                         alert('Please select a product from suggestions first.');
@@ -198,6 +210,8 @@
                             document.getElementById('selectedProductId').value = '';
                             document.getElementById('selectedProductName').value = '';
                             document.getElementById('selectedProductPrice').value = '';
+                            document.getElementById('selectedProductCostPrice').value = '';
+                            document.getElementById('selectedProductUnit').value = '';
                             document.getElementById('selectedProductText').textContent = '';
 
                             calculateTotals();
@@ -212,8 +226,10 @@
                         + productName
                         + '<input type="hidden" name="productId" value="' + productId + '">'
                         + '</td>'
+                        + '<td><input type="text" name="unit" value="' + unit + '" readonly style="width: 70px;"></td>'
+                        + '<td><input type="number" name="costPrice" min="0" step="0.01" value="' + costPrice + '" readonly></td>'
+                        + '<td><input type="number" name="sellingPrice" min="0" step="0.01" value="' + sellingPrice + '" readonly></td>'
                         + '<td><input type="number" name="quantity" min="1" value="1" required oninput="calculateTotals()"></td>'
-                        + '<td><input type="number" name="sellingPrice" min="0" step="0.01" value="' + sellingPrice + '" readonly oninput="calculateTotals()"></td>'
                         + '<td><input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required oninput="calculateTotals()"></td>'
                         + '<td><input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required oninput="calculateTotals()"></td>'
                         + '<td class="lineTotal">0</td>'
@@ -225,6 +241,8 @@
                     document.getElementById('selectedProductId').value = '';
                     document.getElementById('selectedProductName').value = '';
                     document.getElementById('selectedProductPrice').value = '';
+                    document.getElementById('selectedProductCostPrice').value = '';
+                    document.getElementById('selectedProductUnit').value = '';
                     document.getElementById('selectedProductText').textContent = '';
 
                     calculateTotals();

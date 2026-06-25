@@ -106,19 +106,29 @@
                     </div>
                     <div class="role-table-wrap">
                         <table>
-                            <thead><tr><th>Role ID</th><th>Role Name</th><th>Created At</th><th>Updated At</th><th>Actions</th></tr></thead>
-                            <tbody>
-                                <c:if test="${empty roleList}"><tr><td colspan="5"><div class="empty-state">No roles found.</div></td></tr></c:if>
-                                <c:forEach var="role" items="${roleList}">
-                                    <tr>
-                                        <td><span class="role-id">R-<c:out value="${role.roleId}"/></span></td>
-                                        <td><div class="role-name"><span class="role-badge"><span class="material-symbols-outlined">shield_person</span></span><strong><c:out value="${role.roleName}"/></strong></div></td>
-                                        <td class="date-muted"><fmt:formatDate value="${role.createAt}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                        <td class="date-muted"><fmt:formatDate value="${role.updateAt}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                        <td><div class="row-actions"><a class="chip primary" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">visibility</span>View</a><a class="chip" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Permissions</a></div></td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
+                             <thead><tr><th>Role ID</th><th>Role Name</th><th>Created At</th><th>Updated At</th><th>Status</th><th>Actions</th></tr></thead>
+                             <tbody>
+                                 <c:if test="${empty roleList}"><tr><td colspan="6"><div class="empty-state">No roles found.</div></td></tr></c:if>
+                                 <c:forEach var="role" items="${roleList}">
+                                     <tr>
+                                         <td><span class="role-id">R-<c:out value="${role.roleId}"/></span></td>
+                                         <td><div class="role-name"><span class="role-badge"><span class="material-symbols-outlined">shield_person</span></span><strong><c:out value="${role.roleName}"/></strong></div></td>
+                                         <td class="date-muted"><fmt:formatDate value="${role.createAt}" pattern="dd/MM/yyyy HH:mm"/></td>
+                                         <td class="date-muted"><fmt:formatDate value="${role.updateAt}" pattern="dd/MM/yyyy HH:mm"/></td>
+                                         <td>
+                                             <c:choose>
+                                                 <c:when test="${role.status == 'Active' || empty role.status}">
+                                                     <span class="chip primary">Active</span>
+                                                 </c:when>
+                                                 <c:otherwise>
+                                                     <span class="chip">Inactive</span>
+                                                 </c:otherwise>
+                                             </c:choose>
+                                         </td>
+                                         <td><div class="row-actions"><a class="chip primary" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">visibility</span>View</a><a class="chip" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Permissions</a></div></td>
+                                     </tr>
+                                 </c:forEach>
+                             </tbody>
                         </table>
                     </div>
                     <div class="pagination">
