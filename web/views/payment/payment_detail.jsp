@@ -206,7 +206,7 @@
                     </div>
 
                     <div class="receipt-footer">
-                        <a href="${pageContext.request.contextPath}/payment-list" class="btn-back">
+                        <a href="${pageContext.request.contextPath}/payment/list" class="btn-back">
                             <span class="material-symbols-outlined">arrow_back</span>
                             Back to Payment Log
                         </a>

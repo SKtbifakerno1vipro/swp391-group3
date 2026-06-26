@@ -9,8 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.User;
 
-@WebServlet(name = "PaymentTestController", urlPatterns = {"/payment-test"})
-public class PaymentTestController extends HttpServlet {
+@WebServlet(name = "CreatePaymentController", urlPatterns = {"/payment/create"})
+public class CreatePaymentController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -22,6 +22,6 @@ public class PaymentTestController extends HttpServlet {
             return;
         }
 
-        request.getRequestDispatcher("views/payment/payment_test.jsp").forward(request, response);
+        request.getRequestDispatcher("views/payment/create_payment.jsp").forward(request, response);
     }
 }

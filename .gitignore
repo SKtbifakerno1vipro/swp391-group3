@@ -53,4 +53,5 @@ resources/
 .idea
 .smarttomcat
 *.iml
-/out/
+out/
+.smarttomcat/

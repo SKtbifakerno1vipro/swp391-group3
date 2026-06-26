@@ -11,6 +11,7 @@ public class PaymentConfig {
     public static String vnp_PayUrl;
     public static String vnp_TmnCode; 
     public static String vnp_HashSecret; 
+    public static boolean isValidConfig = true;
 
     static {
         Properties props = new Properties();
@@ -34,22 +35,30 @@ public class PaymentConfig {
                     vnp_TmnCode = props.getProperty("vnp_TmnCode");
                     vnp_HashSecret = props.getProperty("vnp_HashSecret");
                 } else {
-                    System.out.println("[ERROR] PaymentConfig.properties file not found! Using defaults.");
-                    useDefaults();
+                    System.out.println("[ERROR] PaymentConfig.properties file not found!");
                 }
             } catch (Exception e) {
                 System.out.println("[ERROR] Failed to load PaymentConfig.properties: " + e.getMessage());
-                useDefaults();
+            }
+        }
+        // Kiểm tra tính hợp lệ của tham số cấu hình
+        if (vnp_PayUrl == null || vnp_PayUrl.trim().isEmpty() ||
+            vnp_TmnCode == null || vnp_TmnCode.trim().isEmpty() ||
+            vnp_HashSecret == null || vnp_HashSecret.trim().isEmpty()) {
+            
+            isValidConfig = false;
+            System.err.println("[ERROR] PaymentConfig is invalid! Payment service is temporarily misconfigured.");
+            if (vnp_PayUrl == null || vnp_PayUrl.trim().isEmpty()) {
+                System.err.println("[ERROR] Missing parameter: vnp_PayUrl");
+            }
+            if (vnp_TmnCode == null || vnp_TmnCode.trim().isEmpty()) {
+                System.err.println("[ERROR] Missing parameter: vnp_TmnCode");
+            }
+            if (vnp_HashSecret == null || vnp_HashSecret.trim().isEmpty()) {
+                System.err.println("[ERROR] Missing parameter: vnp_HashSecret");
             }
         }
     }
-
-    private static void useDefaults() {
-        vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        vnp_TmnCode = "2QXUIOJ7";
-        vnp_HashSecret = "DBCOHGBWREOQPYQEXUYWJWYGZHXIZWIZ";
-    }
-
     public static String hmacSHA512(final String key, final String data) {
         try {
             if (key == null || data == null) {

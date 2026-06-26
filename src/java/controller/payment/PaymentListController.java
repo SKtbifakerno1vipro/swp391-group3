@@ -13,7 +13,7 @@ import model.Payment;
 import model.User;
 import dal.PaymentDAO;
 
-@WebServlet(name = "PaymentListController", urlPatterns = {"/payment-list"})
+@WebServlet(name = "PaymentListController", urlPatterns = {"/payment/list"})
 public class PaymentListController extends HttpServlet {
 
     private final PaymentDAO paymentDAO = new PaymentDAO();

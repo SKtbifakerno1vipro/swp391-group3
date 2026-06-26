@@ -37,8 +37,8 @@ public class SecurityFilter implements Filter {
             "/register",
             "/auth/forgot",
             "/user/password/change",
-            "/payment-ipn",
-            "/payment-return"
+            "/payment/ipn",
+            "/payment/return"
     );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
@@ -73,9 +73,9 @@ public class SecurityFilter implements Filter {
             "/invoice",
             "/revenue-report",
             "/payment",
-            "/payment-test",
-            "/payment-list",
-            "/payment-detail",
+            "/payment/create",
+            "/payment/list",
+            "/payment/detail",
             "/admin/audit-logs"
     );
 
@@ -103,9 +103,9 @@ public class SecurityFilter implements Filter {
             "/revenue-report",
             "/Signature",
             "/payment",
-            "/payment-test",
-            "/payment-list",
-            "/payment-detail"
+            "/payment/create",
+            "/payment/list",
+            "/payment/detail"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
@@ -114,9 +114,9 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/customer/detail",
             "/payment",
-            "/payment-test",
-            "/payment-list",
-            "/payment-detail"
+            "/payment/create",
+            "/payment/list",
+            "/payment/detail"
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(
@@ -148,8 +148,8 @@ public class SecurityFilter implements Filter {
             //"/Invoice",
             "/invoice",
             "/payment",
-            "/payment-list",
-            "/payment-detail"
+            "/payment/list",
+            "/payment/detail"
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(

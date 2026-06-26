@@ -4,7 +4,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Quên Mật Khẩu - Terra Enterprise</title>
+    <title>Forgot Password - Terra Enterprise</title>
     <style>
         .form-container {
             max-width: 450px;
@@ -112,20 +112,20 @@
 
 <body style="min-height: 100vh; background-color: var(--bg); display: flex; align-items: center; justify-content: center; padding: 20px; font-family: 'Nunito Sans', sans-serif; margin: 0;">
     <div class="form-container" style="background: var(--surface); border: 1px solid rgba(221, 213, 201, 0.85); border-radius: 22px; box-shadow: var(--shadow); padding: 30px; width: 100%; max-width: 450px; margin: 0;">
-        <h2>Quên Mật Khẩu</h2>
+        <h2>Forgot Password</h2>
 
-        <%-- Thông báo kết quả --%>
+        <%-- Result messages --%>
         <c:if test="${not empty success}">
             <div class="alert alert-success">
                 ${success}
                 <c:if test="${isForgetFlowSuccess}">
-                    <br><a href="${pageContext.request.contextPath}/login" style="color: #155724; font-weight: bold; text-decoration: underline;">Đăng nhập ngay</a>
+                    <br><a href="${pageContext.request.contextPath}/login" style="color: #155724; font-weight: bold; text-decoration: underline;">Log in now</a>
                 </c:if>
             </div>
         </c:if>
         <c:if test="${not empty error}">
             <div class="alert alert-danger">
-                <strong>Lỗi:</strong> ${error}
+                <strong>Error:</strong> ${error}
                 <c:if test="${not empty errorDetail}">
                     <br><small>${errorDetail}</small>
                 </c:if>
@@ -136,24 +136,24 @@
             <input type="hidden" name="isForgot" value="true">
 
             <div class="form-group">
-                <label for="username">Tên đăng nhập:</label>
+                <label for="username">Username:</label>
                 <input type="text" id="username" name="username" value="${username}" required>
             </div>
 
             <div class="form-group">
-                <label for="email">Email đăng ký:</label>
+                <label for="email">Registered Email:</label>
                 <div class="input-group">
                     <input type="email" id="email" name="email" value="${email}" required>
-                    <button type="button" id="btnSendOtp" name="action" onclick="sendOtpAjax()" class="btn-send">Gửi mã</button>
+                    <button type="button" id="btnSendOtp" name="action" onclick="sendOtpAjax()" class="btn-send">Send code</button>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="otpCode">Mã xác nhận (OTP):</label>
-                <input type="text" id="otpCode" name="otpCode" required placeholder="Nhập mã từ Email">
+                <label for="otpCode">Verification Code (OTP):</label>
+                <input type="text" id="otpCode" name="otpCode" required placeholder="Enter code from Email">
             </div>
 
-            <button type="submit" name="action" value="resetPassword" class="btn-submit">Gửi yêu cầu</button>
+            <button type="submit" name="action" value="resetPassword" class="btn-submit">Send request</button>
         </form>
     </div>
 </body>
@@ -166,12 +166,12 @@
         const btn = document.getElementById("btnSendOtp");
 
         if (!email || !username) {
-            alert("Vui lòng nhập đầy đủ Tên đăng nhập và Email trước khi nhận mã!");
+            alert("Please enter both Username and Email before requesting the code!");
             return;
         }
 
         btn.disabled = true;
-        btn.innerText = "Đang gửi...";
+        btn.innerText = "Sending...";
 
         const params = new URLSearchParams();
         params.append("action", "sendOtp");
@@ -189,19 +189,19 @@
         .then(response => response.text())
         .then(data => {
             btn.disabled = false;
-            btn.innerText = "Gửi mã";
+            btn.innerText = "Send code";
 
             if (data.trim() === "SUCCESS") {
-                alert("Mã xác nhận (OTP) đã được gửi tới Email của bạn!");
+                alert("Verification code (OTP) has been sent to your Email!");
             } else {
-                alert("Lỗi: " + data);
+                alert("Error: " + data);
             }
         })
         .catch(error => {
             btn.disabled = false;
-            btn.innerText = "Gửi mã";
-            console.error("Lỗi AJAX:", error);
-            alert("Đã xảy ra lỗi kết nối mạng!");
+            btn.innerText = "Send code";
+            console.error("AJAX Error:", error);
+            alert("A network connection error occurred!");
         });
     }
 </script>

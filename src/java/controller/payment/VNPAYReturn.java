@@ -26,7 +26,7 @@ import model.Contract;
 import dal.PaymentDAO;
 import dal.ContractDAO;
 
-@WebServlet(name = "VNPAYReturn", urlPatterns = {"/payment-return"})
+@WebServlet(name = "VNPAYReturn", urlPatterns = {"/payment/return"})
 public class VNPAYReturn extends HttpServlet {
 
     private final PaymentDAO paymentDAO = new PaymentDAO();
@@ -101,6 +101,6 @@ public class VNPAYReturn extends HttpServlet {
         }
 
         int paymentId = paymentDAO.insertPayment(payment);
-        resp.sendRedirect(req.getContextPath() + "/payment-detail?id=" + paymentId);
+        resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId);
     }
 }
