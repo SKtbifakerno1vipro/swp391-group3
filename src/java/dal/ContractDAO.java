@@ -46,7 +46,9 @@ public class ContractDAO extends DBContext {
         List<ContractCustomerDTO> list = new ArrayList<>();
         String sql = """
                     SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type,  c.created_at,
-                    cust.company_name, cust.user_id, cust.tax_code, u.email, u.phone  FROM customer_contract c 
+                    cust.company_name, cust.user_id, cust.tax_code, u.email, u.phone,
+                    (SELECT TOP 1 co.customer_order_id FROM customer_order co WHERE co.customer_contract_id = c.customer_contract_id) AS order_id
+                    FROM customer_contract c 
                     LEFT JOIN customer cust
                     ON c.customer_id = cust.customer_id
                     left join [user] u on cust.user_id= u.user_id
@@ -136,6 +138,7 @@ public class ContractDAO extends DBContext {
                 c.setTaxCode(rs.getString("tax_code"));
                 c.setPhone(rs.getString("phone"));
                 c.setEmail(rs.getString("email"));
+                c.setOrderId(rs.getInt("order_id"));
                 list.add(c);
             }
         } catch (Exception e) {

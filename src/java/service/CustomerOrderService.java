@@ -38,16 +38,16 @@ public class CustomerOrderService {
         return customerOrderDAO.getTotalOrders();
     }
 
-    public List<CustomerOrderDTO> getOrdersByPage(int page, int size) {
-        return customerOrderDAO.getOrdersWithPaging(page, size);
+    public List<CustomerOrderDTO> getOrdersByPage(int page, int size, String sortBy, String sortOrder) {
+        return customerOrderDAO.getOrdersWithPaging(page, size, sortBy, sortOrder);
     }
 
     public int getTotalSearchCount(String keyword) {
         return customerOrderDAO.getTotalOrdersBySearch(keyword);
     }
 
-    public List<CustomerOrderDTO> searchOrdersByPage(String kw, int p, int s) {
-        return customerOrderDAO.searchOrdersWithPaging(kw, p, s);
+    public List<CustomerOrderDTO> searchOrdersByPage(String kw, int p, int s, String sortBy, String sortOrder) {
+        return customerOrderDAO.searchOrdersWithPaging(kw, p, s, sortBy, sortOrder);
     }
     public boolean updateOrderStatus(int orderId, String status) {
         return customerOrderDAO.updateOrderStatus(orderId, status);
@@ -58,6 +58,10 @@ public class CustomerOrderService {
 
     public boolean deleteOrderDetail(int detailId) {
         return customerOrderDAO.deleteOrderDetail(detailId);
+    }
+    
+    public boolean deleteCustomerOrder(int orderId) {
+        return customerOrderDAO.deleteCustomerOrder(orderId);
     }
     
     // -xoa thi nho bao xhieu

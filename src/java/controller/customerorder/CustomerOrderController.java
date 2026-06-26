@@ -45,6 +45,21 @@ public class CustomerOrderController extends HttpServlet {
             return;
         }
 
+        String action = request.getParameter("action");
+        if ("delete_order".equals(action)) {
+            String idParam = request.getParameter("id");
+            if (idParam != null && !idParam.isBlank()) {
+                try {
+                    int orderId = Integer.parseInt(idParam);
+                    customerOrderService.deleteCustomerOrder(orderId);
+                    service.AuditLogService.log(currentUser.getUserId(), "DELETE", "Order", "Xóa đơn hàng ID: " + orderId);
+                } catch (NumberFormatException e) {
+                }
+            }
+            response.sendRedirect(request.getContextPath() + "/customer-order-list");
+            return;
+        }
+
         String idParam = request.getParameter("id");
         if (idParam != null && !idParam.isBlank()) {
             handleDetailView(request, response, idParam);
@@ -114,6 +129,18 @@ public class CustomerOrderController extends HttpServlet {
                 customerId = Integer.parseInt(customerIdParam);
             } catch (NumberFormatException e) {}
         }
+        
+        // Auto-detect customerId from contractId if missing
+        String contractIdParam = request.getParameter("contractId");
+        if (customerId == -1 && contractIdParam != null && !contractIdParam.isBlank()) {
+            try {
+                int contractIdForLookup = Integer.parseInt(contractIdParam);
+                Contract tempContract = contractDao.getContractById(contractIdForLookup);
+                if (tempContract != null) {
+                    customerId = tempContract.getCustomerId();
+                }
+            } catch (Exception e) {}
+        }
 
         try {
             // Product pagination logic
@@ -146,6 +173,24 @@ public class CustomerOrderController extends HttpServlet {
                 List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
                 request.setAttribute("customers", customers);
             }
+            
+            contractIdParam = request.getParameter("contractId");
+            if (contractIdParam == null || contractIdParam.isBlank()) {
+                contractIdParam = request.getParameter("customerContractId");
+            }
+            if (contractIdParam != null && !contractIdParam.isBlank()) {
+                try {
+                    int contractId = Integer.parseInt(contractIdParam);
+                    request.setAttribute("selectedContractId", contractId);
+                    Contract selectedContract = contractDao.getContractById(contractId);
+                    if (selectedContract != null) {
+                        request.setAttribute("selectedContract", selectedContract);
+                        dal.QuotationDAO quotationDao = new dal.QuotationDAO();
+                        List<model.QuotationDetail> quotationDetails = quotationDao.getQuotationDetailsByQuotationId(selectedContract.getQuotationId());
+                        request.setAttribute("quotationDetails", quotationDetails);
+                    }
+                } catch (Exception e) {}
+            }
 
             request.getRequestDispatcher("/views/customer-order/create.jsp").forward(request, response);
 
@@ -161,7 +206,7 @@ public class CustomerOrderController extends HttpServlet {
             throws IOException, ServletException {
         String customerIdStr = request.getParameter("customerId");
         String contractIdStr = request.getParameter("customerContractId");
-        String[] productIds = request.getParameterValues("productIds");
+        String[] qdIds = request.getParameterValues("quotationDetailIds");
 
         if (customerIdStr == null || customerIdStr.isBlank() || contractIdStr == null || contractIdStr.isBlank()) {
             request.setAttribute("error", "Customer and Contract are required.");
@@ -173,15 +218,20 @@ public class CustomerOrderController extends HttpServlet {
             int customerId = Integer.parseInt(customerIdStr);
             int contractId = Integer.parseInt(contractIdStr);
 
-            if (productIds == null || productIds.length == 0) {
+            if (qdIds == null || qdIds.length == 0) {
                 request.setAttribute("error", "Please select at least one product.");
                 handleCreateView(request, response);
                 return;
             }
 
-            List<Product> allProducts = productService.getAllProducts();
-            Map<Integer, Product> productMap = allProducts.stream()
-                    .collect(Collectors.toMap(Product::getProductId, p -> p));
+            dal.QuotationDAO quotationDao = new dal.QuotationDAO();
+            Contract selectedContract = contractDao.getContractById(contractId);
+            List<model.QuotationDetail> quotationDetails = new ArrayList<>();
+            if (selectedContract != null) {
+                quotationDetails = quotationDao.getQuotationDetailsByQuotationId(selectedContract.getQuotationId());
+            }
+            Map<Integer, model.QuotationDetail> qdMap = quotationDetails.stream()
+                    .collect(Collectors.toMap(model.QuotationDetail::getQuotationDetailId, qd -> qd));
 
             CustomerOrder order = new CustomerOrder();
             order.setCustomerId(customerId);
@@ -190,19 +240,20 @@ public class CustomerOrderController extends HttpServlet {
             order.setCreatedBy(currentUser.getUserId());
 
             List<CustomerOrderDetail> details = new ArrayList<>();
-            for (String pidStr : productIds) {
-                int pid = Integer.parseInt(pidStr);
-                String qtyStr = request.getParameter("qty_" + pid);
+            for (String qidStr : qdIds) {
+                int qid = Integer.parseInt(qidStr);
+                String qtyStr = request.getParameter("qty_" + qid);
                 if (qtyStr != null && !qtyStr.isBlank()) {
                     int quantity = Integer.parseInt(qtyStr);
                     if (quantity > 0) {
-                        Product p = productMap.get(pid);
-                        if (p != null) {
+                        model.QuotationDetail qd = qdMap.get(qid);
+                        if (qd != null) {
                             CustomerOrderDetail detail = new CustomerOrderDetail();
-                            detail.setProductId(pid);
+                            detail.setQuotationDetailId(qid);
+                            detail.setProductId(qd.getProductId());
                             detail.setQuantity(quantity);
-                            detail.setCostPrice(p.getCostPrice());
-                            detail.setSellingPrice(p.getSellingPrice());
+                            detail.setCostPrice(qd.getCostPrice().doubleValue());
+                            detail.setSellingPrice(qd.getSellingPrice().doubleValue());
                             details.add(detail);
                         }
                     }
@@ -219,7 +270,7 @@ public class CustomerOrderController extends HttpServlet {
                 service.AuditLogService.log(currentUser.getUserId(), "CREATE", "Order", "Tạo đơn hàng mới cho khách hàng ID: " + customerId + " (Số mặt hàng: " + details.size() + ")");
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
             } else {
-                request.setAttribute("error", "Failed to create order.");
+                request.setAttribute("error", "Failed to create order. " + dal.CustomerOrderDAO.lastError);
                 handleCreateView(request, response);
             }
         } catch (NumberFormatException e) {

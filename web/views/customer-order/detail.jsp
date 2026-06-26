@@ -53,38 +53,26 @@
                     <th>Product Name</th>
                     <th>Quantity</th>
                     <th>Unit Price</th>
-                    <th>Total</th>
-                    <th>Actions</th>
+                    <th>Tax (%)</th>
+                    <th>Total (incl. Tax)</th>
                 </tr>
             </thead>
             <tbody>
                 <c:set var="totalOrderAmount" value="0" />
                 <c:forEach var="item" items="${details}">
-                    <c:set var="itemTotal" value="${item.detail.quantity * item.detail.sellingPrice}" />
+                    <c:set var="subTotal" value="${item.detail.quantity * item.detail.sellingPrice}" />
+                    <c:set var="taxAmount" value="${subTotal * (item.detail.taxPercent / 100.0)}" />
+                    <c:set var="itemTotal" value="${subTotal + taxAmount}" />
                     <c:set var="totalOrderAmount" value="${totalOrderAmount + itemTotal}" />
                     <tr>
                         <td>${item.product.productId}</td>
                         <td>${item.product.productName}</td>
                         <td>
-                            <form action="${pageContext.request.contextPath}/customer-order" method="POST" style="display:inline;">
-                                <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
-                                <input type="hidden" name="detailId" value="${item.detail.customerOrderDetailId}">
-                                <input type="hidden" name="action" value="update_quantity">
-                                <input type="number" name="quantity" value="${item.detail.quantity}" min="1" style="width: 60px;">
-                                ${item.product.unit}
-                                <button type="submit">Update</button>
-                            </form>
+                            ${item.detail.quantity} ${item.product.unit}
                         </td>
                         <td><fmt:formatNumber value="${item.detail.sellingPrice}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                        <td><fmt:formatNumber value="${item.detail.taxPercent}" maxFractionDigits="2"/>%</td>
                         <td><fmt:formatNumber value="${itemTotal}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
-                        <td>
-                            <form action="${pageContext.request.contextPath}/customer-order" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                                <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
-                                <input type="hidden" name="detailId" value="${item.detail.customerOrderDetailId}">
-                                <input type="hidden" name="action" value="delete_item">
-                                <button type="submit" style="color: red;">Delete</button>
-                            </form>
-                        </td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty details}">
@@ -95,9 +83,8 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="4" style="text-align: right;">Grand Total:</th>
+                    <th colspan="5" style="text-align: right;">Grand Total:</th>
                     <th><fmt:formatNumber value="${totalOrderAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></th>
-                    <th></th>
                 </tr>
             </tfoot>
         </table>
