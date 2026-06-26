@@ -207,7 +207,6 @@ CREATE TABLE contract_edit_history (
     from_status VARCHAR(50),
     to_status VARCHAR(50),
 	edit_status varchar(50),
-	contract_version VARCHAR(50),
 	note nvarchar(max),
     changed_by INT,
     created_at DATETIME DEFAULT GETDATE(),
@@ -463,7 +462,7 @@ DECLARE @C1 INT = SCOPE_IDENTITY();
 INSERT INTO contract_edit_history (contract_id, from_status, to_status, changed_by) VALUES 
 (@C1, NULL, 'DRAFT', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
 (@C1, 'DRAFT', 'PENDING_REVIEW', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-(@C1, 'PENDING_REVIEW', 'INTERNAL_APPROVED', (SELECT user_id FROM [user] WHERE user_name = 'manager_01')),
+(@C1, 'PENDING_REVIEW', 'CUSTOMER_CHECK', (SELECT user_id FROM [user] WHERE user_name = 'manager_01')),
 (@C1, 'PENDING_REVIEW', 'CUSTOMER_CHECK', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
 (@C1, 'CUSTOMER_CHECK', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 
@@ -511,14 +510,14 @@ INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contr
     @Q2, 
     'HD-2026-002', 
     '/uploads/HD-002.pdf', 
-    'CUSTOMER_REQUESTED_REVISION', 
+    'CUSTOMER_CHECK', 
     (SELECT user_id FROM [user] WHERE user_name = 'officer_01')
 );
 DECLARE @C2 INT = SCOPE_IDENTITY();
 
 -- Ghi lich su yeu cau sua
-INSERT INTO contract_edit_history (contract_id, from_status, to_status, contract_version, changed_by) VALUES 
-(@C2, 'SENT_TO_CUSTOMER', 'CUSTOMER_REQUESTED_REVISION', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_02'));
+INSERT INTO contract_edit_history (contract_id, from_status, to_status, changed_by) VALUES 
+(@C2, 'PENDING_REVIEW', 'CUSTOMER_CHECK', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_02'));
 DECLARE @H2 INT = SCOPE_IDENTITY();
 INSERT INTO contract_revision_item (history_id, contract_id, revision_type, revision_detail) VALUES 
 (@H2, @C2, N'Địa chỉ', N'Đổi địa chỉ giao sang Kho số 2 quận Tân Bình'),
@@ -616,9 +615,9 @@ INSERT INTO quotation_detail (quotation_id, product_id, product_name, unit, quan
 
 -- 5. Them 3 hop dong mau (De he thong co du customer_contract_id tu 1 den 5)
 INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, created_by) VALUES 
-((SELECT customer_id FROM customer WHERE tax_code = '0390000003'), @Q3, 'HD-2026-003', '/uploads/HD-003.pdf', 'ACTIVE', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-((SELECT customer_id FROM customer WHERE tax_code = '0390000004'), @Q4, 'HD-2026-004', '/uploads/HD-004.pdf', 'ACTIVE', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-((SELECT customer_id FROM customer WHERE tax_code = '0390000005'), @Q5, 'HD-2026-005', '/uploads/HD-005.pdf', 'ACTIVE', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+((SELECT customer_id FROM customer WHERE tax_code = '0390000003'), @Q3, 'HD-2026-003', '/uploads/HD-003.pdf', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+((SELECT customer_id FROM customer WHERE tax_code = '0390000004'), @Q4, 'HD-2026-004', '/uploads/HD-004.pdf', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+((SELECT customer_id FROM customer WHERE tax_code = '0390000005'), @Q5, 'HD-2026-005', '/uploads/HD-005.pdf', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
 GO
 
 
@@ -656,10 +655,10 @@ BEGIN
     SELECT TOP 1 @RandomUserID = user_id FROM [user] WHERE role_id IN (SELECT role_id FROM role WHERE role_name IN (N'System Admin', N'Manager', N'Sale Staff', N'Admin Officer')) ORDER BY NEWID();
 
     -- 3. Gan trang thai ngau nhien
-    SET @Status = CASE WHEN @Loop % 4 = 0 THEN 'Completed'
-                       WHEN @Loop % 4 = 1 THEN 'Processing'
-                       WHEN @Loop % 4 = 2 THEN 'Pending'
-                       ELSE 'Cancelled' END;
+    SET @Status = CASE WHEN @Loop % 4 = 0 THEN 'COMPLETED'
+                       WHEN @Loop % 4 = 1 THEN 'SHIPPING'
+                       WHEN @Loop % 4 = 2 THEN 'PENDING'
+                       ELSE 'CANCELLED' END;
 
     -- 4. Chen vao bang customer_order
     INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by, created_at)
