@@ -49,7 +49,7 @@ public class PaymentDetailController extends HttpServlet {
             }
 
             request.setAttribute("payment", payment);
-            request.getRequestDispatcher("views/payment/payment_detail.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/payment/payment_detail.jsp").forward(request, response);
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/payment/list");
         }

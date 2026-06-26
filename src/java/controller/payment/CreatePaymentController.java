@@ -22,6 +22,6 @@ public class CreatePaymentController extends HttpServlet {
             return;
         }
 
-        request.getRequestDispatcher("views/payment/create_payment.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/payment/create_payment.jsp").forward(request, response);
     }
 }

@@ -85,7 +85,7 @@
                             ${param.error}
                         </div>
                     </c:if>
-                    <form action="payment" method="POST">
+                    <form action="${pageContext.request.contextPath}/payment" method="POST">
                         <h3>Thanh toán Hợp đồng</h3>
                         
                         <div class="info-group">

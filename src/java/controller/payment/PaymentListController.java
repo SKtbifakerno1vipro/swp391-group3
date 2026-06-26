@@ -38,6 +38,6 @@ public class PaymentListController extends HttpServlet {
         }
 
         request.setAttribute("list", list);
-        request.getRequestDispatcher("views/payment/payment_list.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/payment/payment_list.jsp").forward(request, response);
     }
 }
