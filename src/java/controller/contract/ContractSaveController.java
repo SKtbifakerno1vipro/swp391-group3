@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.nio.charset.StandardCharsets;
+import utils.EmailUtils;
 
 @WebServlet(urlPatterns = {"/contract-save"})
 public class ContractSaveController extends HttpServlet {
@@ -104,8 +105,6 @@ public class ContractSaveController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-
-
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         if (user == null) {
@@ -184,6 +183,7 @@ public class ContractSaveController extends HttpServlet {
         c.setCreatedBy(user.getUserId());
 
         int newId = contractService.insert(c);
+        EmailUtils.sendEmail("omovie111@gmail.com", "check1", "check2");
         if (newId > 0) {
             c.setContractId(newId);
             insertHistory(c, "DRAFT", "Contract created in DRAFT status.", user.getUserId());
