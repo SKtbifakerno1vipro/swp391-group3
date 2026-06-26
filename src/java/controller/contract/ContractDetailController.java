@@ -19,6 +19,7 @@ import service.CustomerService;
 import service.RoleService;
 import service.SignatureService;
 import service.UserService;
+import utils.EmailUtils;
 
 @WebServlet("/contract-detail")
 public class ContractDetailController extends HttpServlet {
@@ -176,7 +177,7 @@ public class ContractDetailController extends HttpServlet {
             }
             // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
-
+            contractService.noticeCustomerCheckContract(contractId, "http://localhost:9999/SWP391_GROUP3/");
             // Lưu lịch sử
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
