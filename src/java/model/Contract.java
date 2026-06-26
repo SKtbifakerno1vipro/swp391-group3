@@ -21,6 +21,16 @@ public class Contract {
     private LocalDateTime updatedAt;
     private String contractContent;
     private String storageType;
+    private String token;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+    
 
     public String getContractContent() {
         return contractContent;

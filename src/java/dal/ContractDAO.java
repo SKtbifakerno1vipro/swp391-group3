@@ -13,8 +13,8 @@ public class ContractDAO extends DBContext {
 
     // CREATE
     public int insert(Contract c) {
-        String sql = "INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_status, contract_content, storage_type, created_by, created_at, updated_at) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+        String sql = "INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_status, contract_content, storage_type, created_by, token, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, c.getCustomerId());
@@ -24,6 +24,7 @@ public class ContractDAO extends DBContext {
             ps.setString(5, c.getContractContent());
             ps.setString(6, c.getStorageType());
             ps.setInt(7, c.getCreatedBy());
+            ps.setString(8, c.getToken() != null ? c.getToken() : java.util.UUID.randomUUID().toString());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -247,6 +248,7 @@ public class ContractDAO extends DBContext {
                     c.setContractStatus(rs.getString("contract_status"));
                     c.setCreatedBy(rs.getInt("created_by"));
                     c.setUpdatedBy(rs.getInt("updated_by"));
+                    c.setToken(rs.getString("token"));
                     if (rs.getTimestamp("created_at") != null) {
                         c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     }
@@ -260,6 +262,29 @@ public class ContractDAO extends DBContext {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * created by vtpp that function validate token when user is guest
+     *
+     * @param contractId
+     * @param token
+     * @return
+     */
+    public boolean validateToken(int contractId, String token) {
+        String sql = "SELECT COUNT(*) FROM contract WHERE contract_id = ? AND token = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contractId);
+            ps.setString(2, token);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
     }
 
     public Contract getContractByQuotationId(int quotationId) {
@@ -578,4 +603,5 @@ public class ContractDAO extends DBContext {
         }
         return null;
     }
+
 }

@@ -19,25 +19,26 @@ import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import utils.EmailUtils;
 
 @WebServlet(urlPatterns = {"/contract-save"})
 public class ContractSaveController extends HttpServlet {
-
+    
     private final ContractService contractService = new ContractService();
     private final QuotationService quotationService = new QuotationService();
     private final CustomerService customerService = new CustomerService();
-
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         if (user == null) {
             response.sendRedirect("login");
             return;
         }
-
+        
         String contractIdRaw = request.getParameter("id");
         String quotationId = request.getParameter("quotationId");
 
@@ -45,12 +46,12 @@ public class ContractSaveController extends HttpServlet {
         if (contractIdRaw != null && !contractIdRaw.isEmpty()) {
             int contractId = Integer.parseInt(contractIdRaw);
             Contract contract = contractService.getContractById(contractId);
-
+            
             if (contract == null) {
                 response.sendRedirect("contract-list");
                 return;
             }
-
+            
             String status = contract.getContractStatus();
 
             // If contract status is customer_approve so can not edit
@@ -83,40 +84,40 @@ public class ContractSaveController extends HttpServlet {
             response.sendRedirect("contract-list");
         }
     }
-
+    
     private String generateContractHtml(Quotation quotation) throws IOException {
         CustomerDTO customer = customerService.getCustomerDTOById(quotation.getCustomerId());
         List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotation.getQuotationId());
-
+        
         Properties config = new Properties();
         try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/config.properties")) {
             if (is != null) {
                 config.load(is);
             }
         }
-
+        
         String templatePath = getServletContext().getRealPath("/views/contract/template.jsp");
         String template = new String(Files.readAllBytes(Paths.get(templatePath)), StandardCharsets.UTF_8);
-
+        
         return contractService.fillTemplate(quotation, customer, details, template, config);
     }
-
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         if (user == null) {
             response.sendRedirect("login");
             return;
         }
-
+        
         String contractIdStr = request.getParameter("contractId");
         String quotationIdStr = request.getParameter("quotationId");
         String contractContent = request.getParameter("contractContent");
         String action = request.getParameter("action");
-
+        
         if (contractContent == null || contractContent.trim().isEmpty()) {
             request.setAttribute("errorMsg", "Contract content cannot be empty!");
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
@@ -131,11 +132,11 @@ public class ContractSaveController extends HttpServlet {
                 response.sendRedirect("contract-list");
                 return;
             }
-
+            
             c.setContractContent(contractContent);
             c.setUpdatedBy(user.getUserId());
             boolean updatecontractSucessful = contractService.update(c);
-
+            
             if (updatecontractSucessful) {
                 if ("submit_for_review".equals(action)) {
                     // Guard: only DRAFT and PENDING_REVIEW can submit_for_review
@@ -161,7 +162,7 @@ public class ContractSaveController extends HttpServlet {
         // --- CREATE ---
         int quotationId = Integer.parseInt(quotationIdStr);
         int customerId = Integer.parseInt(request.getParameter("customerId"));
-
+        
         if (contractService.getContractByQuotationId(quotationId) != null) {
             request.setAttribute("errorMsg", "A contract for this quotation already exists!");
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
@@ -172,7 +173,7 @@ public class ContractSaveController extends HttpServlet {
         String year = LocalDate.now()
                 .format(DateTimeFormatter.ofPattern("yyyy"));
         String newContractNumber = String.format("%03d", quotationId) + "/" + year + "-HĐ";
-
+        
         Contract c = new Contract();
         c.setCustomerId(customerId);
         c.setQuotationId(quotationId);
@@ -181,7 +182,8 @@ public class ContractSaveController extends HttpServlet {
         c.setStorageType("TEXT");
         c.setContractContent(contractContent);
         c.setCreatedBy(user.getUserId());
-
+        String secureToken = UUID.randomUUID().toString();
+        c.setToken(secureToken);
         int newId = contractService.insert(c);
         EmailUtils.sendEmail("omovie111@gmail.com", "check1", "check2");
         if (newId > 0) {

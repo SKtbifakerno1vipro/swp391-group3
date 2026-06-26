@@ -176,6 +176,7 @@ CREATE TABLE customer_contract (
 
 	contract_content nvarchar(max),
     storage_type VARCHAR(10) NOT NULL DEFAULT 'TEXT',
+    token VARCHAR(255) UNIQUE,
 
     created_by INT,
 	updated_by INT,
