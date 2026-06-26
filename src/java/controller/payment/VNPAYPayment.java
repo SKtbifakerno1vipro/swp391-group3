@@ -26,7 +26,12 @@ public class VNPAYPayment extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (!PaymentConfig.isValidConfig) {
             String errorMsg = URLEncoder.encode("Payment service is temporarily misconfigured. Please contact support", StandardCharsets.UTF_8.toString());
-            resp.sendRedirect(req.getContextPath() + "/payment/create?error=" + errorMsg);
+            String orderId = req.getParameter("orderId");
+            if (orderId != null && !orderId.isEmpty()) {
+                resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + orderId + "&error=" + errorMsg);
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + errorMsg);
+            }
             return;
         }
 

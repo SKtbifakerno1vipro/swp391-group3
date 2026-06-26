@@ -10,12 +10,12 @@ import jakarta.servlet.http.HttpSession;
 
 import model.Payment;
 import model.User;
-import dal.PaymentDAO;
+import service.PaymentService;
 
 @WebServlet(name = "PaymentDetailController", urlPatterns = {"/payment/detail"})
 public class PaymentDetailController extends HttpServlet {
 
-    private final PaymentDAO paymentDAO = new PaymentDAO();
+    private final PaymentService paymentService = new PaymentService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -35,7 +35,7 @@ public class PaymentDetailController extends HttpServlet {
 
         try {
             int paymentId = Integer.parseInt(idStr);
-            Payment payment = paymentDAO.getPaymentById(paymentId);
+            Payment payment = paymentService.getPaymentById(paymentId);
 
             if (payment == null) {
                 response.sendRedirect(request.getContextPath() + "/payment/list");

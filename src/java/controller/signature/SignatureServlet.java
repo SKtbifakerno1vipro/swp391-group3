@@ -17,6 +17,7 @@ import java.util.List;
 import model.Contract;
 import model.Signature;
 import model.User;
+import service.PaymentService;
 import service.ContractService;
 import service.CustomerService;
 import service.RoleService;
@@ -35,6 +36,7 @@ public class SignatureServlet extends HttpServlet {
     private final RoleService rService = new RoleService();
     private final ContractService ctrService = new ContractService();
     private final UserService uService = new UserService();
+    private final PaymentService paymentService = new PaymentService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -202,6 +204,9 @@ public class SignatureServlet extends HttpServlet {
             }
             if (managerSigned && customerSigned) {
                 ctrService.updateStatus(contractId, "SIGNED");
+                
+                // Automatically create a PENDING payment record if it doesn't exist yet
+                paymentService.createPendingPaymentForContractIfNotExists(contractId);
             }
             response.sendRedirect("contract-detail?id=" + contractId);
 

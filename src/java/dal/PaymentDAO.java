@@ -160,4 +160,36 @@ public class PaymentDAO extends DBContext {
         }
         return 1; // absolute fallback
     }
+
+    public boolean updatePaymentStatus(int paymentId, String status) {
+        String sql = "UPDATE payment SET payment_status = ?, paid_at = ? WHERE payment_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            if ("COMPLETED".equals(status)) {
+                ps.setTimestamp(2, new java.sql.Timestamp(System.currentTimeMillis()));
+            } else {
+                ps.setNull(2, java.sql.Types.TIMESTAMP);
+            }
+            ps.setInt(3, paymentId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean hasPaymentForContract(int contractId) {
+        String sql = "SELECT COUNT(*) FROM payment WHERE customer_contract_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contractId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

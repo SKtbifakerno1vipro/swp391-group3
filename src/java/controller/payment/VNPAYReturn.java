@@ -23,13 +23,13 @@ import jakarta.servlet.http.HttpSession;
 import model.Payment;
 import model.User;
 import model.Contract;
-import dal.PaymentDAO;
+import service.PaymentService;
 import dal.ContractDAO;
 
 @WebServlet(name = "VNPAYReturn", urlPatterns = {"/payment/return"})
 public class VNPAYReturn extends HttpServlet {
 
-    private final PaymentDAO paymentDAO = new PaymentDAO();
+    private final PaymentService paymentService = new PaymentService();
     private final ContractDAO contractDAO = new ContractDAO();
 
     @Override
@@ -75,32 +75,29 @@ public class VNPAYReturn extends HttpServlet {
         long amountCents = Long.parseLong(vnp_Amount != null ? vnp_Amount : "0");
         BigDecimal amountPaid = BigDecimal.valueOf(amountCents / 100.0);
 
-        int contractId = -1;
-        if (vnp_TxnRef != null) {
-            List<Contract> contracts = null;
-            if (contracts != null && !contracts.isEmpty()) {
-                contractId = contracts.get(0).getContractId();
-            }
-        }
+        int paymentId = -1;
+        try {
+            paymentId = Integer.parseInt(vnp_TxnRef);
+        } catch (NumberFormatException ignored) {}
 
-        if (contractId == -1) {
-            contractId = paymentDAO.getAnyContractId();
-        }
+        String newStatus = (isSignValid && "00".equals(vnp_ResponseCode)) ? "COMPLETED" : "FAILED";
 
-        Payment payment = new Payment();
-        payment.setCustomerContractId(contractId);
-        payment.setAmount(amountPaid);
-        payment.setPaymentType("VNPAY");
-        payment.setPaidAt(LocalDateTime.now());
-        payment.setCreatedBy(user != null ? user.getUserId() : null);
-
-        if (isSignValid && "00".equals(vnp_ResponseCode)) {
-            payment.setPaymentStatus("COMPLETED");
+        if (paymentId > 0) {
+            // Update existing payment status
+            paymentService.updatePaymentStatus(paymentId, newStatus);
         } else {
-            payment.setPaymentStatus("FAILED");
+            // Fallback: insert new payment record
+            int contractId = paymentService.getAnyContractId();
+            Payment payment = new Payment();
+            payment.setCustomerContractId(contractId);
+            payment.setAmount(amountPaid);
+            payment.setPaymentType("VNPAY");
+            payment.setPaidAt("COMPLETED".equals(newStatus) ? LocalDateTime.now() : null);
+            payment.setPaymentStatus(newStatus);
+            payment.setCreatedBy(user != null ? user.getUserId() : null);
+            paymentId = paymentService.insertPayment(payment);
         }
 
-        int paymentId = paymentDAO.insertPayment(payment);
         resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId);
     }
 }
