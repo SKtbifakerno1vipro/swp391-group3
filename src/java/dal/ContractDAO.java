@@ -272,7 +272,7 @@ public class ContractDAO extends DBContext {
      * @return
      */
     public boolean validateToken(int contractId, String token) {
-        String sql = "SELECT COUNT(*) FROM contract WHERE contract_id = ? AND token = ?";
+        String sql = "SELECT COUNT(*) FROM customer_contract WHERE customer_contract_id = ? AND token = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
             ps.setString(2, token);
