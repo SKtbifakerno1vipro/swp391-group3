@@ -1,7 +1,5 @@
 package controller.dashboard;
 
-
-
 import dal.DashboardDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -18,6 +16,7 @@ import dto.*;
 
 @WebServlet(name = "DashboardController", urlPatterns = {"/dashboard"})
 public class DashboardController extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -65,6 +64,19 @@ public class DashboardController extends HttpServlet {
             request.getRequestDispatcher("/views/customer-dashboard.jsp").forward(request, response);
             return;
         }
+        if (user.getRoleId() == 5) { // ROLE IS ADMIN OFFICER
+            request.setAttribute("awaitingQuotations", dashboardDAO.countQuotationAwaitingContract());
+            request.setAttribute("contractsInProgress", dashboardDAO.countContractInProgress());
+            request.setAttribute("activeContracts", dashboardDAO.countActiveContracts());
+
+            request.setAttribute("contractStatusCounts",
+                    dashboardDAO.countByStatus("customer_contract", "contract_status"));
+            request.setAttribute("contractsNeedingAction", dashboardDAO.getContractNeedingAction(5));
+            System.out.println(dashboardDAO.getContractNeedingAction(5));
+            request.getRequestDispatcher("/views/dashboard/admin-officier-dashboard.jsp").forward(request, response);
+            return;
+        }
+
         service.DashboardService dashboardService = new service.DashboardService();
 
         Integer UserId = null;
@@ -79,13 +91,15 @@ public class DashboardController extends HttpServlet {
         request.setAttribute("totalContracts", dashboardDAO.count("customer_contract"));
         request.setAttribute("totalOrders", dashboardService.getTotalOrders());
         request.setAttribute("totalRevenue", dashboardService.getTotalRevenue(UserId));
-        
+
         request.setAttribute("quotationStatusCounts", dashboardDAO.countByStatus("quotation", "quotation_status"));
         request.setAttribute("contractStatusCounts", dashboardDAO.countByStatus("customer_contract", "contract_status"));
         request.setAttribute("orderStatusCounts", dashboardService.getOrderStatusStats());
-        
+
         request.setAttribute("recentContracts", dashboardDAO.getRecentContracts(5));
         request.setAttribute("recentOrders", dashboardDAO.getRecentOrders(5));
         request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
+
     }
+
 }
