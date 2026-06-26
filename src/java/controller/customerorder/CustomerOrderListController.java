@@ -21,6 +21,12 @@ public class CustomerOrderListController extends HttpServlet {
         String action = request.getParameter("search");
         String keyword = request.getParameter("keyword");
         String pageRaw = request.getParameter("page");
+        String sortBy = request.getParameter("sortBy");
+        String sortOrder = request.getParameter("sortOrder");
+
+        // Defaults
+        if (sortBy == null || sortBy.isEmpty()) sortBy = "orderId";
+        if (sortOrder == null || sortOrder.isEmpty()) sortOrder = "desc";
 
         int pageIndex = (pageRaw != null && !pageRaw.isEmpty()) ? Integer.parseInt(pageRaw) : 1;
         int pageSize = 10;
@@ -29,10 +35,10 @@ public class CustomerOrderListController extends HttpServlet {
 
         if ("search".equals(action) && keyword != null && !keyword.trim().isEmpty()) {
             keyword = keyword.trim();           
-            listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize);
+            listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize, sortBy, sortOrder);
             totalRecords = customerOrderService.getTotalSearchCount(keyword);
         } else {
-            listOrder = customerOrderService.getOrdersByPage(pageIndex, pageSize);
+            listOrder = customerOrderService.getOrdersByPage(pageIndex, pageSize, sortBy, sortOrder);
             totalRecords = customerOrderService.getTotalOrderCount();
         }
 
@@ -43,6 +49,8 @@ public class CustomerOrderListController extends HttpServlet {
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("keyword", keyword);
         request.setAttribute("action", action);
+        request.setAttribute("sortBy", sortBy);
+        request.setAttribute("sortOrder", sortOrder);
 
         request.getRequestDispatcher("/views/customer-order/list.jsp").forward(request, response);
     }

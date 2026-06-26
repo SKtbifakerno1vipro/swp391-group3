@@ -67,9 +67,9 @@ public class DashboardController extends HttpServlet {
         }
         service.DashboardService dashboardService = new service.DashboardService();
 
-        Integer filterUserId = null;
+        Integer UserId = null;
         if (user.getRoleId() == 4) {
-            filterUserId = user.getUserId();
+            UserId = user.getUserId();
         }
 
         request.setAttribute("user", user);
@@ -78,7 +78,7 @@ public class DashboardController extends HttpServlet {
         request.setAttribute("totalQuotations", dashboardDAO.count("quotation"));
         request.setAttribute("totalContracts", dashboardDAO.count("customer_contract"));
         request.setAttribute("totalOrders", dashboardService.getTotalOrders());
-        request.setAttribute("totalRevenue", dashboardService.getTotalRevenue(filterUserId));
+        request.setAttribute("totalRevenue", dashboardService.getTotalRevenue(UserId));
         
         request.setAttribute("quotationStatusCounts", dashboardDAO.countByStatus("quotation", "quotation_status"));
         request.setAttribute("contractStatusCounts", dashboardDAO.countByStatus("customer_contract", "contract_status"));

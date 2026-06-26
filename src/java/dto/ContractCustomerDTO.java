@@ -23,6 +23,16 @@ public class ContractCustomerDTO {
     public void setContractId(int contractId) {
         this.contractId = contractId;
     }
+    
+    private int orderId;
+
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
     private LocalDateTime createdAt;
 
     public String getEmail() {

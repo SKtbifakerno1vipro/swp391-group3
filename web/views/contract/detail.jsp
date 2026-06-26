@@ -133,74 +133,86 @@
         <div class="layout-container">
             <!-- COT 1: SIDEBAR -->
             <div class="sidebar">
-                <h3>Action For Contract</h3>
-                <p><strong>Status</strong> <span
-                        style="color: red; font-weight: bold;">${contract.contractStatus}</span></p>
-                <hr>
-
                 <c:choose>
-                    <%-- 1. Status: DRAFT / PENDING_REVIEW --%>
-                    <c:when test="${canRequestEdit}">
-
-                        <!-- Manager (Role 2) -->
-                        <c:if test="${sessionScope.user.roleId == 2}">
-                            <form method="POST" action="contract-detail" style="margin:0;">
-                                <input type="hidden" name="action" value="approve" />
-                                <input type="hidden" name="contractId" value="${contract.contractId}" />
-                                <button type="submit" class="btn btn-green">Approve</button>
-                            </form>
-                        </c:if>
-
-                        <!-- Admin Officer (Role 5) -->
-                        <c:if test="${sessionScope.user.roleId == 5}">
-                            <a href="contract-save?id=${contract.contractId}" class="btn btn-blue">Edit
-                                Contract</a>
-                            <form method="POST" action="contract-detail" style="margin:0;">
-                                <input type="hidden" name="action" value="send_to_manager" />
-                                <input type="hidden" name="contractId" value="${contract.contractId}" />
-                                <button type="submit" class="btn btn-gray">Send to Manager</button>
-                            </form>
-                        </c:if>
+                    <c:when test="${isGuest}">
+                        <h3>Action For Contract</h3>
+                        <p><strong>Status</strong> <span
+                                style="color: red; font-weight: bold;">${contract.contractStatus}</span></p>
+                        <hr>
+                        <p style="color: #666; font-size: 0.9em; line-height: 1.4;">You need to login for request edit</p>
+                        <a href="login?redirect=contract-detail?id=${contract.contractId}" class="btn btn-blue" style="margin-top: 10px;">Đăng Nhập</a>
                     </c:when>
+                    <c:otherwise>
+                        <h3>Action For Contract</h3>
+                        <p><strong>Status</strong> <span
+                                style="color: red; font-weight: bold;">${contract.contractStatus}</span></p>
+                        <hr>
 
-                    <%-- 2. TRANG THAI: CUSTOMER_CHECK --%>
-                    <c:when test="${canCustomerCheck}">
-                        <!-- Khach hang (Role 3) -->
-                        <c:if test="${sessionScope.user.roleId == 3}">
-                            <form method="POST" action="contract-detail" style="margin:0;">
-                                <input type="hidden" name="action" value="customer_approve" />
-                                <input type="hidden" name="contractId" value="${contract.contractId}" />
-                                <button type="submit" class="btn btn-green">Approve</button>
-                            </form>
+                        <c:choose>
+                            <%-- 1. Status: DRAFT / PENDING_REVIEW --%>
+                            <c:when test="${canRequestEdit}">
 
-                        </c:if>
-                    </c:when>
+                                <!-- Manager (Role 2) -->
+                                <c:if test="${sessionScope.user.roleId == 2}">
+                                    <form method="POST" action="contract-detail" style="margin:0;">
+                                        <input type="hidden" name="action" value="approve" />
+                                        <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                        <button type="submit" class="btn btn-green">Approve</button>
+                                    </form>
+                                </c:if>
 
-                    <%-- 3. TRANG THAI: APPROVED --%>
-                    <c:when test="${isApproved}">
-                        <p style="color: green; text-align: center; font-weight: bold;">Contract
-                            Approved</p>
-                            <c:if test="${sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
-                                <c:if test="${not signed}">
-                                <form action="Signature" method="get">
-                                    <input type="hidden" name="contractId"
-                                           value="${contract.contractId}">
-                                    <input type="hidden" name="signerId"
-                                           value="${sessionScope.user.userId}">
-                                    <input class="btn btn-blue" type="submit" value="Sign Contract" />
-                                    <hr>
-                                </form>
-                            </c:if>
-                        </c:if>
-                    </c:when>
-                    <%-- 4. TRANG THAI: SIGNED --%>
+                                <!-- Admin Officer (Role 5) -->
+                                <c:if test="${sessionScope.user.roleId == 5}">
+                                    <a href="contract-save?id=${contract.contractId}" class="btn btn-blue">Edit
+                                        Contract</a>
+                                    <form method="POST" action="contract-detail" style="margin:0;">
+                                        <input type="hidden" name="action" value="send_to_manager" />
+                                        <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                        <button type="submit" class="btn btn-gray">Send to Manager</button>
+                                    </form>
+                                </c:if>
+                            </c:when>
+
+                            <%-- 2. TRANG THAI: CUSTOMER_CHECK --%>
+                            <c:when test="${canCustomerCheck}">
+                                <!-- Khach hang (Role 3) -->
+                                <c:if test="${sessionScope.user.roleId == 3}">
+                                    <form method="POST" action="contract-detail" style="margin:0;">
+                                        <input type="hidden" name="action" value="customer_approve" />
+                                        <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                        <button type="submit" class="btn btn-green">Approve</button>
+                                    </form>
+
+                                </c:if>
+                            </c:when>
+
+                            <%-- 3. TRANG THAI: APPROVED --%>
+                            <c:when test="${isApproved}">
+                                <p style="color: green; text-align: center; font-weight: bold;">Contract
+                                    Approved</p>
+                                    <c:if test="${sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                                        <c:if test="${not signed}">
+                                        <form action="Signature" method="get">
+                                            <input type="hidden" name="contractId"
+                                                   value="${contract.contractId}">
+                                            <input type="hidden" name="signerId"
+                                                   value="${sessionScope.user.userId}">
+                                            <input class="btn btn-blue" type="submit" value="Sign Contract" />
+                                            <hr>
+                                        </form>
+                                    </c:if>
+                                </c:if>
+                            </c:when>
+                            <%-- 4. TRANG THAI: SIGNED --%>
+                        </c:choose>
+
+                        <a href="export-pdf?id=${contract.contractId}" class="btn btn-blue"
+                           style="background-color: #6c757d; margin-top: 10px;">
+                            Xuất PDF
+                        </a>
+                        <a href="contract-list" style="color: #007bff; text-decoration: none;">Back to contract list</a>
+                    </c:otherwise>
                 </c:choose>
-
-                <a href="export-pdf?id=${contract.contractId}" class="btn btn-blue"
-                   style="background-color: #6c757d; margin-top: 10px;">
-                    Xuất PDF
-                </a>
-                <a href="contract-list" style="color: #007bff; text-decoration: none;">Back to contract list</a>
             </div>
 
             <!-- COT 2: CONTENT -->
@@ -222,7 +234,7 @@
 
             <!-- COT 3: TYPE NOTE + HISTORY -->
             <div class="right-panel">
-                <c:if test="${(( sessionScope.user.roleId == 2) || ( sessionScope.user.roleId == 3)) 
+                <c:if test="${not isGuest && (( sessionScope.user.roleId == 2) || ( sessionScope.user.roleId == 3)) 
                               && (contract.contractStatus== 'PENDING_REVIEW' ||contract.contractStatus== 'CUSTOMER_CHECK' ) }">
                       <div class="type-note-section">
                           <h3 style="margin-top:0;">Type note</h3>

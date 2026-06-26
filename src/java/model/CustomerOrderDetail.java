@@ -9,6 +9,8 @@ public class CustomerOrderDetail {
     private int quantity;
     private double costPrice;
     private double sellingPrice;
+    private int quotationDetailId;
+    private double taxPercent;
 
     public CustomerOrderDetail() {}
     
@@ -24,4 +26,10 @@ public class CustomerOrderDetail {
     public void setCostPrice(double costPrice) { this.costPrice = costPrice; }
     public double getSellingPrice() { return sellingPrice; }
     public void setSellingPrice(double sellingPrice) { this.sellingPrice = sellingPrice; }
+    
+    public int getQuotationDetailId() { return quotationDetailId; }
+    public void setQuotationDetailId(int quotationDetailId) { this.quotationDetailId = quotationDetailId; }
+
+    public double getTaxPercent() { return taxPercent; }
+    public void setTaxPercent(double taxPercent) { this.taxPercent = taxPercent; }
 }
