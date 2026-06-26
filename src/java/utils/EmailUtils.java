@@ -74,9 +74,14 @@ public class EmailUtils {
             msg.addHeader("Content-Type", "text/html; charset=UTF-8");
 
             // Đoi voi Gmail, senderEmail bat buoc phai trung khop voi loginUser (Email ca nhan cua ban)
-            msg.setFrom(new InternetAddress(senderEmail, senderName));
+            msg.setFrom(new InternetAddress(senderEmail, senderName,"UTF-8"));
 
             msg.setSubject(subject, "UTF-8");
+
+            
+            msg.setHeader("Content-Type", "text/html; charset=UTF-8");
+            msg.setHeader("Content-Transfer-Encoding", "quoted-printable");
+            
             msg.setContent(content, "text/html; charset=UTF-8");
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
 
