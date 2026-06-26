@@ -13,7 +13,7 @@ import model.Payment;
 import model.User;
 import dal.PaymentDAO;
 
-@WebServlet(name = "PaymentListController", urlPatterns = {"/payment-list"})
+@WebServlet(name = "PaymentListController", urlPatterns = {"/payment/list"})
 public class PaymentListController extends HttpServlet {
 
     private final PaymentDAO paymentDAO = new PaymentDAO();
@@ -38,6 +38,6 @@ public class PaymentListController extends HttpServlet {
         }
 
         request.setAttribute("list", list);
-        request.getRequestDispatcher("views/payment/payment_list.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/payment/payment_list.jsp").forward(request, response);
     }
 }

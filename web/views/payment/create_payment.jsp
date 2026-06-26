@@ -5,7 +5,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>VNPAY Test Payment - Po Bread Sales</title>
+        <title>Create Payment - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -74,13 +74,18 @@
     <body>
         <div class="dashboard-shell">
             <jsp:include page="/views/shared/sidebar.jsp">
-                <jsp:param name="activeMenu" value="paymentTest"/>
+                <jsp:param name="activeMenu" value="createPayment"/>
             </jsp:include>
             <main class="main legacy-page">
-                <h2>VNPAY Simulation Terminal</h2>
+                <h2>VNPAY Checkout Terminal</h2>
                 
                 <div class="payment-card">
-                    <form action="payment" method="POST">
+                    <c:if test="${not empty param.error}">
+                        <div class="alert alert-danger" style="background-color: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; text-align: center; border: 1px solid #fca5a5; font-size: 0.95rem;">
+                            ${param.error}
+                        </div>
+                    </c:if>
+                    <form action="${pageContext.request.contextPath}/payment" method="POST">
                         <h3>Thanh toán Hợp đồng</h3>
                         
                         <div class="info-group">
@@ -96,7 +101,7 @@
                         <input type="hidden" name="orderId" value="HD88923">
                         <input type="hidden" name="amount" value="50000">
 
-                        <img class="vnpay-logo" src="https://sandbox.vnpayment.vn/paymentv2/Images/about/logo-vnpay.png" alt="VNPAY logo">
+                        <img class="vnpay-logo" src="${pageContext.request.contextPath}/assets/img/logo-vnpay.png" alt="VNPAY logo">
 
                         <button type="submit" class="btn-pay">Thanh toán qua VNPAY</button>
                     </form>

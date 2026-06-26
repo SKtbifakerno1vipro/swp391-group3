@@ -135,4 +135,12 @@ public class Quotation {
     public void setHasContract(boolean hasContract) {
         this.hasContract = hasContract;
     }
+
+    public String getFormattedCreatedAt() {
+        if (this.createdAt != null) {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return this.createdAt.format(formatter);
+        }
+        return "";
+    }
 }

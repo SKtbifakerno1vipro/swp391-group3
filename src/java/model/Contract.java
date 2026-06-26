@@ -182,4 +182,12 @@ public class Contract {
         return "N/A";
     }
 
+    public String getFormattedEffectiveDate() {
+        if (this.effectiveDate != null) {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return this.effectiveDate.format(formatter);
+        }
+        return "";
+    }
+
 }

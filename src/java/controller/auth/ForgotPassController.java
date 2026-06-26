@@ -55,19 +55,19 @@ public class ForgotPassController extends HttpServlet {
                 session.setAttribute("otpCreationTime", System.currentTimeMillis());
                 session.setAttribute("userAuth", u);
 
-                String emailSubject = "[SWP391] Mã xác thực (OTP) khôi phục mật khẩu";
+                String emailSubject = "[SWP391] Verification code (OTP) for password recovery";
                 String emailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;'>"
-                                 + "<h2>Xác thực yêu cầu cấp lại mật khẩu</h2>"
-                                 + "<p>Xin chào,</p>"
-                                 + "<p>Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản liên kết với Email này trên hệ thống <strong>SWP391</strong>.</p>"
-                                 + "<p>Mã xác thực (OTP) của bạn là:</p>"
+                                 + "<h2>Reset Password Verification</h2>"
+                                 + "<p>Hello,</p>"
+                                 + "<p>We received a request to recover the password for the account associated with this email address on <strong>SWP391</strong>.</p>"
+                                 + "<p>Your verification code (OTP) is:</p>"
                                  + "<div style='text-align: center; margin: 20px 0;'>"
                                  + "    <span style='font-size: 24px; font-weight: bold; color: #4CAF50; letter-spacing: 5px; border: 2px dashed #4CAF50; padding: 10px 20px; background-color: #f9f9f9;'>" + otpCode + "</span>"
                                  + "</div>"
-                                 + "<p style='color: red;'><strong>Lưu ý:</strong> Mã này có hiệu lực trong vòng 5 phút. Để bảo mật, tuyệt đối KHÔNG chia sẻ mã này với bất kỳ ai.</p>"
-                                 + "<p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email hoặc liên hệ với bộ phận hỗ trợ của chúng tôi để đảm bảo an toàn cho tài khoản.</p>"
+                                 + "<p style='color: red;'><strong>Note:</strong> This code is valid for 5 minutes. For security reasons, please do NOT share this code with anyone.</p>"
+                                 + "<p>If you did not make this request, please ignore this email or contact support to ensure your account security.</p>"
                                  + "<hr style='border: none; border-top: 1px solid #eee;'/>"
-                                 + "<p style='font-size: 12px; color: #888;'>Trân trọng,<br/>Đội ngũ hỗ trợ kỹ thuật SWP391.</p>"
+                                 + "<p style='font-size: 12px; color: #888;'>Best regards,<br/>SWP391 Technical Support Team.</p>"
                                  + "</div>";
 
                 //4. Gửi email chứa mã OTP cho người dùng
@@ -76,10 +76,10 @@ public class ForgotPassController extends HttpServlet {
                 if (isSent) {
                     response.getWriter().write("SUCCESS");
                 } else {
-                    response.getWriter().write("Không thể gửi Email. Vui lòng thử lại!");
+                    response.getWriter().write("Could not send email. Please try again!");
                 }
             } else {
-                response.getWriter().write("Email hoặc Tên đăng nhập không khớp với hệ thống!");
+                response.getWriter().write("Email or Username does not match our records!");
             }
             return; 
 
@@ -118,35 +118,35 @@ public class ForgotPassController extends HttpServlet {
                         session.removeAttribute("userAuth");
                         session.removeAttribute("recoveryOtp");
                         session.removeAttribute("otpCreationTime");
-                        request.setAttribute("error", "Đặt lại mật khẩu thất bại. Vui lòng thử lại!");
+                        request.setAttribute("error", "Resetting password failed. Please try again!");
                     }
                 } catch (Exception e) {
                     e.printStackTrace(); 
                     session.removeAttribute("userAuth");
                     session.removeAttribute("recoveryOtp");
                     session.removeAttribute("otpCreationTime");
-                    request.setAttribute("error", "Đã xảy ra lỗi hệ thống khi cập nhật mật khẩu.");
+                    request.setAttribute("error", "A system error occurred while updating the password.");
                     request.setAttribute("errorDetail", e.getMessage());
                 }
             } else {
                 // Xác định rõ nguyên nhân thất bại để hiển thị thông báo chi tiết và tránh xóa session bừa bãi
                 if (sessionOtp == null || otpCreationTime == null || sessionUser == null) {
-                    request.setAttribute("error", "Vui lòng yêu cầu gửi mã xác nhận trước!");
+                    request.setAttribute("error", "Please request a verification code first!");
                 } else if (userOtp == null || userOtp.trim().isEmpty()) {
-                    request.setAttribute("error", "Vui lòng nhập mã xác nhận (OTP)!");
+                    request.setAttribute("error", "Please enter the verification code (OTP)!");
                 } else {
                     long elapsedTime = System.currentTimeMillis() - otpCreationTime;
                     if (elapsedTime > 5 * 60 * 1000) {
-                        // Quá hạn: Xóa các thông tin xác thực cũ
+                        // Quá hạn
                         session.removeAttribute("userAuth");
                         session.removeAttribute("recoveryOtp");
                         session.removeAttribute("otpCreationTime");
-                        request.setAttribute("error", "Mã xác nhận (OTP) đã hết hạn (quá 5 phút). Vui lòng gửi lại mã mới!");
+                        request.setAttribute("error", "The verification code (OTP) has expired (exceeded 5 minutes). Please request a new code!");
                     } else if (email == null || !email.trim().equals(sessionUser.getEmail().trim())) {
-                        request.setAttribute("error", "Email không khớp với yêu cầu khôi phục!");
+                        request.setAttribute("error", "Email does not match the recovery request!");
                     } else {
                         // Sai mã xác nhận nhưng chưa hết hạn: Cho phép nhập lại (không xóa session)
-                        request.setAttribute("error", "Mã xác nhận (OTP) không chính xác. Vui lòng nhập lại!");
+                        request.setAttribute("error", "Incorrect verification code (OTP). Please try again!");
                     }
                 }
             }

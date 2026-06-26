@@ -24,7 +24,7 @@ import model.Contract;
 import dal.PaymentDAO;
 import dal.ContractDAO;
 
-@WebServlet(name = "VNPAYIPN", urlPatterns = {"/payment-ipn"})
+@WebServlet(name = "VNPAYIPN", urlPatterns = {"/payment/ipn"})
 public class VNPAYIPN extends HttpServlet {
 
     private final PaymentDAO paymentDAO = new PaymentDAO();

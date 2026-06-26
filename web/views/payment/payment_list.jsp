@@ -105,7 +105,7 @@
                                 </td>
                                 <td>${p.formattedPaidAt}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/payment-detail?id=${p.paymentId}" style="color: #0284c7; text-decoration: none; font-weight: bold;">View Details</a>
+                                    <a href="${pageContext.request.contextPath}/payment/detail?id=${p.paymentId}" style="color: #0284c7; text-decoration: none; font-weight: bold;">View Details</a>
                                 </td>
                             </tr>
                         </c:forEach>
