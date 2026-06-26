@@ -167,24 +167,41 @@ public class SecurityFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-chain.doFilter(request, response);
-//        HttpServletRequest req = (HttpServletRequest) request;
-//        HttpServletResponse res = (HttpServletResponse) response;
-//        String path = req.getServletPath();
-//
-//        if (isStaticResource(path)) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        HttpSession session = req.getSession(false);
-//        User user = (session != null) ? (User) session.getAttribute("user") : null;
-//
+
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        String path = req.getServletPath();
+
+        if (isStaticResource(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if ("/contract-detail".equals(path)) {
+            String token = req.getParameter("token");
+            String idStr = req.getParameter("id");
+            if (token != null && idStr != null) {
+                try {
+                    int contractId = Integer.parseInt(idStr);
+                    dal.ContractDAO cDAO = new dal.ContractDAO();
+                    if (cDAO.validateToken(contractId, token)) {
+                        chain.doFilter(request, response);
+                        return;
+                    }
+                } catch (Exception e) {
+                    res.sendRedirect(req.getContextPath() + "/login");
+                }
+            }
+        }
+
 //        if (user == null) {
 //            res.sendRedirect(req.getContextPath() + "/login");
 //            return;
@@ -223,6 +240,7 @@ chain.doFilter(request, response);
 //                    + "/dashboard?error=denied");
 //            return;
 //        }
+        chain.doFilter(request, response);
     }
 
     private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
