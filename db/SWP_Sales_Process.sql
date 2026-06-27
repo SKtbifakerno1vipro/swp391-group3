@@ -232,7 +232,8 @@ CREATE TABLE contract_revision_item (
 -- 14. Signature
 CREATE TABLE signature (
     signature_id INT IDENTITY(1,1) PRIMARY KEY,
-    customer_contract_id INT NOT NULL,
+    customer_contract_id INT,
+	invoice_id int,
     file_name NVARCHAR(255),
     file_url NVARCHAR(1000),
     signer_user_id INT NULL,
@@ -278,32 +279,41 @@ CREATE TABLE customer_order_detail (
 GO
 
 -- 17. Invoice
-CREATE TABLE invoice (
+create TABLE invoice (
     invoice_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_contract_id INT NOT NULL,
     customer_order_id INT NOT NULL,
-    invoice_no NVARCHAR(100) UNIQUE,
+    invoice_no NVARCHAR(100),
     issue_date DATETIME,
-    invoice_status VARCHAR(20),
+    invoice_status VARCHAR(50),
+--UNRELEASED
+--RELEASED
+--CANCELED
+
     invoice_type VARCHAR(20) NOT NULL DEFAULT 'SALES',      -- 'VAT' or 'SALES'
-    template_code VARCHAR(20) NOT NULL DEFAULT '2',          -- '1' (VAT), '2' (SALES)
     invoice_symbol VARCHAR(20) NOT NULL DEFAULT 'K26TYY',     -- E-invoice code without tax code
     
     -- Seller info snapshot
     seller_name NVARCHAR(255) NULL,
     seller_tax_code VARCHAR(20) NULL,
     seller_address NVARCHAR(255) NULL,
+	seller_phone VARCHAR(20) NULL,
     
     -- Buyer info snapshot
     buyer_name NVARCHAR(255) NULL,
     buyer_tax_code VARCHAR(20) NULL,
     buyer_address NVARCHAR(255) NULL,
-    
+    buyer_phone VARCHAR(20) NULL,
+
     -- Financial summary snapshot
     sub_total DECIMAL(18,2) DEFAULT 0,
     tax_amount DECIMAL(18,2) DEFAULT 0,
     total_amount DECIMAL(18,2) DEFAULT 0,
     
+	--Note
+	customer_note NVARCHAR(max) NULL,
+	internal_note NVARCHAR(max) NULL,
+
     created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),
@@ -480,8 +490,8 @@ INSERT INTO customer_order (customer_id, customer_contract_id, order_status, cre
 );
 DECLARE @O1 INT = SCOPE_IDENTITY();
 INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (@O1, @QD1, 100, 15000, 22000);
-INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, template_code, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, sub_total, tax_amount, total_amount, created_by) 
-VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', '1', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2090000.00, 209000.00, 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, sub_total, tax_amount, total_amount, created_by) 
+VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2090000.00, 209000.00, 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
 INSERT INTO payment (customer_contract_id, invoice_id, amount, payment_type, payment_status, paid_at, created_by) VALUES (@C1, SCOPE_IDENTITY(), 2299000.00, 'BANK_TRANSFER', 'COMPLETED', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 GO
 

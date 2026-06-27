@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" import="service.InvoiceService,model.Invoice" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -56,8 +56,18 @@
                 <th>Action</th>
             </tr>
         </thead>
+        <% InvoiceService invService = new InvoiceService(); %>
         <tbody>
             <c:forEach var="item" items="${orders}">
+                <%
+                    dto.CustomerOrderDTO itemDto = (dto.CustomerOrderDTO) pageContext.getAttribute("item");
+                    if (itemDto != null && itemDto.getCustomerOrder() != null) {
+                        Invoice inv = invService.getInvoiceByOrderId(itemDto.getCustomerOrder().getCustomerOrderId());
+                        pageContext.setAttribute("invOfOrder", inv);
+                    } else {
+                        pageContext.removeAttribute("invOfOrder");
+                    }
+                %>
                 <tr>
                     <td>${item.customerOrder.customerOrderId}</td>
                     <td>${item.customerUser.fullName}</td>
@@ -70,6 +80,17 @@
                     <td>
                         <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">View</a> |
                         <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
+                        <c:if test="${item.customerOrder.orderStatus == 'COMPLETED'}">
+                            |
+                            <c:choose>
+                                <c:when test="${empty invOfOrder}">
+                                    <a href="${pageContext.request.contextPath}/invoice?orderId=${item.customerOrder.customerOrderId}" style="color: #16a34a; font-weight: bold; text-decoration: none;">Create Invoice</a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="color: #0284c7; font-weight: bold; text-decoration: none;">View Invoice</a>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:if>
                     </td>
                 </tr>
             </c:forEach>

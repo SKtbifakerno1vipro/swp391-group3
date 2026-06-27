@@ -47,13 +47,14 @@
                    href="${pageContext.request.contextPath}/customer-order-list"><span
                         class="material-symbols-outlined">shopping_cart</span>Orders</a>
                 <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
-                   href="${pageContext.request.contextPath}/invoice"><span
-                        class="material-symbols-outlined">receipt_long</span>Invoices</a>
+                   href="${pageContext.request.contextPath}/invoice-list"><span
+                        class="material-symbols-outlined">receipt</span>My Invoices</a>
                 <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/payment/list"><span
                         class="material-symbols-outlined">payments</span>Payments</a>
                 </c:when>
                 <c:otherwise>
+
                 <a class="nav-link ${param.activeMenu == 'customers' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/customer/list"><span
                         class="material-symbols-outlined">groups</span>Customers</a>
@@ -76,6 +77,12 @@
                    href="${pageContext.request.contextPath}/payment/list"><span
                         class="material-symbols-outlined">payments</span>Payments</a>
 
+                <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
+                   href="${pageContext.request.contextPath}/invoice-list"><span
+                        class="material-symbols-outlined">receipt</span>Invoices</a>
+                <a class="nav-link ${param.activeMenu == 'createPayment' ? 'active' : ''}"
+                   href="${pageContext.request.contextPath}/payment/create"><span
+                        class="material-symbols-outlined">add_card</span>Create Payment</a>
                 <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/user-list"><span
                         class="material-symbols-outlined">manage_accounts</span>Users</a>
