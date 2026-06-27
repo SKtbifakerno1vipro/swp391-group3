@@ -189,11 +189,7 @@ public class ContractService {
         return contractDAO.getContractByQuotationId(quotationId);
     }
 
-    // XHieu-begin - delete contact me
-    public List<Contract> getContractsByCustomerId(int customerId) {
-        return contractDAO.getContractsByCustomerId(customerId);
-    }
-    // Xhieu - end
+
 
     // nguyen kien - begin
     public boolean updateContractContent(int contractId, String contractContent) {

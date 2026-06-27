@@ -206,10 +206,20 @@
                     </div>
 
                     <div class="receipt-footer">
-                        <a href="${pageContext.request.contextPath}/payment/list" class="btn-back">
+                        <a href="${pageContext.request.contextPath}/payment/list" class="btn-back" style="margin-bottom: 10px;">
                             <span class="material-symbols-outlined">arrow_back</span>
                             Back to Payment Log
                         </a>
+                        <c:if test="${payment.paymentStatus == 'PENDING' && sessionScope.user.roleId == 3}">
+                            <form action="${pageContext.request.contextPath}/payment" method="POST" style="margin-top: 15px;">
+                                <input type="hidden" name="orderId" value="${payment.paymentId}">
+                                <input type="hidden" name="amount" value="${payment.amount.longValue()}">
+                                <button type="submit" class="btn-pay" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #10b981; color: #ffffff; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); width: 100%; box-sizing: border-box;">
+                                    <span class="material-symbols-outlined">payment</span>
+                                    Thanh toán qua VNPAY
+                                </button>
+                            </form>
+                        </c:if>
                     </div>
                 </div>
             </main>
