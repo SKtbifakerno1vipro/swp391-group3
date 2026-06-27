@@ -78,17 +78,21 @@
                                 <td>${c.email}</td>
                                 <td>
                                     <c:if test="${sessionScope.user.roleId==5}">
-                                        <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |                          
+                                        <c:if test="${c.contractStatus != 'SIGNED'}">
+                                            <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |      
+                                        </c:if>                    
                                     </c:if>
-                                    <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">Details</a> |
-                                    <c:choose>
-                                        <c:when test="${c.orderId > 0}">
-                                            <a href="${pageContext.request.contextPath}/customer-order?id=${c.orderId}">View Order</a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <a href="${pageContext.request.contextPath}//customer-order?contractId=${c.contractId}">Create Order</a>
-                                        </c:otherwise>
-                                    </c:choose>
+                                    <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">Details</a> 
+                                    <c:if test="${c.contractStatus =='SIGNED'}">
+                                        <c:choose>
+                                            <c:when test="${c.orderId > 0}">
+                                                <a href="${pageContext.request.contextPath}/customer-order?id=${c.orderId}">| View Order</a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="${pageContext.request.contextPath}//customer-order?contractId=${c.contractId}">Create Order</a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:if>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -96,7 +100,9 @@
                 </table>
 
                 <c:if test="${endPage > 1}">
-                    <c:set var="params" value="contractNumber=${contractNumber}&customerName=${customerName}&status=${status}&storageType=${storageType}&fromDate=${fromDate}&toDate=${toDate}&customerTaxCode=${customerTaxCode}&customerPhone=${customerPhone}&customerEmail=${customerEmail}" />
+                    <c:set var="params" value="contractNumber=${contractNumber}&customerName=${customerName}
+                           &status=${status}&storageType=${storageType}&fromDate=${fromDate}&toDate=${toDate}
+                           &customerTaxCode=${customerTaxCode}&customerPhone=${customerPhone}&customerEmail=${customerEmail}" />
                     <div>
                         <a href="contract-list?page=1&${params}" ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&laquo;</a>
                         <a href="contract-list?page=${currentPage - 1}&${params}" ${currentPage == 1 ? 'style="pointer-events:none;color:#aaa;"' : ''}>&lsaquo;</a>

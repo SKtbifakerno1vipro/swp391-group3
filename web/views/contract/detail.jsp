@@ -6,276 +6,297 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Contract Detail - Dashboard</title>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
+        <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet">
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: #f4f7f6;
-            }
-
-            h2 {
-                padding-left: 20px;
-                color: #333;
-            }
-
             .layout-container {
                 display: grid;
-                grid-template-columns: 250px 1fr 350px;
+                grid-template-columns: 1fr 380px;
                 gap: 20px;
+                align-items: start;
+            }
+
+            .content-panel, .right-panel {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 22px;
+                box-shadow: var(--shadow);
                 padding: 20px;
             }
 
-            .sidebar,
-            .content,
-            .history {
-                background: #fff;
-                border: 1px solid #ddd;
-                padding: 20px;
-                border-radius: 5px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            }
-
-            .right-panel {
-                background: #fff;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-                padding: 20px;
-                display: flex;
-                flex-direction: column;
-            }
-
-            .type-note-section {
-                margin-bottom: 15px;
+            .action-section {
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid var(--line);
             }
 
             .note-textarea {
                 width: 100%;
-                min-height: 150px;
+                min-height: 120px;
                 padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                font-family: Arial, sans-serif;
+                border: 1px solid var(--line);
+                border-radius: 12px;
+                font-family: inherit;
                 font-size: 14px;
                 resize: vertical;
                 box-sizing: border-box;
+                margin-bottom: 10px;
             }
 
             .note-textarea:focus {
                 outline: none;
-                border-color: #007bff;
-                box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
-            }
-
-            .btn {
-                padding: 10px 15px;
-                border: none;
-                cursor: pointer;
-                border-radius: 3px;
-                color: white;
-                text-decoration: none;
-                display: inline-block;
-                text-align: center;
-                width: 100%;
-                box-sizing: border-box;
-                margin-bottom: 10px;
-                font-weight: bold;
-            }
-
-            .btn-orange {
-                background: #fd7e14;
-            }
-
-            .btn-green {
-                background: #28a745;
-            }
-
-            .btn-blue {
-                background: #007bff;
-            }
-
-            .btn-gray {
-                background: #6c757d;
-            }
-
-            .btn-red {
-                background: #dc3545;
-                width: auto;
-            }
-
-            .btn-submit-note {
-                background: #fd7e14;
-                margin-top: 10px;
+                border-color: var(--primary);
             }
 
             .history-section {
-                flex: 1;
+                max-height: 500px;
                 overflow-y: auto;
-                max-height: 400px;
+                padding-right: 5px;
+            }
+
+            .history-section::-webkit-scrollbar {
+                width: 6px;
+            }
+            .history-section::-webkit-scrollbar-thumb {
+                background: rgba(0,0,0,0.1);
+                border-radius: 3px;
             }
 
             .note-block {
-                border-left: 3px solid #007bff;
-                padding: 8px;
+                border-left: 3px solid var(--primary);
+                padding: 8px 12px;
                 margin-bottom: 5px;
-                background: #f8f9fa;
+                background: var(--surface-soft);
                 white-space: pre-wrap;
                 word-wrap: break-word;
                 font-size: 0.9em;
+                border-radius: 0 8px 8px 0;
+            }
+            
+            .history-item {
+                border-bottom: 1px solid var(--line);
+                padding-bottom: 15px;
+                margin-bottom: 15px;
+            }
+            .history-item:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            .action-btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+            }
+            .action-btn-group form {
+                margin: 0;
+                padding: 0;
+                background: none;
+                border: none;
+                box-shadow: none;
+            }
+            .action-btn-group .btn-full {
+                width: 100%;
+                display: block;
+                text-align: center;
+                box-sizing: border-box;
+            }
+            .btn-tertiary {
+                background: var(--tertiary) !important;
+            }
+            .btn-secondary {
+                background: var(--muted) !important;
+            }
+            
+            @media (max-width: 900px) {
+                .layout-container {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* Override app-layout.css for raw contract content */
+            .legacy-page .raw-content table {
+                background: #fff;
+                box-shadow: none;
+                border-radius: 0;
+                border: none;
+                margin: 10px 0;
+            }
+            .legacy-page .raw-content th,
+            .legacy-page .raw-content thead td,
+            .legacy-page .raw-content td {
+                background: #fff;
+                color: inherit;
+                font-size: inherit;
+                text-transform: none;
+                letter-spacing: normal;
+                font-weight: normal;
+                border: none;
+                padding: 8px;
+            }
+            .legacy-page .raw-content th {
+                font-weight: bold;
+            }
+            .legacy-page .raw-content table[border="1"],
+            .legacy-page .raw-content table[border="1"] th,
+            .legacy-page .raw-content table[border="1"] td {
+                border: 1px solid #000;
             }
         </style>
     </head>
 
     <body>
-        <h2>No Contract: ${contract.contractNumber}</h2>
+        <div class="dashboard-shell">
+            <jsp:include page="../shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="contracts" />
+            </jsp:include>
+            
+            <main class="main legacy-page">
+                <h2>No Contract: ${contract.contractNumber}</h2>
 
-        <div class="layout-container">
-            <!-- COT 1: SIDEBAR -->
-            <div class="sidebar">
-                <c:choose>
-                    <c:when test="${isGuest}">
-                        <h3>Action For Contract</h3>
-                        <p><strong>Status</strong> <span
-                                style="color: red; font-weight: bold;">${contract.contractStatus}</span></p>
-                        <hr>
-                        <p style="color: #666; font-size: 0.9em; line-height: 1.4;">You need to login for request edit</p>
-                        <a href="login?redirect=contract-detail?id=${contract.contractId}" class="btn btn-blue" style="margin-top: 10px;">Đăng Nhập</a>
-                    </c:when>
-                    <c:otherwise>
-                        <h3>Action For Contract</h3>
-                        <p><strong>Status</strong> <span
-                                style="color: red; font-weight: bold;">${contract.contractStatus}</span></p>
-                        <hr>
+                <div class="layout-container">
+                    <!-- COT 1: CONTENT (Left) -->
+                    <div class="content-panel">
+                        <c:if test="${errorSig != null}">
+                            <div style="color: var(--danger); background: var(--danger-soft); padding: 10px; border-radius: 8px; margin-bottom: 15px;">${errorSig}</div>
+                        </c:if>
+                        
+                        <h3 style="margin-top: 0;">Content Details</h3>
+                        <div style="background: var(--bg); padding: 15px; border: 1px solid var(--line); margin-bottom: 15px; border-radius: 12px;">
+                            <p style="margin: 0 0 5px 0;"><strong>Customer:</strong> ${contract.customerName}</p>
+                            <p style="margin: 0;"><strong>Storage type:</strong> ${contract.storageType}</p>
+                        </div>
+                        
+                        <div class="raw-content" style="border: 1px solid var(--line); padding: 20px; background: #fff; min-height: 500px; overflow-x: auto; border-radius: 12px;">
+                            ${contract.contractContent}
+                        </div>
+                    </div>
 
-                        <c:choose>
-                            <%-- 1. Status: DRAFT / PENDING_REVIEW --%>
-                            <c:when test="${canRequestEdit}">
+                    <!-- COT 2: ACTION + HISTORY (Right) -->
+                    <div class="right-panel">
+                        
+                        <!-- ACTION BLOCK -->
+                        <div class="action-section">
+                            <h3 style="margin-top: 0;">Action For Contract</h3>
+                            <p><strong>Status:</strong> <span style="color: var(--danger); font-weight: bold;">${contract.contractStatus}</span></p>
+                            
+                            <c:choose>
+                                <c:when test="${isGuest}">
+                                    <p style="color: var(--muted); font-size: 0.9em; line-height: 1.4; margin-top: 10px;">You need to login for request edit</p>
+                                    <div class="action-btn-group">
+                                        <a href="login?redirect=contract-detail?id=${contract.contractId}" class="btn-full"><button type="button" style="width: 100%;">Đăng Nhập</button></a>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="action-btn-group">
+                                        <c:choose>
+                                            <c:when test="${canRequestEdit}">
+                                                <!-- Manager (Role 2) -->
+                                                <c:if test="${sessionScope.user.roleId == 2}">
+                                                    <form method="POST" action="contract-detail">
+                                                        <input type="hidden" name="action" value="approve" />
+                                                        <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                                        <button type="submit" class="btn-full" style="background: var(--primary);">Approve</button>
+                                                    </form>
+                                                </c:if>
 
-                                <!-- Manager (Role 2) -->
-                                <c:if test="${sessionScope.user.roleId == 2}">
-                                    <form method="POST" action="contract-detail" style="margin:0;">
-                                        <input type="hidden" name="action" value="approve" />
-                                        <input type="hidden" name="contractId" value="${contract.contractId}" />
-                                        <button type="submit" class="btn btn-green">Approve</button>
-                                    </form>
-                                </c:if>
+                                                <!-- Admin Officer (Role 5) -->
+                                                <c:if test="${sessionScope.user.roleId == 5}">
+                                                    <a href="contract-save?id=${contract.contractId}" class="btn-full" style="text-decoration:none;">
+                                                        <button type="button" style="width: 100%;">Edit Contract</button>
+                                                    </a>
+                                                    <form method="POST" action="contract-detail">
+                                                        <input type="hidden" name="action" value="send_to_manager" />
+                                                        <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                                        <button type="submit" class="btn-full btn-secondary">Send to Manager</button>
+                                                    </form>
+                                                </c:if>
+                                            </c:when>
 
-                                <!-- Admin Officer (Role 5) -->
-                                <c:if test="${sessionScope.user.roleId == 5}">
-                                    <a href="contract-save?id=${contract.contractId}" class="btn btn-blue">Edit
-                                        Contract</a>
-                                    <form method="POST" action="contract-detail" style="margin:0;">
-                                        <input type="hidden" name="action" value="send_to_manager" />
-                                        <input type="hidden" name="contractId" value="${contract.contractId}" />
-                                        <button type="submit" class="btn btn-gray">Send to Manager</button>
-                                    </form>
-                                </c:if>
-                            </c:when>
+                                            <c:when test="${canCustomerCheck}">
+                                                <!-- Khach hang (Role 3) -->
+                                                <c:if test="${sessionScope.user.roleId == 3}">
+                                                    <form method="POST" action="contract-detail">
+                                                        <input type="hidden" name="action" value="customer_approve" />
+                                                        <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                                        <button type="submit" class="btn-full" style="background: var(--primary);">Approve</button>
+                                                    </form>
+                                                </c:if>
+                                            </c:when>
 
-                            <%-- 2. TRANG THAI: CUSTOMER_CHECK --%>
-                            <c:when test="${canCustomerCheck}">
-                                <!-- Khach hang (Role 3) -->
-                                <c:if test="${sessionScope.user.roleId == 3}">
-                                    <form method="POST" action="contract-detail" style="margin:0;">
-                                        <input type="hidden" name="action" value="customer_approve" />
-                                        <input type="hidden" name="contractId" value="${contract.contractId}" />
-                                        <button type="submit" class="btn btn-green">Approve</button>
-                                    </form>
+                                            <c:when test="${isApproved}">
+                                                <p style="color: var(--primary); text-align: center; font-weight: bold; margin: 10px 0;">Contract Approved</p>
+                                                <c:if test="${sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                                                    <c:if test="${not signed}">
+                                                        <form action="Signature" method="get">
+                                                            <input type="hidden" name="contractId" value="${contract.contractId}">
+                                                            <input type="hidden" name="signerId" value="${sessionScope.user.userId}">
+                                                            <button type="submit" class="btn-full">Sign Contract</button>
+                                                        </form>
+                                                    </c:if>
+                                                </c:if>
+                                            </c:when>
+                                        </c:choose>
 
-                                </c:if>
-                            </c:when>
+                                        <a href="export-pdf?id=${contract.contractId}" class="btn-full" style="text-decoration:none;">
+                                            <button type="button" class="btn-secondary" style="width: 100%;">Xuất PDF</button>
+                                        </a>
+                                        <div style="text-align: center; margin-top: 5px;">
+                                            <a href="contract-list" style="color: var(--primary); font-size: 0.9em; font-weight: 600;">Back to contract list</a>
+                                        </div>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
 
-                            <%-- 3. TRANG THAI: APPROVED --%>
-                            <c:when test="${isApproved}">
-                                <p style="color: green; text-align: center; font-weight: bold;">Contract
-                                    Approved</p>
-                                    <c:if test="${sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
-                                        <c:if test="${not signed}">
-                                        <form action="Signature" method="get">
-                                            <input type="hidden" name="contractId"
-                                                   value="${contract.contractId}">
-                                            <input type="hidden" name="signerId"
-                                                   value="${sessionScope.user.userId}">
-                                            <input class="btn btn-blue" type="submit" value="Sign Contract" />
-                                            <hr>
-                                        </form>
-                                    </c:if>
-                                </c:if>
-                            </c:when>
-                            <%-- 4. TRANG THAI: SIGNED --%>
-                        </c:choose>
+                        <!-- TYPE NOTE BLOCK -->
+                        <c:if test="${not isGuest && (( sessionScope.user.roleId == 2) || ( sessionScope.user.roleId == 3)) 
+                                      && (contract.contractStatus== 'PENDING_REVIEW' ||contract.contractStatus== 'CUSTOMER_CHECK' ) }">
+                            <div class="type-note-section" style="margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 20px;">
+                                <h3 style="margin-top:0;">Type note</h3>
+                                <form method="POST" action="contract-detail" id="requestEditForm" style="background: none; border: none; box-shadow: none; padding: 0; margin: 0;">
+                                    <input type="hidden" name="action" value="request_edit" />
+                                    <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                    <textarea name="revision_note" class="note-textarea" placeholder="Ex:&#10;price: change to 10000&#10;name: change to vtp neee" required></textarea>
+                                    <button type="submit" class="btn-tertiary" style="width: 100%;">Send note</button>
+                                </form>
+                            </div>
+                        </c:if>
 
-                        <a href="export-pdf?id=${contract.contractId}" class="btn btn-blue"
-                           style="background-color: #6c757d; margin-top: 10px;">
-                            Xuất PDF
-                        </a>
-                        <a href="contract-list" style="color: #007bff; text-decoration: none;">Back to contract list</a>
-                    </c:otherwise>
-                </c:choose>
-            </div>
+                        <!-- HISTORY BLOCK -->
+                        <div class="history-section">
+                            <h3 style="margin-top:0;">History request edit</h3>
+                            <c:choose>
+                                <c:when test="${not empty historyList}">
+                                    <c:forEach var="h" items="${historyList}">
+                                        <div class="history-item">
+                                            <p style="margin: 0 0 3px 0; color: var(--muted); font-size: 0.85em;">${h.getCreateTimeString()}</p>
+                                            <p style="margin: 0 0 3px 0; font-size: 0.9em;"><strong>Status:</strong> ${h.toStatus}</p>
+                                            <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>By:</strong> ${h.changedByName}</p>
+                                            <c:if test="${sessionScope.user.roleId == 5}">
+                                                <p style="margin: 0 0 5px 0; color: var(--danger); font-size: 0.9em;"><strong>Note:</strong> ${h.note}</p>
+                                            </c:if>
+                                            <c:if test="${not empty h.revisionItems}">
+                                                <c:forEach var="item" items="${h.revisionItems}">
+                                                    <div class="note-block">${item.revisionDetail}</div>
+                                                </c:forEach>
+                                            </c:if>
+                                        </div>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <p style="color: var(--muted); font-style: italic; font-size: 0.9em;">Not have any history</p>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
 
-            <!-- COT 2: CONTENT -->
-            <div class="content">
-                <c:if test="${errorSig != null}">
-                    <p style="color: red">${errorSig}</p>
-                </c:if>
-                <h3>Content Details</h3>
-                <div
-                    style="background: #fdfdfd; padding: 15px; border: 1px solid #eee; margin-bottom: 15px; border-radius: 4px;">
-                    <p style="margin: 0 0 5px 0;"><strong>Customer</strong> ${contract.customerName}</p>
-                    <p style="margin: 0;"><strong>Storage type:</strong> ${contract.storageType}</p>
+                    </div>
                 </div>
-                <div
-                    style="border: 1px solid #ddd; padding: 20px; background: #fff; min-height: 500px; overflow-x: auto;">
-                    ${contract.contractContent}
-                </div>
-            </div>
-
-            <!-- COT 3: TYPE NOTE + HISTORY -->
-            <div class="right-panel">
-                <c:if test="${not isGuest && (( sessionScope.user.roleId == 2) || ( sessionScope.user.roleId == 3)) 
-                              && (contract.contractStatus== 'PENDING_REVIEW' ||contract.contractStatus== 'CUSTOMER_CHECK' ) }">
-                      <div class="type-note-section">
-                          <h3 style="margin-top:0;">Type note</h3>
-                          <form method="POST" action="contract-detail" id="requestEditForm">
-                              <input type="hidden" name="action" value="request_edit" />
-                              <input type="hidden" name="contractId" value="${contract.contractId}" />
-                              <textarea name="revision_note" class="note-textarea" placeholder="Ex:&#10;price: change to 10000&#10;name: change to vtp neee" required></textarea>
-                              <button type="submit" class="btn btn-submit-note">Send note</button>
-                          </form>
-                      </div>
-                      <hr style="margin:10px 0;">
-                </c:if>
-
-                <div class="history-section">
-                    <h3 style="margin-top:0;">History request edit</h3>
-                    <c:choose>
-                        <c:when test="${not empty historyList}">
-                            <c:forEach var="h" items="${historyList}">
-                                <div style="border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 10px;">
-                                    <p style="margin: 0 0 3px 0; color: #666; font-size: 0.85em;">${h.getCreateTimeString()}</p>
-                                    <p style="margin: 0 0 3px 0; font-size: 0.9em;"><strong>Status:</strong> ${h.toStatus}</p>
-                                    <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>By:</strong> ${h.changedByName}</p>
-                                    <c:if test="${sessionScope.user.roleId == 5}">
-                                        <p style="margin: 0 0 5px 0; color: red; font-size: 0.9em;"><strong>Note:</strong> ${h.note}</p>
-                                    </c:if>
-                                    <c:if test="${not empty h.revisionItems}">
-                                        <c:forEach var="item" items="${h.revisionItems}">
-                                            <div class="note-block">${item.revisionDetail}</div>
-                                        </c:forEach>
-                                    </c:if>
-                                </div>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <p style="color: #888;">Not have any history</p>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </div>
+            </main>
         </div>
-
     </body>
 
 </html>
