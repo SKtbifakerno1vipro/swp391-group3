@@ -310,6 +310,9 @@
                         <a class="button" href="${pageContext.request.contextPath}/customer/detail?id_cus=${customer.customerId}" id="btn-view-profile">
                             <span class="material-symbols-outlined">account_circle</span>Thông tin cá nhân
                         </a>
+                        <a class="button primary" href="${pageContext.request.contextPath}/auto-generator" id="btn-auto-generator">
+                            <span class="material-symbols-outlined">bolt</span>Auto Generator Contract
+                        </a>
                     </div>
                 </section>
 
@@ -437,7 +440,7 @@
                                         <c:forEach var="con" items="${recentContracts}">
                                             <tr>
                                                 <td>#<c:out value="${con.contractNumber}"/></td>
-                                                <td><c:out value="${con.formattedEffectiveDate}"/></td>
+                                                <td><c:out value="${con.formattedCreatedAt}"/></td>
                                                 <td>
                                                     <c:choose>
                                                         <c:when test="${con.contractStatus == 'ACTIVE'}">
@@ -455,7 +458,7 @@
                                                     </c:choose>
                                                 </td>
                                                 <td>
-                                                    <a class="btn-action" href="${pageContext.request.contextPath}/contract-detail?contractId=${con.contractId}">Chi tiết</a>
+                                                    <a class="btn-action" href="${pageContext.request.contextPath}/contract-detail?id=${con.contractId}">Chi tiết</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
