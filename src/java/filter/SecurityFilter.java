@@ -73,7 +73,6 @@ public class SecurityFilter implements Filter {
             "/invoice",
             "/revenue-report",
             "/payment",
-            "/payment/create",
             "/payment/list",
             "/payment/detail",
             "/admin/audit-logs"
@@ -103,7 +102,6 @@ public class SecurityFilter implements Filter {
             "/revenue-report",
             "/Signature",
             "/payment",
-            "/payment/create",
             "/payment/list",
             "/payment/detail"
     );
@@ -114,7 +112,6 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/customer/detail",
             "/payment",
-            "/payment/create",
             "/payment/list",
             "/payment/detail"
     );
