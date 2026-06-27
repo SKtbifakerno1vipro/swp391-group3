@@ -4,9 +4,18 @@ import java.time.LocalDateTime;
 
 public class ContractCustomerDTO {
 
-    private String contractNumber, customerName, 
+    private String contractNumber, customerName,
             storageType, taxCode, phone, email, contractStatus;
     private int contractId;
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+    private LocalDateTime updatedAt;
 
     public String getContractStatus() {
         return contractStatus;
@@ -23,7 +32,7 @@ public class ContractCustomerDTO {
     public void setContractId(int contractId) {
         this.contractId = contractId;
     }
-    
+
     private int orderId;
 
     public int getOrderId() {
@@ -61,7 +70,6 @@ public class ContractCustomerDTO {
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
-
 
     public String getStorageType() {
         return storageType;

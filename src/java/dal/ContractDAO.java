@@ -47,6 +47,7 @@ public class ContractDAO extends DBContext {
         List<ContractCustomerDTO> list = new ArrayList<>();
         String sql = """
                     SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type,  c.created_at,
+                    c.signed_date, c.contract_file_url, c.effective_date,
                     cust.company_name, cust.user_id, cust.tax_code, u.email, u.phone,
                     (SELECT TOP 1 co.customer_order_id FROM customer_order co WHERE co.customer_contract_id = c.customer_contract_id) AS order_id
                     FROM customer_contract c 
@@ -140,6 +141,13 @@ public class ContractDAO extends DBContext {
                 c.setPhone(rs.getString("phone"));
                 c.setEmail(rs.getString("email"));
                 c.setOrderId(rs.getInt("order_id"));
+                c.setContractFileUrl(rs.getString("contract_file_url"));
+                if (rs.getTimestamp("signed_date") != null) {
+                    c.setSignDate(rs.getTimestamp("signed_date").toLocalDateTime());
+                }
+                if (rs.getTimestamp("effective_date") != null) {
+                    c.setEffectiveDate(rs.getTimestamp("effective_date").toLocalDateTime());
+                }
                 list.add(c);
             }
         } catch (Exception e) {
@@ -335,7 +343,6 @@ public class ContractDAO extends DBContext {
                 + "contract_number = ?, "
                 + "contract_content = ?, "
                 + "contract_status = ?, "
-                + "contract_version = ?, "
                 + "effective_date = ?, "
                 + "end_date = ?, "
                 + "signed_date = ?, "
@@ -347,12 +354,11 @@ public class ContractDAO extends DBContext {
             ps.setString(1, c.getContractNumber());
             ps.setString(2, c.getContractContent());
             ps.setString(3, c.getContractStatus());
-            ps.setString(4, c.getContractVersion());
-            ps.setTimestamp(5, c.getEffectiveDate() != null ? Timestamp.valueOf(c.getEffectiveDate()) : null);
-            ps.setTimestamp(6, c.getEndDate() != null ? Timestamp.valueOf(c.getEndDate()) : null);
-            ps.setTimestamp(7, c.getSignDate() != null ? Timestamp.valueOf(c.getSignDate()) : null);
-            ps.setInt(8, c.getUpdatedBy());
-            ps.setInt(9, c.getContractId());
+            ps.setTimestamp(4, c.getEffectiveDate() != null ? Timestamp.valueOf(c.getEffectiveDate()) : null);
+            ps.setTimestamp(5, c.getEndDate() != null ? Timestamp.valueOf(c.getEndDate()) : null);
+            ps.setTimestamp(6, c.getSignDate() != null ? Timestamp.valueOf(c.getSignDate()) : null);
+            ps.setInt(7, c.getUpdatedBy());
+            ps.setInt(8, c.getContractId());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -361,49 +367,7 @@ public class ContractDAO extends DBContext {
         return false;
     }
 
-    // XHieu-begin - delete contact me
-    public List<Contract> getContractsByCustomerId(int customerId) {
-        List<Contract> list = new ArrayList<>();
-        String sql = "SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type, "
-                + "c.contract_version, c.effective_date, c.end_date, c.signed_date, c.created_at, c.updated_at, cust.company_name "
-                + "FROM customer_contract c  JOIN customer cust ON c.customer_id = cust.customer_id "
-                + "WHERE c.customer_id = ? "
-                + "ORDER BY c.updated_at DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, customerId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Contract c = new Contract();
-                c.setContractId(rs.getInt("customer_contract_id"));
-                c.setContractNumber(rs.getString("contract_number"));
-                c.setContractStatus(rs.getString("contract_status"));
-                c.setStorageType(rs.getString("storage_type"));
-                c.setContractVersion(rs.getString("contract_version"));
-                c.setCustomerName(rs.getString("company_name"));
 
-                if (rs.getTimestamp("effective_date") != null) {
-                    c.setEffectiveDate(rs.getTimestamp("effective_date").toLocalDateTime());
-                }
-                if (rs.getTimestamp("end_date") != null) {
-                    c.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
-                }
-                if (rs.getTimestamp("signed_date") != null) {
-                    c.setSignDate(rs.getTimestamp("signed_date").toLocalDateTime());
-                }
-                if (rs.getTimestamp("created_at") != null) {
-                    c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                }
-                if (rs.getTimestamp("updated_at") != null) {
-                    c.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-                }
-                list.add(c);
-            }
-        } catch (Exception e) {
-            System.out.println("getContractsByCustomerId error: " + e.getMessage());
-        }
-        return list;
-    }
-    // Xhieu - end
 
     //nguyenkien - begin
     public boolean updateContractContent(int contractId, String contractContent) {

@@ -18,8 +18,8 @@
         <a class="nav-link ${param.activeMenu == 'dashboard' ? 'active' : ''}"
            href="${pageContext.request.contextPath}/dashboard"><span
                 class="material-symbols-outlined">dashboard</span>Dashboard</a>
-        <c:choose>
-            <c:when test="${sessionScope.user.roleId == 3}">
+            <c:choose>
+                <c:when test="${sessionScope.user.roleId == 3}">
                 <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/customer/detail?id_cus=${sessionScope.customerId}"><span
                         class="material-symbols-outlined">account_circle</span>My Profile</a>
@@ -35,9 +35,28 @@
                 <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/payment/list"><span
                         class="material-symbols-outlined">payments</span>My Payments</a>
-
-            </c:when>
-            <c:otherwise>
+                <a class="nav-link ${param.activeMenu == 'createPayment' ? 'active' : ''}"
+                   href="${pageContext.request.contextPath}/payment/create"><span
+                        class="material-symbols-outlined">add_card</span>Create Payment</a>
+                </c:when>
+                <c:when test="${sessionScope.user.roleId == 5}">
+                <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
+                   href="${pageContext.request.contextPath}/quotation-list"><span
+                        class="material-symbols-outlined">request_quote</span>Quotations</a>
+                <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
+                   href="${pageContext.request.contextPath}/contract-list"><span
+                        class="material-symbols-outlined">contract</span>Contracts</a>
+                <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
+                   href="${pageContext.request.contextPath}/customer-order-list"><span
+                        class="material-symbols-outlined">shopping_cart</span>Orders</a>
+                <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
+                   href="${pageContext.request.contextPath}/invoice"><span
+                        class="material-symbols-outlined">receipt_long</span>Invoices</a>
+                <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
+                   href="${pageContext.request.contextPath}/payment/list"><span
+                        class="material-symbols-outlined">payments</span>Payments</a>
+                </c:when>
+                <c:otherwise>
                 <a class="nav-link ${param.activeMenu == 'customers' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/customer/list"><span
                         class="material-symbols-outlined">groups</span>Customers</a>
@@ -66,21 +85,21 @@
                 <a class="nav-link ${param.activeMenu == 'roles' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/role-list"><span
                         class="material-symbols-outlined">admin_panel_settings</span>Roles</a>
-                <c:if test="${sessionScope.user.roleId == 2 || sessionScope.user.roleId == 4}">
+                    <c:if test="${sessionScope.user.roleId == 2 || sessionScope.user.roleId == 4}">
                     <a class="nav-link ${param.activeMenu == 'revenue' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/revenue-report"><span
                             class="material-symbols-outlined">analytics</span>Revenue Report</a>
-                </c:if>
-                <c:if test="${sessionScope.user.roleId == 1}">
+                    </c:if>
+                    <c:if test="${sessionScope.user.roleId == 1}">
                     <a class="nav-link ${param.activeMenu == 'emailLogs' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/email/logs"><span
                             class="material-symbols-outlined">mail</span>Email Logs</a>
                     <a class="nav-link ${param.activeMenu == 'auditLogs' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/admin/audit-logs"><span
                             class="material-symbols-outlined">history</span>System Audit Logs</a>
-                </c:if>
-            </c:otherwise>
-        </c:choose>
+                    </c:if>
+                </c:otherwise>
+            </c:choose>
     </nav>
 
     <div class="sidebar-footer">
@@ -92,8 +111,16 @@
                         <c:out value="${sessionScope.user.fullName}" />
                     </strong><br>
                     <small>@
-                        <c:out value="${sessionScope.user.userName}" /> - Role
-                        <c:out value="${sessionScope.user.roleId}" />
+                        <c:out value="${sessionScope.user.userName}" />
+                        <br>
+                        <c:choose>
+                            <c:when test="${sessionScope.user.roleId == 1}">Admin</c:when>
+                            <c:when test="${sessionScope.user.roleId == 2}">Manager</c:when>
+                            <c:when test="${sessionScope.user.roleId == 3}">Customer</c:when>
+                            <c:when test="${sessionScope.user.roleId == 4}">Sale</c:when>
+                            <c:when test="${sessionScope.user.roleId == 5}">Admin Officer</c:when>
+                            <c:otherwise>Role <c:out value="${sessionScope.user.roleId}" /></c:otherwise>
+                        </c:choose>
                     </small>
                 </div>
             </div>

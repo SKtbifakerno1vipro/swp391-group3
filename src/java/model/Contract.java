@@ -11,11 +11,10 @@ public class Contract {
     private String contractNumber;
     private String contractFileUrl;
     private String contractStatus;
-    private String contractVersion;
     private LocalDateTime effectiveDate;
     private LocalDateTime endDate;
     private LocalDateTime signDate;
-        private int createdBy;
+    private int createdBy;
     private int updatedBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -30,12 +29,12 @@ public class Contract {
     public void setToken(String token) {
         this.token = token;
     }
-    
 
     public String getContractContent() {
         return contractContent;
     }
-        public String getCustomerName() {
+
+    public String getCustomerName() {
         return customerName;
     }
 
@@ -54,8 +53,6 @@ public class Contract {
     public void setStorageType(String storageType) {
         this.storageType = storageType;
     }
-
-
 
     public int getContractId() {
         return contractId;
@@ -103,14 +100,6 @@ public class Contract {
 
     public void setContractStatus(String contractStatus) {
         this.contractStatus = contractStatus;
-    }
-
-    public String getContractVersion() {
-        return contractVersion;
-    }
-
-    public void setContractVersion(String contractVersion) {
-        this.contractVersion = contractVersion;
     }
 
     public LocalDateTime getEffectiveDate() {
@@ -171,7 +160,6 @@ public class Contract {
 
     public Contract() {
     }
-
 
     // XHieu-begin - delete contact me
     public String getFormattedSignDate() {

@@ -139,7 +139,7 @@ public class ContractService {
                 + "    </div>"
                 + "</body>"
                 + "</html>";
-        EmailUtils.sendEmail("phuvt.tech@gmail.com", subject, content);
+        EmailUtils.sendEmail(customer.getEmail(), subject, content);
     }
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
