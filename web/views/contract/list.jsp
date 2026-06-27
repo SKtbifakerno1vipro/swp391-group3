@@ -89,7 +89,7 @@
                                                 <a href="${pageContext.request.contextPath}/customer-order?id=${c.orderId}">| View Order</a>
                                             </c:when>
                                             <c:otherwise>
-                                                <a href="${pageContext.request.contextPath}//customer-order?contractId=${c.contractId}">Create Order</a>
+                                                <a href="${pageContext.request.contextPath}//customer-order?contractId=${c.contractId}">| Create Order</a>
                                             </c:otherwise>
                                         </c:choose>
                                     </c:if>
