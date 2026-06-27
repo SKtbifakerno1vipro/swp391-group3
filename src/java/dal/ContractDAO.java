@@ -335,7 +335,6 @@ public class ContractDAO extends DBContext {
                 + "contract_number = ?, "
                 + "contract_content = ?, "
                 + "contract_status = ?, "
-                + "contract_version = ?, "
                 + "effective_date = ?, "
                 + "end_date = ?, "
                 + "signed_date = ?, "
@@ -347,12 +346,11 @@ public class ContractDAO extends DBContext {
             ps.setString(1, c.getContractNumber());
             ps.setString(2, c.getContractContent());
             ps.setString(3, c.getContractStatus());
-            ps.setString(4, c.getContractVersion());
-            ps.setTimestamp(5, c.getEffectiveDate() != null ? Timestamp.valueOf(c.getEffectiveDate()) : null);
-            ps.setTimestamp(6, c.getEndDate() != null ? Timestamp.valueOf(c.getEndDate()) : null);
-            ps.setTimestamp(7, c.getSignDate() != null ? Timestamp.valueOf(c.getSignDate()) : null);
-            ps.setInt(8, c.getUpdatedBy());
-            ps.setInt(9, c.getContractId());
+            ps.setTimestamp(4, c.getEffectiveDate() != null ? Timestamp.valueOf(c.getEffectiveDate()) : null);
+            ps.setTimestamp(5, c.getEndDate() != null ? Timestamp.valueOf(c.getEndDate()) : null);
+            ps.setTimestamp(6, c.getSignDate() != null ? Timestamp.valueOf(c.getSignDate()) : null);
+            ps.setInt(7, c.getUpdatedBy());
+            ps.setInt(8, c.getContractId());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -378,7 +376,6 @@ public class ContractDAO extends DBContext {
                 c.setContractNumber(rs.getString("contract_number"));
                 c.setContractStatus(rs.getString("contract_status"));
                 c.setStorageType(rs.getString("storage_type"));
-                c.setContractVersion(rs.getString("contract_version"));
                 c.setCustomerName(rs.getString("company_name"));
 
                 if (rs.getTimestamp("effective_date") != null) {
