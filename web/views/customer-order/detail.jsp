@@ -38,7 +38,14 @@
                     </select>
                     <button type="submit">Update Status</button>
                 </li>
-                <li><strong>Created At:</strong>
+                <c:if test="${order.customerOrder.orderStatus == 'COMPLETED'}">
+                    <li style="margin-top: 15px;"><strong>Hành động:</strong>
+                        <a href="${pageContext.request.contextPath}/invoice?orderId=${order.customerOrder.customerOrderId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #15803d; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(21, 128, 61, 0.2);">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: white;">receipt_long</span> Create Invoice
+                        </a>
+                    </li>
+                </c:if>
+                <li style="margin-top: 15px;"><strong>Created At:</strong>
                     <fmt:parseDate value="${order.customerOrder.createdAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
                     <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
                 </li>

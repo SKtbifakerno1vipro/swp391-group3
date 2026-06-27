@@ -232,7 +232,8 @@ CREATE TABLE contract_revision_item (
 -- 14. Signature
 CREATE TABLE signature (
     signature_id INT IDENTITY(1,1) PRIMARY KEY,
-    customer_contract_id INT NOT NULL,
+    customer_contract_id INT,
+	invoice_id int,
     file_name NVARCHAR(255),
     file_url NVARCHAR(1000),
     signer_user_id INT NULL,
@@ -278,7 +279,7 @@ CREATE TABLE customer_order_detail (
 GO
 
 -- 17. Invoice
-CREATE TABLE invoice (
+drop TABLE invoice (
     invoice_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_contract_id INT NOT NULL,
     customer_order_id INT NOT NULL,
@@ -286,7 +287,6 @@ CREATE TABLE invoice (
     issue_date DATETIME,
     invoice_status VARCHAR(20),
     invoice_type VARCHAR(20) NOT NULL DEFAULT 'SALES',      -- 'VAT' or 'SALES'
-    template_code VARCHAR(20) NOT NULL DEFAULT '2',          -- '1' (VAT), '2' (SALES)
     invoice_symbol VARCHAR(20) NOT NULL DEFAULT 'K26TYY',     -- E-invoice code without tax code
     
     -- Seller info snapshot
@@ -304,6 +304,10 @@ CREATE TABLE invoice (
     tax_amount DECIMAL(18,2) DEFAULT 0,
     total_amount DECIMAL(18,2) DEFAULT 0,
     
+	--Note
+	customer_note NVARCHAR(max) NULL,
+	internal_note NVARCHAR(max) NULL,
+
     created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),

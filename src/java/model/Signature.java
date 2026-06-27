@@ -14,6 +14,7 @@ public class Signature {
 
     private int id;
     private int customerContractId;
+    private Integer invoiceId;
     private String fileName;
     private String fileUrl;
     private Integer signerUserId;
@@ -95,6 +96,14 @@ public class Signature {
 
     public void setUploadedAt(Timestamp uploadedAt) {
         this.uploadedAt = uploadedAt;
+    }
+
+    public Integer getInvoiceId() {
+        return invoiceId;
+    }
+
+    public void setInvoiceId(Integer invoiceId) {
+        this.invoiceId = invoiceId;
     }
 
 }
