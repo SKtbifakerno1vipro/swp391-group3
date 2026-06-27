@@ -17,6 +17,7 @@ public class Invoice {
     private String sellerName;
     private String sellerTaxCode;
     private String sellerAddress;
+    private String sellerPhone;
     
     // Buyer info snapshot
     private String buyerName;
@@ -123,6 +124,14 @@ public class Invoice {
 
     public void setSellerAddress(String sellerAddress) {
         this.sellerAddress = sellerAddress;
+    }
+
+    public String getSellerPhone() {
+        return sellerPhone;
+    }
+
+    public void setSellerPhone(String sellerPhone) {
+        this.sellerPhone = sellerPhone;
     }
 
     public String getBuyerName() {

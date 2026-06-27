@@ -31,6 +31,9 @@ public class InvoiceList extends HttpServlet {
             return;
         }
 
+        String errorInvoice = null;
+        errorInvoice = (String)session.getAttribute("errorInvoice");
+        session.removeAttribute("errorInvoice");
         String pageRaw = request.getParameter("page");
         int page = 1;
         if (pageRaw != null && !pageRaw.trim().isEmpty()) {
@@ -46,12 +49,13 @@ public class InvoiceList extends HttpServlet {
         page = productService.nomalizePage(page, totalPage);
 
         List<Invoice> list = invoiceService.getInvoices(totalRow, page, totalPage, PAGE_SIZE);
-
+        
         request.setAttribute("invoices", list);
+        request.setAttribute("errorInvoice", errorInvoice);
         request.setAttribute("page", page);
         request.setAttribute("totalPage", totalPage);
         request.setAttribute("totalRow", totalRow);
-
+        
         request.getRequestDispatcher("/views/invoice/list.jsp").forward(request, response);
     } 
 

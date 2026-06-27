@@ -24,6 +24,10 @@ public class CustomerOrderService {
         return customerOrderDAO.getDetailsByOrderId(orderId);
     }
 
+    public List<dto.CustomerOrderDTO> getOrderDetailsVer2(int orderId) {
+        return customerOrderDAO.getDetailsByOrderIdVer2(orderId);
+    }
+
     public boolean createOrder(model.CustomerOrder order, List<model.CustomerOrderDetail> details) {
         return customerOrderDAO.createOrder(order, details);
     }

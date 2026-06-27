@@ -1,6 +1,10 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8" import="java.time.LocalDate"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%
+    String defaultSymbol = "1C" + String.format("%02d", LocalDate.now().getYear() % 100) + "TYY";
+    pageContext.setAttribute("defaultSymbol", defaultSymbol);
+%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -21,7 +25,7 @@
                 font-family: 'Nunito Sans', sans-serif;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             }
-            
+
             /* Status section */
             .status-section {
                 text-align: right;
@@ -47,7 +51,7 @@
             /* Buyer & invoice info block */
             .buyer-info-grid {
                 display: grid;
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr;
                 gap: 15px 25px;
                 background: #fdfdfd;
                 border: 1px solid #e2e8f0;
@@ -55,7 +59,7 @@
                 border-radius: 8px;
                 margin-bottom: 20px;
             }
-            
+
             .buyer-group {
                 display: flex;
                 align-items: center;
@@ -94,7 +98,7 @@
                 border-color: #3b82f6;
                 outline: none;
             }
-            
+
             .btn-icon {
                 display: grid;
                 place-items: center;
@@ -140,7 +144,7 @@
                 gap: 15px;
                 align-items: center;
             }
-            
+
             .search-product-input {
                 padding: 6px 10px;
                 border: 1px solid #cbd5e1;
@@ -191,7 +195,7 @@
             .product-table td:last-child, .product-table th:last-child {
                 border-right: none;
             }
-            
+
             .product-table input, .product-table select {
                 width: 100%;
                 box-sizing: border-box;
@@ -216,14 +220,14 @@
                 outline: none;
                 border-radius: 4px;
             }
-            
+
             .text-right {
                 text-align: right !important;
             }
             .text-center {
                 text-align: center !important;
             }
-            
+
             /* Summary fields */
             .summary-layout {
                 display: grid;
@@ -423,6 +427,94 @@
                     justify-content: center;
                 }
             }
+
+            /* MODAL PREVIEW INVOICE */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(15, 23, 42, 0.6);
+                backdrop-filter: blur(4px);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+            .modal-content {
+                background: #ffffff;
+                border-radius: 16px;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                width: 100%;
+                max-width: 850px;
+                max-height: 90%;
+                display: flex;
+                flex-direction: column;
+                animation: slideUp 0.3s ease-out;
+            }
+            @keyframes slideUp {
+                from {
+                    transform: translateY(20px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            .modal-header {
+                padding: 16px 24px;
+                border-bottom: 1px solid #e2e8f0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .close-modal-btn {
+                font-size: 24px;
+                font-weight: bold;
+                color: #64748b;
+                cursor: pointer;
+                transition: color 0.2s;
+            }
+            .close-modal-btn:hover {
+                color: #0f172a;
+            }
+            .modal-body {
+                padding: 24px;
+                overflow-y: auto;
+                background: #f8fafc;
+            }
+            .modal-footer {
+                padding: 16px 24px;
+                border-top: 1px solid #e2e8f0;
+                display: flex;
+                justify-content: flex-end;
+                gap: 12px;
+            }
+
+            /* E-Invoice Layout Styling */
+            .e-invoice-wrapper {
+                background: #ffffff;
+                border: 1px solid #cbd5e1;
+                padding: 30px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                font-family: 'Times New Roman', Times, serif;
+                color: #0f172a;
+            }
+            .e-invoice-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+            .preview-products-table th, .preview-products-table td {
+                border: 1px solid #cbd5e1;
+                padding: 8px 6px;
+            }
+            .preview-products-table td {
+                vertical-align: middle;
+            }
         </style>
     </head>
     <body>
@@ -430,21 +522,21 @@
             <jsp:include page="/views/shared/sidebar.jsp">
                 <jsp:param name="activeMenu" value="invoices"/>
             </jsp:include>
-            
+
             <main class="main legacy-page">
                 <div class="invoice-container">
-                    
+
                     <!-- STATUS LABELS -->
                     <div class="status-section">
-                        Trạng thái: <span class="status-label">Chờ xuất</span> 
-                        | Phân loại: <span style="font-weight: bold; color: #15803d;">Hóa đơn gốc</span>
+                        Status: <span class="status-label">${not empty invoice ? invoice.invoiceStatus : 'UNRELEASED'}</span> 
+                        | Created By: <span style="font-weight: bold; color: #15803d;">${not empty creatorName ? creatorName : 'N/A'}</span>
                     </div>
 
                     <!-- DYNAMIC INVOICE TITLE -->
                     <div class="invoice-title" id="dynamicTitle">
-                        HÓA ĐƠN GIÁ TRỊ GIA TĂNG (CÓ MÃ KHỞI TẠO TỪ MÁY TÍNH TIỀN)
+                        ${(not empty invoice ? invoice.invoiceType : (empty invoiceType ? 'VAT' : invoiceType)) == 'VAT' ? 'VALUE ADDED TAX INVOICE' : 'SALES INVOICE'}
                     </div>
-                    
+
                     <c:if test="${error != null}">
                         <div style="color: #dc3545; background: #fee2e2; border: 1px solid #fca5a5; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 13px;">
                             ${error}
@@ -452,89 +544,88 @@
                     </c:if>
 
                     <form id="invoiceForm" action="${pageContext.request.contextPath}/invoice" method="post">
-                        
+
                         <!-- HIDDEN DATA TO SUBMIT TO DATABASE -->
-                        <input type="hidden" name="customerContractId" id="customerContractId" value="${contract.contractId}">
-                        <input type="hidden" name="customerOrderId" id="customerOrderId" value="${order.customerOrderId}">
-                        <input type="hidden" name="sellerName" value="Công ty TNHH Bánh Ngọt Po Bread">
-                        <input type="hidden" name="sellerTaxCode" value="0101234567">
-                        <input type="hidden" name="sellerAddress" value="1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội">
-                        <input type="hidden" name="invoiceStatus" value="UNPAID">
+                        <c:set var="isReadOnly" value="${not empty invoice && invoice.invoiceStatus != 'UNRELEASED'}"/>
+                        <input type="hidden" name="invoiceId" value="${invoice.invoiceId}">
+                        <input type="hidden" name="customerContractId" id="customerContractId" value="${not empty invoice ? invoice.customerContractId : contract.contractId}">
+                        <input type="hidden" name="customerOrderId" id="customerOrderId" value="${not empty invoice ? invoice.customerOrderId : order.customerOrderId}">
+                        <input type="hidden" name="sellerName" value="${not empty invoice ? invoice.sellerName : companyName}">
+                        <input type="hidden" name="sellerTaxCode" value="${not empty invoice ? invoice.sellerTaxCode : companyTaxCode}">
+                        <input type="hidden" name="sellerAddress" value="${not empty invoice ? invoice.sellerAddress : companyAddress}">
+                        <input type="hidden" name="sellerPhone" id="sellerPhone" value="${not empty invoice ? invoice.sellerPhone : companyPhone}">
+                        <input type="hidden" name="invoiceStatus" id="invoiceStatus" value="${not empty invoice ? invoice.invoiceStatus : 'UNRELEASED'}">
 
                         <!-- BUYER & INVOICE DETAILS BLOCK -->
                         <div class="buyer-info-grid">
-                            <!-- Column 1 (Thông tin khách hàng) -->
+                            <!-- Column 1 (Customer Information) -->
                             <div>
                                 <div class="buyer-group form-group">
-                                    <label>Mã khách hàng</label>
+                                    <label>Customer Code</label>
                                     <div class="input-wrapper">
-                                        <input type="text" id="buyerCode" value="KH-${customer.customerId}" readonly>
-                                        <button type="button" class="btn-icon" style="opacity: 0.6; pointer-events: none;"><span class="material-symbols-outlined" style="font-size: 18px;">search</span></button>
-                                        <button type="button" class="btn-icon btn-add" style="opacity: 0.6; pointer-events: none;"><span class="material-symbols-outlined" style="font-size: 18px;">add</span></button>
+                                        <input type="text" id="buyerCode" value="KH-${not empty customer ? customer.customerId : order.customerId}" readonly>
                                     </div>
                                 </div>
                                 <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Mã số thuế</label>
+                                    <label>Tax Code</label>
                                     <div class="input-wrapper">
-                                        <input type="text" name="buyerTaxCode" id="buyerTaxCode" value="${customer.taxCode}" readonly>
-                                        <button type="button" class="btn-info-get" style="opacity: 0.6; pointer-events: none;">Lấy thông tin</button>
+                                        <input type="text" name="buyerTaxCode" id="buyerTaxCode" value="${not empty invoice ? invoice.buyerTaxCode : customer.taxCode}" ${isReadOnly ? 'readonly' : ''}>
                                     </div>
                                 </div>
                                 <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Tên người mua</label>
+                                    <label>Buyer Company</label>
                                     <div class="input-wrapper">
-                                        <input type="text" name="buyerName" id="buyerName" value="${customer.companyName}" readonly>
+                                        <input type="text" name="buyerName" id="buyerName" value="${not empty invoice ? invoice.buyerName : customer.companyName}" ${isReadOnly ? 'readonly' : ''}>
+                                    </div>
+                                </div>
+                                <div class="buyer-group form-group" style="margin-top: 15px;">
+                                    <label>Phone Number</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" name="buyerPhone" id="buyerPhone" value="${not empty buyerPhone ? buyerPhone : customerUser.phone}" ${isReadOnly ? 'readonly' : ''}>
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Column 2 (Thông tin đơn hàng & Ngày hóa đơn) -->
-                            <div>
-                                <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Điện thoại</label>
-                                    <div class="input-wrapper">
-                                        <input type="text" name="buyerPhone" id="buyerPhone" value="${customerUser.phone}" readonly>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Column 3 (Thông tin mẫu hóa đơn) -->
+                            <!-- Column 2 (Invoice Template Info) -->
                             <div>
                                 <div class="buyer-group form-group">
-                                    <label for="invoiceType">* Mẫu số HĐ</label>
+                                    <label for="invoiceType">* Invoice Template</label>
                                     <div class="input-wrapper">
-                                        <select name="invoiceType" id="invoiceType" onchange="onInvoiceTypeChange()">
-                                            <option value="VAT" ${invoiceType == 'VAT' ? 'selected' : ''}>1 - Hóa đơn GTGT</option>
-                                            <option value="SALES" ${invoiceType == 'SALES' ? 'selected' : ''}>2 - Hóa đơn Bán hàng</option>
+                                        <select name="invoiceType" id="invoiceType" onchange="onInvoiceTypeChange()" ${isReadOnly ? 'disabled' : ''}>
+                                            <option value="VAT" ${(not empty invoice ? invoice.invoiceType : (empty invoiceType ? 'VAT' : invoiceType)) == 'VAT' ? 'selected' : ''}>1 - VAT Invoice</option>
+                                            <option value="SALES" ${(not empty invoice ? invoice.invoiceType : (empty invoiceType ? 'VAT' : invoiceType)) == 'SALES' ? 'selected' : ''}>2 - Sales Invoice</option>
                                         </select>
-                                        <input type="hidden" name="templateCode" id="templateCode" value="1">
+                                        <c:if test="${isReadOnly}">
+                                            <input type="hidden" name="invoiceType" value="${not empty invoice ? invoice.invoiceType : 'VAT'}">
+                                        </c:if>
                                     </div>
                                 </div>
                                 <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Ký hiệu hóa đơn</label>
+                                    <label>Invoice Symbol</label>
                                     <div class="input-wrapper">
-                                        <input type="text" name="invoiceSymbol" id="invoiceSymbol" value="${empty invoiceSymbol ? '1C26TYY' : invoiceSymbol}" required maxlength="10">
+                                        <input type="text" name="invoiceSymbol" id="invoiceSymbol" value="${not empty invoice ? invoice.invoiceSymbol : (empty invoiceSymbol ? defaultSymbol : invoiceSymbol)}" required maxlength="10" ${isReadOnly ? 'readonly' : ''}>
                                     </div>
                                 </div>
                                 <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Số hóa đơn</label>
+                                    <label>Invoice Number</label>
                                     <div class="input-wrapper">
-                                        <input type="text" name="invoiceNo" id="invoiceNo" value="${empty invoiceNo ? '0' : invoiceNo}" required readonly style="color: #dc2626; font-weight: bold; background: #f8fafc;">
+                                        <input type="text" id="invoiceNoDisplay" value="${(not empty invoice && invoice.invoiceStatus != 'UNRELEASED') ? invoice.invoiceNo : 'Not assigned (Auto-generated)'}" readonly style="color: #dc2626; font-weight: bold; background: #f8fafc;">
+                                        <input type="hidden" name="invoiceNo" id="invoiceNo" value="${not empty invoice ? invoice.invoiceNo : '0'}">
                                     </div>
                                 </div>
                                 <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>* Ngày hóa đơn</label>
+                                    <label>Invoice Date</label>
                                     <div class="input-wrapper">
-                                        <input type="datetime-local" name="issueDate" id="issueDate" value="${issueDate}" required>
+                                        <input type="text" id="issueDateDisplay" value="${(not empty invoice && invoice.issueDate != null) ? invoice.issueDate : 'Auto-retrieved upon release'}" readonly style="background: #f8fafc; color: #64748b;">
+                                        <input type="hidden" name="issueDate" id="issueDate" value="${(not empty invoice && invoice.issueDate != null) ? invoice.issueDate : ''}">
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Address Input spanning full width -->
                             <div class="buyer-group form-group full-width-field" style="margin-top: 10px;">
-                                <label style="width: 110px;">Địa chỉ bên mua</label>
+                                <label style="width: 110px;">Buyer Address</label>
                                 <div class="input-wrapper">
-                                    <input type="text" name="buyerAddress" id="buyerAddress" value="${customerUser.address}" readonly>
+                                    <input type="text" name="buyerAddress" id="buyerAddress" value="${not empty invoice ? invoice.buyerAddress : customerUser.address}" ${isReadOnly ? 'readonly' : ''}>
                                 </div>
                             </div>
                         </div>
@@ -542,10 +633,10 @@
                         <!-- TABLE CONTROL PANEL (READ-ONLY DISPLAY CONTEXT) -->
                         <div class="table-controls">
                             <div class="table-controls-left">
-                                <span style="font-weight: bold; color: var(--primary);">Danh sách hàng hóa & dịch vụ từ đơn hàng</span>
+                                <span style="font-weight: bold; color: var(--primary);">List of Goods & Services from Order</span>
                             </div>
                             <div class="table-controls-right">
-                                <label><input type="checkbox" checked disabled> Đơn giá, số lượng đã khóa</label>
+                                <label><input type="checkbox" checked disabled> Unit price, quantity locked</label>
                                 <span class="material-symbols-outlined" style="color: #cbd5e1;">settings</span>
                             </div>
                         </div>
@@ -555,54 +646,53 @@
                             <table class="product-table" id="productTable">
                                 <thead>
                                     <tr>
-                                        <th style="width: 10%;" class="text-center">Mã hàng</th>
-                                        <th style="width: 30%;">Tên hàng hóa & dịch vụ</th>
-                                        <th style="width: 10%;">Đơn vị tính</th>
-                                        <th style="width: 8%;" class="text-right">Số lượng</th>
-                                        <th style="width: 10%;" class="text-right">Đơn giá</th>
-                                        <th style="width: 10%;" class="text-right">Thành tiền</th>
+                                        <th style="width: 10%;" class="text-center">Item Code</th>
+                                        <th style="width: 25%;">Goods & Services Name</th>
+                                        <th style="width: 8%;">Unit</th>
+                                        <th style="width: 7%;" class="text-right">Quantity</th>
+                                        <th style="width: 10%;" class="text-right">Unit Price</th>
+                                        <th style="width: 10%;" class="text-right">Line Amount</th>
+                                        <th style="width: 10%;" class="text-center">(%) Discount</th>
                                         <th style="width: 10%;" class="text-center">(%) VAT</th>
-                                        <th style="width: 10%;" class="text-right">Thuế VAT</th>
+                                        <th style="width: 10%;" class="text-right">VAT Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody id="productTableBody">
                                     <c:if var="hasNoItems" test="${empty orderDetails}">
                                         <tr id="emptyRowPlaceholder">
                                             <td colspan="9" class="text-center" style="color: var(--muted); padding: 15px;">
-                                                Không có dữ liệu mặt hàng nào.
+                                                No item data available.
                                             </td>
                                         </tr>
                                     </c:if>
                                     <c:forEach var="item" items="${orderDetails}">
                                         <tr class="product-row">
                                             <td class="text-center">
-                                                <input type="text" value="${item.product.productId}" style="text-align: center;" readonly>
+                                                <input type="text" value="${item.productId}" style="text-align: center;" readonly>
                                             </td>
                                             <td>
-                                                <input type="text" value="${item.product.productName}" readonly>
+                                                <input type="text" value="${item.productName}" readonly>
                                             </td>
                                             <td>
-                                                <input type="text" value="${item.product.unit}" style="text-align: center;" readonly>
+                                                <input type="text" value="${item.unit}" style="text-align: center;" readonly>
                                             </td>
                                             <td>
-                                                <input type="number" class="row-qty text-right" value="${item.detail.quantity}" readonly>
+                                                <input type="number" class="row-qty text-right" value="${item.quantity}" readonly>
                                             </td>
                                             <td>
-                                                <input type="number" class="row-price text-right" value="${item.detail.sellingPrice}" readonly>
+                                                <input type="number" class="row-price text-right" value="${item.sellingPrice}" readonly>
                                             </td>
                                             <td>
-                                                <input type="text" class="row-amount text-right" value="${item.detail.quantity * item.detail.sellingPrice}" readonly style="font-weight: 600;">
+                                                <input type="text" class="row-amount text-right" value="${item.lineAmount}" readonly style="font-weight: 600;">
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" class="row-discount-rate text-center" value="${item.discountPercent}" readonly style="width: 40px; text-align: center; border: none; background: transparent; pointer-events: none;">%
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="text" class="row-tax-rate text-center" value="${empty item.taxPercent ? 0 : item.taxPercent}" readonly style="width: 40px; text-align: center; border: none; background: transparent; pointer-events: none;">%
                                             </td>
                                             <td>
-                                                <select class="row-tax-rate text-center" onchange="onRowValueChange(this)">
-                                                    <option value="10" ${item.detail.taxPercent == 10 || empty item.detail.taxPercent ? 'selected' : ''}>10%</option>
-                                                    <option value="8" ${item.detail.taxPercent == 8 ? 'selected' : ''}>8%</option>
-                                                    <option value="5" ${item.detail.taxPercent == 5 ? 'selected' : ''}>5%</option>
-                                                    <option value="0" ${item.detail.taxPercent == 0 ? 'selected' : ''}>0%</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="row-tax-val text-right" value="0" readonly style="font-weight: 600;">
+                                                <input type="text" class="row-tax-val text-right" value="${item.lineTax}" readonly style="font-weight: 600;">
                                             </td>
                                         </tr>
                                     </c:forEach>
@@ -615,62 +705,46 @@
                             <!-- Left notes & words -->
                             <div class="summary-notes">
                                 <div class="summary-notes-group">
-                                    <label for="invoiceNotes">Ghi chú trên hóa đơn</label>
-                                    <textarea id="invoiceNotes" name="invoiceNotes" rows="2" placeholder="Ghi chú in ra hóa đơn gửi khách hàng..."></textarea>
+                                    <label for="invoiceNotes">Customer Notes</label>
+                                    <textarea id="invoiceNotes" name="invoiceNotes" rows="2" placeholder="Notes printed on invoice for customer..." ${isReadOnly ? 'readonly' : ''}>${not empty invoice ? invoice.customerNote : ''}</textarea>
                                 </div>
                                 <div class="summary-notes-group">
-                                    <label for="internalNotes">Ghi chú nội bộ</label>
-                                    <textarea id="internalNotes" name="internalNotes" rows="2" placeholder="Ghi chú nội bộ dành cho nhân viên..."></textarea>
+                                    <label for="internalNotes">Internal Notes</label>
+                                    <textarea id="internalNotes" name="internalNotes" rows="2" placeholder="Internal notes for staff..." ${isReadOnly ? 'readonly' : ''}>${not empty invoice ? invoice.internalNote : ''}</textarea>
                                 </div>
                                 <div class="money-in-words" id="moneyInWords">
-                                    Số tiền bằng chữ: <em>Không đồng</em>
+                                    Amount in words: <em>Zero dong</em>
                                 </div>
                             </div>
-                            
+
                             <!-- Right financial counts -->
                             <div class="summary-values">
                                 <div class="summary-row">
-                                    <label>Cộng tiền hàng</label>
+                                    <label>Sub-Total</label>
                                     <div class="value-box">
-                                        <input type="text" name="subTotal" id="subTotal" value="0" readonly>
+                                        <input type="text" name="subTotal" id="subTotal" value="${subTotal}" readonly>
                                         <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
                                     </div>
                                 </div>
                                 <div class="summary-row">
-                                    <label>Chiết khấu (%)</label>
+                                    <label>Total Discount</label>
                                     <div class="value-box">
-                                        <input type="number" id="discountPercent" value="0" min="0" max="100" style="text-align: right;" oninput="recalculateAll()">
-                                        <span style="font-size: 11px; font-weight: bold; color: var(--muted);">%</span>
-                                    </div>
-                                </div>
-                                <div class="summary-row">
-                                    <label>Tổng thuế VAT (5%)</label>
-                                    <div class="value-box">
-                                        <input type="text" id="tax5" value="0" readonly>
+                                        <input type="text" name="discountTotal" id="discountTotal" value="${discountTotal}" style="text-align: right;" readonly>
                                         <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
                                     </div>
                                 </div>
                                 <div class="summary-row">
-                                    <label>Tổng thuế VAT (8%)</label>
+                                    <label>Total VAT</label>
                                     <div class="value-box">
-                                        <input type="text" id="tax8" value="0" readonly>
+                                        <input type="text" name="taxAmount" id="taxAmount" value="${taxAmount}" readonly>
                                         <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
                                     </div>
                                 </div>
-                                <div class="summary-row">
-                                    <label>Tổng thuế VAT (10%)</label>
-                                    <div class="value-box">
-                                        <input type="text" id="tax10" value="0" readonly>
-                                        <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
-                                    </div>
-                                </div>
-                                <!-- Hidden input for database taxAmount -->
-                                <input type="hidden" name="taxAmount" id="taxAmount" value="0">
-                                
+
                                 <div class="summary-row summary-row-total">
-                                    <label style="color: #dc2626; font-weight: 800; font-size: 14px;">Tổng thanh toán</label>
+                                    <label style="color: #dc2626; font-weight: 800; font-size: 14px;">Total Amount</label>
                                     <div class="value-box">
-                                        <input type="text" name="totalAmount" id="totalAmount" value="0" readonly>
+                                        <input type="text" name="totalAmount" id="totalAmount" value="${totalAmount}" readonly>
                                         <span style="font-size: 11px; font-weight: bold; color: #dc2626;">VND</span>
                                     </div>
                                 </div>
@@ -680,14 +754,25 @@
                         <!-- ACTIONS BUTTONS BAR -->
                         <div class="actions-bar">
                             <div class="actions-left">
-                                <button type="button" class="btn-action" style="opacity: 0.6; pointer-events: none;"><span class="material-symbols-outlined" style="font-size: 16px;">build</span> Tiện ích <span style="font-size: 10px;">▼</span></button>
-                                <button type="button" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">print</span> Xem hóa đơn</button>
+                                <button type="button" class="btn-action" style="opacity: 0.6; pointer-events: none;"><span class="material-symbols-outlined" style="font-size: 16px;">build</span> Utilities <span style="font-size: 10px;">▼</span></button>
+                                <button type="button" class="btn-action" onclick="showInvoicePreview()"><span class="material-symbols-outlined" style="font-size: 16px;">print</span> Preview Invoice</button>
                             </div>
-                            
+
                             <div class="actions-right">
-                                <button type="submit" class="btn-action success"><span class="material-symbols-outlined" style="font-size: 16px;">send</span> Xuất hóa đơn</button>
-                                <button type="button" class="btn-action" onclick="submitDraftForm()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Ghi</button>
-                                <a href="${pageContext.request.contextPath}/invoice-list" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">close</span> Đóng</a>
+                                <c:choose>
+                                    <c:when test="${empty invoice}">
+                                        <!-- Creation Mode: Only Save Draft -->
+                                        <button type="button" class="btn-action" onclick="submitDraft()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Save Draft</button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <!-- Detail/Edit Mode -->
+                                        <c:if test="${invoice.invoiceStatus == 'UNRELEASED'}">
+                                            <button type="button" class="btn-action success" onclick="submitPublish()"><span class="material-symbols-outlined" style="font-size: 16px;">send</span> Release Invoice</button>
+                                            <button type="button" class="btn-action" onclick="submitDraft()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Update Draft</button>
+                                        </c:if>
+                                    </c:otherwise>
+                                </c:choose>
+                                <a href="${pageContext.request.contextPath}/invoice-list" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">close</span> Close</a>
                             </div>
                         </div>
                     </form>
@@ -695,154 +780,379 @@
             </main>
         </div>
 
+        <!-- INVOICE PREVIEW MODAL -->
+        <div id="previewModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content invoice-preview-card">
+                <div class="modal-header">
+                    <h3 style="margin: 0; color: var(--primary); font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined">visibility</span> Xem trước hóa đơn điện tử
+                    </h3>
+                    <span class="close-modal-btn" onclick="closePreviewModal()">&times;</span>
+                </div>
+                <div class="modal-body" id="printArea">
+                    <!-- Rendered Vietnam E-Invoice Layout -->
+                    <div class="e-invoice-wrapper">
+                        <div class="e-invoice-header">
+                            <div class="header-left">
+                                <h2 id="previewTitle" style="color: #dc2626; margin: 0; font-weight: 800; font-size: 20px; text-transform: uppercase;">HÓA ĐƠN GIÁ TRỊ GIA TĂNG</h2>
+                                <div style="margin-top: 5px; font-size: 13px; font-style: italic; color: #475569;">(Bản thể hiện của hóa đơn điện tử)</div>
+                            </div>
+                            <div class="header-right" style="text-align: right; font-size: 13px; line-height: 1.6;">
+                                <div><strong>Ký hiệu (Symbol):</strong> <span id="previewSymbol"></span></div>
+                                <div><strong>Số (No.):</strong> <span id="previewNo" style="color: #dc2626; font-weight: bold; font-size: 15px;"></span></div>
+                                <div><strong>Ngày (Date):</strong> <span id="previewDate"></span></div>
+                            </div>
+                        </div>
+
+                        <hr style="border: 0; border-top: 2px solid #dc2626; margin: 15px 0;">
+
+                        <!-- Seller Info -->
+                        <div class="invoice-section">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.6;">
+                                <tr>
+                                    <td style="width: 18%; font-weight: bold; color: #475569; vertical-align: top;">Đơn vị bán hàng:</td>
+                                    <td id="previewSellerName" style="font-weight: bold; text-transform: uppercase; color: var(--primary);"></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; color: #475569;">Mã số thuế:</td>
+                                    <td id="previewSellerTaxCode" style="font-weight: bold; letter-spacing: 1px;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; color: #475569; vertical-align: top;">Địa chỉ:</td>
+                                    <td id="previewSellerAddress"></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; color: #475569;">Điện thoại:</td>
+                                    <td id="previewSellerPhone"></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 12px 0;">
+
+                        <!-- Buyer Info -->
+                        <div class="invoice-section">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.6;">
+                                <tr>
+                                    <td style="width: 18%; font-weight: bold; color: #475569; vertical-align: top;">Đơn vị mua hàng:</td>
+                                    <td id="previewBuyerName" style="font-weight: bold;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; color: #475569;">Mã số thuế:</td>
+                                    <td id="previewBuyerTaxCode" style="font-weight: bold; letter-spacing: 1px;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; color: #475569;">Điện thoại:</td>
+                                    <td id="previewBuyerPhone"></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; color: #475569; vertical-align: top;">Địa chỉ:</td>
+                                    <td id="previewBuyerAddress"></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Products Table -->
+                        <table class="preview-products-table" style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px;">
+                            <thead>
+                                <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold; border: 1px solid #cbd5e1;">
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; width: 4%;">STT</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; width: 8%;">Mã hàng</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; width: 25%; text-align: left;">Tên hàng hóa, dịch vụ</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; width: 6%;">ĐVT</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; width: 6%; text-align: right;">Số lượng</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; width: 10%; text-align: right;">Đơn giá</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; width: 11%; text-align: right;">Thành tiền</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; width: 10%;">(%) CK</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; width: 10%;">(%) VAT</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; width: 10%; text-align: right;">Thuế VAT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="previewProductsList">
+                                <!-- Dynamic items will load here -->
+                            </tbody>
+                        </table>
+
+                        <!-- Summary Panel -->
+                        <div style="margin-top: 15px; font-size: 13px; width: 100%; display: flex; justify-content: flex-end;">
+                            <table style="width: 45%; border-collapse: collapse; line-height: 1.8;">
+                                <tr>
+                                    <td style="font-weight: 500; color: #475569;">Cộng tiền hàng:</td>
+                                    <td id="previewSubTotal" style="text-align: right; font-weight: bold;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500; color: #475569;">Tiền chiết khấu:</td>
+                                    <td id="previewDiscountAmt" style="text-align: right; font-weight: bold;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500; color: #475569;">Tổng tiền thuế VAT:</td>
+                                    <td id="previewTaxAmt" style="text-align: right; font-weight: bold;"></td>
+                                </tr>
+                                <tr style="border-top: 1px solid #cbd5e1; font-size: 14px;">
+                                    <td style="font-weight: bold; color: #dc2626; padding-top: 5px;">Tổng cộng thanh toán:</td>
+                                    <td id="previewTotalAmt" style="text-align: right; font-weight: bold; color: #dc2626; padding-top: 5px;"></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Money in Words -->
+                        <div style="margin-top: 15px; font-size: 13px; font-style: italic; border-top: 1px solid #e2e8f0; padding-top: 8px;" id="previewWords">
+                            Số tiền viết bằng chữ: ...
+                        </div>
+
+                        <!-- Signatures -->
+                        <div style="margin-top: 30px; display: flex; justify-content: space-between; font-size: 13px; text-align: center;">
+                            <div style="width: 45%;">
+                                <strong>NGƯỜI MUA HÀNG</strong><br>
+                                <span style="font-size: 11px; color: #64748b;">(Ký, ghi rõ họ tên)</span>
+                                <div style="height: 60px;"></div>
+                            </div>
+                            <div style="width: 45%;">
+                                <strong>NGƯỜI BÁN HÀNG</strong><br>
+                                <span style="font-size: 11px; color: #64748b;">(Ký, đóng dấu, ghi rõ họ tên)</span>
+                                <div style="height: 60px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-action" onclick="printInvoice()"><span class="material-symbols-outlined" style="font-size: 16px;">print</span> In hóa đơn</button>
+                    <button type="button" class="btn-action" onclick="closePreviewModal()"><span class="material-symbols-outlined" style="font-size: 16px;">close</span> Đóng</button>
+                </div>
+            </div>
+        </div>
+
         <script>
-            // Execute recalculations and setup on load
-            window.onload = function() {
-                var issueDateInput = document.getElementById('issueDate');
-                if (!issueDateInput.value) {
-                    var now = new Date();
-                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                    issueDateInput.value = now.toISOString().slice(0, 16);
-                }
-                
-                var invoiceNoInput = document.getElementById('invoiceNo');
-                if (invoiceNoInput.value === '' || invoiceNoInput.value === '0') {
-                    invoiceNoInput.value = 'INV-' + Math.floor(100000 + Math.random() * 900000);
-                }
-                
+            // Execute setup on load
+            window.onload = function () {
                 onInvoiceTypeChange();
-                recalculateAll();
+                updateMoneyInWords();
             };
+
+            function submitPublish() {
+                document.getElementById('invoiceStatus').value = 'RELEASED';
+                document.getElementById('invoiceForm').submit();
+            }
+
+            function submitDraft() {
+                document.getElementById('invoiceStatus').value = 'UNRELEASED';
+                document.getElementById('invoiceForm').submit();
+            }
 
             // Dynamic header title and symbols mapping based on invoice type
             function onInvoiceTypeChange() {
                 var type = document.getElementById('invoiceType').value;
                 var titleDiv = document.getElementById('dynamicTitle');
-                var templateInput = document.getElementById('templateCode');
                 var symbolInput = document.getElementById('invoiceSymbol');
 
                 var currentSymbol = symbolInput.value || '';
-                var remainingSymbol = currentSymbol.length > 1 ? currentSymbol.substring(1) : 'C26TYY';
+                var remainingSymbol = currentSymbol.length > 1 ? currentSymbol.substring(1) : '';
 
                 if (type === 'VAT') {
-                    titleDiv.innerHTML = "HÓA ĐƠN GIÁ TRỊ GIA TẰNG (CÓ MÃ KHỞI TẠO TỪ MÁY TÍNH TIỀN)";
-                    templateInput.value = '1';
+                    titleDiv.innerHTML = "VALUE ADDED TAX INVOICE";
                     symbolInput.value = '1' + remainingSymbol;
                 } else {
-                    titleDiv.innerHTML = "HÓA ĐƠN BÁN HÀNG (CÓ MÃ KHỞI TẠO TỪ MÁY TÍNH TIỀN)";
-                    templateInput.value = '2';
+                    titleDiv.innerHTML = "SALES INVOICE";
                     symbolInput.value = '2' + remainingSymbol;
                 }
             }
 
-            // Handle tax rate change on a row
-            function onRowValueChange(element) {
-                recalculateAll();
-            }
-
-            // Recalculate totals and words conversion
-            function recalculateAll() {
-                var rows = document.querySelectorAll('.product-row');
-                var subTotal = 0;
-                var totalTax = 0;
-                var tax5 = 0;
-                var tax8 = 0;
-                var tax10 = 0;
-
-                rows.forEach(row => {
-                    var qty = parseFloat(row.querySelector('.row-qty').value) || 0;
-                    var price = parseFloat(row.querySelector('.row-price').value) || 0;
-                    var taxRate = parseFloat(row.querySelector('.row-tax-rate').value) || 0;
-
-                    var amount = qty * price;
-                    var taxVal = amount * (taxRate / 100);
-
-                    // Update row amount and row tax values dynamically
-                    row.querySelector('.row-amount').value = amount.toFixed(2);
-                    row.querySelector('.row-tax-val').value = taxVal.toFixed(2);
-
-                    subTotal += amount;
-                    totalTax += taxVal;
-
-                    if (taxRate === 5) tax5 += taxVal;
-                    else if (taxRate === 8) tax8 += taxVal;
-                    else if (taxRate === 10) tax10 += taxVal;
-                });
-
-                var discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
-                var discountAmt = subTotal * (discountPercent / 100);
-                var totalAmount = subTotal + totalTax - discountAmt;
-
-                // Set summary fields
-                document.getElementById('subTotal').value = subTotal.toFixed(2);
-                document.getElementById('tax5').value = tax5.toFixed(2);
-                document.getElementById('tax8').value = tax8.toFixed(2);
-                document.getElementById('tax10').value = tax10.toFixed(2);
-                document.getElementById('taxAmount').value = totalTax.toFixed(2);
-                document.getElementById('totalAmount').value = totalAmount.toFixed(2);
-
-                // Convert to Vietnamese words
-                document.getElementById('moneyInWords').innerHTML = "Số tiền bằng chữ: <em>" + numberToWords(Math.round(totalAmount)) + " đồng</em>";
+            // Update money in words based on total amount
+            function updateMoneyInWords() {
+                var totalAmount = parseFloat(document.getElementById('totalAmount').value) || 0;
+                document.getElementById('moneyInWords').innerHTML = "Amount in words: <em>" + numberToWords(Math.round(totalAmount)) + " đồng</em>";
             }
 
             // Convert number to Vietnamese words
             function numberToWords(number) {
                 if (number === 0) return "Không";
-                var units = ["", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
-                var places = ["", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ"];
-                
-                var str = "";
-                var groupCount = 0;
-                
-                while (number > 0) {
-                    var group = number % 1000;
-                    number = Math.floor(number / 1000);
-                    
-                    if (group > 0) {
-                        var groupStr = convertGroup(group);
-                        str = groupStr + " " + places[groupCount] + " " + str;
-                    }
-                    groupCount++;
-                }
-                
-                str = str.trim();
-                return str.charAt(0).toUpperCase() + str.slice(1);
 
-                function convertGroup(num) {
-                    var h = Math.floor(num / 100);
-                    var t = Math.floor((num % 100) / 10);
-                    var u = num % 10;
-                    
-                    var out = "";
-                    if (h > 0) {
-                        out += units[h] + " trăm ";
-                    } else if (str !== "") {
-                        out += "không trăm ";
-                    }
-                    
-                    if (t > 1) {
-                        out += units[t] + " mươi ";
-                    } else if (t === 1) {
-                        out += "mười ";
-                    } else if (u > 0 && str !== "") {
-                        out += "lẻ ";
-                    }
-                    
-                    if (u === 5 && t > 0) {
-                        out += "lăm";
-                    } else if (u === 1 && t > 1) {
-                        out += "mốt";
-                    } else if (u > 0) {
-                        out += units[u];
-                    }
-                    
-                    return out.trim();
+                var units = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
+                
+                var numStr = Math.round(number).toString();
+                var len = numStr.length;
+                var groups = [];
+                
+                for (var i = len; i > 0; i -= 3) {
+                    groups.push(numStr.substring(Math.max(0, i - 3), i));
                 }
+                groups.reverse();
+
+                var res = "";
+                var totalGroups = groups.length;
+
+                for (var i = 0; i < totalGroups; i++) {
+                    var groupVal = parseInt(groups[i], 10);
+                    if (groupVal === 0 && i > 0) {
+                        var hasFollowing = false;
+                        for (var j = i + 1; j < totalGroups; j++) {
+                            if (parseInt(groups[j], 10) > 0) {
+                                hasFollowing = true;
+                                break;
+                            }
+                        }
+                        if (hasFollowing) {
+                            var scaleIndex = totalGroups - 1 - i;
+                            if (scaleIndex > 0 && scaleIndex % 3 === 0) {
+                                res += " tỷ";
+                            }
+                        }
+                        continue;
+                    }
+
+                    var h = Math.floor(groupVal / 100);
+                    var t = Math.floor((groupVal % 100) / 10);
+                    var u = groupVal % 10;
+
+                    var groupText = "";
+                    
+                    if (i === 0) {
+                        if (h > 0) {
+                            groupText += units[h] + " trăm ";
+                        }
+                    } else {
+                        groupText += units[h] + " trăm ";
+                    }
+
+                    if (t > 1) {
+                        groupText += units[t] + " mươi ";
+                    } else if (t === 1) {
+                        groupText += "mười ";
+                    } else if (t === 0 && u > 0) {
+                        if (i > 0 || h > 0) {
+                            groupText += "lẻ ";
+                        }
+                    }
+
+                    if (u === 5 && t > 0) {
+                        groupText += "lăm";
+                    } else if (u === 1 && t > 1) {
+                        groupText += "mốt";
+                    } else if (u > 0) {
+                        groupText += units[u];
+                    }
+
+                    groupText = groupText.trim();
+
+                    var scaleIndex = totalGroups - 1 - i;
+                    var suffix = "";
+                    if (scaleIndex > 0) {
+                        if (scaleIndex % 3 === 0) {
+                            var tỷCount = Math.floor(scaleIndex / 3);
+                            suffix = Array(tỷCount + 1).join("tỷ ").trim();
+                        } else if (scaleIndex % 3 === 1) {
+                            suffix = "nghìn";
+                            if (Math.floor(scaleIndex / 3) > 0) {
+                                var tỷCount = Math.floor(scaleIndex / 3);
+                                suffix += " " + Array(tỷCount + 1).join("tỷ ").trim();
+                            }
+                        } else if (scaleIndex % 3 === 2) {
+                            suffix = "triệu";
+                            if (Math.floor(scaleIndex / 3) > 0) {
+                                var tỷCount = Math.floor(scaleIndex / 3);
+                                suffix += " " + Array(tỷCount + 1).join("tỷ ").trim();
+                            }
+                        }
+                    }
+
+                    res += " " + groupText + " " + suffix;
+                }
+
+                res = res.replace(/\s+/g, " ").trim();
+                if (res === "") return "Không";
+                return res.charAt(0).toUpperCase() + res.slice(1);
             }
 
-            function submitDraftForm() {
-                var form = document.getElementById('invoiceForm');
-                form.submit();
+            function showInvoicePreview() {
+                // Populate invoice headers
+                var type = document.getElementById('invoiceType').value;
+                document.getElementById('previewTitle').innerText = (type === 'VAT') ? 'HÓA ĐƠN GIÁ TRỊ GIA TĂNG' : 'HÓA ĐƠN BÁN HÀNG';
+                document.getElementById('previewSymbol').innerText = document.getElementById('invoiceSymbol').value;
+                document.getElementById('previewNo').innerText = document.getElementById('invoiceNoDisplay').value;
+                document.getElementById('previewDate').innerText = document.getElementById('issueDateDisplay').value;
+
+                // Populate Seller Info (hidden values)
+                document.getElementById('previewSellerName').innerText = document.getElementsByName('sellerName')[0].value;
+                document.getElementById('previewSellerTaxCode').innerText = document.getElementsByName('sellerTaxCode')[0].value;
+                document.getElementById('previewSellerAddress').innerText = document.getElementsByName('sellerAddress')[0].value;
+                document.getElementById('previewSellerPhone').innerText = document.getElementById('sellerPhone').value;
+
+                // Populate Buyer Info (form inputs)
+                document.getElementById('previewBuyerName').innerText = document.getElementById('buyerName').value;
+                document.getElementById('previewBuyerTaxCode').innerText = document.getElementById('buyerTaxCode').value;
+                document.getElementById('previewBuyerPhone').innerText = document.getElementById('buyerPhone').value;
+                document.getElementById('previewBuyerAddress').innerText = document.getElementById('buyerAddress').value;
+
+                // Populate Products
+                var listBody = document.getElementById('previewProductsList');
+                listBody.innerHTML = ''; // clear first
+
+                var rows = document.querySelectorAll('.product-row');
+                var stt = 1;
+                rows.forEach(row => {
+                    var prodId = row.cells[0].querySelector('input').value;
+                    var prodName = row.cells[1].querySelector('input').value;
+                    var unit = row.cells[2].querySelector('input').value;
+                    var qty = parseFloat(row.querySelector('.row-qty').value) || 0;
+                    var price = parseFloat(row.querySelector('.row-price').value) || 0;
+                    var amount = parseFloat(row.querySelector('.row-amount').value) || 0;
+                    var discountRate = parseFloat(row.querySelector('.row-discount-rate').value) || 0;
+                    var taxRate = parseFloat(row.querySelector('.row-tax-rate').value) || 0;
+                    var taxVal = parseFloat(row.querySelector('.row-tax-val').value) || 0;
+
+                    var tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="text-align: center; border: 1px solid #cbd5e1; padding: 8px;">\${stt++}</td>
+                        <td style="text-align: center; border: 1px solid #cbd5e1; padding: 8px;">\${prodId}</td>
+                        <td style="border: 1px solid #cbd5e1; padding: 8px;">\${prodName}</td>
+                        <td style="text-align: center; border: 1px solid #cbd5e1; padding: 8px;">\${unit}</td>
+                        <td style="text-align: right; border: 1px solid #cbd5e1; padding: 8px;">\${qty.toLocaleString('en-US')}</td>
+                        <td style="text-align: right; border: 1px solid #cbd5e1; padding: 8px;">\${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td style="text-align: right; border: 1px solid #cbd5e1; padding: 8px;">\${amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td style="text-align: center; border: 1px solid #cbd5e1; padding: 8px;">\${discountRate}%</td>
+                        <td style="text-align: center; border: 1px solid #cbd5e1; padding: 8px;">\${taxRate}%</td>
+                        <td style="text-align: right; border: 1px solid #cbd5e1; padding: 8px; font-weight: bold;">\${taxVal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    `;
+                    listBody.appendChild(tr);
+                });
+
+                // Populate Financial Summary
+                document.getElementById('previewSubTotal').innerText = parseFloat(document.getElementById('subTotal').value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' VND';
+                var discountAmtVal = parseFloat(document.getElementById('discountTotal').value) || 0;
+                document.getElementById('previewDiscountAmt').innerText = discountAmtVal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' VND';
+
+                document.getElementById('previewTaxAmt').innerText = parseFloat(document.getElementById('taxAmount').value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' VND';
+                document.getElementById('previewTotalAmt').innerText = parseFloat(document.getElementById('totalAmount').value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' VND';
+
+                var totalAmountVal = parseFloat(document.getElementById('totalAmount').value) || 0;
+                document.getElementById('previewWords').innerHTML = "Số tiền viết bằng chữ: <em>" + numberToWords(Math.round(totalAmountVal)) + " đồng</em>";
+
+                // Show modal
+                document.getElementById('previewModal').style.display = 'flex';
+            }
+
+            function closePreviewModal() {
+                document.getElementById('previewModal').style.display = 'none';
+            }
+
+            function printInvoice() {
+                var printContents = document.getElementById('printArea').innerHTML;
+
+                var printWindow = window.open('', '_blank');
+                printWindow.document.write('<html><head><title>In hóa đơn điện tử</title>');
+                printWindow.document.write('<style>');
+                printWindow.document.write('body { font-family: "Times New Roman", serif; padding: 20px; color: #000; }');
+                printWindow.document.write('.e-invoice-wrapper { border: none; padding: 0; box-shadow: none; }');
+                printWindow.document.write('.e-invoice-header { display: flex; justify-content: space-between; align-items: flex-start; }');
+                printWindow.document.write('table { width: 100%; border-collapse: collapse; margin-top: 15px; }');
+                printWindow.document.write('th, td { border: 1px solid #000; padding: 6px; }');
+                printWindow.document.write('.invoice-section table th, .invoice-section table td { border: none; }');
+                printWindow.document.write('hr { border: 0; border-top: 2px solid #000; margin: 15px 0; }');
+                printWindow.document.write('</style></head><body>');
+                printWindow.document.write(printContents);
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                printWindow.print();
             }
         </script>
     </body>

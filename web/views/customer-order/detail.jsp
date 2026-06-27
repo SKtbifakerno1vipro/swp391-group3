@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" import="service.InvoiceService,model.Invoice" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -23,6 +23,16 @@
 
 
         <h3>Order Information</h3>
+        <%
+            InvoiceService invService = new InvoiceService();
+            dto.CustomerOrderDTO orderDto = (dto.CustomerOrderDTO) request.getAttribute("order");
+            if (orderDto != null && orderDto.getCustomerOrder() != null) {
+                Invoice inv = invService.getInvoiceByOrderId(orderDto.getCustomerOrder().getCustomerOrderId());
+                pageContext.setAttribute("invOfOrder", inv);
+            } else {
+                pageContext.removeAttribute("invOfOrder");
+            }
+        %>
         <form action="${pageContext.request.contextPath}/customer-order" method="POST">
             <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
             <input type="hidden" name="action" value="update_status">
@@ -40,9 +50,18 @@
                 </li>
                 <c:if test="${order.customerOrder.orderStatus == 'COMPLETED'}">
                     <li style="margin-top: 15px;"><strong>Hành động:</strong>
-                        <a href="${pageContext.request.contextPath}/invoice?orderId=${order.customerOrder.customerOrderId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #15803d; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(21, 128, 61, 0.2);">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: white;">receipt_long</span> Create Invoice
-                        </a>
+                        <c:choose>
+                            <c:when test="${empty invOfOrder}">
+                                <a href="${pageContext.request.contextPath}/invoice?orderId=${order.customerOrder.customerOrderId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #15803d; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(21, 128, 61, 0.2);">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: white;">receipt_long</span> Create Invoice
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #0284c7; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: white;">visibility</span> View Invoice
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
                     </li>
                 </c:if>
                 <li style="margin-top: 15px;"><strong>Created At:</strong>

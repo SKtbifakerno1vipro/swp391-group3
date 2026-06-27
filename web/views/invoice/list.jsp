@@ -50,17 +50,21 @@
                 font-weight: 600;
                 display: inline-block;
             }
-            .status-paid {
+            .status-released {
                 background-color: rgba(40, 167, 69, 0.2);
                 color: #28a745;
             }
-            .status-unpaid {
-                background-color: rgba(220, 53, 69, 0.2);
-                color: #dc3545;
-            }
-            .status-cancelled {
+            .status-unreleased {
                 background-color: rgba(108, 117, 125, 0.2);
                 color: #6c757d;
+            }
+            .status-waiting {
+                background-color: rgba(0, 123, 255, 0.2);
+                color: #007bff;
+            }
+            .status-canceled {
+                background-color: rgba(220, 53, 69, 0.2);
+                color: #dc3545;
             }
         </style>
     </head>
@@ -75,14 +79,14 @@
                     <c:if test="${errorMsg != null}">
                         <div style="color: red; margin-bottom: 10px;">${errorMsg}</div>
                     </c:if>
-                    
+
                     <div>
-                        <h3>Invoice List</h3>
                         <div>
                             <table border="1">
                                 <tr>
                                     <th>Invoice Id</th>
                                     <th>Invoice No</th>
+                                    <th>Company Seller</th>
                                     <th>Contract Id</th>
                                     <th>Order Id</th>
                                     <th>Issue Date</th>
@@ -94,13 +98,14 @@
                                 </tr>
                                 <c:if test="${empty invoices}">
                                     <tr>
-                                        <td colspan="10">No invoice found.</td>
+                                        <td colspan="11">No invoice found.</td>
                                     </tr>
                                 </c:if>
                                 <c:forEach var="i" items="${invoices}">
                                     <tr>
                                         <td>${i.invoiceId}</td>
                                         <td><strong>${i.invoiceNo}</strong></td>
+                                        <td>${i.buyerName}</td>
                                         <td>${i.customerContractId}</td>
                                         <td>${i.customerOrderId}</td>
                                         <td>
@@ -111,42 +116,49 @@
                                         <td>${i.invoiceSymbol}</td>
                                         <td><fmt:formatNumber value="${i.totalAmount}" pattern="#,##0.##"/> VND</td>
                                         <td>
-                                            <span class="status-badge ${i.invoiceStatus == 'PAID' ? 'status-paid' : (i.invoiceStatus == 'UNPAID' ? 'status-unpaid' : 'status-cancelled')}">
+                                            <span class="status-badge ${i.invoiceStatus == 'RELEASED' ? 'status-released' : (i.invoiceStatus == 'UNRELEASED' ? 'status-unreleased' : (i.invoiceStatus == 'WAIT_FOR_RELEASE' ? 'status-waiting' : 'status-canceled'))}">
                                                 ${i.invoiceStatus}
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="${pageContext.request.contextPath}/invoice?id=${i.invoiceId}">View</a>
+                                            <a href="${pageContext.request.contextPath}/invoice?invoiceId=${i.invoiceId}">View</a>
                                         </td>
                                     </tr>
                                 </c:forEach>
                             </table>
                         </div>
-                        
+
                         <div class="pagination">
                             <c:set var="numLinksTwoSide" value="2"></c:set>
                             <c:set var="start" value="${page - numLinksTwoSide > 1 ? page - numLinksTwoSide : 1}"></c:set>
                             <c:set var="end" value="${page + numLinksTwoSide > totalPage ? totalPage : page + numLinksTwoSide}"></c:set>
 
-                            <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=1">Begin</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=1">Begin</a>
                             <c:if test="${page != 1}">
                                 <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=${page - 1}">Previous</a>
                             </c:if>
                             <c:if test="${start > 1}">...</c:if>
                             <c:forEach var="pageNum" begin="${start}" end="${end}">
                                 <a href="${pageContext.request.contextPath}/invoice-list?page=${pageNum}"><span class="${pageNum == page ? 'page-current' : 'page-link'}">${pageNum}</span></a>
-                            </c:forEach>
-                            <c:if test="${end < totalPage}">...</c:if>
+                                </c:forEach>
+                                <c:if test="${end < totalPage}">...</c:if>
                             <c:if test="${page < totalPage}">
                                 <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=${page + 1}">Next</a>
                             </c:if>
                             <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=${totalPage}">End</a>
                         </div>
-                        
+
                         <div><a href="${pageContext.request.contextPath}/dashboard">Back to Dashboard</a></div>
                     </div>
                 </div>
             </main>
         </div>
+        <script>
+            
+            let error = ${errorInvoice};
+            if (error !== "") {
+                alert(error);
+            }
+        </script>
     </body>
 </html>

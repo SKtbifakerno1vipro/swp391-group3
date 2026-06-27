@@ -11,6 +11,7 @@ public class CustomerOrderDetail {
     private double sellingPrice;
     private int quotationDetailId;
     private double taxPercent;
+    private double discountPercent;
 
     public CustomerOrderDetail() {}
     
@@ -32,4 +33,7 @@ public class CustomerOrderDetail {
 
     public double getTaxPercent() { return taxPercent; }
     public void setTaxPercent(double taxPercent) { this.taxPercent = taxPercent; }
+
+    public double getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(double discountPercent) { this.discountPercent = discountPercent; }
 }
