@@ -310,7 +310,7 @@
                         <a class="button" href="${pageContext.request.contextPath}/customer/detail?id_cus=${customer.customerId}" id="btn-view-profile">
                             <span class="material-symbols-outlined">account_circle</span>Thông tin cá nhân
                         </a>
-                        <a class="button primary" href="${pageContext.request.contextPath}/auto-generator" id="btn-auto-generator">
+                        <a class="button primary" href="${pageContext.request.contextPath}/tool/auto-generate" id="btn-auto-generator">
                             <span class="material-symbols-outlined">bolt</span>Auto Generator Contract
                         </a>
                     </div>
