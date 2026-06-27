@@ -53,12 +53,15 @@ public class DashboardController extends HttpServlet {
             }
             request.setAttribute("recentQuotations", recentQuotations);
 
-            List<Contract> contracts = contractService.getContractsByCustomerId(customerId);
-            request.setAttribute("totalContracts", contracts.size());
-            List<Contract> recentContracts = contracts;
-            if (recentContracts.size() > 5) {
-                recentContracts = recentContracts.subList(0, 5);
-            }
+            List<ContractCustomerDTO> recentContracts = contractService.searchContracts(
+                    null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
+                    null, null, null, null, null
+            );
+            int totalContracts = contractService.getTotalContracts(
+                    null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
+                    null, null, null, null, null
+            );
+            request.setAttribute("totalContracts", totalContracts);
             request.setAttribute("recentContracts", recentContracts);
 
             request.getRequestDispatcher("/views/customer-dashboard.jsp").forward(request, response);

@@ -41,6 +41,7 @@ public class ContractDAO extends DBContext {
         return -1;
     }
 
+
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
             String fromDate, String toDate, String taxCode, String phone, String email) {
@@ -359,48 +360,7 @@ public class ContractDAO extends DBContext {
         return false;
     }
 
-    // XHieu-begin - delete contact me
-    public List<Contract> getContractsByCustomerId(int customerId) {
-        List<Contract> list = new ArrayList<>();
-        String sql = "SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type, "
-                + "c.contract_version, c.effective_date, c.end_date, c.signed_date, c.created_at, c.updated_at, cust.company_name "
-                + "FROM customer_contract c  JOIN customer cust ON c.customer_id = cust.customer_id "
-                + "WHERE c.customer_id = ? "
-                + "ORDER BY c.updated_at DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, customerId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Contract c = new Contract();
-                c.setContractId(rs.getInt("customer_contract_id"));
-                c.setContractNumber(rs.getString("contract_number"));
-                c.setContractStatus(rs.getString("contract_status"));
-                c.setStorageType(rs.getString("storage_type"));
-                c.setCustomerName(rs.getString("company_name"));
 
-                if (rs.getTimestamp("effective_date") != null) {
-                    c.setEffectiveDate(rs.getTimestamp("effective_date").toLocalDateTime());
-                }
-                if (rs.getTimestamp("end_date") != null) {
-                    c.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
-                }
-                if (rs.getTimestamp("signed_date") != null) {
-                    c.setSignDate(rs.getTimestamp("signed_date").toLocalDateTime());
-                }
-                if (rs.getTimestamp("created_at") != null) {
-                    c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                }
-                if (rs.getTimestamp("updated_at") != null) {
-                    c.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-                }
-                list.add(c);
-            }
-        } catch (Exception e) {
-            System.out.println("getContractsByCustomerId error: " + e.getMessage());
-        }
-        return list;
-    }
-    // Xhieu - end
 
     //nguyenkien - begin
     public boolean updateContractContent(int contractId, String contractContent) {

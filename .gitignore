@@ -55,3 +55,6 @@ resources/
 *.iml
 out/
 .smarttomcat/
+
+# Local test tools
+tool/

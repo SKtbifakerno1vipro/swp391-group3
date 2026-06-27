@@ -78,9 +78,7 @@
                 <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/payment/list"><span
                         class="material-symbols-outlined">payments</span>Payments</a>
-                <a class="nav-link ${param.activeMenu == 'createPayment' ? 'active' : ''}"
-                   href="${pageContext.request.contextPath}/payment/create"><span
-                        class="material-symbols-outlined">add_card</span>Create Payment</a>
+
                 <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/user-list"><span
                         class="material-symbols-outlined">manage_accounts</span>Users</a>

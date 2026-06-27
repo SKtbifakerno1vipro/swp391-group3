@@ -11,12 +11,12 @@ import jakarta.servlet.http.HttpSession;
 
 import model.Payment;
 import model.User;
-import dal.PaymentDAO;
+import service.PaymentService;
 
 @WebServlet(name = "PaymentListController", urlPatterns = {"/payment/list"})
 public class PaymentListController extends HttpServlet {
 
-    private final PaymentDAO paymentDAO = new PaymentDAO();
+    private final PaymentService paymentService = new PaymentService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,10 +31,10 @@ public class PaymentListController extends HttpServlet {
         List<Payment> list;
         if (user.getRoleId() == 3) {
             // Customer - only view their own payments
-            list = paymentDAO.getPaymentsByCustomerId(user.getUserId());
+            list = paymentService.getPaymentsByCustomerId(user.getUserId());
         } else {
             // Admin, Manager, etc. - view all payments
-            list = paymentDAO.getAllPayments();
+            list = paymentService.getAllPayments();
         }
 
         request.setAttribute("list", list);
