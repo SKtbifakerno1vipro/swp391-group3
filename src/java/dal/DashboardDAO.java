@@ -404,6 +404,22 @@ public class DashboardDAO extends DBContext {
         return list;
     }
 
+    public Map<String, Integer> countContractStatusForOfficer() {
+        Map<String, Integer> statusCounts = new LinkedHashMap<>();
+        String sql = "SELECT contract_status as c_status, COUNT(*) AS total "
+                + "FROM customer_contract "
+                + "WHERE contract_status IS NOT NULL "
+                + "GROUP BY contract_status";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                statusCounts.put(rs.getString("c_status"), rs.getInt("total"));
+            }
+        } catch (Exception e) {
+            System.out.println("countContractStatusForOfficer error: " + e.getMessage());
+        }
+        return statusCounts;
+    }
+
     public int countActiveContracts() {
         String sql = "SELECT COUNT(*) FROM customer_contract WHERE contract_status IN ('SIGNED')";
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
@@ -412,6 +428,18 @@ public class DashboardDAO extends DBContext {
             }
         } catch (Exception e) {
             System.out.println("countActiveContracts error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public int countDraftContracts() {
+        String sql = "SELECT COUNT(*) FROM customer_contract WHERE contract_status = 'DRAFT'";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("countDraftContracts error: " + e.getMessage());
         }
         return 0;
     }

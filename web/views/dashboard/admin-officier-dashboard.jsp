@@ -48,51 +48,9 @@
     <body>
         <div class="dashboard-shell">
             <!-- SIDEBAR -->
-            <aside class="sidebar">
-                <div class="brand">
-                    <div class="brand-mark"><span class="material-symbols-outlined">bakery_dining</span></div>
-                    <div>
-                        <h1 class="brand-title">Po Bread</h1>
-                        <p class="brand-subtitle">Sales Management</p>
-                    </div>
-                </div>
-                
-                <nav class="nav-group">
-                    <a href="${pageContext.request.contextPath}/dashboard" class="nav-link active">
-                        <span class="material-symbols-outlined">dashboard</span>
-                        <span>Dashboard</span>
-                    </a>
-                    <a href="${pageContext.request.contextPath}/contract-list" class="nav-link">
-                        <span class="material-symbols-outlined">contract</span>
-                        <span>Contracts</span>
-                    </a>
-                    <a href="${pageContext.request.contextPath}/customer-order-list" class="nav-link">
-                        <span class="material-symbols-outlined">shopping_cart</span>
-                        <span>Orders</span>
-                    </a>
-                    <a href="${pageContext.request.contextPath}/invoice" class="nav-link">
-                        <span class="material-symbols-outlined">receipt_long</span>
-                        <span>Invoices</span>
-                    </a>
-                    <a href="${pageContext.request.contextPath}/payment-list" class="nav-link">
-                        <span class="material-symbols-outlined">payments</span>
-                        <span>Payments</span>
-                    </a>
-                </nav>
-
-                <div class="sidebar-footer">
-                    <div class="user-card">
-                        <div class="avatar">${user.fullName.substring(0,1)}</div>
-                        <div style="flex:1; min-width:0;">
-                            <div style="font-weight:800; color:var(--primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${user.fullName}</div>
-                            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Admin Officer</div>
-                        </div>
-                        <a href="${pageContext.request.contextPath}/logout" style="color:var(--danger); padding:8px; border-radius:8px; background:rgba(184,50,48,.1); display:grid; place-items:center;" title="Logout">
-                            <span class="material-symbols-outlined" style="font-size:18px;">logout</span>
-                        </a>
-                    </div>
-                </div>
-            </aside>
+            <jsp:include page="../shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="dashboard"/>
+            </jsp:include>
 
             <!-- NỘI DUNG CHÍNH -->
             <div class="main">
@@ -125,9 +83,11 @@
 
                 <div style="display:grid; grid-template-columns: 1fr 2fr; gap: 20px;">
                     <!-- 2. BIỂU ĐỒ TRẠNG THÁI -->
-                    <div style="background:var(--surface); padding:24px; border-radius:16px; border:1px solid var(--line);">
+                    <div style="background:var(--surface); padding:24px; border-radius:16px; border:1px solid var(--line); display:flex; flex-direction:column;">
                         <h3 style="margin-top:0;">Contract Status</h3>
-                        <canvas id="statusChart"></canvas>
+                        <div style="position:relative; height:300px; width:100%; flex:1; display:flex; justify-content:center; align-items:center;">
+                            <canvas id="statusChart"></canvas>
+                        </div>
                     </div>
 
                     <!-- 3. DANH SÁCH NHẮC VIỆC -->
@@ -187,9 +147,24 @@
                 },
                 options: { 
                     responsive: true, 
+                    maintainAspectRatio: false,
                     cutout: '70%',
                     plugins: {
-                        legend: { position: 'bottom' }
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let value = context.raw;
+                                    let percentage = Math.round((value / total) * 100) + '%';
+                                    return label + value + ' (' + percentage + ')';
+                                }
+                            }
+                        }
                     }
                 }
             });
