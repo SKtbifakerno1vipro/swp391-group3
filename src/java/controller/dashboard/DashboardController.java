@@ -64,7 +64,7 @@ public class DashboardController extends HttpServlet {
             request.setAttribute("totalContracts", totalContracts);
             request.setAttribute("recentContracts", recentContracts);
 
-            request.getRequestDispatcher("/views/customer-dashboard.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/dashboard/customer-dashboard.jsp").forward(request, response);
             return;
         }
         if (user.getRoleId() == 5) { // ROLE IS ADMIN OFFICER

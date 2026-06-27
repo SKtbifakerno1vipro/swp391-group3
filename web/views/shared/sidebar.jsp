@@ -35,9 +35,6 @@
                 <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/payment/list"><span
                         class="material-symbols-outlined">payments</span>My Payments</a>
-                <a class="nav-link ${param.activeMenu == 'createPayment' ? 'active' : ''}"
-                   href="${pageContext.request.contextPath}/payment/create"><span
-                        class="material-symbols-outlined">add_card</span>Create Payment</a>
                 </c:when>
                 <c:when test="${sessionScope.user.roleId == 5}">
                 <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
