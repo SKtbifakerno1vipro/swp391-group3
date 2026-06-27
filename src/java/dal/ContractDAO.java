@@ -41,13 +41,13 @@ public class ContractDAO extends DBContext {
         return -1;
     }
 
+
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
             String fromDate, String toDate, String taxCode, String phone, String email) {
         List<ContractCustomerDTO> list = new ArrayList<>();
         String sql = """
                     SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type,  c.created_at,
-                    c.signed_date, c.contract_file_url, c.effective_date,
                     cust.company_name, cust.user_id, cust.tax_code, u.email, u.phone,
                     (SELECT TOP 1 co.customer_order_id FROM customer_order co WHERE co.customer_contract_id = c.customer_contract_id) AS order_id
                     FROM customer_contract c 
@@ -141,13 +141,6 @@ public class ContractDAO extends DBContext {
                 c.setPhone(rs.getString("phone"));
                 c.setEmail(rs.getString("email"));
                 c.setOrderId(rs.getInt("order_id"));
-                c.setContractFileUrl(rs.getString("contract_file_url"));
-                if (rs.getTimestamp("signed_date") != null) {
-                    c.setSignDate(rs.getTimestamp("signed_date").toLocalDateTime());
-                }
-                if (rs.getTimestamp("effective_date") != null) {
-                    c.setEffectiveDate(rs.getTimestamp("effective_date").toLocalDateTime());
-                }
                 list.add(c);
             }
         } catch (Exception e) {
