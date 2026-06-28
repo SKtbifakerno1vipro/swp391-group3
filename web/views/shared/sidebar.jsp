@@ -37,6 +37,7 @@
                         class="material-symbols-outlined">payments</span>My Payments</a>
                 </c:when>
                 <c:when test="${sessionScope.user.roleId == 5}">
+                    
                 <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/quotation-list"><span
                         class="material-symbols-outlined">request_quote</span>Quotations</a>
@@ -52,6 +53,7 @@
                 <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/payment/list"><span
                         class="material-symbols-outlined">payments</span>Payments</a>
+                        
                 </c:when>
                 <c:otherwise>
 

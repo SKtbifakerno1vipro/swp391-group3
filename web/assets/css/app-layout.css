@@ -250,6 +250,9 @@ a { color: inherit; text-decoration: none; }
 .main {
     min-width: 0;
     padding: 30px 36px 42px;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 .legacy-page h1,
