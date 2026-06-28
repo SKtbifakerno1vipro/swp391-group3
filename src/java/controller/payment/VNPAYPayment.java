@@ -24,6 +24,17 @@ public class VNPAYPayment extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (!PaymentConfig.isValidConfig) {
+            String errorMsg = URLEncoder.encode("Payment service is temporarily misconfigured. Please contact support", StandardCharsets.UTF_8.toString());
+            String orderId = req.getParameter("orderId");
+            if (orderId != null && !orderId.isEmpty()) {
+                resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + orderId + "&error=" + errorMsg);
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + errorMsg);
+            }
+            return;
+        }
+
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TmnCode = PaymentConfig.vnp_TmnCode; 
@@ -53,11 +64,11 @@ public class VNPAYPayment extends HttpServlet {
         vnp_Params.put("vnp_OrderInfo", vnp_OrderInfo);
         vnp_Params.put("vnp_OrderType", orderType);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
-        vnp_Params.put("vnp_Locale", "vn"); 
+        vnp_Params.put("vnp_Locale", "en"); 
 
         
         String contextPath = req.getContextPath();
-        String returnUrl = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + contextPath + "/payment-return";
+        String returnUrl = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + contextPath + "/payment/return";
         vnp_Params.put("vnp_ReturnUrl", returnUrl);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));

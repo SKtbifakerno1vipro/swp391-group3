@@ -135,7 +135,6 @@ public class EditProduct extends HttpServlet {
             return;
         }
 
-        // BƯỚC 1: Đọc tất cả các tham số từ form gửi lên
         String action = request.getParameter("action");
         String productId = request.getParameter("id");
 
@@ -148,7 +147,6 @@ public class EditProduct extends HttpServlet {
         String qRaw = request.getParameter("quantity");
         String cRaw = request.getParameter("categoryId");
 
-        // BƯỚC 2: Kiểm tra tính hợp lệ của dữ liệu (Validation)
         String error = null;
         if (error == null) {
             error = Validation.validateCompanyName(name);
@@ -187,14 +185,12 @@ public class EditProduct extends HttpServlet {
                 request.setAttribute("categoryId", cRaw);
                 request.getRequestDispatcher("/views/product/create.jsp").forward(request, response);
             } else if ("edit".equals(action)) {
-                // Đóng gói các giá trị bị lỗi vào đối tượng Product tạm thời để hiển thị lại trên Form detail.jsp
                 Product errorProduct = new Product();
                 errorProduct.setProductId(Integer.parseInt(productId));
                 errorProduct.setProductName(name);
                 errorProduct.setDescription(des);
                 errorProduct.setUnit(unit);
                 errorProduct.setProductStatus(status);
-                // Tránh lỗi ném ra Exception khi chuyển đổi giá trị số bị nhập sai định dạng
                 try {
                     errorProduct.setCostPrice(Double.parseDouble(costRaw));
                 } catch (Exception e) {
@@ -219,7 +215,6 @@ public class EditProduct extends HttpServlet {
             return;
         }
 
-        // BƯỚC 4: Dữ liệu HỢP LỆ -> Khởi tạo Product mới với dữ liệu đã nhập
         Product product = new Product();
         product.setProductName(name);
         product.setCostPrice(Double.parseDouble(costRaw));
@@ -231,7 +226,6 @@ public class EditProduct extends HttpServlet {
         product.setProductStatus(status);
         product.setUpdatedBy(u.getUserId());
 
-        // BƯỚC 5: Thực hiện Insert (Create) hoặc Update (Edit) tương ứng
         if ("create".equals(action)) {
             boolean isCreated = pService.createProduct(product);
             if (isCreated) {

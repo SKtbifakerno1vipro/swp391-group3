@@ -72,6 +72,18 @@ CREATE TABLE [user] (
 );
 GO
 
+-- 4b. System Audit Log
+CREATE TABLE system_audit_log (
+    log_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NULL,
+    action_type NVARCHAR(255) NOT NULL,
+    affected_object NVARCHAR(255) NOT NULL,
+    description NVARCHAR(MAX) NULL,
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES [user](user_id)
+);
+GO
+
 -- 5. Category
 CREATE TABLE category (
     category_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -176,6 +188,7 @@ CREATE TABLE customer_contract (
 
 	contract_content nvarchar(max),
     storage_type VARCHAR(10) NOT NULL DEFAULT 'TEXT',
+    token VARCHAR(255) UNIQUE,
 
     created_by INT,
 	updated_by INT,
@@ -207,7 +220,6 @@ CREATE TABLE contract_edit_history (
     from_status VARCHAR(50),
     to_status VARCHAR(50),
 	edit_status varchar(50),
-	contract_version VARCHAR(50),
 	note nvarchar(max),
     changed_by INT,
     created_at DATETIME DEFAULT GETDATE(),
@@ -232,7 +244,8 @@ CREATE TABLE contract_revision_item (
 -- 14. Signature
 CREATE TABLE signature (
     signature_id INT IDENTITY(1,1) PRIMARY KEY,
-    customer_contract_id INT NOT NULL,
+    customer_contract_id INT,
+	invoice_id int,
     file_name NVARCHAR(255),
     file_url NVARCHAR(1000),
     signer_user_id INT NULL,
@@ -278,32 +291,41 @@ CREATE TABLE customer_order_detail (
 GO
 
 -- 17. Invoice
-CREATE TABLE invoice (
+create TABLE invoice (
     invoice_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_contract_id INT NOT NULL,
     customer_order_id INT NOT NULL,
-    invoice_no NVARCHAR(100) UNIQUE,
+    invoice_no NVARCHAR(100),
     issue_date DATETIME,
-    invoice_status VARCHAR(20),
+    invoice_status VARCHAR(50),
+--UNRELEASED
+--RELEASED
+--CANCELED
+
     invoice_type VARCHAR(20) NOT NULL DEFAULT 'SALES',      -- 'VAT' or 'SALES'
-    template_code VARCHAR(20) NOT NULL DEFAULT '2',          -- '1' (VAT), '2' (SALES)
     invoice_symbol VARCHAR(20) NOT NULL DEFAULT 'K26TYY',     -- E-invoice code without tax code
     
     -- Seller info snapshot
     seller_name NVARCHAR(255) NULL,
     seller_tax_code VARCHAR(20) NULL,
     seller_address NVARCHAR(255) NULL,
+	seller_phone VARCHAR(20) NULL,
     
     -- Buyer info snapshot
     buyer_name NVARCHAR(255) NULL,
     buyer_tax_code VARCHAR(20) NULL,
     buyer_address NVARCHAR(255) NULL,
-    
+    buyer_phone VARCHAR(20) NULL,
+
     -- Financial summary snapshot
     sub_total DECIMAL(18,2) DEFAULT 0,
     tax_amount DECIMAL(18,2) DEFAULT 0,
     total_amount DECIMAL(18,2) DEFAULT 0,
     
+	--Note
+	customer_note NVARCHAR(max) NULL,
+	internal_note NVARCHAR(max) NULL,
+
     created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),
@@ -316,7 +338,7 @@ GO
 CREATE TABLE payment (
     payment_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_contract_id INT NOT NULL,
-    invoice_id INT UNIQUE,
+    invoice_id INT,
     amount DECIMAL(18,2) CHECK (amount > 0),
     payment_type VARCHAR(50),
     payment_status VARCHAR(20),
@@ -327,6 +349,11 @@ CREATE TABLE payment (
     FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id),
     FOREIGN KEY (created_by) REFERENCES [user](user_id)
 );
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX UX_payment_invoice_id 
+ON payment(invoice_id) 
+WHERE invoice_id IS NOT NULL;
 GO
 
 -- 19. Stock Transaction
@@ -463,7 +490,7 @@ DECLARE @C1 INT = SCOPE_IDENTITY();
 INSERT INTO contract_edit_history (contract_id, from_status, to_status, changed_by) VALUES 
 (@C1, NULL, 'DRAFT', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
 (@C1, 'DRAFT', 'PENDING_REVIEW', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-(@C1, 'PENDING_REVIEW', 'INTERNAL_APPROVED', (SELECT user_id FROM [user] WHERE user_name = 'manager_01')),
+(@C1, 'PENDING_REVIEW', 'CUSTOMER_CHECK', (SELECT user_id FROM [user] WHERE user_name = 'manager_01')),
 (@C1, 'PENDING_REVIEW', 'CUSTOMER_CHECK', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
 (@C1, 'CUSTOMER_CHECK', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 
@@ -480,8 +507,8 @@ INSERT INTO customer_order (customer_id, customer_contract_id, order_status, cre
 );
 DECLARE @O1 INT = SCOPE_IDENTITY();
 INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (@O1, @QD1, 100, 15000, 22000);
-INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, template_code, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, sub_total, tax_amount, total_amount, created_by) 
-VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', '1', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2090000.00, 209000.00, 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, sub_total, tax_amount, total_amount, created_by) 
+VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2090000.00, 209000.00, 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
 INSERT INTO payment (customer_contract_id, invoice_id, amount, payment_type, payment_status, paid_at, created_by) VALUES (@C1, SCOPE_IDENTITY(), 2299000.00, 'BANK_TRANSFER', 'COMPLETED', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 GO
 
@@ -511,14 +538,14 @@ INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contr
     @Q2, 
     'HD-2026-002', 
     '/uploads/HD-002.pdf', 
-    'CUSTOMER_REQUESTED_REVISION', 
+    'CUSTOMER_CHECK', 
     (SELECT user_id FROM [user] WHERE user_name = 'officer_01')
 );
 DECLARE @C2 INT = SCOPE_IDENTITY();
 
 -- Ghi lich su yeu cau sua
-INSERT INTO contract_edit_history (contract_id, from_status, to_status, contract_version, changed_by) VALUES 
-(@C2, 'SENT_TO_CUSTOMER', 'CUSTOMER_REQUESTED_REVISION', '1.0.0', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_02'));
+INSERT INTO contract_edit_history (contract_id, from_status, to_status, changed_by) VALUES 
+(@C2, 'PENDING_REVIEW', 'CUSTOMER_CHECK', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_02'));
 DECLARE @H2 INT = SCOPE_IDENTITY();
 INSERT INTO contract_revision_item (history_id, contract_id, revision_type, revision_detail) VALUES 
 (@H2, @C2, N'Địa chỉ', N'Đổi địa chỉ giao sang Kho số 2 quận Tân Bình'),
@@ -616,9 +643,9 @@ INSERT INTO quotation_detail (quotation_id, product_id, product_name, unit, quan
 
 -- 5. Them 3 hop dong mau (De he thong co du customer_contract_id tu 1 den 5)
 INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, created_by) VALUES 
-((SELECT customer_id FROM customer WHERE tax_code = '0390000003'), @Q3, 'HD-2026-003', '/uploads/HD-003.pdf', 'ACTIVE', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-((SELECT customer_id FROM customer WHERE tax_code = '0390000004'), @Q4, 'HD-2026-004', '/uploads/HD-004.pdf', 'ACTIVE', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-((SELECT customer_id FROM customer WHERE tax_code = '0390000005'), @Q5, 'HD-2026-005', '/uploads/HD-005.pdf', 'ACTIVE', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+((SELECT customer_id FROM customer WHERE tax_code = '0390000003'), @Q3, 'HD-2026-003', '/uploads/HD-003.pdf', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+((SELECT customer_id FROM customer WHERE tax_code = '0390000004'), @Q4, 'HD-2026-004', '/uploads/HD-004.pdf', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
+((SELECT customer_id FROM customer WHERE tax_code = '0390000005'), @Q5, 'HD-2026-005', '/uploads/HD-005.pdf', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
 GO
 
 
@@ -656,10 +683,10 @@ BEGIN
     SELECT TOP 1 @RandomUserID = user_id FROM [user] WHERE role_id IN (SELECT role_id FROM role WHERE role_name IN (N'System Admin', N'Manager', N'Sale Staff', N'Admin Officer')) ORDER BY NEWID();
 
     -- 3. Gan trang thai ngau nhien
-    SET @Status = CASE WHEN @Loop % 4 = 0 THEN 'Completed'
-                       WHEN @Loop % 4 = 1 THEN 'Processing'
-                       WHEN @Loop % 4 = 2 THEN 'Pending'
-                       ELSE 'Cancelled' END;
+    SET @Status = CASE WHEN @Loop % 4 = 0 THEN 'COMPLETED'
+                       WHEN @Loop % 4 = 1 THEN 'SHIPPING'
+                       WHEN @Loop % 4 = 2 THEN 'PENDING'
+                       ELSE 'CANCELLED' END;
 
     -- 4. Chen vao bang customer_order
     INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by, created_at)

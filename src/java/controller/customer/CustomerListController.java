@@ -54,6 +54,10 @@ public class CustomerListController extends HttpServlet {
         String searchEmail = request.getParameter("searchEmail");
         String searchMst = request.getParameter("searchMst");
         String typeCus = request.getParameter("type");
+        String searchStatus = request.getParameter("searchStatus");
+        if (searchStatus == null) {
+            searchStatus = "ACTIVE"; // default is ACTIVE
+        }
         String pageRaw = request.getParameter("page");
 
         int page = 1;       // Default page when accessing for the first time
@@ -62,6 +66,17 @@ public class CustomerListController extends HttpServlet {
                 page = Integer.parseInt(pageRaw);
             } catch (NumberFormatException e) {
                 page = 1;
+            }
+        }
+
+        String pageSizeRaw = request.getParameter("pageSize");
+        int pageSize = 10;
+        if (pageSizeRaw != null && !pageSizeRaw.isBlank()) {
+            try {
+                pageSize = Integer.parseInt(pageSizeRaw.trim());
+                if (pageSize < 1) pageSize = 10;
+            } catch (NumberFormatException e) {
+                pageSize = 10;
             }
         }
 
@@ -103,12 +118,14 @@ public class CustomerListController extends HttpServlet {
 
         // filter and paginate
         List<CustomerDTO> list = customerService.getSearchAndPaginatedCusDTOs(searchName, searchSdt, searchEmail,
-                searchMst, typeCus, assignedToUserId, page, PAGE_SIZE);
-        int totalPages = customerService.getTotalPages(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId, PAGE_SIZE);
+                searchMst, typeCus, assignedToUserId, searchStatus, page, pageSize);
+        int totalPages = customerService.getTotalPages(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId, searchStatus, pageSize);
 
         request.setAttribute("customersDTOs", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
+        request.setAttribute("searchStatus", searchStatus);
 
         request.setAttribute("searchName", searchName);
         request.setAttribute("searchSdt", searchSdt);

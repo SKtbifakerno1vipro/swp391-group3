@@ -12,6 +12,8 @@ import java.sql.Timestamp;
 
 public class CustomerOrderDAO extends DBContext {
 
+    public static String lastError = "";
+
     public List<CustomerOrderDTO> getAllCustomerOrders() {
         List<CustomerOrderDTO> list = new ArrayList<>();
         String sql = "SELECT co.*, c.tax_code, u.full_name "
@@ -50,11 +52,11 @@ public class CustomerOrderDAO extends DBContext {
         return null;
     }
 
-    public List<dto.CustomerOrderDTO> getDetailsByOrderId(int orderId) {
+    public List<CustomerOrderDTO> getDetailsByOrderId(int orderId) {
         List<dto.CustomerOrderDTO> details = new ArrayList<>();
-        String sql = "SELECT cod.*, p.product_name, p.unit "
+        String sql = "SELECT cod.*, qd.product_name, qd.unit, qd.product_id, qd.tax_percent, qd.discount_percent "
                 + "FROM customer_order_detail cod "
-                + "JOIN product p ON cod.product_id = p.product_id "
+                + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
                 + "WHERE cod.customer_order_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, orderId);
@@ -63,17 +65,17 @@ public class CustomerOrderDAO extends DBContext {
                 model.CustomerOrderDetail cod = new model.CustomerOrderDetail();
                 cod.setCustomerOrderDetailId(rs.getInt("customer_order_detail_id"));
                 cod.setCustomerOrderId(rs.getInt("customer_order_id"));
-                cod.setProductId(rs.getInt("product_id"));
+                cod.setQuotationDetailId(rs.getInt("quotation_detail_id"));
                 cod.setQuantity(rs.getInt("quantity"));
                 cod.setCostPrice(rs.getDouble("cost_price"));
                 cod.setSellingPrice(rs.getDouble("selling_price"));
+                cod.setTaxPercent(rs.getDouble("tax_percent"));
+                cod.setDiscountPercent(rs.getDouble("discount_percent"));
 
                 model.Product p = new model.Product();
                 p.setProductId(rs.getInt("product_id"));
                 p.setProductName(rs.getString("product_name"));
-
                 p.setSellingPrice(rs.getDouble("selling_price"));
-
                 p.setUnit(rs.getString("unit"));
 
                 dto.CustomerOrderDTO detailDto = new dto.CustomerOrderDTO();
@@ -89,7 +91,7 @@ public class CustomerOrderDAO extends DBContext {
 
     public boolean createOrder(CustomerOrder order, List<model.CustomerOrderDetail> details) {
         String insertOrderSql = "INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by, created_at) VALUES (?, ?, ?, ?, GETDATE())";
-        String insertDetailSql = "INSERT INTO customer_order_detail (customer_order_id, product_id, quantity, cost_price, selling_price) VALUES (?, ?, ?, ?, ?)";
+        String insertDetailSql = "INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (?, ?, ?, ?, ?)";
 
         try {
             connection.setAutoCommit(false);
@@ -121,7 +123,7 @@ public class CustomerOrderDAO extends DBContext {
                 try (PreparedStatement psDetail = connection.prepareStatement(insertDetailSql)) {
                     for (model.CustomerOrderDetail detail : details) {
                         psDetail.setInt(1, orderId);
-                        psDetail.setInt(2, detail.getProductId());
+                        psDetail.setInt(2, detail.getQuotationDetailId());
                         psDetail.setInt(3, detail.getQuantity());
                         psDetail.setDouble(4, detail.getCostPrice());
                         psDetail.setDouble(5, detail.getSellingPrice());
@@ -140,6 +142,7 @@ public class CustomerOrderDAO extends DBContext {
                 ex.printStackTrace();
             }
             e.printStackTrace();
+            lastError = e.getMessage();
             return false;
         } finally {
             try {
@@ -182,6 +185,44 @@ public class CustomerOrderDAO extends DBContext {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public boolean deleteCustomerOrder(int orderId) {
+        String deleteDetailsSql = "DELETE FROM customer_order_detail WHERE customer_order_id = ?";
+        String deleteOrderSql = "DELETE FROM customer_order WHERE customer_order_id = ?";
+        try {
+            connection.setAutoCommit(false);
+            
+            // Delete details first
+            try (PreparedStatement psDetails = connection.prepareStatement(deleteDetailsSql)) {
+                psDetails.setInt(1, orderId);
+                psDetails.executeUpdate();
+            }
+            
+            // Then delete order
+            int affectedRows;
+            try (PreparedStatement psOrder = connection.prepareStatement(deleteOrderSql)) {
+                psOrder.setInt(1, orderId);
+                affectedRows = psOrder.executeUpdate();
+            }
+            
+            connection.commit();
+            return affectedRows > 0;
+        } catch (Exception e) {
+            try {
+                connection.rollback();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private CustomerOrderDTO mapResultSetToDTO(ResultSet rs) throws java.sql.SQLException {
@@ -246,12 +287,24 @@ public class CustomerOrderDAO extends DBContext {
         return 0;
     }
 
-    public List<CustomerOrderDTO> getOrdersWithPaging(int pageIndex, int pageSize) {
+    private String getOrderByClause(String sortBy, String sortOrder) {
+        String col = "co.customer_order_id";
+        if ("orderId".equals(sortBy)) col = "co.customer_order_id";
+        else if ("customerName".equals(sortBy)) col = "u.full_name";
+        else if ("taxCode".equals(sortBy)) col = "c.tax_code";
+        else if ("status".equals(sortBy)) col = "co.order_status";
+
+        String dir = "asc".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC";
+        return "ORDER BY " + col + " " + dir;
+    }
+
+    public List<CustomerOrderDTO> getOrdersWithPaging(int pageIndex, int pageSize, String sortBy, String sortOrder) {
         List<CustomerOrderDTO> list = new ArrayList<>();
+        String orderBy = getOrderByClause(sortBy, sortOrder);
         String sql = "SELECT co.*, c.tax_code, u.full_name FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "ORDER BY co.customer_order_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                + orderBy + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (pageIndex - 1) * pageSize);
             ps.setInt(2, pageSize);
@@ -284,13 +337,14 @@ public class CustomerOrderDAO extends DBContext {
         return 0;
     }
 
-    public List<CustomerOrderDTO> searchOrdersWithPaging(String keyword, int pageIndex, int pageSize) {
+    public List<CustomerOrderDTO> searchOrdersWithPaging(String keyword, int pageIndex, int pageSize, String sortBy, String sortOrder) {
         List<CustomerOrderDTO> list = new ArrayList<>();
+        String orderBy = getOrderByClause(sortBy, sortOrder);
         String sql = "SELECT co.*, c.tax_code, u.full_name FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
                 + "WHERE u.full_name LIKE ? OR c.tax_code LIKE ? "
-                + "ORDER BY co.customer_order_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                + orderBy + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             String p = "%" + keyword + "%";
             ps.setString(1, p);

@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+Shortcuts<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
@@ -6,96 +6,188 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>${contract == null ? 'Create' : 'Edit'} Contract</title>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
+        <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet">
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                padding: 20px;
-                background-color: #f8f9fa;
-            }
-
             #contract-body {
-                border: 1px solid #ccc;
+                border: 1px solid var(--line);
                 padding: 20px;
                 min-height: 500px;
                 background: #fff;
                 margin-top: 10px;
-                border-radius: 4px;
+                border-radius: 12px;
             }
 
-            .btn {
-                padding: 10px 20px;
-                margin-right: 10px;
-                cursor: pointer;
-                border: none;
+            .layout-container {
+                display: grid;
+                grid-template-columns: 1fr 280px;
+                gap: 20px;
+                align-items: start;
+            }
+
+            .shortcut-panel {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 22px;
+                box-shadow: var(--shadow);
+                padding: 20px;
+                position: sticky;
+                top: 20px;
+            }
+
+            .shortcut-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px dashed var(--line);
+                font-size: 0.9em;
+            }
+
+            .shortcut-item:last-child {
+                border-bottom: none;
+            }
+
+            kbd {
+                background: #fff;
+                border: 1px solid var(--line);
                 border-radius: 4px;
+                padding: 3px 6px;
+                font-family: monospace;
+                font-size: 0.9em;
+                color: var(--muted);
+                box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+            }
+
+            @media (max-width: 900px) {
+                .layout-container {
+                    grid-template-columns: 1fr;
+                }
+            }
+            
+            /* Override app-layout.css for raw contract content */
+            .legacy-page .raw-content table {
+                background: #fff;
+                box-shadow: none;
+                border-radius: 0;
+                border: none;
+                margin: 10px 0;
+            }
+            .legacy-page .raw-content th,
+            .legacy-page .raw-content thead td,
+            .legacy-page .raw-content td {
+                background: #fff;
+                color: inherit;
+                font-size: inherit;
+                text-transform: none;
+                letter-spacing: normal;
+                font-weight: normal;
+                border: none;
+                padding: 8px;
+            }
+            .legacy-page .raw-content th {
                 font-weight: bold;
             }
-
-            .btn-save {
-                background: #007bff;
-                color: white;
-            }
-
-            .btn-approve {
-                background: #28a745;
-                color: white;
-            }
-
-            .btn-review {
-                background: #0056b3;
-                color: white;
+            .legacy-page .raw-content table[border="1"],
+            .legacy-page .raw-content table[border="1"] th,
+            .legacy-page .raw-content table[border="1"] td {
+                border: 1px solid #000;
             }
         </style>
     </head>
 
     <body>
-        <c:if test="${not empty errorMsg}">
-            <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;">${errorMsg}</div>
-        </c:if>
+        <div class="dashboard-shell">
+            <jsp:include page="../shared/sidebar.jsp">
+                <jsp:param name="activeMenu" value="contracts" />
+            </jsp:include>
 
-        <h2>${contract == null ? 'Create Contract' : 'Edit Contract'}</h2>
-
-        <form action="contract-save" method="POST" id="contractForm">
-            <input type="hidden" name="contractId" value="${contract.contractId}">
-            <input type="hidden" name="quotationId" value="${quotationId}">
-            <input type="hidden" name="customerId" value="${customerId}">
-            <input type="hidden" name="action" id="actionInput">
-            <input type="hidden" name="contractContent" id="contractContentInput">
-
-            <c:if test="${not empty contract.contractNumber}">
-                <p><strong>Contract Number:</strong> ${contract.contractNumber}</p>
-            </c:if>
-
-            <label style="font-weight:bold;">Contract Content:</label>
-            <div id="contract-body" contenteditable="${editable ? 'true' : 'false'}"
-                 style="border: 1px solid #ccc; padding: 20px; min-height: 500px; background: ${editable ? 'white' : '#f9f9f9'}; margin-top: 10px;">
-                ${not empty contract.contractContent ? contract.contractContent : templateContent}
-            </div>
-
-            <br>
-            <c:if test="${editable}">
-                <button type="button" class="btn btn-save" onclick="submitForm('save')">Save Changes</button>
-
-                <c:if test="${contract != null}">
-       
-                    <!--officier-->
-                    <c:if test="${sessionScope.user.roleId == 5}">
-                        <button type="button" class="btn btn-review" onclick="submitForm('submit_for_review')">Send to review</button>
-                    </c:if>
+            <main class="main legacy-page">
+                <c:if test="${not empty errorMsg}">
+                    <div style="color: var(--danger); border: 1px solid var(--danger); padding: 10px; margin-bottom: 15px; border-radius: 12px; background: var(--danger-soft);">${errorMsg}</div>
                 </c:if>
-            </c:if>
 
-            <div style="margin-top: 20px;"><a href="contract-list">Back to contract list</a></div>
+                <h2>${contract == null ? 'Create Contract' : 'Edit Contract'}</h2>
 
-            <script>
-                function submitForm(action) {
-        
-                    document.getElementById('contractContentInput').value = document.getElementById('contract-body').innerHTML;
-                    document.getElementById('actionInput').value = action;
-                    document.getElementById('contractForm').submit();
-                }
-            </script>
-        </form>
+                <div class="layout-container">
+                    <div class="content-panel">
+                        <form action="contract-save" method="POST" id="contractForm" style="display: block; width: 100%;">
+                            <input type="hidden" name="contractId" value="${contract.contractId}">
+                            <input type="hidden" name="quotationId" value="${quotationId}">
+                            <input type="hidden" name="customerId" value="${customerId}">
+                            <input type="hidden" name="action" id="actionInput">
+                            <input type="hidden" name="contractContent" id="contractContentInput">
+
+                            <c:if test="${not empty contract.contractNumber}">
+                                <p><strong>Contract Number:</strong> ${contract.contractNumber}</p>
+                            </c:if>
+
+                            <label style="font-weight:bold; display:block; margin-top: 15px;">Contract Content:</label>
+                            <div id="contract-body" class="raw-content" contenteditable="${editable ? 'true' : 'false'}"
+                                 style="background: ${editable ? 'white' : '#f9f9f9'};">
+                                ${not empty contract.contractContent ? contract.contractContent : templateContent}
+                            </div>
+
+                            <div style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
+                                <c:if test="${editable}">
+                                    <button type="button" onclick="submitForm('save')">Save Changes</button>
+
+                                    <c:if test="${contract != null}">
+                                        <!--officier-->
+                                        <c:if test="${sessionScope.user.roleId == 5}">
+                                            <button type="button" style="background: var(--tertiary);" onclick="submitForm('submit_for_review')">Send to review</button>
+                                        </c:if>
+                                    </c:if>
+                                </c:if>
+
+                                <a href="contract-list" style="margin-left: 10px; color: var(--primary); font-weight: 600;">Back to contract list</a>
+                            </div>
+
+                            <script>
+                                function submitForm(action) {
+                                    document.getElementById('contractContentInput').value = document.getElementById('contract-body').innerHTML;
+                                    document.getElementById('actionInput').value = action;
+                                    document.getElementById('contractForm').submit();
+                                }
+                            </script>
+                        </form>
+                    </div>
+
+                    <div class="shortcut-panel">
+                        <h3 style="margin-top: 0; font-size: 1.1em; color: var(--primary); display: flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">keyboard</span>
+                            Shortcuts
+                        </h3>
+                        <p style="color: var(--muted); font-size: 0.85em; margin-bottom: 15px;">Use these shortcuts while editing contract content:</p>
+                        
+                        <div class="shortcut-item">
+                            <span>Bold</span>
+                            <kbd>Ctrl + B</kbd>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>Italic</span>
+                            <kbd>Ctrl + I</kbd>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>Underline</span>
+                            <kbd>Ctrl + U</kbd>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>Undo</span>
+                            <kbd>Ctrl + Z</kbd>
+                        </div>
+                        <div class="shortcut-item">
+                            <span>Redo</span>
+                            <kbd>Ctrl + Y</kbd>
+                        </div>
+                        <div class="shortcut-item" style="margin-top: 15px; border-top: 1px solid var(--line); border-bottom: none; padding-top: 15px; display: block; color: var(--muted); font-size: 0.85em;">
+                            <i>Note: These are native browser shortcuts that work inside the editor.</i>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </body>
 
 </html>

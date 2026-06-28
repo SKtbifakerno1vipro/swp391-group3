@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Payment Records - Po Bread Sales</title>
+        <title>Payment - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -34,6 +34,149 @@
                 background-color: #fef3c7;
                 color: #92400e;
             }
+            .pagination {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 20px;
+                border-top: 1px solid var(--line);
+            }
+            .page-link, .page-current {
+                min-width: 36px;
+                height: 36px;
+                display: grid;
+                place-items: center;
+                border-radius: 12px;
+                font-weight: 900;
+                text-decoration: none;
+                color: whitesmoke;
+            }
+            .page-link {
+                background: var(--surface-soft);
+                color: var(--muted);
+            }
+            .page-current, .page-link:hover {
+                background: var(--primary);
+                color: #fff;
+            }
+            .disabled {
+                opacity: .45;
+                pointer-events: none;
+            }
+            
+            /* Responsive Search Form Styles */
+            .search-form-responsive {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                background: var(--surface) !important;
+                border: 1px solid rgba(221, 213, 201, 0.85) !important;
+                border-radius: 16px !important;
+                box-shadow: var(--shadow) !important;
+                padding: 16px 20px !important;
+                margin: 16px 0 22px !important;
+            }
+
+            .search-row {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 12px;
+                width: 100%;
+            }
+
+            .search-label,
+            .range-title {
+                font-size: 11px;
+                font-weight: 800;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                white-space: nowrap;
+                width: 130px;
+                flex-shrink: 0;
+            }
+
+            .range-separator {
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--muted);
+                padding: 0 2px;
+            }
+
+            .input-small {
+                box-sizing: border-box;
+                padding: 6px 10px !important;
+                font-size: 13px !important;
+                border: 1px solid var(--line) !important;
+                border-radius: 8px !important;
+                color: var(--text) !important;
+                background-color: #fff !important;
+                outline: none;
+                transition: border-color 0.2s ease;
+                width: 145px !important;
+                height: 34px !important;
+            }
+
+            .input-small[type="date"] {
+                width: 130px !important;
+            }
+
+            .input-small[type="number"] {
+                width: 100px !important;
+            }
+
+            .input-small:focus {
+                border-color: var(--primary) !important;
+            }
+
+            .actions-group {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                margin-left: auto;
+            }
+
+            .btn-search {
+                padding: 6px 18px !important;
+                height: 34px !important;
+                background-color: var(--primary) !important;
+                color: white !important;
+                border: none !important;
+                border-radius: 999px !important;
+                font-weight: 800 !important;
+                cursor: pointer !important;
+                transition: all 0.2s ease;
+                font-size: 13px !important;
+            }
+
+            .btn-search:hover {
+                transform: translateY(-1px);
+                filter: brightness(1.1);
+            }
+
+            .btn-clear {
+                padding: 6px 18px !important;
+                height: 34px !important;
+                box-sizing: border-box;
+                line-height: 20px;
+                background-color: var(--surface-soft) !important;
+                color: var(--text) !important;
+                border: 1px solid var(--line) !important;
+                border-radius: 999px !important;
+                text-decoration: none !important;
+                font-weight: 800 !important;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                font-size: 13px !important;
+            }
+
+            .btn-clear:hover {
+                background-color: var(--surface-strong) !important;
+                transform: translateY(-1px);
+            }
         </style>
     </head>
     <body>
@@ -42,7 +185,55 @@
                 <jsp:param name="activeMenu" value="payments"/>
             </jsp:include>
             <main class="main legacy-page">
-                <h2>Payment Log Management</h2>
+                <h2>Payment Management</h2>
+
+                <form action="${pageContext.request.contextPath}/payment/list" method="GET" class="search-form-responsive">
+                    <!-- Row 1: Basic search (Contract, Customer Name, Status) -->
+                    <div class="search-row">
+                        <span class="search-label">Search Payments:</span>
+                        
+                        <input type="text" name="customerName" value="${customerName}" placeholder="Customer Name..." class="input-small" />
+                        
+                        <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Contract No..." class="input-small" />
+                        
+                        <select name="status" class="input-small">
+                            <option value="">-- Status --</option>
+                            <option value="PENDING" ${status eq 'PENDING' ? 'selected' : ''}>Pending</option>
+                            <option value="COMPLETED" ${status eq 'COMPLETED' ? 'selected' : ''}>Completed</option>
+                            <option value="FAILED" ${status eq 'FAILED' ? 'selected' : ''}>Failed</option>
+                        </select>
+                    </div>
+
+                    <!-- Row 2: Date filter -->
+                    <div class="search-row">
+                        <span class="range-title">Date:</span>
+                        <input type="date" name="startDate" value="${startDate}" title="Paid Start Date" class="input-small" />
+                        <span class="range-separator">to</span>
+                        <input type="date" name="endDate" value="${endDate}" title="Paid End Date" class="input-small" />
+                    </div>
+
+                    <!-- Row 3: Amount filter & Buttons -->
+                    <div class="search-row">
+                        <span class="range-title">Amount:</span>
+                        <input type="number" step="0.01" name="minAmount" value="${minAmount}" placeholder="Min..." class="input-small" />
+                        <span class="range-separator">to</span>
+                        <input type="number" step="0.01" name="maxAmount" value="${maxAmount}" placeholder="Max..." class="input-small" />
+                        
+                        <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-left: 15px; letter-spacing: 0.05em;">Show:</span>
+                        <select name="pageSize" class="input-small" style="width: 100px !important;" onchange="this.form.submit()">
+                            <option value="5" ${pageSize == 5 ? 'selected' : ''}>5 items</option>
+                            <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 items</option>
+                            <option value="15" ${pageSize == 15 ? 'selected' : ''}>15 items</option>
+                            <option value="25" ${pageSize == 25 ? 'selected' : ''}>25 items</option>
+                        </select>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">per page</span>
+                        
+                        <div class="actions-group">
+                            <button type="submit" class="btn-search">Search</button>
+                            <a href="${pageContext.request.contextPath}/payment/list" class="btn-clear">Clear Filters</a>
+                        </div>
+                    </div>
+                </form>
 
                 <table>
                     <thead>
@@ -53,17 +244,18 @@
                             <th>Amount</th>
                             <th>Payment Type</th>
                             <th>Status</th>
+                            <th>Created Date</th>
                             <th>Processed Date</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:if test="${empty list}">
-                            <tr><td colspan="8" style="text-align:center;">No payment transactions recorded.</td></tr>
+                            <tr><td colspan="9" style="text-align:center;">No payment transactions recorded.</td></tr>
                         </c:if>
                         <c:forEach items="${list}" var="p">
                             <tr>
-                                <td>PAY-${p.paymentId}</td>
+                                <td>${p.paymentId}</td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${not empty p.contractNumber}">
@@ -103,14 +295,45 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
+                                <td>${p.formattedCreatedAt}</td>
                                 <td>${p.formattedPaidAt}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/payment-detail?id=${p.paymentId}" style="color: #0284c7; text-decoration: none; font-weight: bold;">View Details</a>
+                                    <a href="${pageContext.request.contextPath}/payment/detail?id=${p.paymentId}" style="color: #0284c7; text-decoration: none; font-weight: bold;">View Details</a>
                                 </td>
                             </tr>
                         </c:forEach>
                     </tbody>
                 </table>
+
+                <c:if test="${totalPages > 1}">
+                    <div class="pagination" style="margin-top: 20px;">
+                        <c:set var="queryParams" value="&customerName=${customerName}&contractNumber=${contractNumber}&status=${status}&startDate=${startDate}&endDate=${endDate}&minAmount=${minAmount}&maxAmount=${maxAmount}&pageSize=${pageSize}" />
+                        
+                        <a class="page-link ${currentPage == 1 ? 'disabled' : ''}" 
+                           href="${pageContext.request.contextPath}/payment/list?page=1${queryParams}">First</a>
+                        
+                        <a class="page-link ${currentPage == 1 ? 'disabled' : ''}" 
+                           href="${pageContext.request.contextPath}/payment/list?page=${currentPage - 1}${queryParams}">Prev</a>
+                        
+                        <c:forEach begin="1" end="${totalPages}" var="i">
+                            <c:choose>
+                                <c:when test="${currentPage == i}">
+                                    <span class="page-current">${i}</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <a class="page-link" 
+                                       href="${pageContext.request.contextPath}/payment/list?page=${i}${queryParams}">${i}</a>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+                        
+                        <a class="page-link ${currentPage == totalPages ? 'disabled' : ''}" 
+                           href="${pageContext.request.contextPath}/payment/list?page=${currentPage + 1}${queryParams}">Next</a>
+                        
+                        <a class="page-link ${currentPage == totalPages ? 'disabled' : ''}" 
+                           href="${pageContext.request.contextPath}/payment/list?page=${totalPages}${queryParams}">Last</a>
+                    </div>
+                </c:if>
             </main>
         </div>
     </body>

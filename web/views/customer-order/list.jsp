@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" import="service.InvoiceService,model.Invoice" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -20,13 +20,28 @@
             </jsp:include>
             <main class="main legacy-page">
     <h2>Customer Order List</h2>
-    <hr>
-    <a href="${pageContext.request.contextPath}/customer-order">Create Order</a>
-    <hr>
-    <form action="customer-order-list" method="GET" >
+    <form action="customer-order-list" method="GET" style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
         <input type="hidden" name="search" value="search">
-        <input type="text" placeholder="Search" name="keyword" value="${keyword}">
-        <button type="submit">Search</button>
+        <div>
+            <input type="text" placeholder="Search by name or tax code" name="keyword" value="${keyword}" style="padding: 6px; width: 220px;">
+        </div>
+        <div>
+            <label for="sortBy" style="font-weight: bold; margin-right: 5px;">Sort by:</label>
+            <select name="sortBy" id="sortBy" style="padding: 6px;">
+                <option value="orderId" ${sortBy == 'orderId' ? 'selected' : ''}>Order ID</option>
+                <option value="customerName" ${sortBy == 'customerName' ? 'selected' : ''}>Customer Name</option>
+                <option value="taxCode" ${sortBy == 'taxCode' ? 'selected' : ''}>Tax Code</option>
+                <option value="status" ${sortBy == 'status' ? 'selected' : ''}>Status</option>
+            </select>
+        </div>
+        <div>
+            <label for="sortOrder" style="font-weight: bold; margin-right: 5px;">Order:</label>
+            <select name="sortOrder" id="sortOrder" style="padding: 6px;">
+                <option value="asc" ${sortOrder == 'asc' ? 'selected' : ''}>Ascending</option>
+                <option value="desc" ${sortOrder == 'desc' ? 'selected' : ''}>Descending</option>
+            </select>
+        </div>
+        <button type="submit" style="padding: 6px 15px; cursor: pointer;">Search/Filter</button>
     </form>
     <br>
 
@@ -41,8 +56,18 @@
                 <th>Action</th>
             </tr>
         </thead>
+        <% InvoiceService invService = new InvoiceService(); %>
         <tbody>
             <c:forEach var="item" items="${orders}">
+                <%
+                    dto.CustomerOrderDTO itemDto = (dto.CustomerOrderDTO) pageContext.getAttribute("item");
+                    if (itemDto != null && itemDto.getCustomerOrder() != null) {
+                        Invoice inv = invService.getInvoiceByOrderId(itemDto.getCustomerOrder().getCustomerOrderId());
+                        pageContext.setAttribute("invOfOrder", inv);
+                    } else {
+                        pageContext.removeAttribute("invOfOrder");
+                    }
+                %>
                 <tr>
                     <td>${item.customerOrder.customerOrderId}</td>
                     <td>${item.customerUser.fullName}</td>
@@ -53,7 +78,19 @@
                         <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
                     </td>
                     <td>
-                        <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">View</a>
+                        <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">View</a> |
+                        <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
+                        <c:if test="${item.customerOrder.orderStatus == 'COMPLETED'}">
+                            |
+                            <c:choose>
+                                <c:when test="${empty invOfOrder}">
+                                    <a href="${pageContext.request.contextPath}/invoice?orderId=${item.customerOrder.customerOrderId}" style="color: #16a34a; font-weight: bold; text-decoration: none;">Create Invoice</a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="color: #0284c7; font-weight: bold; text-decoration: none;">View Invoice</a>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:if>
                     </td>
                 </tr>
             </c:forEach>
@@ -67,7 +104,7 @@
 
     <div>
         <c:if test="${totalPages > 1}">
-            <c:set var="queryParams" value="search=${action}&keyword=${keyword}" />
+            <c:set var="queryParams" value="search=${action}&keyword=${keyword}&sortBy=${sortBy}&sortOrder=${sortOrder}" />
 
             <c:if test="${currentPage > 1}">
                 <a href="customer-order-list?page=${currentPage - 1}&${queryParams}">Previous</a>

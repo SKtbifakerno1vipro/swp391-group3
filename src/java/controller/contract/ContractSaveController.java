@@ -19,6 +19,8 @@ import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+import utils.EmailUtils;
 
 @WebServlet(urlPatterns = {"/contract-save"})
 public class ContractSaveController extends HttpServlet {
@@ -32,7 +34,7 @@ public class ContractSaveController extends HttpServlet {
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        if (user == null) {
+        if (user == null ) {
             response.sendRedirect("login");
             return;
         }
@@ -103,8 +105,6 @@ public class ContractSaveController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
@@ -182,8 +182,10 @@ public class ContractSaveController extends HttpServlet {
         c.setStorageType("TEXT");
         c.setContractContent(contractContent);
         c.setCreatedBy(user.getUserId());
-
+        String secureToken = UUID.randomUUID().toString();
+        c.setToken(secureToken);
         int newId = contractService.insert(c);
+
         if (newId > 0) {
             c.setContractId(newId);
             insertHistory(c, "DRAFT", "Contract created in DRAFT status.", user.getUserId());

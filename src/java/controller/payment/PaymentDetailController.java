@@ -10,12 +10,12 @@ import jakarta.servlet.http.HttpSession;
 
 import model.Payment;
 import model.User;
-import dal.PaymentDAO;
+import service.PaymentService;
 
-@WebServlet(name = "PaymentDetailController", urlPatterns = {"/payment-detail"})
+@WebServlet(name = "PaymentDetailController", urlPatterns = {"/payment/detail"})
 public class PaymentDetailController extends HttpServlet {
 
-    private final PaymentDAO paymentDAO = new PaymentDAO();
+    private final PaymentService paymentService = new PaymentService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -29,16 +29,16 @@ public class PaymentDetailController extends HttpServlet {
 
         String idStr = request.getParameter("id");
         if (idStr == null || idStr.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/payment-list");
+            response.sendRedirect(request.getContextPath() + "/payment/list");
             return;
         }
 
         try {
             int paymentId = Integer.parseInt(idStr);
-            Payment payment = paymentDAO.getPaymentById(paymentId);
+            Payment payment = paymentService.getPaymentById(paymentId);
 
             if (payment == null) {
-                response.sendRedirect(request.getContextPath() + "/payment-list");
+                response.sendRedirect(request.getContextPath() + "/payment/list");
                 return;
             }
 
@@ -49,9 +49,9 @@ public class PaymentDetailController extends HttpServlet {
             }
 
             request.setAttribute("payment", payment);
-            request.getRequestDispatcher("views/payment/payment_detail.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/payment/payment_detail.jsp").forward(request, response);
         } catch (NumberFormatException e) {
-            response.sendRedirect(request.getContextPath() + "/payment-list");
+            response.sendRedirect(request.getContextPath() + "/payment/list");
         }
     }
 }

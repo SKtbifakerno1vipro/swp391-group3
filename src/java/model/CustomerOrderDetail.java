@@ -9,6 +9,9 @@ public class CustomerOrderDetail {
     private int quantity;
     private double costPrice;
     private double sellingPrice;
+    private int quotationDetailId;
+    private double taxPercent;
+    private double discountPercent;
 
     public CustomerOrderDetail() {}
     
@@ -24,4 +27,19 @@ public class CustomerOrderDetail {
     public void setCostPrice(double costPrice) { this.costPrice = costPrice; }
     public double getSellingPrice() { return sellingPrice; }
     public void setSellingPrice(double sellingPrice) { this.sellingPrice = sellingPrice; }
+    
+    public int getQuotationDetailId() { return quotationDetailId; }
+    public void setQuotationDetailId(int quotationDetailId) { this.quotationDetailId = quotationDetailId; }
+
+    public double getTaxPercent() { return taxPercent; }
+    public void setTaxPercent(double taxPercent) { this.taxPercent = taxPercent; }
+
+    public double getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(double discountPercent) { this.discountPercent = discountPercent; }
+    
+    // Tính toán Discount Amount từ Selling Price, Quantity và Discount Percent
+    public double getDiscount() {
+        return (this.sellingPrice * this.quantity) * (this.discountPercent / 100.0);
+    }
+    
 }

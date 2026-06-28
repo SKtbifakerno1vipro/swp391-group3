@@ -4,9 +4,18 @@ import java.time.LocalDateTime;
 
 public class ContractCustomerDTO {
 
-    private String contractNumber, customerName, 
+    private String contractNumber, customerName,
             storageType, taxCode, phone, email, contractStatus;
     private int contractId;
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+    private LocalDateTime updatedAt;
 
     public String getContractStatus() {
         return contractStatus;
@@ -22,6 +31,16 @@ public class ContractCustomerDTO {
 
     public void setContractId(int contractId) {
         this.contractId = contractId;
+    }
+
+    private int orderId;
+
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
     private LocalDateTime createdAt;
 
@@ -51,7 +70,6 @@ public class ContractCustomerDTO {
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
-
 
     public String getStorageType() {
         return storageType;
@@ -85,4 +103,12 @@ public class ContractCustomerDTO {
         this.createdAt = createdAt;
     }
 
+    public String getFormattedCreatedAt() {
+        if (this.createdAt != null) {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return this.createdAt.format(formatter);
+        }
+        return "";
+    }
 }
+

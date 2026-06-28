@@ -401,7 +401,7 @@
                                         <div class="info-value" style="color: var(--primary); font-weight: 700;">
                                             <c:choose>
                                                 <c:when test="${not empty cusDTO.assignedToUserId}">
-                                                    <c:forEach var="u" items="${users}">
+                                                    <c:forEach var="u" items="${listSales}">
                                                         <c:if test="${cusDTO.assignedToUserId == u.userId}">
                                                             ${u.fullName} (${u.userName})
                                                         </c:if>
@@ -473,10 +473,9 @@
                                         <thead>
                                             <tr>
                                                 <th>Contract No.</th>
-                                                <th>Version</th>
                                                 <th>Status</th>
-                                                <th>Signed At</th>
-                                                <th>Documents</th>
+                                                <th>Created At</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -490,31 +489,19 @@
                                                                     ${c.contractNumber}
                                                                 </a>
                                                             </td>
-                                                            <td>v${c.contractVersion}</td>
                                                             <td><span class="badge"
                                                                     style="background-color: #e2e3e5; color: #383d41;">${c.contractStatus}</span>
                                                             </td>
-                                                            <td>${c.formattedSignDate}</td>
+                                                            <td>${c.formattedCreatedAt}</td>
                                                             <td>
-                                                                <c:choose>
-                                                                    <c:when test="${not empty c.contractFileUrl}">
-                                                                        <a href="${pageContext.request.contextPath}/${c.contractFileUrl}"
-                                                                            target="_blank" class="btn-action-sm"
-                                                                            style="background-color: #28a745;">Download</a>
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        <span
-                                                                            style="color: #6c757d; font-style: italic;">No
-                                                                            Document</span>
-                                                                    </c:otherwise>
-                                                                </c:choose>
+                                                                <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}" class="btn-action-sm">View Details</a>
                                                             </td>
                                                         </tr>
                                                     </c:forEach>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <tr>
-                                                        <td colspan="5" class="no-data">No legal contracts initialized.
+                                                        <td colspan="4" class="no-data">No legal contracts initialized.
                                                         </td>
                                                     </tr>
                                                 </c:otherwise>

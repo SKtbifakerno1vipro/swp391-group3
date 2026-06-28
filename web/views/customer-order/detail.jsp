@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" import="service.InvoiceService,model.Invoice" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -23,6 +23,16 @@
 
 
         <h3>Order Information</h3>
+        <%
+            InvoiceService invService = new InvoiceService();
+            dto.CustomerOrderDTO orderDto = (dto.CustomerOrderDTO) request.getAttribute("order");
+            if (orderDto != null && orderDto.getCustomerOrder() != null) {
+                Invoice inv = invService.getInvoiceByOrderId(orderDto.getCustomerOrder().getCustomerOrderId());
+                pageContext.setAttribute("invOfOrder", inv);
+            } else {
+                pageContext.removeAttribute("invOfOrder");
+            }
+        %>
         <form action="${pageContext.request.contextPath}/customer-order" method="POST">
             <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
             <input type="hidden" name="action" value="update_status">
@@ -38,7 +48,23 @@
                     </select>
                     <button type="submit">Update Status</button>
                 </li>
-                <li><strong>Created At:</strong>
+                <c:if test="${order.customerOrder.orderStatus == 'COMPLETED'}">
+                    <li style="margin-top: 15px;"><strong>Hành động:</strong>
+                        <c:choose>
+                            <c:when test="${empty invOfOrder}">
+                                <a href="${pageContext.request.contextPath}/invoice?orderId=${order.customerOrder.customerOrderId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #15803d; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(21, 128, 61, 0.2);">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: white;">receipt_long</span> Create Invoice
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #0284c7; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: white;">visibility</span> View Invoice
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
+                    </li>
+                </c:if>
+                <li style="margin-top: 15px;"><strong>Created At:</strong>
                     <fmt:parseDate value="${order.customerOrder.createdAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
                     <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
                 </li>
@@ -53,51 +79,38 @@
                     <th>Product Name</th>
                     <th>Quantity</th>
                     <th>Unit Price</th>
-                    <th>Total</th>
-                    <th>Actions</th>
+                    <th>Discount</th>
+                    <th>Tax (%)</th>
+                    <th>Total (incl. Tax)</th>
                 </tr>
             </thead>
             <tbody>
-                <c:set var="totalOrderAmount" value="0" />
                 <c:forEach var="item" items="${details}">
-                    <c:set var="itemTotal" value="${item.detail.quantity * item.detail.sellingPrice}" />
-                    <c:set var="totalOrderAmount" value="${totalOrderAmount + itemTotal}" />
                     <tr>
                         <td>${item.product.productId}</td>
                         <td>${item.product.productName}</td>
                         <td>
-                            <form action="${pageContext.request.contextPath}/customer-order" method="POST" style="display:inline;">
-                                <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
-                                <input type="hidden" name="detailId" value="${item.detail.customerOrderDetailId}">
-                                <input type="hidden" name="action" value="update_quantity">
-                                <input type="number" name="quantity" value="${item.detail.quantity}" min="1" style="width: 60px;">
-                                ${item.product.unit}
-                                <button type="submit">Update</button>
-                            </form>
+                            ${item.detail.quantity} ${item.product.unit}
                         </td>
                         <td><fmt:formatNumber value="${item.detail.sellingPrice}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
-                        <td><fmt:formatNumber value="${itemTotal}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
                         <td>
-                            <form action="${pageContext.request.contextPath}/customer-order" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                                <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
-                                <input type="hidden" name="detailId" value="${item.detail.customerOrderDetailId}">
-                                <input type="hidden" name="action" value="delete_item">
-                                <button type="submit" style="color: red;">Delete</button>
-                            </form>
+                            
+                            <fmt:formatNumber value="${item.detail.discountPercent}" maxFractionDigits="2"/>%
                         </td>
+                        <td><fmt:formatNumber value="${item.detail.taxPercent}" maxFractionDigits="2"/>%</td>
+                        <td><fmt:formatNumber value="${item.detail.total}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty details}">
                     <tr>
-                        <td colspan="6" style="text-align: center;">No items found in this order.</td>
+                        <td colspan="7" style="text-align: center;">No items found in this order.</td>
                     </tr>
                 </c:if>
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="4" style="text-align: right;">Grand Total:</th>
-                    <th><fmt:formatNumber value="${totalOrderAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></th>
-                    <th></th>
+                    <th colspan="6" style="text-align: right;">Grand Total:</th>
+                    <th><fmt:formatNumber value="${quotationTotal}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></th>
                 </tr>
             </tfoot>
         </table>

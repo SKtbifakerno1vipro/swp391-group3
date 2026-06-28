@@ -38,6 +38,17 @@ public class EmailLogController extends HttpServlet {
             }
         }
 
+        String pageSizeRaw = request.getParameter("pageSize");
+        int pageSize = 10;
+        if (pageSizeRaw != null && !pageSizeRaw.isBlank()) {
+            try {
+                pageSize = Integer.parseInt(pageSizeRaw.trim());
+                if (pageSize < 1) pageSize = 10;
+            } catch (NumberFormatException e) {
+                pageSize = 10;
+            }
+        }
+
         if (searchEmail != null) {
             searchEmail = searchEmail.trim();
         }
@@ -64,9 +75,9 @@ public class EmailLogController extends HttpServlet {
             }
         }
 
-        List<EmailLog> list = emailLogDAO.searchAndPaginateLogs(searchEmail, searchUsername, startTimestamp, endTimestamp, page, PAGE_SIZE);
+        List<EmailLog> list = emailLogDAO.searchAndPaginateLogs(searchEmail, searchUsername, startTimestamp, endTimestamp, page, pageSize);
         int totalRecords = emailLogDAO.getTotalLogsCount(searchEmail, searchUsername, startTimestamp, endTimestamp);
-        int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
         if (totalPages < 1) {
             totalPages = 1;
         }
@@ -74,6 +85,7 @@ public class EmailLogController extends HttpServlet {
         request.setAttribute("emailLogs", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("searchEmail", searchEmail);
         request.setAttribute("searchUsername", searchUsername);
         request.setAttribute("startDate", startDate);

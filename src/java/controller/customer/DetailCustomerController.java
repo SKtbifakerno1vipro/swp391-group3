@@ -60,12 +60,16 @@ public class DetailCustomerController extends HttpServlet {
             }
             List<CustomerOrderDTO> listOrdersCus = customerOrderService.getListCustomerOrderDTOByCusId(idCus);
             List<Quotation> listQuotationsForCus = quotationService.getQuotationsByCustomerId(idCus);
-            List<Contract> listContractsForCus = contractService.getContractsByCustomerId(idCus);
+            List<ContractCustomerDTO> listContractsForCus = contractService.searchContracts(
+                    null, null, null, null, 1, 1000, cusDTO.getUserId(), 3,
+                    null, null, null, null, null
+            );
             
             request.setAttribute("listOrdersForCus", listOrdersCus);
             request.setAttribute("listQuotationsForCus", listQuotationsForCus);
             request.setAttribute("listContractsForCus", listContractsForCus);
             request.setAttribute("cusDTO", cusDTO);
+            request.setAttribute("listSales", customerService.getAllSalesExecutiveUsers());
             request.getRequestDispatcher("/views/customer/customer_detail.jsp").forward(request, response);
         } catch (NumberFormatException | NullPointerException e) {
             response.sendRedirect(request.getContextPath() + "/customer/list");

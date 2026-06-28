@@ -310,6 +310,9 @@
                         <a class="button" href="${pageContext.request.contextPath}/customer/detail?id_cus=${customer.customerId}" id="btn-view-profile">
                             <span class="material-symbols-outlined">account_circle</span>Thông tin cá nhân
                         </a>
+                        <a class="button primary" href="${pageContext.request.contextPath}/tool/auto-generate" id="btn-auto-generator">
+                            <span class="material-symbols-outlined">bolt</span>Auto Generator Contract
+                        </a>
                     </div>
                 </section>
 
@@ -384,22 +387,22 @@
                                             <tr>
                                                 <td>#<c:out value="${quote.quotationId}"/></td>
                                                 <td>
-                                                    <fmt:formatNumber value="${quote.totalPrice}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
+                                                    <fmt:formatNumber value="${quote.totalAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
                                                 </td>
-                                                <td><fmt:formatDate value="${quote.createdAt}" pattern="dd/MM/yyyy"/></td>
+                                                <td><c:out value="${quote.formattedCreatedAt}"/></td>
                                                 <td>
                                                     <c:choose>
-                                                        <c:when test="${quote.status == 'APPROVED'}">
+                                                        <c:when test="${quote.quotationStatus == 'APPROVED'}">
                                                             <span class="badge">Đã duyệt</span>
                                                         </c:when>
-                                                        <c:when test="${quote.status == 'PENDING'}">
+                                                        <c:when test="${quote.quotationStatus == 'PENDING'}">
                                                             <span class="badge pending">Đang chờ</span>
                                                         </c:when>
-                                                        <c:when test="${quote.status == 'REJECTED'}">
+                                                        <c:when test="${quote.quotationStatus == 'REJECTED'}">
                                                             <span class="badge danger">Bị từ chối</span>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <span class="badge info"><c:out value="${quote.status}"/></span>
+                                                            <span class="badge info"><c:out value="${quote.quotationStatus}"/></span>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
@@ -437,25 +440,25 @@
                                         <c:forEach var="con" items="${recentContracts}">
                                             <tr>
                                                 <td>#<c:out value="${con.contractNumber}"/></td>
-                                                <td><fmt:formatDate value="${con.startDate}" pattern="dd/MM/yyyy"/></td>
+                                                <td><c:out value="${con.formattedCreatedAt}"/></td>
                                                 <td>
                                                     <c:choose>
-                                                        <c:when test="${con.status == 'ACTIVE'}">
+                                                        <c:when test="${con.contractStatus == 'ACTIVE'}">
                                                             <span class="badge">Hiệu lực</span>
                                                         </c:when>
-                                                        <c:when test="${con.status == 'DRAFT'}">
+                                                        <c:when test="${con.contractStatus == 'DRAFT'}">
                                                             <span class="badge pending">Bản nháp</span>
                                                         </c:when>
-                                                        <c:when test="${con.status == 'EXPIRED'}">
+                                                        <c:when test="${con.contractStatus == 'EXPIRED'}">
                                                             <span class="badge danger">Hết hạn</span>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <span class="badge info"><c:out value="${con.status}"/></span>
+                                                            <span class="badge info"><c:out value="${con.contractStatus}"/></span>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
                                                 <td>
-                                                    <a class="btn-action" href="${pageContext.request.contextPath}/contract-detail?contractId=${con.contractId}">Chi tiết</a>
+                                                    <a class="btn-action" href="${pageContext.request.contextPath}/contract-detail?id=${con.contractId}">Chi tiết</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>

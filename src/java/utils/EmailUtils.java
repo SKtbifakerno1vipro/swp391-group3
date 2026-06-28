@@ -7,11 +7,12 @@ import java.util.Properties;
 import dal.EmailLogDAO;
 
 public class EmailUtils {
+
     //thu vien Jakarta Mail API đe ket noi voi Server SMTP cua Google (Gmail) va gui email đi duoi dang ma HTML
     private static final EmailLogDAO emailLogDAO = new EmailLogDAO();
     private static final String HOSTNAME = "smtp.gmail.com";
     private static final String PORT = "587"; // Cổng TLS của Gmail
-    
+
     // Helper method to load email configuration from properties file
     private static Properties loadEmailProperties() {
         Properties props = new Properties();
@@ -35,6 +36,7 @@ public class EmailUtils {
         }
         return props;
     }
+
     public static boolean sendEmail(String toEmail, String subject, String content) {
         // Read credentials from local properties file
         Properties config = loadEmailProperties();
@@ -54,9 +56,9 @@ public class EmailUtils {
         props.put("mail.smtp.port", PORT);
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true"); // Bắt buộc dùng TLS đối với Gmail cổng 587
-        
+
         // tranh loi bat tay SSL/TLS voi server Google
-        props.put("mail.smtp.ssl.protocols", "TLSv1.2"); 
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
         props.put("mail.smtp.starttls.required", "true");
 
         // kiem tra danh tinh khi connect voi gmail
@@ -69,12 +71,17 @@ public class EmailUtils {
         session.setDebug(true);
         try {
             MimeMessage msg = new MimeMessage(session);
-            msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-            
+            msg.addHeader("Content-Type", "text/html; charset=UTF-8");
+
             // Đoi voi Gmail, senderEmail bat buoc phai trung khop voi loginUser (Email ca nhan cua ban)
-            msg.setFrom(new InternetAddress(senderEmail, senderName));
-            
+            msg.setFrom(new InternetAddress(senderEmail, senderName,"UTF-8"));
+
             msg.setSubject(subject, "UTF-8");
+
+            
+            msg.setHeader("Content-Type", "text/html; charset=UTF-8");
+            msg.setHeader("Content-Transfer-Encoding", "quoted-printable");
+            
             msg.setContent(content, "text/html; charset=UTF-8");
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
 

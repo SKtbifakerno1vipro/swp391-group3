@@ -1,7 +1,5 @@
 package controller.contract;
 
-import dal.ContractDAO;
-import dto.CustomerDTO;
 import model.*;
 import model.ContractHistory;
 import model.ContractRevisionItem;
@@ -15,7 +13,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import service.ContractService;
-import service.CustomerService;
 import service.RoleService;
 import service.SignatureService;
 import service.UserService;
@@ -33,10 +30,33 @@ public class ContractDetailController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+
+        String token = request.getParameter("token");
+        String contractIdRaw = request.getParameter("id");
+        boolean isGuest = false;
+
         if (user == null) {
-            response.sendRedirect("login");
-            return;
+            // if user is guest and click to the link url send from email
+            if (token != null && contractIdRaw != null) {
+                try {
+                    int contractid = Integer.parseInt(contractIdRaw);
+                    if (contractService.validateToken(contractid, token)) {
+                        isGuest = true;
+                    } else {
+                        response.sendRedirect("login");
+                        return;
+                    }
+                } catch (Exception e) {
+                    response.sendRedirect("login");
+                    return;
+                }
+            } else { // if not link from email
+                response.sendRedirect("login");
+                return;
+            }
         }
+        request.setAttribute("isGuest", isGuest);
+
         if ((String) session.getAttribute("errorSig") != null) {
             request.setAttribute("errorSig", (String) session.getAttribute("errorSig"));
             session.removeAttribute("errorSig");
@@ -53,7 +73,7 @@ public class ContractDetailController extends HttpServlet {
                 if (contract != null) {
                     List<ContractHistory> historyList = contractService.getHistoriesByContractId(id);
 
-//nguyenkien - begin
+                    //nguyenkien - begin
                     String finalHtml = contract.getContractContent();
                     String status = contract.getContractStatus();
                     boolean isApproved = "APPROVED".equals(status);
@@ -63,7 +83,10 @@ public class ContractDetailController extends HttpServlet {
                         String uploadsUrl = request.getContextPath() + "/uploads/";
                         finalHtml = finalHtml.replaceAll("(src=[\\\"']?)File\\?name=([^\\\"'>]+)([\\\"']?)",
                                 "$1" + uploadsUrl + "$2$3");
-                        Signature existSign = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
+                        Signature existSign = null;
+                        if (user != null) {
+                            existSign = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
+                        }
                         existSignature = (existSign != null);
                         request.setAttribute("signed", existSignature);
                         List<Signature> sigList = sService.getSignaturesByContractId(id);
@@ -125,6 +148,7 @@ public class ContractDetailController extends HttpServlet {
         }
 
         String action = request.getParameter("action");
+        
         int contractId = Integer.parseInt(request.getParameter("contractId"));
 
         // take contract with the id
@@ -176,7 +200,7 @@ public class ContractDetailController extends HttpServlet {
             }
             // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
-
+            contractService.noticeCustomerCheckContract(contractId, "http://localhost:9999/SWP391_GROUP3/");
             // Lưu lịch sử
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);

@@ -37,8 +37,8 @@ public class SecurityFilter implements Filter {
             "/register",
             "/auth/forgot",
             "/user/password/change",
-            "/payment-ipn",
-            "/payment-return"
+            "/payment/ipn",
+            "/payment/return"
     );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
@@ -73,9 +73,8 @@ public class SecurityFilter implements Filter {
             "/invoice",
             "/revenue-report",
             "/payment",
-            "/payment-test",
-            "/payment-list",
-            "/payment-detail",
+            "/payment/list",
+            "/payment/detail",
             "/admin/audit-logs"
     );
 
@@ -103,9 +102,8 @@ public class SecurityFilter implements Filter {
             "/revenue-report",
             "/Signature",
             "/payment",
-            "/payment-test",
-            "/payment-list",
-            "/payment-detail"
+            "/payment/list",
+            "/payment/detail"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
@@ -114,9 +112,8 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/customer/detail",
             "/payment",
-            "/payment-test",
-            "/payment-list",
-            "/payment-detail"
+            "/payment/list",
+            "/payment/detail"
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(
@@ -148,8 +145,8 @@ public class SecurityFilter implements Filter {
             //"/Invoice",
             "/invoice",
             "/payment",
-            "/payment-list",
-            "/payment-detail"
+            "/payment/list",
+            "/payment/detail"
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
@@ -170,6 +167,11 @@ public class SecurityFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setDateHeader("Expires", 0);
+
         String path = req.getServletPath();
 
         if (isStaticResource(path)) {
@@ -185,44 +187,62 @@ public class SecurityFilter implements Filter {
         HttpSession session = req.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
-        if (user == null) {
-            res.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
-        // Check if user has been banned/deactivated (INACTIVE status)
-        User dbUser = userDAO.getUserById(user.getUserId());
-        if (dbUser == null || "INACTIVE".equalsIgnoreCase(dbUser.getStatus())) {
-            if (session != null) {
-                session.invalidate();
+        if ("/contract-detail".equals(path)) {
+            String token = req.getParameter("token");
+            String idStr = req.getParameter("id");
+            if (token != null && idStr != null) {
+                try {
+                    int contractId = Integer.parseInt(idStr);
+                    dal.ContractDAO cDAO = new dal.ContractDAO();
+                    if (cDAO.validateToken(contractId, token)) {
+                        chain.doFilter(request, response);
+                        return;
+                    }
+                } catch (Exception e) {
+                    res.sendRedirect(req.getContextPath() + "/login");
+                }
             }
-            res.sendRedirect(req.getContextPath() + "/login");
-            return;
         }
 
-        if (LOGGED_IN_URLS.contains(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (path.startsWith("/views/")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (hasPermission(user.getRoleId(), path, req)) {
-            chain.doFilter(request, response);
-            return;
-        } else {
-            System.out.println("Access Denied: Role "
-                    + user.getRoleId()
-                    + " tried to access "
-                    + path);
-
-            res.sendRedirect(req.getContextPath()
-                    + "/dashboard?error=denied");
-            return;
-        }
+//        if (user == null) {
+//            res.sendRedirect(req.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        // Check if user has been banned/deactivated (INACTIVE status)
+//        User dbUser = userDAO.getUserById(user.getUserId());
+//        if (dbUser == null || "INACTIVE".equalsIgnoreCase(dbUser.getStatus())) {
+//            if (session != null) {
+//                session.invalidate();
+//            }
+//            res.sendRedirect(req.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        if (LOGGED_IN_URLS.contains(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (path.startsWith("/views/")) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (hasPermission(user.getRoleId(), path, req)) {
+//            chain.doFilter(request, response);
+//            return;
+//        } else {
+//            System.out.println("Access Denied: Role "
+//                    + user.getRoleId()
+//                    + " tried to access "
+//                    + path);
+//
+//            res.sendRedirect(req.getContextPath()
+//                    + "/dashboard?error=denied");
+//            return;
+//        }
+        chain.doFilter(request, response);
     }
 
     private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
