@@ -36,4 +36,10 @@ public class CustomerOrderDetail {
 
     public double getDiscountPercent() { return discountPercent; }
     public void setDiscountPercent(double discountPercent) { this.discountPercent = discountPercent; }
+    
+    // Tính toán Discount Amount từ Selling Price, Quantity và Discount Percent
+    public double getDiscount() {
+        return (this.sellingPrice * this.quantity) * (this.discountPercent / 100.0);
+    }
+    
 }

@@ -9,7 +9,7 @@ import model.Quotation;
 import model.Role;
 
 public class RoleDAO extends DBContext {
-
+//lay toan bo roles 
     public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {
@@ -32,7 +32,7 @@ public class RoleDAO extends DBContext {
         }
         return roles;
     }
-
+//tao roles
     public int createRole(String roleName) {
         String sql = "INSERT INTO role (role_name) VALUES (?)";
 
@@ -55,7 +55,7 @@ public class RoleDAO extends DBContext {
 
         return -1;
     }
-
+//lay role theo ID
     public model.Role getRoleById(int id) {
         String sql = "SELECT * FROM role WHERE role_id = ?";
         try {
@@ -76,7 +76,7 @@ public class RoleDAO extends DBContext {
         }
         return null;
     }
-
+//cap nhat role
     public boolean updateRole(model.Role role) {
         String sql = "UPDATE role SET role_name = ?, updated_at = GETDATE() WHERE role_id = ?";
         try {
@@ -90,7 +90,7 @@ public class RoleDAO extends DBContext {
         return false;
     }
 
-
+//lay role chi tiet
     public model.Role getRoleDetail(int id) {
         model.Role role = null;
         //join 1: dung đe lay danh sach cac permission đuoc gan cho role.
@@ -132,7 +132,7 @@ public class RoleDAO extends DBContext {
         }
         return role;
     }
-
+//lay toan bo phan quyen
     public java.util.List<model.RolePermission> getAllPermissions() {
         java.util.List<model.RolePermission> list = new java.util.ArrayList<>();
         String sql = "SELECT * FROM permission";
@@ -150,7 +150,7 @@ public class RoleDAO extends DBContext {
         }
         return list;
     }
-
+//cap nhat quyen
     public void updateRolePermissions(
             int roleId,
             List<Integer> permissionIds) {
@@ -217,7 +217,7 @@ public class RoleDAO extends DBContext {
             }
         }
     }
-
+//lay id theo name
     // begin - Xhieu - contact me wwhen remove
     public int getRoleIdByName(String roleName) {
         String sql = "SELECT role_id FROM role WHERE role_name = ?";
@@ -235,7 +235,7 @@ public class RoleDAO extends DBContext {
         return 0;
     }
     // end - Xhieu
-
+//check xem ten role da ton tai truoc do chua
     public boolean isRoleNameExists(String roleName) {
         String sql = "SELECT COUNT(*) FROM role WHERE role_name = ?";
         try {
@@ -251,7 +251,7 @@ public class RoleDAO extends DBContext {
         }
         return false;
     }
-
+//search role
     public List<Role> searchRole(String searchText) {
         List<Role> list = new ArrayList<>();
         String sql = "SELECT role_id, role_name, created_at, updated_at, status FROM role "
@@ -260,6 +260,7 @@ public class RoleDAO extends DBContext {
         if (searchText != null && !searchText.trim().isEmpty()) {
             sql += "AND role_name LIKE ?";
         }
+        //DESC: tang dan, ASC: giam dan
         sql += " ORDER BY role.created_at DESC";
 
         try {
@@ -285,7 +286,7 @@ public class RoleDAO extends DBContext {
         }
         return list;
     }
-
+//lay role theo trang (phan trang)
     public List<Role> getrolesByPage(int page, int pageSize) {
         List<Role> list = new ArrayList<>();
 
@@ -321,7 +322,7 @@ public class RoleDAO extends DBContext {
 
         return list;
     }
-
+//dem so roles hien co  
     public int countRoles() {
         String sql = "SELECT COUNT(*) FROM role";
         try {

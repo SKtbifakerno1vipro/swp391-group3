@@ -79,17 +79,13 @@
                     <th>Product Name</th>
                     <th>Quantity</th>
                     <th>Unit Price</th>
+                    <th>Discount</th>
                     <th>Tax (%)</th>
                     <th>Total (incl. Tax)</th>
                 </tr>
             </thead>
             <tbody>
-                <c:set var="totalOrderAmount" value="0" />
                 <c:forEach var="item" items="${details}">
-                    <c:set var="subTotal" value="${item.detail.quantity * item.detail.sellingPrice}" />
-                    <c:set var="taxAmount" value="${subTotal * (item.detail.taxPercent / 100.0)}" />
-                    <c:set var="itemTotal" value="${subTotal + taxAmount}" />
-                    <c:set var="totalOrderAmount" value="${totalOrderAmount + itemTotal}" />
                     <tr>
                         <td>${item.product.productId}</td>
                         <td>${item.product.productName}</td>
@@ -97,20 +93,24 @@
                             ${item.detail.quantity} ${item.product.unit}
                         </td>
                         <td><fmt:formatNumber value="${item.detail.sellingPrice}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                        <td>
+                            
+                            <fmt:formatNumber value="${item.detail.discountPercent}" maxFractionDigits="2"/>%
+                        </td>
                         <td><fmt:formatNumber value="${item.detail.taxPercent}" maxFractionDigits="2"/>%</td>
-                        <td><fmt:formatNumber value="${itemTotal}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                        <td><fmt:formatNumber value="${item.detail.total}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty details}">
                     <tr>
-                        <td colspan="6" style="text-align: center;">No items found in this order.</td>
+                        <td colspan="7" style="text-align: center;">No items found in this order.</td>
                     </tr>
                 </c:if>
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="5" style="text-align: right;">Grand Total:</th>
-                    <th><fmt:formatNumber value="${totalOrderAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></th>
+                    <th colspan="6" style="text-align: right;">Grand Total:</th>
+                    <th><fmt:formatNumber value="${quotationTotal}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></th>
                 </tr>
             </tfoot>
         </table>

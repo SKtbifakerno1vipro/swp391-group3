@@ -48,6 +48,7 @@ public class SecurityFilter implements Filter {
 
     private static final List<String> SYSTEM_ADMIN_URLS = List.of(
             "/dashboard",
+            "/admin-dashboard",
             "/user-list",
             "/user-detail",
             "/create-user",

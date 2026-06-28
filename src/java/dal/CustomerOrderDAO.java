@@ -52,46 +52,7 @@ public class CustomerOrderDAO extends DBContext {
         return null;
     }
 
-    public List<dto.CustomerOrderDTO> getDetailsByOrderId(int orderId) {
-        List<dto.CustomerOrderDTO> details = new ArrayList<>();
-        String sql = "SELECT cod.*, p.product_name, p.unit, p.product_id, qd.tax_percent, qd.discount_percent "
-                + "FROM customer_order_detail cod "
-                + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
-                + "JOIN product p ON qd.product_id = p.product_id "
-                + "WHERE cod.customer_order_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                model.CustomerOrderDetail cod = new model.CustomerOrderDetail();
-                cod.setCustomerOrderDetailId(rs.getInt("customer_order_detail_id"));
-                cod.setCustomerOrderId(rs.getInt("customer_order_id"));
-                cod.setQuotationDetailId(rs.getInt("quotation_detail_id"));
-                cod.setProductId(rs.getInt("product_id"));
-                cod.setQuantity(rs.getInt("quantity"));
-                cod.setCostPrice(rs.getDouble("cost_price"));
-                cod.setSellingPrice(rs.getDouble("selling_price"));
-                cod.setTaxPercent(rs.getDouble("tax_percent"));
-                cod.setDiscountPercent(rs.getDouble("discount_percent"));
-
-                model.Product p = new model.Product();
-                p.setProductId(rs.getInt("product_id"));
-                p.setProductName(rs.getString("product_name"));
-                p.setSellingPrice(rs.getDouble("selling_price"));
-                p.setUnit(rs.getString("unit"));
-
-                dto.CustomerOrderDTO detailDto = new dto.CustomerOrderDTO();
-                detailDto.setDetail(cod);
-                detailDto.setProduct(p);
-                details.add(detailDto);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return details;
-    }
-
-    public List<CustomerOrderDTO> getDetailsByOrderIdVer2(int orderId) {
+    public List<CustomerOrderDTO> getDetailsByOrderId(int orderId) {
         List<dto.CustomerOrderDTO> details = new ArrayList<>();
         String sql = "SELECT cod.*, qd.product_name, qd.unit, qd.product_id, qd.tax_percent, qd.discount_percent "
                 + "FROM customer_order_detail cod "

@@ -56,6 +56,7 @@
                     <th>Customer</th>
                     <th>Quotation Date</th>
                     <th>Status</th>
+                    <th>Total Price</th>
                     <th>Created By</th>
                     <th>Created At</th>
                     <th>Actions</th>
@@ -65,7 +66,7 @@
                 <%-- Neu danh sach rong thi hien thong bao. --%>
                 <c:if test="${empty quotationList}">
                     <tr>
-                        <td colspan="7" style="text-align: center;">No quotations found.</td>
+                        <td colspan="8" style="text-align: center;">No quotations found.</td>
                     </tr>
                 </c:if>
 
@@ -76,6 +77,9 @@
                         <td>${quotation.customerName}</td>
                         <td>${quotation.quotationDate}</td>
                         <td>${quotation.quotationStatus}</td>
+                        <td>
+                            <fmt:formatNumber value="${quotation.totalPrice != null ? quotation.totalPrice : 0}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
+                        </td>
                         <td>${quotation.createdByName}</td>
                         <td>${quotation.createdAt}</td>
                         <td>

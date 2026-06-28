@@ -21,18 +21,22 @@ public class RoleListController extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         
+        // chuc nang cua searchtext
         String searchText = request.getParameter("search");
         if (searchText != null) {
             searchText = searchText.trim().replaceAll("\\s+", " ");
         }
 
         List<Role> roles;
+        // neu searchtext khong null va ko rong thi thuc hien chuc nang cua search role
         if (searchText != null && !searchText.isBlank()) {
             roles = roleDAO.searchRole(searchText);
-        } else {
+        }
+        //neu khong thi van hien thi getAllRoles 
+        else {
             roles = roleDAO.getAllRoles();
         }
-
+        //chuc nang chia trang, 1 trang size bao nhieu
         int page = 1;
         int pageSize = 5;
         String pageParam = request.getParameter("page");
@@ -44,7 +48,7 @@ public class RoleListController extends HttpServlet {
                 page = 1;
             }
         }
-
+// thuat toan chia trang 
         int totalRoles = roles.size();
         int totalPages = (int) Math.ceil((double) totalRoles / pageSize);
         if (totalPages == 0) {
