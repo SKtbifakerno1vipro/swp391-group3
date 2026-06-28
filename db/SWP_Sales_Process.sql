@@ -139,6 +139,7 @@ CREATE TABLE quotation (
 --REJECTED
     created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
+    total_price DECIMAL(18,2) DEFAULT 0.00,
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
     FOREIGN KEY (created_by) REFERENCES [user](user_id)
 );
