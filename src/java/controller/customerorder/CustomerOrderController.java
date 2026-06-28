@@ -86,10 +86,6 @@ public class CustomerOrderController extends HttpServlet {
             handleCreateAction(request, response, currentUser);
         } else if ("update_status".equals(action)) {
             handleUpdateStatusAction(request, response);
-        } else if ("update_quantity".equals(action)) {
-            handleUpdateQuantityAction(request, response);
-        } else if ("delete_item".equals(action)) {
-            handleDeleteItemAction(request, response);
         } else {
             response.sendRedirect(request.getContextPath() + "/customer-order-list");
         }
@@ -109,7 +105,18 @@ public class CustomerOrderController extends HttpServlet {
             }
 
             List<CustomerOrderDTO> details = customerOrderService.getOrderDetails(orderId);
-
+            
+            // Fetch total from quotation
+            java.math.BigDecimal quotationTotal = java.math.BigDecimal.ZERO;
+            if (order.getCustomerOrder() != null) {
+                
+                model.Contract contract = contractDao.getContractById(order.getCustomerOrder().getCustomerContractId());
+                if (contract != null) {
+                    quotationTotal = contractDao.calculateTotalAmountWithTaxAndDiscount(contract.getQuotationId());
+                }
+            }
+            
+            request.setAttribute("quotationTotal", quotationTotal);
             request.setAttribute("order", order);
             request.setAttribute("details", details);
             request.getRequestDispatcher("/views/customer-order/detail.jsp").forward(request, response);
@@ -293,29 +300,5 @@ public class CustomerOrderController extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
     }
 
-    private void handleUpdateQuantityAction(HttpServletRequest request, HttpServletResponse response) 
-            throws IOException {
-        int orderId = Integer.parseInt(request.getParameter("orderId"));
-        int detailId = Integer.parseInt(request.getParameter("detailId"));
-        int quantity = Integer.parseInt(request.getParameter("quantity"));
-        
-        if (quantity > 0) {
-            customerOrderService.updateOrderDetailQuantity(detailId, quantity);
-        }
-        response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
-    }
-
-    private void handleDeleteItemAction(HttpServletRequest request, HttpServletResponse response) 
-            throws IOException {
-        int orderId = Integer.parseInt(request.getParameter("orderId"));
-        int detailId = Integer.parseInt(request.getParameter("detailId"));
-        customerOrderService.deleteOrderDetail(detailId);
-        
-        HttpSession session = request.getSession();
-        User currentUser = (User) session.getAttribute("user");
-        Integer currentUserId = currentUser != null ? currentUser.getUserId() : null;
-        service.AuditLogService.log(currentUserId, "DELETE", "Order", "Xóa mặt hàng (Detail ID: " + detailId + ") khỏi đơn hàng ID " + orderId);
-        
-        response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
-    }
+    
 }

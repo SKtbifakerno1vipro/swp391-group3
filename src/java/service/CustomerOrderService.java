@@ -20,11 +20,11 @@ public class CustomerOrderService {
         return customerOrderDAO.getCustomerOrderDTOById(id);
     }
 
-    public List<dto.CustomerOrderDTO> getOrderDetails(int orderId) {
-        return customerOrderDAO.getDetailsByOrderId(orderId);
-    }
+//    public List<dto.CustomerOrderDTO> getOrderDetails(int orderId) {
+//        return customerOrderDAO.getDetailsByOrderId(orderId);
+//    }
 
-    public List<dto.CustomerOrderDTO> getOrderDetailsVer2(int orderId) {
+    public List<dto.CustomerOrderDTO> getOrderDetails(int orderId) {
         return customerOrderDAO.getDetailsByOrderIdVer2(orderId);
     }
 
@@ -58,10 +58,6 @@ public class CustomerOrderService {
     }
     public boolean updateOrderDetailQuantity(int detailId, int quantity) {
         return customerOrderDAO.updateOrderDetailQuantity(detailId, quantity);
-    }
-
-    public boolean deleteOrderDetail(int detailId) {
-        return customerOrderDAO.deleteOrderDetail(detailId);
     }
     
     public boolean deleteCustomerOrder(int orderId) {
