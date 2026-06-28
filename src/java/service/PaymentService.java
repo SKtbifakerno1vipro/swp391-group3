@@ -70,7 +70,7 @@ public class PaymentService {
         return paymentDAO.hasPaymentForContract(contractId);
     }
 
-    public void createPendingPaymentForContractIfNotExists(int contractId) {
+    public synchronized void createPendingPaymentForContractIfNotExists(int contractId) {
         if (!hasPaymentForContract(contractId)) {
             try {
                 ContractDAO contractDAO = new ContractDAO();

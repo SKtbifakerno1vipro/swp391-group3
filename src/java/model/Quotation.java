@@ -20,6 +20,8 @@ public class Quotation {
     private String updatedByName;
     private BigDecimal totalAmount; 
     private boolean hasContract;
+    private BigDecimal totalPrice;
+
 
     public Quotation() {
     }
@@ -113,7 +115,7 @@ public class Quotation {
     }
 
     public BigDecimal getTotalAmount() {
-        return totalAmount;
+        return totalAmount != null ? totalAmount : totalPrice;
     }
 
     public void setTotalAmount(BigDecimal totalAmount) {
@@ -143,4 +145,13 @@ public class Quotation {
         }
         return "";
     }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 }
+
