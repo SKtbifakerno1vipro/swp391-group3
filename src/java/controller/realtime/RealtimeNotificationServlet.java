@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @WebServlet(name = "RealtimeNotificationServlet", urlPatterns = {"/realtime/notifications"})
@@ -39,7 +40,9 @@ public class RealtimeNotificationServlet extends HttpServlet {
         response.setHeader("Connection", "keep-alive");
 
         PrintWriter writer = response.getWriter();
-        Timestamp lastChecked = new Timestamp(System.currentTimeMillis());
+        // Lùi mốc thời gian ban đầu lại 5 giây để quét bắt kịp các giao dịch trong lúc chuyển trang
+        Timestamp lastChecked = new Timestamp(System.currentTimeMillis() - 5000);
+        System.out.println("[Realtime Servlet] Client connected: " + user.getUserName() + " (Role: " + user.getRoleId() + ")");
 
         while (!writer.checkError()) {
             int roleId = user.getRoleId();
@@ -49,13 +52,14 @@ public class RealtimeNotificationServlet extends HttpServlet {
                 // Customer: only their own payments
                 List<Payment> myPayments = paymentDAO.getPaymentsSince(lastChecked, user.getUserId());
                 for (Payment p : myPayments) {
-                    writer.write("event: notification\n");
-                    writer.write("data: " + formatCustomerPaymentJson(p, request.getContextPath()) + "\n\n");
-                    
                     if (p.getCreatedAt() != null) {
+                        writer.write("event: notification\n");
+                        writer.write("data: " + formatCustomerPaymentJson(p, request.getContextPath()) + "\n\n");
+                        
                         Timestamp pTime = Timestamp.valueOf(p.getCreatedAt());
-                        if (pTime.after(lastChecked)) {
-                            lastChecked = pTime;
+                        Timestamp nextTime = new Timestamp(pTime.getTime() + 100);
+                        if (nextTime.after(lastChecked)) {
+                            lastChecked = nextTime;
                         }
                     }
                 }
@@ -63,13 +67,14 @@ public class RealtimeNotificationServlet extends HttpServlet {
                 // Admin / Staff: all payments
                 List<Payment> allPayments = paymentDAO.getPaymentsSince(lastChecked, null);
                 for (Payment p : allPayments) {
-                    writer.write("event: notification\n");
-                    writer.write("data: " + formatAdminPaymentJson(p, request.getContextPath()) + "\n\n");
-                    
                     if (p.getCreatedAt() != null) {
+                        writer.write("event: notification\n");
+                        writer.write("data: " + formatAdminPaymentJson(p, request.getContextPath()) + "\n\n");
+                        
                         Timestamp pTime = Timestamp.valueOf(p.getCreatedAt());
-                        if (pTime.after(lastChecked)) {
-                            lastChecked = pTime;
+                        Timestamp nextTime = new Timestamp(pTime.getTime() + 100);
+                        if (nextTime.after(lastChecked)) {
+                            lastChecked = nextTime;
                         }
                     }
                 }
@@ -79,19 +84,20 @@ public class RealtimeNotificationServlet extends HttpServlet {
             if (roleId == 1 || roleId == 2) {
                 List<CustomerDTO> newCustomers = customerDAO.getCustomersSince(lastChecked);
                 for (CustomerDTO c : newCustomers) {
-                    writer.write("event: notification\n");
-                    writer.write("data: " + formatNewCustomerJson(c, request.getContextPath()) + "\n\n");
-                    
                     if (c.getUser() != null && c.getUser().getCreateAt() != null) {
+                        writer.write("event: notification\n");
+                        writer.write("data: " + formatNewCustomerJson(c, request.getContextPath()) + "\n\n");
+                        
                         Timestamp cTime = Timestamp.valueOf(c.getUser().getCreateAt());
-                        if (cTime.after(lastChecked)) {
-                            lastChecked = cTime;
+                        Timestamp nextTime = new Timestamp(cTime.getTime() + 100);
+                        if (nextTime.after(lastChecked)) {
+                            lastChecked = nextTime;
                         }
                     }
                 }
             }
-
             writer.flush();
+            response.flushBuffer();
 
             try {
                 Thread.sleep(4000);
@@ -99,6 +105,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
                 break;
             }
         }
+        System.out.println("[Realtime Servlet] Connection closed for user: " + user.getUserName());
     }
 
     private String escapeJson(String input) {
@@ -112,12 +119,16 @@ public class RealtimeNotificationServlet extends HttpServlet {
 
     private String formatCustomerPaymentJson(Payment p, String contextPath) {
         double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;
+        String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
         return String.format(
-            "{\"type\":\"success\",\"title\":\"Thành công\",\"message\":\"Giao dịch thanh toán trị giá %,.0f VNĐ đã được xử lý.\",\"link\":\"%s/payment/list\"}",
+            "{\"type\":\"success\",\"title\":\"Ký hợp đồng thành công\",\"message\":\"Hợp đồng số %s trị giá %,.0f VNĐ vừa được ký.<br>Hãy nhấn vào \'Thanh toán\' để hoàn tất thủ tục.\",\"link\":\"%s/payment/list\",\"btnText\":\"Thanh toán\"}",
+            escapeJson(contractNo),
             amt,
             contextPath
         );
     }
+
+
 
     private String formatAdminPaymentJson(Payment p, String contextPath) {
         String name = p.getCustomerName() != null ? p.getCustomerName() : "System / Anonymous";
