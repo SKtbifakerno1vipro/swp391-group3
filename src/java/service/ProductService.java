@@ -25,10 +25,6 @@ public class ProductService {
         return productDAO.updateProduct(product);
     }
 
-    public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status) {
-        return productDAO.searchProduct(searchText, categoryId, sort, status);
-    }
-
     public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status, int totalRow, int page, int totalPage, int pageSize) {
     return productDAO.searchProduct(searchText, categoryId, sort, status, totalRow, page, totalPage, pageSize);
     }

@@ -2,6 +2,7 @@ package service;
 
 import dal.InvoiceDAO;
 import dto.InvoiceItemDTO;
+import java.time.LocalDateTime;
 import java.util.List;
 import model.Invoice;
 
@@ -13,8 +14,16 @@ public class InvoiceService {
         return invoiceDAO.getInvoices(totalRow, page, totalPage, pageSize);
     }
 
+    public List<Invoice> getInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, int totalRow, int page, int totalPage, int pageSize) {
+        return invoiceDAO.getInvoices(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, pageSize);
+    }
+
     public int countInvoices() {
         return invoiceDAO.countInvoices();
+    }
+
+    public int countInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate) {
+        return invoiceDAO.countInvoices(searchBuyerName, status, type, startDate, endDate);
     }
 
     public List<InvoiceItemDTO> getInvoiceItemsByOrderId(int orderId) {
@@ -73,5 +82,9 @@ public class InvoiceService {
 
     public boolean insertInvoice(Invoice invoice) {
         return invoiceDAO.insertInvoice(invoice);
+    }
+
+    public boolean updateInvoiceStatus(int id, String status) {
+        return invoiceDAO.updateInvoiceStatus(id, status);
     }
 }
