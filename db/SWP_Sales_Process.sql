@@ -128,6 +128,7 @@ GO
 
 
 -- 8. Quotation
+-- 8. Quotation
 CREATE TABLE quotation (
     quotation_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_id INT NOT NULL,
@@ -139,6 +140,7 @@ CREATE TABLE quotation (
 --REJECTED
     created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
+    total_price DECIMAL(18,2) DEFAULT 0.00,
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
     FOREIGN KEY (created_by) REFERENCES [user](user_id)
 );
