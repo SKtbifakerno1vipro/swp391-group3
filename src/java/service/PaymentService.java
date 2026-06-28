@@ -26,6 +26,34 @@ public class PaymentService {
         return paymentDAO.getPaymentsByCustomerId(userId);
     }
 
+    public List<Payment> searchPayments(
+            Integer customerUserId,
+            String customerName,
+            String contractNumber,
+            String status,
+            String startDate,
+            String endDate,
+            BigDecimal minAmount,
+            BigDecimal maxAmount,
+            int page,
+            int pageSize
+    ) {
+        return paymentDAO.searchPayments(customerUserId, customerName, contractNumber, status, startDate, endDate, minAmount, maxAmount, page, pageSize);
+    }
+
+    public int getSearchPaymentsCount(
+            Integer customerUserId,
+            String customerName,
+            String contractNumber,
+            String status,
+            String startDate,
+            String endDate,
+            BigDecimal minAmount,
+            BigDecimal maxAmount
+    ) {
+        return paymentDAO.getSearchPaymentsCount(customerUserId, customerName, contractNumber, status, startDate, endDate, minAmount, maxAmount);
+    }
+
     public Payment getPaymentById(int paymentId) {
         return paymentDAO.getPaymentById(paymentId);
     }
