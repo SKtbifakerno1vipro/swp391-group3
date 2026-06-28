@@ -268,10 +268,10 @@ public class PaymentDAO extends DBContext {
                 ps.setString(index++, status.trim());
             }
             if (hasStartDate) {
-                ps.setTimestamp(index++, Timestamp.valueOf(startDate.trim() + " 00:00:00"));
+                ps.setTimestamp(index++, parseDateTime(startDate, false));
             }
             if (hasEndDate) {
-                ps.setTimestamp(index++, Timestamp.valueOf(endDate.trim() + " 23:59:59"));
+                ps.setTimestamp(index++, parseDateTime(endDate, true));
             }
             if (hasMinAmount) {
                 ps.setBigDecimal(index++, minAmount);
@@ -375,10 +375,10 @@ public class PaymentDAO extends DBContext {
                 ps.setString(index++, status.trim());
             }
             if (hasStartDate) {
-                ps.setTimestamp(index++, Timestamp.valueOf(startDate.trim() + " 00:00:00"));
+                ps.setTimestamp(index++, parseDateTime(startDate, false));
             }
             if (hasEndDate) {
-                ps.setTimestamp(index++, Timestamp.valueOf(endDate.trim() + " 23:59:59"));
+                ps.setTimestamp(index++, parseDateTime(endDate, true));
             }
             if (hasMinAmount) {
                 ps.setBigDecimal(index++, minAmount);
@@ -395,5 +395,27 @@ public class PaymentDAO extends DBContext {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    private Timestamp parseDateTime(String input, boolean isEnd) {
+        if (input == null || input.isBlank()) return null;
+        try {
+            String val = input.trim();
+            if (val.contains("T")) {
+                String formatted = val.replace("T", " ");
+                if (formatted.length() == 16) {
+                    formatted += ":00";
+                }
+                return Timestamp.valueOf(formatted);
+            } else {
+                if (isEnd) {
+                    return Timestamp.valueOf(val + " 23:59:59");
+                } else {
+                    return Timestamp.valueOf(val + " 00:00:00");
+                }
+            }
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -119,8 +119,8 @@
                 height: 34px !important;
             }
 
-            .input-small[type="date"] {
-                width: 130px !important;
+            .input-small[type="datetime-local"] {
+                width: 190px !important;
             }
 
             .input-small[type="number"] {
@@ -207,9 +207,9 @@
                     <!-- Row 2: Date filter -->
                     <div class="search-row">
                         <span class="range-title">Date:</span>
-                        <input type="date" name="startDate" value="${startDate}" title="Paid Start Date" class="input-small" />
+                        <input type="datetime-local" name="startDate" value="${startDate}" title="Paid Start Date" class="input-small" />
                         <span class="range-separator">to</span>
-                        <input type="date" name="endDate" value="${endDate}" title="Paid End Date" class="input-small" />
+                        <input type="datetime-local" name="endDate" value="${endDate}" title="Paid End Date" class="input-small" />
                     </div>
 
                     <!-- Row 3: Amount filter & Buttons -->
