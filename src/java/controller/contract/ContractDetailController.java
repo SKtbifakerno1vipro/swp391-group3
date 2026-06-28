@@ -148,6 +148,7 @@ public class ContractDetailController extends HttpServlet {
         }
 
         String action = request.getParameter("action");
+        
         int contractId = Integer.parseInt(request.getParameter("contractId"));
 
         // take contract with the id
