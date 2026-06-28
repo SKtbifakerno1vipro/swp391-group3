@@ -72,6 +72,18 @@ CREATE TABLE [user] (
 );
 GO
 
+-- 4b. System Audit Log
+CREATE TABLE system_audit_log (
+    log_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NULL,
+    action_type NVARCHAR(255) NOT NULL,
+    affected_object NVARCHAR(255) NOT NULL,
+    description NVARCHAR(MAX) NULL,
+    created_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES [user](user_id)
+);
+GO
+
 -- 5. Category
 CREATE TABLE category (
     category_id INT IDENTITY(1,1) PRIMARY KEY,
