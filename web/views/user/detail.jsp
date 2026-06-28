@@ -88,6 +88,17 @@
                 background:var(--surface-soft);
                 color:var(--muted)
             }
+            .readonly-value {
+                display:block;
+                width:100%;
+                padding:12px 13px;
+                border:1px solid transparent;
+                border-radius:15px;
+                background:var(--surface-soft, #faf9f7);
+                color:var(--text);
+                font-weight:700;
+                box-sizing:border-box;
+            }
             .actions{
                 display:flex;
                 gap:10px;
@@ -156,6 +167,10 @@
                             <div class="field"><label>Gender</label><select name="gender"><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Male</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Female</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Other</option></select></div>
                             <div class="field"><label>Role</label><select name="roleId" required><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
                             <div class="field"><label>Status</label><select name="status"><option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>Active</option><option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>Inactive</option></select></div>
+                            <div class="field"><label>Created By</label><span class="readonly-value"><c:set var="creator" value="${userService.getUserById(u.createdBy)}" /><c:out value="${creator != null ? creator.userName : (u.createdBy == 0 ? 'N/A' : u.createdBy)}"/></span></div>
+                            <div class="field"><label>Created At</label><span class="readonly-value"><c:out value="${u.createTimeString}"/></span></div>
+                            <div class="field"><label>Updated By</label><span class="readonly-value"><c:set var="updator" value="${userService.getUserById(u.updatedBy)}" /><c:out value="${updator != null ? updator.userName : (u.updatedBy == 0 ? 'N/A' : u.updatedBy)}"/></span></div>
+                            <div class="field"><label>Updated At</label><span class="readonly-value"><c:out value="${u.updateTimeString}"/></span></div>
                         </div>
                         <div class="actions" style="margin-top:24px"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Save changes</button><a class="button danger" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">close</span>Cancel</a></div>
                     </div>

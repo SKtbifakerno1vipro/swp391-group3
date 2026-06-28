@@ -68,40 +68,7 @@
                 border-color:var(--danger-soft);
                 color:var(--danger);
             }
-            .summary-grid {
-                display:grid;
-                grid-template-columns:repeat(3,minmax(0,1fr));
-                gap:16px;
-                margin-bottom:22px;
-            }
-            .summary-card {
-                padding:20px;
-                border-radius:24px;
-                background:var(--surface);
-                border:1px solid rgba(221,213,201,.85);
-                box-shadow:var(--shadow);
-            }
-            .summary-icon {
-                width:42px;
-                height:42px;
-                display:grid;
-                place-items:center;
-                border-radius:15px;
-                background:var(--primary-soft);
-                color:var(--primary);
-                margin-bottom:14px;
-            }
-            .summary-value {
-                margin:0;
-                font-family:'Literata', Georgia, serif;
-                font-size:34px;
-                font-weight:700;
-            }
-            .summary-label {
-                margin:2px 0 0;
-                color:var(--muted);
-                font-weight:700;
-            }
+
             .panel {
                 background:var(--surface);
                 border:1px solid rgba(221,213,201,.85);
@@ -141,9 +108,35 @@
             }
             .table-wrap {
                 overflow-x:auto;
+                background:#fff;
             }
             table {
-                min-width:980px;
+                min-width:1000px;
+                width:100%;
+                border-collapse:collapse;
+            }
+            th, td {
+                padding:16px 22px;
+                text-align:left;
+                border-bottom:1px solid var(--line);
+                vertical-align:middle;
+            }
+            th {
+                font-size:11px;
+                font-weight:900;
+                text-transform:uppercase;
+                letter-spacing:.05em;
+                color:var(--muted);
+                background:var(--surface-soft, #faf9f7);
+            }
+            .table-row {
+                transition:background 0.2s ease;
+            }
+            .table-row:hover {
+                background:var(--surface-soft, #faf9f7);
+            }
+            .table-row:last-child td {
+                border-bottom:none;
             }
             .user-name {
                 display:flex;
@@ -268,11 +261,6 @@
                     </div>
                 </section>
 
-                <section class="summary-grid">
-                    <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">group</span></div><p class="summary-value"><c:out value="${empty users ? 0 : users.size()}"/></p><p class="summary-label">Users on this page</p></div>
-                    <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">admin_panel_settings</span></div><p class="summary-value"><c:out value="${empty roles ? 0 : roles.size()}"/></p><p class="summary-label">Available roles</p></div>
-                    <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">layers</span></div><p class="summary-value"><c:out value="${endPage}"/></p><p class="summary-label">Total pages</p></div>
-                </section>
 
                 <section class="panel">
                     <div class="toolbar">
@@ -289,15 +277,17 @@
                     </div>
                     <div class="table-wrap">
                         <table>
-                            <thead><tr><th>User</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>ID</th><th>Full Name</th><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
                             <tbody>
-                                <c:if test="${empty users}"><tr><td colspan="6" style="text-align:center;">No users found.</td></tr></c:if>
+                                <c:if test="${empty users}"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted);font-weight:600;">No users found.</td></tr></c:if>
                                 <c:forEach var="u" items="${users}">
-                                    <tr>
-                                        <td><div class="user-name"><span class="user-avatar"><span class="material-symbols-outlined">person</span></span><div><strong><c:out value="${u.fullName}"/></strong><br><small>@<c:out value="${u.userName}"/></small></div></div></td>
-                                        <td><c:out value="${u.email}"/></td>
-                                        <td><c:out value="${u.phone}"/></td>
-                                        <td><c:out value="${u.roleName}"/></td>
+                                    <tr class="table-row">
+                                        <td style="color:var(--muted);font-weight:800;font-size:13px;">#<c:out value="${u.userId}"/></td>
+                                        <td style="font-weight:700;"><c:out value="${u.fullName}"/></td>
+                                        <td style="color:var(--muted);">@<c:out value="${u.userName}"/></td>
+                                        <td style="color:var(--text-light, #6b7280);"><c:out value="${u.email}"/></td>
+                                        <td style="color:var(--text-light, #6b7280);"><c:out value="${u.phone}"/></td>
+                                        <td style="font-weight:700;"><c:out value="${u.roleName}"/></td>
                                         <td><span class="status-pill ${u.status == 'ACTIVE' ? 'status-active' : 'status-inactive'}"><c:out value="${u.status}"/></span></td>
                                         <td><div class="row-actions"><a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">edit</span>Edit</a><form action="${pageContext.request.contextPath}/user-list" method="post" style="display:inline;"><input type="hidden" name="userId" value="${u.userId}"><input type="hidden" name="status" value="${u.status}"><button class="chip ${u.status == 'ACTIVE' ? 'danger' : 'primary'}" type="submit"><span class="material-symbols-outlined">${u.status == 'ACTIVE' ? 'lock' : 'lock_open'}</span>${u.status == 'ACTIVE' ? 'Ban' : 'Unban'}</button></form></div></td>
                                     </tr>
