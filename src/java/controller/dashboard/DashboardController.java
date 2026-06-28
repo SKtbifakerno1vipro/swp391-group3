@@ -28,6 +28,10 @@ public class DashboardController extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
+        if (user.getRoleId() == 1) {
+            response.sendRedirect(request.getContextPath() + "/admin-dashboard");
+            return;
+        }
         DashboardDAO dashboardDAO = new DashboardDAO();
         QuotationService quotationService = new QuotationService();
         CustomerService customerService = new CustomerService();
@@ -100,7 +104,7 @@ public class DashboardController extends HttpServlet {
 
         request.setAttribute("recentContracts", dashboardDAO.getRecentContracts(5));
         request.setAttribute("recentOrders", dashboardDAO.getRecentOrders(5));
-        request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/dashboard/admin-dashboard.jsp").forward(request, response);
 
     }
 
