@@ -326,7 +326,7 @@ GO
 CREATE TABLE payment (
     payment_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_contract_id INT NOT NULL,
-    invoice_id INT UNIQUE,
+    invoice_id INT,
     amount DECIMAL(18,2) CHECK (amount > 0),
     payment_type VARCHAR(50),
     payment_status VARCHAR(20),
@@ -337,6 +337,11 @@ CREATE TABLE payment (
     FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id),
     FOREIGN KEY (created_by) REFERENCES [user](user_id)
 );
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX UX_payment_invoice_id 
+ON payment(invoice_id) 
+WHERE invoice_id IS NOT NULL;
 GO
 
 -- 19. Stock Transaction

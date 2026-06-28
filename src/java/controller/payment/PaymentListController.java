@@ -28,16 +28,72 @@ public class PaymentListController extends HttpServlet {
             return;
         }
 
-        List<Payment> list;
+        // Parse search & pagination params
+        String customerName = request.getParameter("customerName");
+        String contractNumber = request.getParameter("contractNumber");
+        String status = request.getParameter("status");
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        
+        String minAmountRaw = request.getParameter("minAmount");
+        java.math.BigDecimal minAmount = null;
+        if (minAmountRaw != null && !minAmountRaw.isBlank()) {
+            try {
+                minAmount = new java.math.BigDecimal(minAmountRaw.trim());
+            } catch (Exception e) {}
+        }
+
+        String maxAmountRaw = request.getParameter("maxAmount");
+        java.math.BigDecimal maxAmount = null;
+        if (maxAmountRaw != null && !maxAmountRaw.isBlank()) {
+            try {
+                maxAmount = new java.math.BigDecimal(maxAmountRaw.trim());
+            } catch (Exception e) {}
+        }
+
+        String pageRaw = request.getParameter("page");
+        int page = 1;
+        if (pageRaw != null && !pageRaw.isBlank()) {
+            try {
+                page = Integer.parseInt(pageRaw.trim());
+                if (page < 1) page = 1;
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+        int pageSize = 10;
+
+        Integer customerUserId = null;
         if (user.getRoleId() == 3) {
-            // Customer - only view their own payments
-            list = paymentService.getPaymentsByCustomerId(user.getUserId());
-        } else {
-            // Admin, Manager, etc. - view all payments
-            list = paymentService.getAllPayments();
+            // Customer - restrict search to their own payments
+            customerUserId = user.getUserId();
+        }
+
+        List<Payment> list = paymentService.searchPayments(
+            customerUserId, customerName, contractNumber, status, startDate, endDate, minAmount, maxAmount, page, pageSize
+        );
+        int totalRecords = paymentService.getSearchPaymentsCount(
+            customerUserId, customerName, contractNumber, status, startDate, endDate, minAmount, maxAmount
+        );
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+        if (totalPages < 1) {
+            totalPages = 1;
         }
 
         request.setAttribute("list", list);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+
+        // Keep values in form inputs
+        request.setAttribute("customerName", customerName);
+        request.setAttribute("contractNumber", contractNumber);
+        request.setAttribute("status", status);
+        request.setAttribute("startDate", startDate);
+        request.setAttribute("endDate", endDate);
+        request.setAttribute("minAmount", minAmountRaw);
+        request.setAttribute("maxAmount", maxAmountRaw);
+
         request.getRequestDispatcher("/views/payment/payment_list.jsp").forward(request, response);
     }
 }

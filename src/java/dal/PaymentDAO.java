@@ -1,5 +1,6 @@
 package dal;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -191,5 +192,208 @@ public class PaymentDAO extends DBContext {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public List<Payment> searchPayments(
+            Integer customerUserId,
+            String customerName,
+            String contractNumber,
+            String status,
+            String startDate,
+            String endDate,
+            BigDecimal minAmount,
+            BigDecimal maxAmount,
+            int page,
+            int pageSize
+    ) {
+        List<Payment> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT p.*, c.contract_number, u.full_name as customer_name "
+                + "FROM payment p "
+                + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
+                + "LEFT JOIN [user] u ON p.created_by = u.user_id "
+                + "WHERE 1=1 "
+        );
+
+        boolean hasCustomerUser = (customerUserId != null);
+        boolean hasCustomerName = (customerName != null && !customerName.isBlank());
+        boolean hasContractNumber = (contractNumber != null && !contractNumber.isBlank());
+        boolean hasStatus = (status != null && !status.isBlank());
+        boolean hasStartDate = (startDate != null && !startDate.isBlank());
+        boolean hasEndDate = (endDate != null && !endDate.isBlank());
+        boolean hasMinAmount = (minAmount != null);
+        boolean hasMaxAmount = (maxAmount != null);
+
+        if (hasCustomerUser) {
+            sql.append("AND p.created_by = ? ");
+        }
+        if (hasCustomerName) {
+            sql.append("AND u.full_name LIKE ? ");
+        }
+        if (hasContractNumber) {
+            sql.append("AND c.contract_number LIKE ? ");
+        }
+        if (hasStatus) {
+            sql.append("AND p.payment_status = ? ");
+        }
+        if (hasStartDate) {
+            sql.append("AND p.paid_at >= ? ");
+        }
+        if (hasEndDate) {
+            sql.append("AND p.paid_at <= ? ");
+        }
+        if (hasMinAmount) {
+            sql.append("AND p.amount >= ? ");
+        }
+        if (hasMaxAmount) {
+            sql.append("AND p.amount <= ? ");
+        }
+
+        sql.append("ORDER BY p.created_at DESC, p.payment_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+        int offset = (page - 1) * pageSize;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int index = 1;
+            if (hasCustomerUser) {
+                ps.setInt(index++, customerUserId);
+            }
+            if (hasCustomerName) {
+                ps.setString(index++, "%" + customerName.trim() + "%");
+            }
+            if (hasContractNumber) {
+                ps.setString(index++, "%" + contractNumber.trim() + "%");
+            }
+            if (hasStatus) {
+                ps.setString(index++, status.trim());
+            }
+            if (hasStartDate) {
+                ps.setTimestamp(index++, Timestamp.valueOf(startDate.trim() + " 00:00:00"));
+            }
+            if (hasEndDate) {
+                ps.setTimestamp(index++, Timestamp.valueOf(endDate.trim() + " 23:59:59"));
+            }
+            if (hasMinAmount) {
+                ps.setBigDecimal(index++, minAmount);
+            }
+            if (hasMaxAmount) {
+                ps.setBigDecimal(index++, maxAmount);
+            }
+            ps.setInt(index++, offset);
+            ps.setInt(index++, pageSize);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Payment p = new Payment();
+                p.setPaymentId(rs.getInt("payment_id"));
+                p.setCustomerContractId(rs.getInt("customer_contract_id"));
+                p.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
+                p.setAmount(rs.getBigDecimal("amount"));
+                p.setPaymentType(rs.getString("payment_type"));
+                p.setPaymentStatus(rs.getString("payment_status"));
+                if (rs.getTimestamp("paid_at") != null) {
+                    p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
+                }
+                p.setCreatedBy(rs.getObject("created_by") != null ? rs.getInt("created_by") : null);
+                if (rs.getTimestamp("created_at") != null) {
+                    p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                }
+                p.setContractNumber(rs.getString("contract_number"));
+                p.setCustomerName(rs.getString("customer_name"));
+                list.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int getSearchPaymentsCount(
+            Integer customerUserId,
+            String customerName,
+            String contractNumber,
+            String status,
+            String startDate,
+            String endDate,
+            BigDecimal minAmount,
+            BigDecimal maxAmount
+    ) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) "
+                + "FROM payment p "
+                + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
+                + "LEFT JOIN [user] u ON p.created_by = u.user_id "
+                + "WHERE 1=1 "
+        );
+
+        boolean hasCustomerUser = (customerUserId != null);
+        boolean hasCustomerName = (customerName != null && !customerName.isBlank());
+        boolean hasContractNumber = (contractNumber != null && !contractNumber.isBlank());
+        boolean hasStatus = (status != null && !status.isBlank());
+        boolean hasStartDate = (startDate != null && !startDate.isBlank());
+        boolean hasEndDate = (endDate != null && !endDate.isBlank());
+        boolean hasMinAmount = (minAmount != null);
+        boolean hasMaxAmount = (maxAmount != null);
+
+        if (hasCustomerUser) {
+            sql.append("AND p.created_by = ? ");
+        }
+        if (hasCustomerName) {
+            sql.append("AND u.full_name LIKE ? ");
+        }
+        if (hasContractNumber) {
+            sql.append("AND c.contract_number LIKE ? ");
+        }
+        if (hasStatus) {
+            sql.append("AND p.payment_status = ? ");
+        }
+        if (hasStartDate) {
+            sql.append("AND p.paid_at >= ? ");
+        }
+        if (hasEndDate) {
+            sql.append("AND p.paid_at <= ? ");
+        }
+        if (hasMinAmount) {
+            sql.append("AND p.amount >= ? ");
+        }
+        if (hasMaxAmount) {
+            sql.append("AND p.amount <= ? ");
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int index = 1;
+            if (hasCustomerUser) {
+                ps.setInt(index++, customerUserId);
+            }
+            if (hasCustomerName) {
+                ps.setString(index++, "%" + customerName.trim() + "%");
+            }
+            if (hasContractNumber) {
+                ps.setString(index++, "%" + contractNumber.trim() + "%");
+            }
+            if (hasStatus) {
+                ps.setString(index++, status.trim());
+            }
+            if (hasStartDate) {
+                ps.setTimestamp(index++, Timestamp.valueOf(startDate.trim() + " 00:00:00"));
+            }
+            if (hasEndDate) {
+                ps.setTimestamp(index++, Timestamp.valueOf(endDate.trim() + " 23:59:59"));
+            }
+            if (hasMinAmount) {
+                ps.setBigDecimal(index++, minAmount);
+            }
+            if (hasMaxAmount) {
+                ps.setBigDecimal(index++, maxAmount);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
