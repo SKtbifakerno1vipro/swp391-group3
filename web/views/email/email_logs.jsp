@@ -44,54 +44,66 @@
         .search-form-responsive {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
             background: var(--surface) !important;
             border: 1px solid rgba(221, 213, 201, 0.85) !important;
-            border-radius: 22px !important;
+            border-radius: 16px !important;
             box-shadow: var(--shadow) !important;
-            padding: 22px !important;
+            padding: 16px 20px !important;
             margin: 16px 0 22px !important;
         }
-        .search-group {
+        .search-row {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
         }
-        .search-label {
+        .search-label,
+        .range-title {
             font-size: 11px;
             font-weight: 800;
             color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            white-space: nowrap;
+            width: 130px;
+            flex-shrink: 0;
         }
-        .inputs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
+        .range-separator {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            padding: 0 2px;
         }
-        .inputs-grid input {
-            width: 100%;
+        .input-small {
             box-sizing: border-box;
-            padding: 10px 14px !important;
-            font-size: 14px !important;
+            padding: 6px 10px !important;
+            font-size: 13px !important;
             border: 1px solid var(--line) !important;
-            border-radius: 12px !important;
+            border-radius: 8px !important;
             color: var(--text) !important;
             background-color: #fff !important;
             outline: none;
             transition: border-color 0.2s ease;
+            width: 170px !important;
+            height: 34px !important;
         }
-        .inputs-grid input:focus {
+        .input-small[type="datetime-local"] {
+            width: 190px !important;
+        }
+        .input-small:focus {
             border-color: var(--primary) !important;
         }
         .actions-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
-            justify-content: flex-end;
+            margin-left: auto;
         }
         .btn-search {
-            padding: 10px 24px !important;
+            padding: 6px 18px !important;
+            height: 34px !important;
             background-color: var(--primary) !important;
             color: white !important;
             border: none !important;
@@ -99,13 +111,17 @@
             font-weight: 800 !important;
             cursor: pointer !important;
             transition: all 0.2s ease;
+            font-size: 13px !important;
         }
         .btn-search:hover {
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             filter: brightness(1.1);
         }
         .btn-clear {
-            padding: 10px 24px !important;
+            padding: 6px 18px !important;
+            height: 34px !important;
+            box-sizing: border-box;
+            line-height: 20px;
             background-color: var(--surface-soft) !important;
             color: var(--text) !important;
             border: 1px solid var(--line) !important;
@@ -113,11 +129,13 @@
             text-decoration: none !important;
             font-weight: 800 !important;
             transition: all 0.2s ease;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            font-size: 13px !important;
         }
         .btn-clear:hover {
             background-color: var(--surface-strong) !important;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         .pagination-container a,
         .pagination-container span,
@@ -184,25 +202,35 @@
             <p style="color: var(--muted); margin-bottom: 20px;">Review all outgoing system email communications (such as password recovery OTPs).</p>
             
             <form action="${pageContext.request.contextPath}/email/logs" method="GET" class="search-form-responsive">
-                <div class="search-group">
-                    <label class="search-label">Search Filters:</label>
-                    <div class="inputs-grid">
-                        <input type="text" name="searchEmail" value="${searchEmail}" placeholder="Recipient Email..." />
-                        <input type="text" name="searchUsername" value="${searchUsername}" placeholder="Recipient Username..." />
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase;">From Date/Time</span>
-                            <input type="datetime-local" name="startDate" value="${startDate}" />
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase;">To Date/Time</span>
-                            <input type="datetime-local" name="endDate" value="${endDate}" />
-                        </div>
-                    </div>
+                <!-- Row 1: Basic search -->
+                <div class="search-row">
+                    <span class="search-label">Search Filters:</span>
+                    <input type="text" name="searchEmail" value="${searchEmail}" placeholder="Recipient Email..." class="input-small" />
+                    <input type="text" name="searchUsername" value="${searchUsername}" placeholder="Recipient Username..." class="input-small" />
                 </div>
 
-                <div class="actions-group">
-                    <button type="submit" class="btn-search">Search</button>
-                    <a href="${pageContext.request.contextPath}/email/logs" class="btn-clear">Clear Filter</a>
+                <!-- Row 2: Date filter -->
+                <div class="search-row">
+                    <span class="range-title">Date:</span>
+                    <input type="datetime-local" name="startDate" value="${startDate}" title="From Date/Time" class="input-small" />
+                    <span class="range-separator">to</span>
+                    <input type="datetime-local" name="endDate" value="${endDate}" title="To Date/Time" class="input-small" />
+                </div>
+
+                <!-- Row 3: Page Size & Action Buttons -->
+                <div class="search-row">
+                    <span class="range-title">Show:</span>
+                    <select name="pageSize" class="input-small" style="width: 100px !important;" onchange="this.form.submit()">
+                        <option value="5" ${pageSize == 5 ? 'selected' : ''}>5 items</option>
+                        <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 items</option>
+                        <option value="20" ${pageSize == 20 ? 'selected' : ''}>20 items</option>
+                    </select>
+                    <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">per page</span>
+
+                    <div class="actions-group">
+                        <button type="submit" class="btn-search">Search</button>
+                        <a href="${pageContext.request.contextPath}/email/logs" class="btn-clear">Clear Filter</a>
+                    </div>
                 </div>
             </form>
 
@@ -250,6 +278,7 @@
 
             <c:if test="${totalPages > 1}">
                 <div class="pagination-container" style="margin-top: 20px; text-align: center;">
+                    <c:set var="queryParams" value="&searchEmail=${searchEmail}&searchUsername=${searchUsername}&startDate=${startDate}&endDate=${endDate}&pageSize=${pageSize}" />
 
                     <%-- Calculate page range for buttons --%>
                     <c:set var="startPage" value="${currentPage - 2}" />
@@ -265,7 +294,7 @@
                     <%-- Back button (<) --%>
                     <c:choose>
                         <c:when test="${currentPage > 1}">
-                            <a href="${pageContext.request.contextPath}/email/logs?page=${currentPage - 1}&searchEmail=${searchEmail}&searchUsername=${searchUsername}&startDate=${startDate}&endDate=${endDate}">&lt;</a>
+                            <a href="${pageContext.request.contextPath}/email/logs?page=${currentPage - 1}${queryParams}">&lt;</a>
                         </c:when>
                         <c:otherwise>
                             <span style="color: #999; border: 1px solid #ddd; padding: 5px 10px;">&lt;</span>
@@ -279,7 +308,7 @@
                                 <strong>${i}</strong>
                             </c:when>
                             <c:otherwise>
-                                <a href="${pageContext.request.contextPath}/email/logs?page=${i}&searchEmail=${searchEmail}&searchUsername=${searchUsername}&startDate=${startDate}&endDate=${endDate}">${i}</a>
+                                <a href="${pageContext.request.contextPath}/email/logs?page=${i}${queryParams}">${i}</a>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -287,7 +316,7 @@
                     <%-- Next button (>) --%>
                     <c:choose>
                         <c:when test="${currentPage < totalPages}">
-                            <a href="${pageContext.request.contextPath}/email/logs?page=${currentPage + 1}&searchEmail=${searchEmail}&searchUsername=${searchUsername}&startDate=${startDate}&endDate=${endDate}">&gt;</a>
+                            <a href="${pageContext.request.contextPath}/email/logs?page=${currentPage + 1}${queryParams}">&gt;</a>
                         </c:when>
                         <c:otherwise>
                             <span style="color: #999; border: 1px solid #ddd; padding: 5px 10px;">&gt;</span>

@@ -30,16 +30,16 @@ public class CustomerService {
     // new
 
     public List<CustomerDTO> getSearchAndPaginatedCusDTOs(String searchName, String searchSdt, String searchEmail, String searchMst,
-            String typeCus, Integer assignedToUserId, int page, int pageSize) {
+            String typeCus, Integer assignedToUserId, String searchStatus, int page, int pageSize) {
         
-        return customerDAO.searchAndPaginateCustomers(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId, page, pageSize);
+        return customerDAO.searchAndPaginateCustomers(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId, searchStatus, page, pageSize);
     }
 
     // new 
     public int getTotalPages(String searchName, String searchSdt, String searchEmail, String searchMst,
-            String typeCus, Integer assignedToUserId, int pageSize) {
+            String typeCus, Integer assignedToUserId, String searchStatus, int pageSize) {
         // Goi ham đem tong so dong thoa man đieu kien loc duoi DAO
-        int totalRecords = customerDAO.getTotalCustomersCount(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId);
+        int totalRecords = customerDAO.getTotalCustomersCount(searchName, searchSdt, searchEmail, searchMst, typeCus, assignedToUserId, searchStatus);
 
         if (totalRecords == 0) {
             return 1;

@@ -401,7 +401,7 @@
                                         <div class="info-value" style="color: var(--primary); font-weight: 700;">
                                             <c:choose>
                                                 <c:when test="${not empty cusDTO.assignedToUserId}">
-                                                    <c:forEach var="u" items="${users}">
+                                                    <c:forEach var="u" items="${listSales}">
                                                         <c:if test="${cusDTO.assignedToUserId == u.userId}">
                                                             ${u.fullName} (${u.userName})
                                                         </c:if>

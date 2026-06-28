@@ -47,19 +47,21 @@
                 .search-form-responsive {
                     display: flex;
                     flex-direction: column;
-                    gap: 16px;
+                    gap: 12px;
                     background: var(--surface) !important;
                     border: 1px solid rgba(221, 213, 201, 0.85) !important;
-                    border-radius: 22px !important;
+                    border-radius: 16px !important;
                     box-shadow: var(--shadow) !important;
-                    padding: 22px !important;
+                    padding: 16px 20px !important;
                     margin: 16px 0 22px !important;
                 }
 
-                .search-group {
+                .search-row {
                     display: flex;
-                    flex-direction: column;
-                    gap: 10px;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: 12px;
+                    width: 100%;
                 }
 
                 .search-label {
@@ -68,42 +70,39 @@
                     color: var(--muted);
                     text-transform: uppercase;
                     letter-spacing: 0.05em;
+                    white-space: nowrap;
+                    width: 130px;
+                    flex-shrink: 0;
                 }
 
-                .inputs-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                    gap: 12px;
-                }
-
-                .inputs-grid input,
-                .inputs-grid select {
-                    width: 100%;
+                .input-small {
                     box-sizing: border-box;
-                    padding: 10px 14px !important;
-                    font-size: 14px !important;
+                    padding: 6px 10px !important;
+                    font-size: 13px !important;
                     border: 1px solid var(--line) !important;
-                    border-radius: 12px !important;
+                    border-radius: 8px !important;
                     color: var(--text) !important;
                     background-color: #fff !important;
                     outline: none;
                     transition: border-color 0.2s ease;
+                    width: 145px !important;
+                    height: 34px !important;
                 }
 
-                .inputs-grid input:focus,
-                .inputs-grid select:focus {
+                .input-small:focus {
                     border-color: var(--primary) !important;
                 }
 
                 .actions-group {
                     display: flex;
-                    gap: 10px;
+                    gap: 8px;
                     align-items: center;
-                    justify-content: flex-end;
+                    margin-left: auto;
                 }
 
                 .btn-search {
-                    padding: 10px 24px !important;
+                    padding: 6px 18px !important;
+                    height: 34px !important;
                     background-color: var(--primary) !important;
                     color: white !important;
                     border: none !important;
@@ -111,15 +110,19 @@
                     font-weight: 800 !important;
                     cursor: pointer !important;
                     transition: all 0.2s ease;
+                    font-size: 13px !important;
                 }
 
                 .btn-search:hover {
-                    transform: translateY(-2px);
+                    transform: translateY(-1px);
                     filter: brightness(1.1);
                 }
 
                 .btn-clear {
-                    padding: 10px 24px !important;
+                    padding: 6px 18px !important;
+                    height: 34px !important;
+                    box-sizing: border-box;
+                    line-height: 20px;
                     background-color: var(--surface-soft) !important;
                     color: var(--text) !important;
                     border: 1px solid var(--line) !important;
@@ -127,12 +130,14 @@
                     text-decoration: none !important;
                     font-weight: 800 !important;
                     transition: all 0.2s ease;
-                    display: inline-block;
+                    display: inline-flex;
+                    align-items: center;
+                    font-size: 13px !important;
                 }
 
                 .btn-clear:hover {
                     background-color: var(--surface-strong) !important;
-                    transform: translateY(-2px);
+                    transform: translateY(-1px);
                 }
             </style>
 
@@ -173,39 +178,57 @@
 
                     <form action="${pageContext.request.contextPath}/customer/list" method="GET"
                         class="search-form-responsive">
-                        <div class="search-group">
-                            <label class="search-label">Search Filters:</label>
-                            <div class="inputs-grid">
-                                <input type="text" name="searchName" value="${searchName}"
-                                    placeholder="Enter name..." />
-                                <input type="text" name="searchSdt" value="${searchSdt}" placeholder="Enter phone..." />
-                                <input type="text" name="searchEmail" value="${searchEmail}"
-                                    placeholder="Enter email..." />
-                                <input type="text" name="searchMst" value="${searchMst}"
-                                    placeholder="Enter tax code..." />
-                                <select name="type">
-                                    <option value="">-- All Types --</option>
-                                    <c:forEach var="typeCus" items="${listTypeCus}">
-                                        <option value="${typeCus}" ${type eq typeCus ? 'selected' : '' }>${typeCus}
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                                <c:if test="${sessionScope.user.roleId != 4}">
-                                    <select name="assignedToUserId">
-                                        <option value="">-- All Sale Staff --</option>
-                                        <c:forEach var="sale" items="${listSales}">
-                                            <option value="${sale.userId}" ${assignedToUserId eq sale.userId
-                                                ? 'selected' : '' }>${sale.fullName}</option>
-                                        </c:forEach>
-                                    </select>
-                                </c:if>
-                            </div>
+                        <!-- Row 1: Search Inputs -->
+                        <div class="search-row">
+                            <span class="search-label">Search Filters:</span>
+                            
+                            <input type="text" name="searchName" value="${searchName}"
+                                placeholder="Enter name..." class="input-small" />
+                            <input type="text" name="searchSdt" value="${searchSdt}" placeholder="Enter phone..." class="input-small" />
+                            <input type="text" name="searchEmail" value="${searchEmail}"
+                                placeholder="Enter email..." class="input-small" />
+                            <input type="text" name="searchMst" value="${searchMst}"
+                                placeholder="Enter tax code..." class="input-small" />
                         </div>
 
-                        <div class="actions-group">
-                            <button type="submit" class="btn-search">Search</button>
-                            <a href="${pageContext.request.contextPath}/customer/list" class="btn-clear">Clear
-                                Filter</a>
+                        <!-- Row 2: Select options & Actions -->
+                        <div class="search-row">
+                            <span class="search-label">Options:</span>
+                            
+                            <select name="type" class="input-small">
+                                <option value="">-- All Types --</option>
+                                <c:forEach var="typeCus" items="${listTypeCus}">
+                                    <option value="${typeCus}" ${type eq typeCus ? 'selected' : '' }>${typeCus}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                            <c:if test="${sessionScope.user.roleId != 4}">
+                                <select name="assignedToUserId" class="input-small">
+                                    <option value="">-- All Sale Staff --</option>
+                                    <c:forEach var="sale" items="${listSales}">
+                                        <option value="${sale.userId}" ${assignedToUserId eq sale.userId
+                                            ? 'selected' : '' }>${sale.fullName}</option>
+                                    </c:forEach>
+                                </select>
+                            </c:if>
+                            <select name="searchStatus" class="input-small">
+                                <option value="">-- All Statuses --</option>
+                                <option value="ACTIVE" ${searchStatus eq 'ACTIVE' ? 'selected' : ''}>Active</option>
+                                <option value="INACTIVE" ${searchStatus eq 'INACTIVE' ? 'selected' : ''}>Inactive</option>
+                            </select>
+
+                            <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-left: 15px; letter-spacing: 0.05em; white-space: nowrap;">Show:</span>
+                            <select name="pageSize" class="input-small" style="width: 100px !important;" onchange="this.form.submit()">
+                                <option value="5" ${pageSize == 5 ? 'selected' : ''}>5 items</option>
+                                <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 items</option>
+                                <option value="20" ${pageSize == 20 ? 'selected' : ''}>20 items</option>
+                            </select>
+                            <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">per page</span>
+
+                            <div class="actions-group">
+                                <button type="submit" class="btn-search">Search</button>
+                                <a href="${pageContext.request.contextPath}/customer/list" class="btn-clear">Clear Filter</a>
+                            </div>
                         </div>
                     </form>
 
@@ -218,9 +241,7 @@
                                 <th>Email</th>
                                 <th>Phone Number</th>
                                 <th>Tax Code</th>
-                                <th>Assigned Sale Staff</th>
                                 <th>Status</th>
-                                <th>Created At</th>
                                 <th>Last Updated</th>
                                 <th>Actions</th>
                             </tr>
@@ -228,7 +249,7 @@
                         <tbody>
                             <c:if test="${empty customersDTOs}">
                                 <tr>
-                                    <td colspan="11" style="text-align: center;">No customer data found</td>
+                                    <td colspan="9" style="text-align: center;">No customer data found</td>
                                 </tr>
                             </c:if>
 
@@ -240,17 +261,7 @@
                                     <td>${cust.email}</td>
                                     <td>${cust.phone}</td>
                                     <td>${cust.taxCode}</td>
-                                    <td>
-                                        <c:set var="assignedName" value="Unassigned" />
-                                        <c:forEach var="sale" items="${listSales}">
-                                            <c:if test="${cust.assignedToUserId eq sale.userId}">
-                                                <c:set var="assignedName" value="${sale.fullName}" />
-                                            </c:if>
-                                        </c:forEach>
-                                        ${assignedName}
-                                    </td>
                                     <td><span>${cust.status}</span></td>
-                                    <td>${cust.createTimeString}</td>
                                     <td>${cust.updateTimeString}</td>
                                     <td>
                                         <a
@@ -267,6 +278,8 @@
                     <c:if test="${totalPages > 1}">
                         <div class="pagination-container" style="margin-top: 20px; text-align: center;">
 
+                            <c:set var="queryParams" value="&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}&assignedToUserId=${assignedToUserId}&searchStatus=${searchStatus}&pageSize=${pageSize}" />
+
                             <%-- Calculate page range for buttons --%>
                                 <c:set var="startPage" value="${currentPage - 2}" />
                                 <c:if test="${startPage < 1}">
@@ -282,7 +295,7 @@
                                     <c:choose>
                                         <c:when test="${currentPage > 1}">
                                             <a
-                                                href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}&assignedToUserId=${assignedToUserId}">&lt;</a>
+                                                href="${pageContext.request.contextPath}/customer/list?page=${currentPage - 1}${queryParams}">&lt;</a>
                                         </c:when>
                                         <c:otherwise>
                                             <span
@@ -298,7 +311,7 @@
                                                 </c:when>
                                                 <c:otherwise>
                                                     <a
-                                                        href="${pageContext.request.contextPath}/customer/list?page=${i}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}&assignedToUserId=${assignedToUserId}">${i}</a>
+                                                        href="${pageContext.request.contextPath}/customer/list?page=${i}${queryParams}">${i}</a>
                                                 </c:otherwise>
                                             </c:choose>
                                         </c:forEach>
@@ -307,7 +320,7 @@
                                             <c:choose>
                                                 <c:when test="${currentPage < totalPages}">
                                                     <a
-                                                        href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}&searchName=${searchName}&searchSdt=${searchSdt}&searchEmail=${searchEmail}&searchMst=${searchMst}&type=${type}&assignedToUserId=${assignedToUserId}">&gt;</a>
+                                                        href="${pageContext.request.contextPath}/customer/list?page=${currentPage + 1}${queryParams}">&gt;</a>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <span

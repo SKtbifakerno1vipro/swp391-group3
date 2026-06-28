@@ -69,6 +69,7 @@ public class DetailCustomerController extends HttpServlet {
             request.setAttribute("listQuotationsForCus", listQuotationsForCus);
             request.setAttribute("listContractsForCus", listContractsForCus);
             request.setAttribute("cusDTO", cusDTO);
+            request.setAttribute("listSales", customerService.getAllSalesExecutiveUsers());
             request.getRequestDispatcher("/views/customer/customer_detail.jsp").forward(request, response);
         } catch (NumberFormatException | NullPointerException e) {
             response.sendRedirect(request.getContextPath() + "/customer/list");
