@@ -61,7 +61,17 @@ public class PaymentListController extends HttpServlet {
                 page = 1;
             }
         }
-        int pageSize = 10;
+
+        String pageSizeRaw = request.getParameter("pageSize");
+        int pageSize = 5;
+        if (pageSizeRaw != null && !pageSizeRaw.isBlank()) {
+            try {
+                pageSize = Integer.parseInt(pageSizeRaw.trim());
+                if (pageSize < 1) pageSize = 5;
+            } catch (NumberFormatException e) {
+                pageSize = 5;
+            }
+        }
 
         Integer customerUserId = null;
         if (user.getRoleId() == 3) {
@@ -84,6 +94,7 @@ public class PaymentListController extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("pageSize", pageSize);
 
         // Keep values in form inputs
         request.setAttribute("customerName", customerName);

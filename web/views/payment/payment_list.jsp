@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Payment Management - Po Bread Sales</title>
+        <title>Payment - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -69,63 +69,78 @@
             .search-form-responsive {
                 display: flex;
                 flex-direction: column;
-                gap: 16px;
+                gap: 12px;
                 background: var(--surface) !important;
                 border: 1px solid rgba(221, 213, 201, 0.85) !important;
-                border-radius: 22px !important;
+                border-radius: 16px !important;
                 box-shadow: var(--shadow) !important;
-                padding: 22px !important;
+                padding: 16px 20px !important;
                 margin: 16px 0 22px !important;
             }
 
-            .search-group {
+            .search-row {
                 display: flex;
-                flex-direction: column;
-                gap: 10px;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 12px;
+                width: 100%;
             }
 
-            .search-label {
+            .search-label,
+            .range-title {
                 font-size: 11px;
                 font-weight: 800;
                 color: var(--muted);
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
+                white-space: nowrap;
+                width: 130px;
+                flex-shrink: 0;
             }
 
-            .inputs-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 12px;
+            .range-separator {
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--muted);
+                padding: 0 2px;
             }
 
-            .inputs-grid input,
-            .inputs-grid select {
-                width: 100%;
+            .input-small {
                 box-sizing: border-box;
-                padding: 10px 14px !important;
-                font-size: 14px !important;
+                padding: 6px 10px !important;
+                font-size: 13px !important;
                 border: 1px solid var(--line) !important;
-                border-radius: 12px !important;
+                border-radius: 8px !important;
                 color: var(--text) !important;
                 background-color: #fff !important;
                 outline: none;
                 transition: border-color 0.2s ease;
+                width: 145px !important;
+                height: 34px !important;
             }
 
-            .inputs-grid input:focus,
-            .inputs-grid select:focus {
+            .input-small[type="date"] {
+                width: 130px !important;
+            }
+
+            .input-small[type="number"] {
+                width: 100px !important;
+            }
+
+            .input-small:focus {
                 border-color: var(--primary) !important;
             }
 
             .actions-group {
                 display: flex;
-                gap: 10px;
+                gap: 8px;
                 align-items: center;
-                justify-content: flex-end;
+                margin-left: auto;
             }
 
             .btn-search {
-                padding: 10px 24px !important;
+                padding: 6px 18px !important;
+                height: 34px !important;
                 background-color: var(--primary) !important;
                 color: white !important;
                 border: none !important;
@@ -133,15 +148,19 @@
                 font-weight: 800 !important;
                 cursor: pointer !important;
                 transition: all 0.2s ease;
+                font-size: 13px !important;
             }
 
             .btn-search:hover {
-                transform: translateY(-2px);
+                transform: translateY(-1px);
                 filter: brightness(1.1);
             }
 
             .btn-clear {
-                padding: 10px 24px !important;
+                padding: 6px 18px !important;
+                height: 34px !important;
+                box-sizing: border-box;
+                line-height: 20px;
                 background-color: var(--surface-soft) !important;
                 color: var(--text) !important;
                 border: 1px solid var(--line) !important;
@@ -149,12 +168,14 @@
                 text-decoration: none !important;
                 font-weight: 800 !important;
                 transition: all 0.2s ease;
-                display: inline-block;
+                display: inline-flex;
+                align-items: center;
+                font-size: 13px !important;
             }
 
             .btn-clear:hover {
                 background-color: var(--surface-strong) !important;
-                transform: translateY(-2px);
+                transform: translateY(-1px);
             }
         </style>
     </head>
@@ -167,28 +188,50 @@
                 <h2>Payment Management</h2>
 
                 <form action="${pageContext.request.contextPath}/payment/list" method="GET" class="search-form-responsive">
-                    <div class="search-group">
-                        <label class="search-label">Search Payments:</label>
-                        <div class="inputs-grid">
-                            <c:if test="${sessionScope.user.roleId != 3}">
-                                <input type="text" name="customerName" value="${customerName}" placeholder="Customer Name..." />
-                            </c:if>
-                            <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Contract Number..." />
-                            <select name="status">
-                                <option value="">-- All Statuses --</option>
-                                <option value="PENDING" ${status eq 'PENDING' ? 'selected' : ''}>Pending</option>
-                                <option value="COMPLETED" ${status eq 'COMPLETED' ? 'selected' : ''}>Completed</option>
-                                <option value="FAILED" ${status eq 'FAILED' ? 'selected' : ''}>Failed</option>
-                            </select>
-                            <input type="date" name="startDate" value="${startDate}" title="Paid Start Date" />
-                            <input type="date" name="endDate" value="${endDate}" title="Paid End Date" />
-                            <input type="number" step="0.01" name="minAmount" value="${minAmount}" placeholder="Min Amount..." />
-                            <input type="number" step="0.01" name="maxAmount" value="${maxAmount}" placeholder="Max Amount..." />
-                        </div>
+                    <!-- Row 1: Basic search (Contract, Customer Name, Status) -->
+                    <div class="search-row">
+                        <span class="search-label">Search Payments:</span>
+                        
+                        <input type="text" name="customerName" value="${customerName}" placeholder="Customer Name..." class="input-small" />
+                        
+                        <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Contract No..." class="input-small" />
+                        
+                        <select name="status" class="input-small">
+                            <option value="">-- Status --</option>
+                            <option value="PENDING" ${status eq 'PENDING' ? 'selected' : ''}>Pending</option>
+                            <option value="COMPLETED" ${status eq 'COMPLETED' ? 'selected' : ''}>Completed</option>
+                            <option value="FAILED" ${status eq 'FAILED' ? 'selected' : ''}>Failed</option>
+                        </select>
                     </div>
-                    <div class="actions-group">
-                        <button type="submit" class="btn-search">Search</button>
-                        <a href="${pageContext.request.contextPath}/payment/list" class="btn-clear">Clear Filters</a>
+
+                    <!-- Row 2: Date filter -->
+                    <div class="search-row">
+                        <span class="range-title">Date:</span>
+                        <input type="date" name="startDate" value="${startDate}" title="Paid Start Date" class="input-small" />
+                        <span class="range-separator">to</span>
+                        <input type="date" name="endDate" value="${endDate}" title="Paid End Date" class="input-small" />
+                    </div>
+
+                    <!-- Row 3: Amount filter & Buttons -->
+                    <div class="search-row">
+                        <span class="range-title">Amount:</span>
+                        <input type="number" step="0.01" name="minAmount" value="${minAmount}" placeholder="Min..." class="input-small" />
+                        <span class="range-separator">to</span>
+                        <input type="number" step="0.01" name="maxAmount" value="${maxAmount}" placeholder="Max..." class="input-small" />
+                        
+                        <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-left: 15px; letter-spacing: 0.05em;">Show:</span>
+                        <select name="pageSize" class="input-small" style="width: 100px !important;" onchange="this.form.submit()">
+                            <option value="5" ${pageSize == 5 ? 'selected' : ''}>5 items</option>
+                            <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 items</option>
+                            <option value="15" ${pageSize == 15 ? 'selected' : ''}>15 items</option>
+                            <option value="25" ${pageSize == 25 ? 'selected' : ''}>25 items</option>
+                        </select>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">per page</span>
+                        
+                        <div class="actions-group">
+                            <button type="submit" class="btn-search">Search</button>
+                            <a href="${pageContext.request.contextPath}/payment/list" class="btn-clear">Clear Filters</a>
+                        </div>
                     </div>
                 </form>
 
@@ -212,7 +255,7 @@
                         </c:if>
                         <c:forEach items="${list}" var="p">
                             <tr>
-                                <td>PAY-${p.paymentId}</td>
+                                <td>${p.paymentId}</td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${not empty p.contractNumber}">
@@ -264,7 +307,7 @@
 
                 <c:if test="${totalPages > 1}">
                     <div class="pagination" style="margin-top: 20px;">
-                        <c:set var="queryParams" value="&customerName=${customerName}&contractNumber=${contractNumber}&status=${status}&startDate=${startDate}&endDate=${endDate}&minAmount=${minAmount}&maxAmount=${maxAmount}" />
+                        <c:set var="queryParams" value="&customerName=${customerName}&contractNumber=${contractNumber}&status=${status}&startDate=${startDate}&endDate=${endDate}&minAmount=${minAmount}&maxAmount=${maxAmount}&pageSize=${pageSize}" />
                         
                         <a class="page-link ${currentPage == 1 ? 'disabled' : ''}" 
                            href="${pageContext.request.contextPath}/payment/list?page=1${queryParams}">First</a>

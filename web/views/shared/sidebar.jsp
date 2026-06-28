@@ -80,9 +80,6 @@
                 <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/invoice-list"><span
                         class="material-symbols-outlined">receipt</span>Invoices</a>
-                <a class="nav-link ${param.activeMenu == 'createPayment' ? 'active' : ''}"
-                   href="${pageContext.request.contextPath}/payment/create"><span
-                        class="material-symbols-outlined">add_card</span>Create Payment</a>
                 <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"
                    href="${pageContext.request.contextPath}/user-list"><span
                         class="material-symbols-outlined">manage_accounts</span>Users</a>
