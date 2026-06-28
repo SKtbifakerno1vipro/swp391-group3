@@ -134,3 +134,147 @@
                 class="material-symbols-outlined">logout</span>Logout</a>
     </div>
 </aside>
+
+<!-- XHieu, this is realtime notification, contact me if you have a question-->
+
+<c:if test="${not empty sessionScope.user}">
+    <!-- Realtime Notification Toast Container -->
+    <div id="realtime-toast-container" style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 350px;
+        pointer-events: none;
+    "></div>
+
+    <style>
+    .toast-box {
+        pointer-events: auto;
+        background: #ffffff;
+        color: #1e293b;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-family: 'Nunito Sans', sans-serif;
+        border-left: 5px solid var(--primary);
+        animation: toastSlideIn 0.3s ease-out forwards, toastFadeOut 0.5s ease-in 4.5s forwards;
+        opacity: 0;
+    }
+
+    .toast-box.info {
+        border-left-color: #3b82f6;
+    }
+
+    .toast-box.success {
+        border-left-color: #10b981;
+    }
+
+    @keyframes toastSlideIn {
+        from {
+            transform: translateX(120%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes toastFadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+
+    .toast-icon {
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .toast-content {
+        flex-grow: 1;
+    }
+
+    .toast-title {
+        font-weight: 800;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .toast-desc {
+        font-size: 12px;
+        color: #64748b;
+        margin: 2px 0 0 0;
+    }
+
+    .toast-btn {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--primary);
+        text-decoration: none;
+        margin-left: 8px;
+        white-space: nowrap;
+    }
+    .toast-btn:hover {
+        text-decoration: underline;
+    }
+    </style>
+
+    <script>
+        const notifySource = new EventSource("${pageContext.request.contextPath}/realtime/notifications");
+
+        notifySource.addEventListener('notification', function(event) {
+            const notify = JSON.parse(event.data);
+            triggerToast(
+                notify.type,
+                notify.title,
+                notify.message,
+                notify.link
+            );
+        });
+
+        function triggerToast(type, title, description, detailUrl) {
+            const container = document.getElementById("realtime-toast-container");
+            if (!container) return;
+
+            const id = 'toast-' + Date.now();
+            const icon = type === 'success' ? 'payments' : 'person_add';
+            const color = type === 'success' ? '#10b981' : '#3b82f6';
+            
+            let toastHtml = '<div id="' + id + '" class="toast-box ' + type + '">' +
+                '<span class="material-symbols-outlined toast-icon" style="color: ' + color + ';">' + icon + '</span>' +
+                '<div class="toast-content">' +
+                    '<p class="toast-title">' + title + '</p>' +
+                    '<p class="toast-desc">' + description + '</p>' +
+                '</div>';
+            if (detailUrl) {
+                toastHtml += '<a href="' + detailUrl + '" class="toast-btn">Xem ngay</a>';
+            }
+            toastHtml += '</div>';
+
+            container.insertAdjacentHTML('beforeend', toastHtml);
+
+            setTimeout(() => {
+                const toastElement = document.getElementById(id);
+                if (toastElement) {
+                    toastElement.remove();
+                }
+            }, 5000);
+        }
+
+        window.addEventListener('beforeunload', () => {
+            notifySource.close();
+        });
+    </script>
+</c:if>
