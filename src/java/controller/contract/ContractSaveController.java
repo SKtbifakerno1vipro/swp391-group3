@@ -34,7 +34,7 @@ public class ContractSaveController extends HttpServlet {
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        if (user == null) {
+        if (user == null ) {
             response.sendRedirect("login");
             return;
         }

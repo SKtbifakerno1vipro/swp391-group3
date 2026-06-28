@@ -456,6 +456,7 @@ public class ContractDAO extends DBContext {
         String sql = "UPDATE customer_contract SET contract_status = ? WHERE customer_contract_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, newStatus);
+            
             ps.setInt(2, contractId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -498,6 +499,7 @@ public class ContractDAO extends DBContext {
                      ) as total_amount
                      FROM quotation_detail 
                      WHERE quotation_id = ?""";
+        
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, quotationId);
