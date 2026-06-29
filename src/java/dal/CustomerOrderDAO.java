@@ -164,29 +164,6 @@ public class CustomerOrderDAO extends DBContext {
         return false;
     }
 
-    public boolean updateOrderDetailQuantity(int detailId, int quantity) {
-        String sql = "UPDATE customer_order_detail SET quantity = ? WHERE customer_order_detail_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, quantity);
-            ps.setInt(2, detailId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean deleteOrderDetail(int detailId) {
-        String sql = "DELETE FROM customer_order_detail WHERE customer_order_detail_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, detailId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public boolean deleteCustomerOrder(int orderId) {
         String deleteDetailsSql = "DELETE FROM customer_order_detail WHERE customer_order_id = ?";
         String deleteOrderSql = "DELETE FROM customer_order WHERE customer_order_id = ?";
