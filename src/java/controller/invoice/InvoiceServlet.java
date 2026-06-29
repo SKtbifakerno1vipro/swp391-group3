@@ -45,7 +45,7 @@ public class InvoiceServlet extends HttpServlet {
 
         // Load company configuration from properties file
         Properties config = new Properties();
-        try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/config.properties")) {
+        try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/resources/config.properties")) {
             if (is != null) {
                 config.load(is);
             }
