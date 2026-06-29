@@ -159,7 +159,7 @@
                 <h2>No Contract: ${contract.contractNumber}</h2>
 
                 <div class="layout-container">
-                    <!-- COT 1: CONTENT (Left) -->
+                    <!-- COL 1: CONTENT (Left) -->
                     <div class="content-panel">
                         <c:if test="${errorSig != null}">
                             <div style="color: var(--danger); background: var(--danger-soft); padding: 10px; border-radius: 8px; margin-bottom: 15px;">${errorSig}</div>
@@ -176,7 +176,7 @@
                         </div>
                     </div>
 
-                    <!-- COT 2: ACTION + HISTORY (Right) -->
+                    <!-- COL 2: ACTION + HISTORY (Right) -->
                     <div class="right-panel">
 
                         <!-- ACTION BLOCK -->

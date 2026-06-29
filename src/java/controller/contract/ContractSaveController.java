@@ -142,13 +142,13 @@ public class ContractSaveController extends HttpServlet {
                     // Guard: only DRAFT or PENDING_REVIEW can submit_for_review (officier -> manager)
                     if ("DRAFT".equals(c.getContractStatus()) || "PENDING_REVIEW".equals(c.getContractStatus())) {
                         contractService.updateStatus(contractId, "PENDING_REVIEW");
-                        insertHistory(c, "PENDING_REVIEW", "Admin officier submitted contract for manager review.", user.getUserId());
+                        insertHistoryForOfficier(c, "PENDING_REVIEW", "Admin officier submitted contract for manager review.", user.getUserId());
                         service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + c.getContractNumber() + " (ID: " + contractId + ")");
                     } else {
                         // Status not DRAFT or PENDING_REVIEW, cannot submit
                     }
                 } else {
-                    insertHistory(c, c.getContractStatus(), "User saved contract content.", user.getUserId());
+                    insertHistoryForOfficier(c, c.getContractStatus(), "User saved contract content.", user.getUserId());
                     service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Lưu nội dung hợp đồng số: " + c.getContractNumber() + " (ID: " + contractId + ")");
                 }
                 response.sendRedirect("contract-detail?id=" + contractId);
@@ -187,14 +187,14 @@ public class ContractSaveController extends HttpServlet {
 
         if (newId > 0) {
             c.setContractId(newId);
-            insertHistory(c, "DRAFT", "Contract created in DRAFT status.", user.getUserId());
+            insertHistoryForOfficier(c, "DRAFT", "Contract created in DRAFT status.", user.getUserId());
             service.AuditLogService.log(user.getUserId(), "CREATE", "Contract", "Tạo dự thảo hợp đồng mới: " + newContractNumber + " (ID: " + newId + ")");// from giang
 
             if ("submit_for_review".equals(action)) {
                 // Guard: only DRAFT and PENDING_REVIEW can submit_for_review
                 if ("DRAFT".equals(c.getContractStatus()) || "PENDING_REVIEW".equals(c.getContractStatus())) {
                     contractService.updateStatus(newId, "PENDING_REVIEW");
-                    insertHistory(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
+                    insertHistoryForOfficier(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
                     service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + newContractNumber + " (ID: " + newId + ")");//from giang
                 }
             }
@@ -208,7 +208,7 @@ public class ContractSaveController extends HttpServlet {
     /**
      * Helper that records a status change / activity in ContractHistory.
      */
-    private void insertHistory(Contract contract, String toStatus, String note, int changedBy) {
+    private void insertHistoryForOfficier(Contract contract, String toStatus, String note, int changedBy) {
         ContractHistory h = new ContractHistory();
         h.setContractId(contract.getContractId());
         h.setFromStatus(contract.getContractStatus());   // previous status
