@@ -90,7 +90,7 @@ public class ContractSaveController extends HttpServlet {
         List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotation.getQuotationId());
 
         Properties config = new Properties();
-        try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/config.properties")) {
+        try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/resources/config.properties")) {
             if (is != null) {
                 config.load(is);
             }

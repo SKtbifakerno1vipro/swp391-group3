@@ -17,11 +17,13 @@ public class EmailUtils {
 
     private static Properties loadEmailProperties() {
         Properties props = new Properties();
-        try (InputStream input = EmailUtils.class.getClassLoader().getResourceAsStream("resources/EmailConfig.properties")) {
-            if (input != null) {
+        try {
+            // Lấy URL nơi chứa class file này khi chạy trên Web Server (đã build) (/WEB-INF/classes/)
+            java.io.File classesDir = new java.io.File(EmailUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            java.io.File webInfDir = classesDir.getParentFile();
+            java.io.File file = new java.io.File(webInfDir, "resources/EmailConfig.properties");
+            try (InputStream input = new java.io.FileInputStream(file)) {
                 props.load(input);
-            } else {
-                System.out.println("[ERROR] EmailConfig.properties file not found in resources classpath!");
             }
         } catch (Exception e) {
             System.out.println("[ERROR] Failed to load EmailConfig.properties: " + e.getMessage());
