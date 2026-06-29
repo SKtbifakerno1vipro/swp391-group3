@@ -208,36 +208,7 @@ public class CustomerService {
                                      + "    </div>"
                                      + "</div>";
 
-        boolean isSent = EmailUtils.sendEmail(user.getEmail(), emailSubject, emailBody);
-
-        new Thread(() -> {
-            if (!isSent) {
-                int[] retryDelaysMs = {5_000, 10_000, 15_000};
-                boolean success = false;
-
-                for (int attempt = 1; attempt <= retryDelaysMs.length; attempt++) {
-                    System.out.println("[Email] Attempt " + attempt + " failed for: " + user.getEmail()
-                            + ". Retrying in " + (retryDelaysMs[attempt - 1] / 1000) + "s...");
-                    try {
-                        Thread.sleep(retryDelaysMs[attempt - 1]);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        return;
-                    }
-                    success = EmailUtils.sendEmail(user.getEmail(), emailSubject, emailBody);
-                    if (success) {
-                        System.out.println("[Email] Retry attempt " + attempt + " succeeded for: " + user.getEmail());
-                        break;
-                    }
-                }
-
-                if (!success) {
-                    System.out.println("[Email] All retry attempts failed for: " + user.getEmail() + ". Giving up.");
-                }
-            } else {
-                System.out.println("[Email] Sent successfully for: " + user.getEmail());
-            }
-        }).start();
+        EmailUtils.sendEmailAsync(user.getEmail(), emailSubject, emailBody);
     }
 
     public String getLastError() {

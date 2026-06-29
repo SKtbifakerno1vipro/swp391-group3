@@ -121,10 +121,11 @@ public class RealtimeNotificationServlet extends HttpServlet {
         double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;
         String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
         return String.format(
-            "{\"type\":\"success\",\"title\":\"Ký hợp đồng thành công\",\"message\":\"Hợp đồng số %s trị giá %,.0f VNĐ vừa được ký.<br>Hãy nhấn vào \'Thanh toán\' để hoàn tất thủ tục.\",\"link\":\"%s/payment/list\",\"btnText\":\"Thanh toán\"}",
+            "{\"type\":\"success\",\"title\":\"Ký hợp đồng thành công\",\"message\":\"Hợp đồng số %s trị giá %,.0f VNĐ vừa được ký.<br>Hãy nhấn vào \'Thanh toán\' để hoàn tất thủ tục.\",\"link\":\"%s/payment/detail?id=%d\",\"btnText\":\"Thanh toán\"}",
             escapeJson(contractNo),
             amt,
-            contextPath
+            contextPath,
+            p.getPaymentId()
         );
     }
 
