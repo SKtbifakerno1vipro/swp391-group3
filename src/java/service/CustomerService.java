@@ -110,14 +110,14 @@ public class CustomerService {
         Connection conn = userService.getConnection();
 
         try {
-            //tat che do tu dong luu cua database sql
+            // Tắt chế độ tự động lưu của database SQL
             conn.setAutoCommit(false);
 
             int generatedUserId = userService.createUserFullParameter(user, conn);
 
             if (generatedUserId == -1) {
-                System.out.println("Cannot create user account");
-                conn.rollback(); // huy bo neu loi
+                System.out.println("[Error] Cannot create user account.");
+                conn.rollback();
                 return null;
             }
 
@@ -126,10 +126,51 @@ public class CustomerService {
             boolean isCustomerInserted = customerDAO.insertCustomer(customer, conn);
 
             if (isCustomerInserted) {
+                // Commit ngay sau khi tạo customer thành công, không phụ thuộc vào email
+                conn.commit();
+
                 int customerRoleId = roleService.getRoleIdByName("Customer");
                 if (user.getRoleId() == customerRoleId) {
-                    String emailSubject = "Chào mừng thành viên mới - Po Bread";
-                    String emailBody = "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e0e0e0; border-radius: 16px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);\">"
+                    // Gửi email chào mừng bất đồng bộ, không ảnh hưởng đến việc tạo customer
+                    sendWelcomeEmailAsync(user, pass);
+                }
+
+                return "SUCCESS";
+            } else {
+                // Tạo Customer thất bại -> Rollback để xóa luôn tài khoản User vừa tạo
+                System.out.println("[Error] Failed to insert customer. Rolling back.");
+                conn.rollback();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gửi email chào mừng trong một thread riêng biệt.
+     * Nếu lần gửi đầu tiên thất bại, sẽ tự động thử lại sau 10 giây.
+     * Nếu lần thử lại cũng thất bại, ghi log lỗi và dừng lại.
+     */
+    private void sendWelcomeEmailAsync(User user, String pass) {
+        String emailSubject = "Chào mừng thành viên mới - Po Bread";
+        String emailBody = "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e0e0e0; border-radius: 16px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);\">"
                                      + "    <div style=\"text-align: center; margin-bottom: 24px; border-bottom: 2px solid #eaeaea; padding-bottom: 16px;\">"
                                      + "        <h2 style=\"color: #4A7C59; margin: 0; font-size: 26px; font-weight: 700; font-family: Georgia, serif;\">Po Bread</h2>"
                                      + "        <p style=\"color: #888888; margin: 5px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;\">Hệ Thống Quản Lý Quy Trình Bán Hàng</p>"
@@ -152,7 +193,7 @@ public class CustomerService {
                                      + "        </table>"
                                      + "    </div>"
                                      + "    <div style=\"text-align: center; margin-bottom: 28px;\">"
-                                     + "        <a href=\"http://localhost:8080/swp391-group3/login\" style=\"display: inline-block; padding: 12px 30px; background-color: #4A7C59; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 15px; box-shadow: 0 4px 8px rgba(74, 124, 89, 0.25);\">"
+                                     + "        <a href=\"http://localhost:8080/SWP_Group3/login\" style=\"display: inline-block; padding: 12px 30px; background-color: #4A7C59; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 15px; box-shadow: 0 4px 8px rgba(74, 124, 89, 0.25);\">"
                                      + "            Đăng nhập hệ thống"
                                      + "        </a>"
                                      + "    </div>"
@@ -167,38 +208,36 @@ public class CustomerService {
                                      + "    </div>"
                                      + "</div>";
 
-                    boolean isSent = EmailUtils.sendEmail(user.getEmail(), emailSubject, emailBody);
-                    if (!isSent) {
-                        conn.rollback();
-                        return "Error when send email to customer";
+        boolean isSent = EmailUtils.sendEmail(user.getEmail(), emailSubject, emailBody);
+
+        new Thread(() -> {
+            if (!isSent) {
+                int[] retryDelaysMs = {5_000, 10_000, 15_000};
+                boolean success = false;
+
+                for (int attempt = 1; attempt <= retryDelaysMs.length; attempt++) {
+                    System.out.println("[Email] Attempt " + attempt + " failed for: " + user.getEmail()
+                            + ". Retrying in " + (retryDelaysMs[attempt - 1] / 1000) + "s...");
+                    try {
+                        Thread.sleep(retryDelaysMs[attempt - 1]);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                    success = EmailUtils.sendEmail(user.getEmail(), emailSubject, emailBody);
+                    if (success) {
+                        System.out.println("[Email] Retry attempt " + attempt + " succeeded for: " + user.getEmail());
+                        break;
                     }
                 }
-                conn.commit(); // gui xong email moi tao
-            } else {
-                // Buoc 3 loi -> Rollback đe xoa luon tai khoan User vua tao o Buoc 1
-                System.out.println("Lỗi: Tạo Customer thất bại! Tiến hành khôi phục dữ liệu.");
-                conn.rollback();
-            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            try {
-                if (conn != null) {
-                    conn.rollback(); // Dính exception là hủy hết
+                if (!success) {
+                    System.out.println("[Email] All retry attempts failed for: " + user.getEmail() + ". Giving up.");
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } else {
+                System.out.println("[Email] Sent successfully for: " + user.getEmail());
             }
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.setAutoCommit(true); // Trả lại trạng thái ban đầu cho Connection
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+        }).start();
     }
 
     public String getLastError() {
