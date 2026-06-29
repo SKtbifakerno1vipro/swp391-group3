@@ -39,7 +39,7 @@ nbproject/
 nbproject/private/
 
 # Resource
-
+resources/
 # intellij
 .idea
 .smarttomcat
