@@ -165,8 +165,8 @@ public class ContractService {
         return contractDAO.insert(c);
     }
 
-    public List<ContractHistory> getHistoriesByContractId(int contractId) {
-        return contractDAO.getHistoriesByContractId(contractId);
+    public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId) {
+        return contractDAO.getHistoriesByContractId(contractId, userId, roleId);
     }
 
     public int insertHistory(ContractHistory h) {

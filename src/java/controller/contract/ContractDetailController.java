@@ -72,7 +72,9 @@ public class ContractDetailController extends HttpServlet {
 
                 //check contract exist?
                 if (contract != null) {
-                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(id);
+                    int userId = (user != null) ? user.getUserId() : 0;
+                    int roleId = (user != null) ? user.getRoleId() : 0;
+                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(id, userId, roleId);
 
                     //nguyenkien - begin
                     String finalHtml = (contract.getContractContent() != null) ? contract.getContractContent() : "Not have any contract";

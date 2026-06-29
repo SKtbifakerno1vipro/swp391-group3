@@ -391,16 +391,25 @@ public class ContractDAO extends DBContext {
 
     //////////////////////////////detail contract
     // Lấy lịch sử và danh sách item liên quan
-    public List<ContractHistory> getHistoriesByContractId(int contractId) {
+    public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId) {
         List<ContractHistory> list = new ArrayList<>();
         String sql = "SELECT h.*, u.user_name "
                 + "FROM contract_edit_history h "
                 + " JOIN [user] u "
                 + "ON h.changed_by = u.user_id "
-                + "WHERE h.contract_id = ? "
-                + "ORDER BY h.created_at DESC";
+                + " JOIN customer_contract c ON h.contract_id = c.customer_contract_id "
+                + " JOIN customer cust ON c.customer_id = cust.customer_id "
+                + "WHERE h.contract_id = ? ";
+        if (userId != 0 && userId > 0 && roleId == 3) {
+            sql += " AND cust.user_id = ? AND u.role_id = 3 ";
+        }
+        sql += "ORDER BY h.created_at DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, contractId);
+            int index = 1;
+            ps.setInt(index++, contractId);
+            if (userId != 0 && userId > 0 && roleId == 3) {
+                ps.setInt(index++, userId);
+            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 ContractHistory h = new ContractHistory();
