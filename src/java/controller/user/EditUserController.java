@@ -28,9 +28,9 @@ public class EditUserController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-
+        
         String idStr = request.getParameter("id");
-        request.setAttribute("roles", roleService.getAllRoles());
+        request.setAttribute("roles", roleService.getAllRolesForCreateUser());
 
         if (idStr != null && !idStr.trim().isEmpty()) {
             try {
@@ -126,7 +126,7 @@ public class EditUserController extends HttpServlet {
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("u", u);
-            request.setAttribute("roles", roleService.getAllRoles());
+            request.setAttribute("roles", roleService.getAllRolesForCreateUser());
             String targetJSP = isEdit ? "/views/user/detail.jsp" : "/views/user/create.jsp";
             request.getRequestDispatcher(targetJSP).forward(request, response);
             return;
@@ -153,7 +153,7 @@ public class EditUserController extends HttpServlet {
         } else {
             request.setAttribute("error", "Database error!");
             request.setAttribute("u", u);
-            request.setAttribute("roles", roleService.getAllRoles());
+            request.setAttribute("roles", roleService.getAllRolesForCreateUser());
             String targetJSP = isEdit ? "/views/user/detail.jsp" : "/views/user/create.jsp";
             request.getRequestDispatcher(targetJSP).forward(request, response);
         }
