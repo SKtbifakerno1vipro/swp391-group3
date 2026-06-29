@@ -194,4 +194,8 @@ public class QuotationService {
     public boolean hasDraftQuotation(int customerId) {
         return quotationDAO.hasDraftQuotation(customerId);
     }
+
+    public QuotationDetail getQuotationDetailByProduct(int quotationId, int productId) {
+        return quotationDAO.getQuotationDetailByProduct(quotationId, productId);
+    }
 }

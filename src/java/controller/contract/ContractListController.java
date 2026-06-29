@@ -47,6 +47,7 @@ public class ContractListController extends HttpServlet {
         String taxcode = request.getParameter("customerTaxCode");
         String phone = request.getParameter("customerPhone");
         String email = request.getParameter("customerEmail");
+        
         // 2. validate page index
         int pageIndex = 1;
         try {

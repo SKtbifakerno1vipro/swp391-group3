@@ -106,57 +106,6 @@ public class ProductDAO extends DBContext {
         }
     }
 
-    public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status) {
-        List<Product> list = new ArrayList<>();
-        try {
-            String sql = """
-                         select * from product p join category c on p.category_id = c.category_id WHERE 1 = 1 and p.product_status = 'ACTIVE'
-                         """;
-            if (searchText != null && !searchText.trim().isEmpty()) {
-                sql += " and product_name LIKE ?";
-            }
-            if (categoryId != null && categoryId > 0) {
-                sql += " and p.category_id = ?";
-            }
-            if (status != null && !status.trim().isEmpty()) {
-                sql += " and p.product_status = ?";
-            }
-            if (sort != null && !sort.trim().isEmpty()) {
-                if(sort.equals("increase"))
-                sql += " \n order by p.selling_price";
-                else if(sort.equals("decrease")){
-                    sql += " \n order by p.selling_price desc";
-                } else if(sort.equals("default")){
-                    sql += " \n order by p.product_id";
-                } 
-            } else {
-                sql += " \n order by p.product_id";
-            }
-
-            PreparedStatement ps = connection.prepareStatement(sql);
-            int index = 1;
-            if (searchText != null && !searchText.trim().isEmpty()) {
-                ps.setString(index++, "%" + searchText + "%");
-            }
-            if (categoryId != null && categoryId != 0) {
-                ps.setInt(index++, categoryId);
-            }
-            
-             if (status != null && !status.trim().isEmpty()) {
-                ps.setString(index++, status);
-            }
-            
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Product p = mapResultSetToProduct(rs);
-                list.add(p);
-            }
-        } catch (Exception e) {
-            System.out.println("searchProduct: " + e.getMessage());
-        }
-        return list;
-    }
-
     public boolean deleteProduct(int productId){
         Product found = getProductById(productId);
         if (found == null) {

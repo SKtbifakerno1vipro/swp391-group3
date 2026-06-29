@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Contract {
 
@@ -175,7 +176,15 @@ public class Contract {
             java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
             return this.effectiveDate.format(formatter);
         }
-        return "";
+        return "N/A";
+    }
+
+    public String getFormattedCreatedAtDate() {
+        if (this.createdAt != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.createdAt.format(formatter);
+        }
+        return "N/A";
     }
 
 }

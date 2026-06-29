@@ -139,7 +139,7 @@ public class ContractService {
                 + "    </div>"
                 + "</body>"
                 + "</html>";
-        EmailUtils.sendEmail(customer.getEmail(), subject, content);
+        EmailUtils.sendEmailAsync(customer.getEmail(), subject, content);
     }
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
@@ -165,8 +165,8 @@ public class ContractService {
         return contractDAO.insert(c);
     }
 
-    public List<ContractHistory> getHistoriesByContractId(int contractId) {
-        return contractDAO.getHistoriesByContractId(contractId);
+    public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId) {
+        return contractDAO.getHistoriesByContractId(contractId, userId, roleId);
     }
 
     public int insertHistory(ContractHistory h) {

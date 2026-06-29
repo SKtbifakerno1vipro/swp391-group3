@@ -16,6 +16,7 @@ import service.UserService;
 import model.Signature;
 import java.util.List;
 import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 
 @WebServlet(name = "ExportPdfController", urlPatterns = {"/export-pdf"})
 public class ExportPdfController extends HttpServlet {
@@ -27,13 +28,9 @@ public class ExportPdfController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 1. Ép UTF-8 cho Request & Response
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-
         String idParam = request.getParameter("id");
         if (idParam == null) {
-            response.getWriter().write("Missing id parameter");
+            System.out.println("Missing id parameter");
             return;
         }
 
@@ -41,13 +38,13 @@ public class ExportPdfController extends HttpServlet {
         try {
             contractId = Integer.parseInt(idParam);
         } catch (Exception e) {
-            response.getWriter().write("Invalid id");
+            System.out.println("Invalid id");
             return;
         }
 
         Contract contract = contractDAO.getContractById(contractId);
         if (contract == null) {
-            response.getWriter().write("Contract not found");
+            System.out.println("Contract not found");
             return;
         }
 
@@ -59,12 +56,8 @@ public class ExportPdfController extends HttpServlet {
         if (!uploadDir.endsWith(File.separator)) {
             uploadDir += File.separator;
         }
-        String uploadsUrl = "file:///" + uploadDir.replace("\\", "/");
-        String html = rawContent.replaceAll("(src=[\\\"']?)File\\?name=([^\\\"'>]+)([\\\"']?)",
-                "$1" + uploadsUrl + "$2$3");
-        // Also replace any already‑converted /uploads/ URLs to file URIs for PDF rendering
-        html = html.replaceAll("(src=[\\\"']?)(?:.*/)?uploads/([^\\\"'>]+)([\\\"']?)",
-                "$1" + uploadsUrl + "$2$3");
+        String uploadsUrl = new File(uploadDir).toURI().toString();
+        String html = rawContent.replaceAll("(src=[\"']?)(?:File\\?name=|(?:.*/)?uploads/)([^\"'>]+)([\"']?)", "$1" + uploadsUrl + "$2$3");
 
         // --------------------------------------------------------
         // 2.3 Insert signature images into the HTML (same logic as the web view)
@@ -88,45 +81,29 @@ public class ExportPdfController extends HttpServlet {
                 html = html.replace("<div style=\"height: 100px;\" id=\"seller\"></div>", imgTag);
             }
         }
-        // --------------------------------------------------------
-        // 3. Chuẩn hóa XHTML cho openhtmltopdf
+
         String xhtml = html.replaceAll("<(br|hr|img|input|meta|link)([^>]*?)(?<!/)>", "<$1$2/>");
-
-
-        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
             PdfRendererBuilder builder = new PdfRendererBuilder();
-            // --- FIX FONT: Dùng font Times New Roman (hỗ trợ tiếng Việt) ---
-            try {
-                String[] fontPaths = {
-                    "assets/fonts/times.ttf", // Relative to web root (runtime)
-                    "d:/Desktop/swp_project/SWP_Group3/web/assets/fonts/times.ttf" // Absolute (IDE)
-                };
-                for (String path : fontPaths) {
-                    File fontFile = new File(path);
-                    if (fontFile.exists()) {
-                        builder.useFont(fontFile, "Times New Roman");
-                        break;
-                    }
-                }
-            } catch (Exception fontEx) {
-                // ignore, will use default font
-            }
-            // Fix base URI to be a proper HTTP URL for openhtmltopdf
-            String baseUri = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
-            System.out.println("Base URI for PDF: " + baseUri);
-            builder.withHtmlContent(xhtml, baseUri);
 
-            builder.toStream(baos);
-            System.out.println("Starting builder.run()...");
-            builder.run();
-            System.out.println("builder.run() completed successfully.");
+            File fontFile = new File(getServletContext().getRealPath("/assets/fonts/times.ttf"));
+//            System.out.println("check path"+getServletContext().getRealPath("/assets/fonts/times.ttf"));
+            if (fontFile.exists()) {
+                builder.useFont(fontFile, "Times New Roman");
+            }
+
+            String baseUri = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
+
+            builder.withHtmlContent(xhtml, baseUri)
+                    .toStream(baos)
+                    .run();
+
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
-            response.getWriter().write("LỖI KHI TẠO PDF:\n\n");
+            response.getWriter().write("LỖI KHI TẠO PDF:\n");
             e.printStackTrace(response.getWriter());
-            return;
         }
 
         // 5. Trả PDF về trình duyệt

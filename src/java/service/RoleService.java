@@ -13,6 +13,12 @@ public class RoleService {
         return roleDAO.getAllRoles();
     }
 
+    public List<Role> getAllRolesForCreateUser() {
+        List<Role> roles = roleDAO.getAllRoles();
+        roles.remove(2);
+        return roles;
+    }
+
     public Role getRoleById(int roleId) {
         return roleDAO.getRoleById(roleId);
     }
@@ -32,7 +38,6 @@ public class RoleService {
     public void updateRole(Role role) {
         roleDAO.updateRole(role);
     }
-
 
     public void updateRolePermissions(int roleId, List<Integer> permissionIds) {
         roleDAO.updateRolePermissions(roleId, permissionIds);

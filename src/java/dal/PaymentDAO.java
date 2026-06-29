@@ -268,10 +268,10 @@ public class PaymentDAO extends DBContext {
                 ps.setString(index++, status.trim());
             }
             if (hasStartDate) {
-                ps.setTimestamp(index++, Timestamp.valueOf(startDate.trim() + " 00:00:00"));
+                ps.setTimestamp(index++, parseDateTime(startDate, false));
             }
             if (hasEndDate) {
-                ps.setTimestamp(index++, Timestamp.valueOf(endDate.trim() + " 23:59:59"));
+                ps.setTimestamp(index++, parseDateTime(endDate, true));
             }
             if (hasMinAmount) {
                 ps.setBigDecimal(index++, minAmount);
@@ -375,10 +375,10 @@ public class PaymentDAO extends DBContext {
                 ps.setString(index++, status.trim());
             }
             if (hasStartDate) {
-                ps.setTimestamp(index++, Timestamp.valueOf(startDate.trim() + " 00:00:00"));
+                ps.setTimestamp(index++, parseDateTime(startDate, false));
             }
             if (hasEndDate) {
-                ps.setTimestamp(index++, Timestamp.valueOf(endDate.trim() + " 23:59:59"));
+                ps.setTimestamp(index++, parseDateTime(endDate, true));
             }
             if (hasMinAmount) {
                 ps.setBigDecimal(index++, minAmount);
@@ -395,5 +395,74 @@ public class PaymentDAO extends DBContext {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    // this is for realtime notification
+    public List<Payment> getPaymentsSince(Timestamp sinceTime, Integer customerUserId) {
+        List<Payment> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT p.*, c.contract_number, u.full_name as customer_name "
+                + "FROM payment p "
+                + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
+                + "LEFT JOIN [user] u ON p.created_by = u.user_id "
+                + "WHERE p.created_at > ? "
+        );
+        if (customerUserId != null) {
+            sql.append("AND p.created_by = ? ");
+        }
+        sql.append("ORDER BY p.created_at ASC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            ps.setTimestamp(1, sinceTime);
+            if (customerUserId != null) {
+                ps.setInt(2, customerUserId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Payment p = new Payment();
+                    p.setPaymentId(rs.getInt("payment_id"));
+                    p.setCustomerContractId(rs.getInt("customer_contract_id"));
+                    p.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
+                    p.setAmount(rs.getBigDecimal("amount"));
+                    p.setPaymentType(rs.getString("payment_type"));
+                    p.setPaymentStatus(rs.getString("payment_status"));
+                    if (rs.getTimestamp("paid_at") != null) {
+                        p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
+                    }
+                    p.setCreatedBy(rs.getObject("created_by") != null ? rs.getInt("created_by") : null);
+                    if (rs.getTimestamp("created_at") != null) {
+                        p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    }
+                    p.setContractNumber(rs.getString("contract_number"));
+                    p.setCustomerName(rs.getString("customer_name"));
+                    list.add(p);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    private Timestamp parseDateTime(String input, boolean isEnd) {
+        if (input == null || input.isBlank()) return null;
+        try {
+            String val = input.trim();
+            if (val.contains("T")) {
+                String formatted = val.replace("T", " ");
+                if (formatted.length() == 16) {
+                    formatted += ":00";
+                }
+                return Timestamp.valueOf(formatted);
+            } else {
+                if (isEnd) {
+                    return Timestamp.valueOf(val + " 23:59:59");
+                } else {
+                    return Timestamp.valueOf(val + " 00:00:00");
+                }
+            }
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

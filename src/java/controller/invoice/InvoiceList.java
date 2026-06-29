@@ -1,6 +1,7 @@
 package controller.invoice;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,6 +35,44 @@ public class InvoiceList extends HttpServlet {
         String errorInvoice = null;
         errorInvoice = (String)session.getAttribute("errorInvoice");
         session.removeAttribute("errorInvoice");
+
+        String searchBuyerName = request.getParameter("searchBuyerName");
+        String status = request.getParameter("status");
+        String type = request.getParameter("type");
+        String startDateRaw = request.getParameter("startDate");
+        String endDateRaw = request.getParameter("endDate");
+
+        if (searchBuyerName != null) {
+            searchBuyerName = searchBuyerName.trim();
+        }
+        if (status != null) {
+            status = status.trim();
+        }
+        if (type != null) {
+            type = type.trim();
+        }
+
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+        if (startDateRaw != null && !startDateRaw.trim().isEmpty()) {
+            try {
+                String sStr = startDateRaw.trim();
+                if (sStr.length() == 10) {
+                    sStr += "T00:00:00";
+                }
+                startDate = LocalDateTime.parse(sStr);
+            } catch (Exception ignored) {}
+        }
+        if (endDateRaw != null && !endDateRaw.trim().isEmpty()) {
+            try {
+                String eStr = endDateRaw.trim();
+                if (eStr.length() == 10) {
+                    eStr += "T23:59:59";
+                }
+                endDate = LocalDateTime.parse(eStr);
+            } catch (Exception ignored) {}
+        }
+
         String pageRaw = request.getParameter("page");
         int page = 1;
         if (pageRaw != null && !pageRaw.trim().isEmpty()) {
@@ -44,11 +83,11 @@ public class InvoiceList extends HttpServlet {
             }
         }
 
-        int totalRow = invoiceService.countInvoices();
+        int totalRow = invoiceService.countInvoices(searchBuyerName, status, type, startDate, endDate);
         int totalPage = productService.calculateTotalPage(totalRow, PAGE_SIZE);
         page = productService.nomalizePage(page, totalPage);
 
-        List<Invoice> list = invoiceService.getInvoices(totalRow, page, totalPage, PAGE_SIZE);
+        List<Invoice> list = invoiceService.getInvoices(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, PAGE_SIZE);
         
         request.setAttribute("invoices", list);
         request.setAttribute("errorInvoice", errorInvoice);
@@ -56,12 +95,30 @@ public class InvoiceList extends HttpServlet {
         request.setAttribute("totalPage", totalPage);
         request.setAttribute("totalRow", totalRow);
         
+        request.setAttribute("searchBuyerName", searchBuyerName);
+        request.setAttribute("status", status);
+        request.setAttribute("type", type);
+        request.setAttribute("startDate", startDateRaw);
+        request.setAttribute("endDate", endDateRaw);
+        
         request.getRequestDispatcher("/views/invoice/list.jsp").forward(request, response);
     } 
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+        String action = request.getParameter("action");
+        if ("cancel".equals(action)) {
+            String invoiceIdRaw = request.getParameter("invoiceId");
+            if (invoiceIdRaw != null && !invoiceIdRaw.trim().isEmpty()) {
+                try {
+                    int invoiceId = Integer.parseInt(invoiceIdRaw);
+                    invoiceService.updateInvoiceStatus(invoiceId, "CANCELED");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        response.sendRedirect(request.getContextPath() + "/invoice-list");
     }
 }

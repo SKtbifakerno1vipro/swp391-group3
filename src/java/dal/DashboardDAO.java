@@ -1,6 +1,10 @@
 package dal;
 
 import dto.ContractCustomerDTO;
+import dto.DashboardSummaryDTO;
+import dto.RoleStatisticDTO;
+import dto.StatusStatisticDTO;
+import dto.ActivityDTO;
 import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
@@ -445,6 +449,130 @@ public class DashboardDAO extends DBContext {
             System.out.println("countDraftContracts error: " + e.getMessage());
         }
         return 0;
+    }
+
+    // --- System Admin Dashboard Specific Methods ---
+
+    public int getTotalUsers() {
+        String sql = "SELECT COUNT(*) FROM [user]";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("getTotalUsers error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public int getTotalContracts() {
+        String sql = "SELECT COUNT(*) FROM customer_contract";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("getTotalContracts error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public int getTotalInvoices() {
+        String sql = "SELECT COUNT(*) FROM invoice";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("getTotalInvoices error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public List<RoleStatisticDTO> getUsersByRole() {
+        List<RoleStatisticDTO> list = new ArrayList<>();
+        String sql = "SELECT r.role_name, COUNT(*) AS total "
+                   + "FROM [user] u "
+                   + "JOIN role r ON u.role_id = r.role_id "
+                   + "GROUP BY r.role_name";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(new RoleStatisticDTO(
+                    rs.getString("role_name"),
+                    rs.getInt("total")
+                ));
+            }
+        } catch (Exception e) {
+            System.out.println("getUsersByRole error: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<StatusStatisticDTO> getContractsByStatus() {
+        List<StatusStatisticDTO> list = new ArrayList<>();
+        String sql = "SELECT contract_status, COUNT(*) AS total "
+                   + "FROM customer_contract "
+                   + "GROUP BY contract_status";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(new StatusStatisticDTO(
+                    rs.getString("contract_status"),
+                    rs.getInt("total")
+                ));
+            }
+        } catch (Exception e) {
+            System.out.println("getContractsByStatus error: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<StatusStatisticDTO> getOrdersByStatus() {
+        List<StatusStatisticDTO> list = new ArrayList<>();
+        String sql = "SELECT order_status, COUNT(*) AS total "
+                   + "FROM customer_order "
+                   + "GROUP BY order_status";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(new StatusStatisticDTO(
+                    rs.getString("order_status"),
+                    rs.getInt("total")
+                ));
+            }
+        } catch (Exception e) {
+            System.out.println("getOrdersByStatus error: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<ActivityDTO> getRecentActivities() {
+        List<ActivityDTO> list = new ArrayList<>();
+        String sql = "SELECT TOP 10 sal.created_at, u.full_name, sal.action_type, sal.affected_object, sal.description "
+                   + "FROM system_audit_log sal "
+                   + "LEFT JOIN [user] u ON sal.user_id = u.user_id "
+                   + "ORDER BY sal.created_at DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                java.sql.Timestamp ts = rs.getTimestamp("created_at");
+                java.time.LocalDateTime ldt = (ts != null) ? ts.toLocalDateTime() : null;
+                list.add(new ActivityDTO(
+                    ldt,
+                    rs.getString("full_name"),
+                    rs.getString("action_type"),
+                    rs.getString("affected_object"),
+                    rs.getString("description")
+                ));
+            }
+        } catch (Exception e) {
+            System.out.println("getRecentActivities error: " + e.getMessage());
+        }
+        return list;
     }
 
 }

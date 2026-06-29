@@ -416,4 +416,28 @@ public class CustomerDAO extends DBContext {
         }
         return null;
     }
+    // this is for realtime notification
+
+    public List<CustomerDTO> getCustomersSince(java.sql.Timestamp sinceTime) {
+        List<CustomerDTO> list = new ArrayList<>();
+        String sql = "SELECT c.customer_id, c.tax_code, c.customer_type, c.company_name, c.user_id, c.assigned_to_user_id, "
+                + "u.user_name, u.email, u.full_name, u.phone, u.gender, u.address, u.account_status, u.role_id, "
+                + "u.created_at, u.updated_at, u.created_by, u.updated_by "
+                + "FROM customer c "
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "WHERE u.created_at > ? "
+                + "ORDER BY u.created_at ASC";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setTimestamp(1, sinceTime);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                CustomerDTO dto = mapCustomerDTO(rs);
+                list.add(dto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
