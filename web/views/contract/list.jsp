@@ -58,6 +58,7 @@
                             <th>Storage Type</th>
                             <th>Tax Code</th>
                             <th>Phone</th>
+                            <th>Created At</th>
                             <th>Email</th>
                             <th>Actions</th>
                         </tr>
@@ -75,10 +76,11 @@
                                 <td>${c.storageType}</td>
                                 <td>${c.taxCode}</td>
                                 <td>${c.phone}</td>
+                                <td>${c.formattedCreatedAtDate}</td>
                                 <td>${c.email}</td>
                                 <td>
                                     <c:if test="${sessionScope.user.roleId==5}">
-                                        <c:if test="${c.contractStatus != 'SIGNED'}">
+                                        <c:if test="${c.contractStatus != 'SIGNED' && c.contractStatus !='APPROVED'}">
                                             <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |      
                                         </c:if>                    
                                     </c:if>

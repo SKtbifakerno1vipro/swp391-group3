@@ -89,6 +89,7 @@ public class ExportPdfController extends HttpServlet {
             PdfRendererBuilder builder = new PdfRendererBuilder();
 
             File fontFile = new File(getServletContext().getRealPath("/assets/fonts/times.ttf"));
+//            System.out.println("check path"+getServletContext().getRealPath("/assets/fonts/times.ttf"));
             if (fontFile.exists()) {
                 builder.useFont(fontFile, "Times New Roman");
             }

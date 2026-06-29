@@ -124,7 +124,7 @@ public class ContractSaveController extends HttpServlet {
             return;
         }
 
-        // --- UPDATE ---
+        //  UPDATE
         if (contractIdStr != null && !contractIdStr.isEmpty()) {
             int contractId = Integer.parseInt(contractIdStr);
             Contract c = contractService.getContractById(contractId);
@@ -139,13 +139,13 @@ public class ContractSaveController extends HttpServlet {
 
             if (updatecontractSucessful) {
                 if ("submit_for_review".equals(action)) {
-                    // Guard: only DRAFT and PENDING_REVIEW can submit_for_review
+                    // Guard: only DRAFT or PENDING_REVIEW can submit_for_review (officier -> manager)
                     if ("DRAFT".equals(c.getContractStatus()) || "PENDING_REVIEW".equals(c.getContractStatus())) {
                         contractService.updateStatus(contractId, "PENDING_REVIEW");
-                        insertHistory(c, "PENDING_REVIEW", "User submitted contract for manager review.", user.getUserId());
+                        insertHistory(c, "PENDING_REVIEW", "Admin officier submitted contract for manager review.", user.getUserId());
                         service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + c.getContractNumber() + " (ID: " + contractId + ")");
                     } else {
-                        // Status not DRAFT, cannot submit
+                        // Status not DRAFT or PENDING_REVIEW, cannot submit
                     }
                 } else {
                     insertHistory(c, c.getContractStatus(), "User saved contract content.", user.getUserId());
@@ -168,8 +168,7 @@ public class ContractSaveController extends HttpServlet {
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
             return;
         }
-
-        // Tạo mã hợp đồng ngay tại đây để gán vào object trước khi insert
+        
         String year = LocalDate.now()
                 .format(DateTimeFormatter.ofPattern("yyyy"));
         String newContractNumber = String.format("%03d", quotationId) + "/" + year + "-HĐ";

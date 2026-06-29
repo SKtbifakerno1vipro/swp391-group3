@@ -33,6 +33,7 @@ public class ContractDetailController extends HttpServlet {
 
         String token = request.getParameter("token");
         String contractIdRaw = request.getParameter("id");
+
         boolean isGuest = false;
 
         if (user == null) {
@@ -74,7 +75,7 @@ public class ContractDetailController extends HttpServlet {
                     List<ContractHistory> historyList = contractService.getHistoriesByContractId(id);
 
                     //nguyenkien - begin
-                    String finalHtml = contract.getContractContent();
+                    String finalHtml = (contract.getContractContent() != null) ? contract.getContractContent() : "Not have any contract";
                     String status = contract.getContractStatus();
                     boolean isApproved = "APPROVED".equals(status);
                     boolean isSigned = "SIGNED".equals(status);
@@ -115,7 +116,7 @@ public class ContractDetailController extends HttpServlet {
                     request.setAttribute("contract", contract);
                     request.setAttribute("historyList", historyList);
 
-                    // Set the status of contract 
+                    // Set status manager or customer can request edit
                     boolean canRequestEdit = "DRAFT".equals(status)
                             || "PENDING_REVIEW".equals(status);
                     boolean canCustomerCheck = "CUSTOMER_CHECK".equals(status);
@@ -148,7 +149,7 @@ public class ContractDetailController extends HttpServlet {
         }
 
         String action = request.getParameter("action");
-        
+
         int contractId = Integer.parseInt(request.getParameter("contractId"));
 
         // take contract with the id
