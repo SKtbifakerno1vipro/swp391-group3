@@ -13,7 +13,7 @@ public class EmailLogDAO extends DBContext {
     public EmailLogDAO() {
     }
 
-    public void insertLog(String recipient, String subject, String content, String status) {
+    public synchronized void insertLog(String recipient, String subject, String content, String status) {
         String sql = "INSERT INTO email_log (recipient, subject, content, status) VALUES (?, ?, ?, ?)";
         try {
             if (connection != null) {

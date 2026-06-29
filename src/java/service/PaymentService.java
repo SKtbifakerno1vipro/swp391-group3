@@ -77,15 +77,24 @@ public class PaymentService {
                 Contract ctr = contractDAO.getContractById(contractId);
                 if (ctr != null) {
                     QuotationDAO quotationDao = new QuotationDAO();
-                    List<QuotationDetail> qDetails = quotationDao.getQuotationDetailsByQuotationId(ctr.getQuotationId());
-                    double total = 0;
-                    for (QuotationDetail detail : qDetails) {
-                        total += detail.getAmount().doubleValue();
+                    model.Quotation quotation = quotationDao.getQuotationById(ctr.getQuotationId());
+                    BigDecimal total = (quotation != null && quotation.getTotalPrice() != null)
+                            ? quotation.getTotalPrice()
+                            : BigDecimal.ZERO;
+
+                    // Fallback to detail sum if total_price is zero or null (e.g., legacy or tool-generated data)
+                    if (total.compareTo(BigDecimal.ZERO) <= 0) {
+                        List<QuotationDetail> qDetails = quotationDao.getQuotationDetailsByQuotationId(ctr.getQuotationId());
+                        double detailSum = 0;
+                        for (QuotationDetail detail : qDetails) {
+                            detailSum += detail.getAmount().doubleValue();
+                        }
+                        total = BigDecimal.valueOf(detailSum);
                     }
                     
                     Payment payment = new Payment();
                     payment.setCustomerContractId(contractId);
-                    payment.setAmount(BigDecimal.valueOf(total));
+                    payment.setAmount(total);
                     payment.setPaymentType("VNPAY");
                     payment.setPaymentStatus("PENDING");
                     payment.setCreatedAt(LocalDateTime.now());
