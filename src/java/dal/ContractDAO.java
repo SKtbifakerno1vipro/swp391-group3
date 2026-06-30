@@ -41,7 +41,6 @@ public class ContractDAO extends DBContext {
         return -1;
     }
 
-
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
             String fromDate, String toDate, String taxCode, String phone, String email) {
@@ -360,8 +359,6 @@ public class ContractDAO extends DBContext {
         return false;
     }
 
-
-
     //nguyenkien - begin
     public boolean updateContractContent(int contractId, String contractContent) {
         String sql = "UPDATE customer_contract SET contract_content = ?, updated_at = GETDATE() WHERE customer_contract_id = ?";
@@ -465,7 +462,7 @@ public class ContractDAO extends DBContext {
         String sql = "UPDATE customer_contract SET contract_status = ? WHERE customer_contract_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, newStatus);
-            
+
             ps.setInt(2, contractId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -499,7 +496,6 @@ public class ContractDAO extends DBContext {
     }
 
     public BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
-
         String sql = """
                      SELECT SUM(
                          (quantity * selling_price) 
@@ -508,7 +504,6 @@ public class ContractDAO extends DBContext {
                      ) as total_amount
                      FROM quotation_detail 
                      WHERE quotation_id = ?""";
-        
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, quotationId);

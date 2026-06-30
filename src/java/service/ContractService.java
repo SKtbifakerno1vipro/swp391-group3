@@ -88,8 +88,7 @@ public class ContractService {
         template = template.replace("{contract_number}",
                 newContractNumber);
 
-        BigDecimal total = contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) != null
-                ? contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) : BigDecimal.ZERO;
+        BigDecimal total = q.getTotalAmount();
         template = template.replace("{total_amount}",
                 String.format("%,.0f", total));
 
@@ -188,8 +187,6 @@ public class ContractService {
     public Contract getContractByQuotationId(int quotationId) {
         return contractDAO.getContractByQuotationId(quotationId);
     }
-
-
 
     // nguyen kien - begin
     public boolean updateContractContent(int contractId, String contractContent) {
