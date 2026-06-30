@@ -42,4 +42,13 @@ public class CustomerOrderDetail {
         return (this.sellingPrice * this.quantity) * (this.discountPercent / 100.0);
     }
     
+    // Tính toán Total (incl. Tax)
+    public double getTotal() {
+        double subtotal = this.sellingPrice * this.quantity;
+        double discountAmount = getDiscount();
+        double taxableAmount = subtotal - discountAmount;
+        double taxAmount = taxableAmount * (this.taxPercent / 100.0);
+        return taxableAmount + taxAmount;
+    }
+    
 }

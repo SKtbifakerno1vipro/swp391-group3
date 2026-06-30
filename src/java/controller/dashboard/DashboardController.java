@@ -88,14 +88,13 @@ public class DashboardController extends HttpServlet {
         if (user.getRoleId() == 4) {
             UserId = user.getUserId();
         }
-
         request.setAttribute("user", user);
         request.setAttribute("totalCustomers", dashboardService.getTotalCustomers());
         request.setAttribute("totalProducts", dashboardService.getTotalProducts());
         request.setAttribute("totalQuotations", dashboardDAO.count("quotation"));
         request.setAttribute("totalContracts", dashboardDAO.count("customer_contract"));
         request.setAttribute("totalOrders", dashboardService.getTotalOrders());
-        request.setAttribute("totalRevenue", dashboardService.getTotalRevenue(UserId));
+        request.setAttribute("totalRevenue", dashboardService.getTotalRevenue(user.getRoleId()));
 
         request.setAttribute("quotationStatusCounts", dashboardDAO.countByStatus("quotation", "quotation_status"));
         request.setAttribute("contractStatusCounts", dashboardDAO.countByStatus("customer_contract", "contract_status"));
@@ -103,12 +102,7 @@ public class DashboardController extends HttpServlet {
 
         request.setAttribute("recentContracts", dashboardDAO.getRecentContracts(5));
         request.setAttribute("recentOrders", dashboardDAO.getRecentOrders(5));
-        if (user.getRoleId() == 3) {
-        request.getRequestDispatcher("/views/dashboard/admin-dashboard.jsp").forward(request, response);
-        }
-        if(user.getRoleId() == 4 || user.getRoleId() == 2){
-             request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
-        }
+        request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);    
     }
 
 }

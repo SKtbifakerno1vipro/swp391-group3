@@ -104,6 +104,30 @@ public class CustomerOrderController extends HttpServlet {
                 return;
             }
 
+            HttpSession session = request.getSession();
+            model.User currentUser = (model.User) session.getAttribute("user");
+            if (currentUser != null && order.getCustomer() != null) {
+                int roleId = currentUser.getRoleId();
+                int userId = currentUser.getUserId();
+                
+                service.RoleService roleService = new service.RoleService();
+                model.Role userRole = roleService.getRoleById(roleId);
+                String roleName = userRole != null ? userRole.getRoleName().toLowerCase() : "";
+                
+                if (roleName.contains("sale")) {
+                    Integer assignedTo = order.getCustomer().getAssignedToUserId();
+                    if (assignedTo == null || assignedTo != userId) {
+                        response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                        return;
+                    }
+                } else if (roleName.contains("customer")) {
+                    if (order.getCustomer().getUserId() == null || order.getCustomer().getUserId() != userId) {
+                        response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                        return;
+                    }
+                }
+            }
+
             List<CustomerOrderDTO> details = customerOrderService.getOrderDetails(orderId);
             
             // Fetch total from quotation
@@ -290,6 +314,13 @@ public class CustomerOrderController extends HttpServlet {
             throws IOException {
         int orderId = Integer.parseInt(request.getParameter("orderId"));
         String status = request.getParameter("status");
+        
+        dto.CustomerOrderDTO order = customerOrderService.getCustomerOrderById(orderId);
+        if (order != null && "COMPLETED".equals(order.getCustomerOrder().getOrderStatus())) {
+            response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
+            return;
+        }
+        
         customerOrderService.updateOrderStatus(orderId, status);
         
         HttpSession session = request.getSession();

@@ -38,20 +38,20 @@ public class CustomerOrderService {
         return customerOrderDAO.getAllCustomerOrdersByName(keyword);
     }
 
-    public int getTotalOrderCount() {
-        return customerOrderDAO.getTotalOrders();
+    public int getTotalOrderCount(int userId, String roleName) {
+        return customerOrderDAO.getTotalOrders(userId, roleName);
     }
 
-    public List<CustomerOrderDTO> getOrdersByPage(int page, int size, String sortBy, String sortOrder) {
-        return customerOrderDAO.getOrdersWithPaging(page, size, sortBy, sortOrder);
+    public List<CustomerOrderDTO> getOrdersByPage(int page, int size, String sortBy, String sortOrder, int userId, String roleName) {
+        return customerOrderDAO.getOrdersWithPaging(page, size, sortBy, sortOrder, userId, roleName);
     }
 
-    public int getTotalSearchCount(String keyword) {
-        return customerOrderDAO.getTotalOrdersBySearch(keyword);
+    public int getTotalSearchCount(String keyword, int userId, String roleName) {
+        return customerOrderDAO.getTotalOrdersBySearch(keyword, userId, roleName);
     }
 
-    public List<CustomerOrderDTO> searchOrdersByPage(String kw, int p, int s, String sortBy, String sortOrder) {
-        return customerOrderDAO.searchOrdersWithPaging(kw, p, s, sortBy, sortOrder);
+    public List<CustomerOrderDTO> searchOrdersByPage(String kw, int p, int s, String sortBy, String sortOrder, int userId, String roleName) {
+        return customerOrderDAO.searchOrdersWithPaging(kw, p, s, sortBy, sortOrder, userId, roleName);
     }
     public boolean updateOrderStatus(int orderId, String status) {
         return customerOrderDAO.updateOrderStatus(orderId, status);

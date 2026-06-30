@@ -190,11 +190,11 @@ public class DashboardDAO extends DBContext {
                 + "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id "
                 + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
                 + "WHERE co.order_status IN ('COMPLETED','DELIVERED', 'SHIPPING')";
-        if (userId != null) {
+        if (userId == 4) {
             sql += "AND co.created_by = ? ";
         }
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            if (userId != null) {
+            if (userId == 4) {
                 ps.setInt(1, userId);
             }
             ResultSet rs = ps.executeQuery();
