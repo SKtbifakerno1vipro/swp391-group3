@@ -61,141 +61,127 @@ public class DashboardDAO extends DBContext {
 
     }
 
-    public Map<String, Integer> countByStatus(String tableName, String statusColumn) {
-
+    public Map<String, Integer> countByStatus(String tableName, String statusColumn, Integer saleId) {
         Map<String, Integer> statusCounts = new LinkedHashMap<>();
-
-        String sql = "SELECT " + statusColumn + ", COUNT(*) AS total FROM " + tableName + " GROUP BY " + statusColumn;
-
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-
-                statusCounts.put(rs.getString(statusColumn), rs.getInt("total"));
-
-            }
-
-        } catch (Exception e) {
-
-            System.out.println("DashboardDAO countByStatus error: " + e.getMessage());
-
+        String sql = "SELECT " + tableName + "." + statusColumn + ", COUNT(*) AS total FROM " + tableName + " ";
+        if (saleId != null) {
+            sql += " LEFT JOIN customer c ON " + tableName + ".customer_id = c.customer_id ";
+            sql += " WHERE c.assigned_to_user_id = ? ";
         }
+        sql += " GROUP BY " + tableName + "." + statusColumn;
 
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            if (saleId != null) {
+                ps.setInt(1, saleId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    statusCounts.put(rs.getString(statusColumn), rs.getInt("total"));
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("DashboardDAO countByStatus error: " + e.getMessage());
+        }
         return statusCounts;
-
     }
 
     public List<Map<String, Object>> getRecentContracts(int limit) {
+        return getRecentContracts(limit, null);
+    }
 
+    public List<Map<String, Object>> getRecentContracts(int limit, Integer saleId) {
         List<Map<String, Object>> contracts = new ArrayList<>();
-
         String sql = "SELECT TOP (?) cc.customer_contract_id, cc.contract_number, cc.contract_status, cc.created_at, "
                 + "c.company_name, "
                 + "COALESCE(SUM(qd.quantity * qd.selling_price * (1 - COALESCE(qd.discount_percent, 0) / 100) "
                 + "* (1 + COALESCE(qd.tax_percent, 0) / 100)), 0) AS contract_value "
                 + "FROM customer_contract cc "
                 + "LEFT JOIN customer c ON cc.customer_id = c.customer_id "
-                + "LEFT JOIN quotation_detail qd ON cc.quotation_id = qd.quotation_id "
-                + "GROUP BY cc.customer_contract_id, cc.contract_number, cc.contract_status, cc.created_at, c.company_name "
+                + "LEFT JOIN quotation_detail qd ON cc.quotation_id = qd.quotation_id ";
+        if (saleId != null) {
+            sql += "WHERE c.assigned_to_user_id = ? ";
+        }
+        sql += "GROUP BY cc.customer_contract_id, cc.contract_number, cc.contract_status, cc.created_at, c.company_name "
                 + "ORDER BY cc.created_at DESC, cc.customer_contract_id DESC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-
             ps.setInt(1, limit);
-
-            try (ResultSet rs = ps.executeQuery()) {
-
-                while (rs.next()) {
-
-                    Map<String, Object> contract = new HashMap<>();
-
-                    contract.put("id", rs.getInt("customer_contract_id"));
-
-                    contract.put("contractNumber", rs.getString("contract_number"));
-
-                    contract.put("status", rs.getString("contract_status"));
-
-                    contract.put("createdAt", rs.getTimestamp("created_at"));
-
-                    contract.put("companyName", rs.getString("company_name"));
-
-                    contract.put("value", rs.getBigDecimal("contract_value"));
-
-                    contracts.add(contract);
-
-                }
-
+            if (saleId != null) {
+                ps.setInt(2, saleId);
             }
-
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> contract = new HashMap<>();
+                    contract.put("id", rs.getInt("customer_contract_id"));
+                    contract.put("contractNumber", rs.getString("contract_number"));
+                    contract.put("status", rs.getString("contract_status"));
+                    contract.put("createdAt", rs.getTimestamp("created_at"));
+                    contract.put("companyName", rs.getString("company_name"));
+                    contract.put("value", rs.getBigDecimal("contract_value"));
+                    contracts.add(contract);
+                }
+            }
         } catch (Exception e) {
-
             System.out.println("DashboardDAO getRecentContracts error: " + e.getMessage());
-
         }
-
         return contracts;
-
     }
 
     public List<Map<String, Object>> getRecentOrders(int limit) {
+        return getRecentOrders(limit, null);
+    }
 
+    public List<Map<String, Object>> getRecentOrders(int limit, Integer saleId) {
         List<Map<String, Object>> orders = new ArrayList<>();
-
         String sql = "SELECT TOP (?) co.customer_order_id, co.order_status, co.created_at, "
                 + "c.company_name, u.full_name "
                 + "FROM customer_order co "
                 + "LEFT JOIN customer c ON co.customer_id = c.customer_id "
-                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "ORDER BY co.created_at DESC, co.customer_order_id DESC";
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id ";
+        if (saleId != null) {
+            sql += "WHERE c.assigned_to_user_id = ? ";
+        }
+        sql += "ORDER BY co.created_at DESC, co.customer_order_id DESC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-
             ps.setInt(1, limit);
-
-            try (ResultSet rs = ps.executeQuery()) {
-
-                while (rs.next()) {
-
-                    Map<String, Object> order = new HashMap<>();
-
-                    order.put("id", rs.getInt("customer_order_id"));
-
-                    order.put("status", rs.getString("order_status"));
-
-                    order.put("createdAt", rs.getTimestamp("created_at"));
-
-                    order.put("companyName", rs.getString("company_name"));
-
-                    order.put("customerName", rs.getString("full_name"));
-
-                    orders.add(order);
-
-                }
-
+            if (saleId != null) {
+                ps.setInt(2, saleId);
             }
-
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> order = new HashMap<>();
+                    order.put("id", rs.getInt("customer_order_id"));
+                    order.put("status", rs.getString("order_status"));
+                    order.put("createdAt", rs.getTimestamp("created_at"));
+                    order.put("companyName", rs.getString("company_name"));
+                    order.put("customerName", rs.getString("full_name"));
+                    orders.add(order);
+                }
+            }
         } catch (Exception e) {
-
             System.out.println("DashboardDAO getRecentOrders error: " + e.getMessage());
-
         }
-
         return orders;
-
     }
 
-    public double getTotalRevenue(Integer userId) {
+    public double getTotalRevenue() {
+        return getTotalRevenue(null);
+    }
+
+    public double getTotalRevenue(Integer saleId) {
         String sql = "SELECT SUM(cod.quantity * cod.selling_price * (1 - COALESCE(qd.discount_percent, 0) / 100.0)) as total_revenue "
                 + "FROM customer_order_detail cod "
                 + "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id "
                 + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
-                + "WHERE co.order_status IN ('COMPLETED','DELIVERED', 'SHIPPING')";
-        if (userId != null) {
-            sql += "AND co.created_by = ? ";
+                + "LEFT JOIN customer c ON co.customer_id = c.customer_id "
+                + "WHERE co.order_status IN ('COMPLETED','DELIVERED', 'SHIPPING') ";
+        if (saleId != null) {
+            sql += "AND c.assigned_to_user_id = ? ";
         }
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            if (userId != null) {
-                ps.setInt(1, userId);
+            if (saleId != null) {
+                ps.setInt(1, saleId);
             }
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -208,8 +194,18 @@ public class DashboardDAO extends DBContext {
     }
 
     public int getTotalOrders() {
-        String sql = "SELECT COUNT(*) as total_orders FROM customer_order";
+        return getTotalOrders(null);
+    }
+
+    public int getTotalOrders(Integer saleId) {
+        String sql = "SELECT COUNT(*) as total_orders FROM customer_order co LEFT JOIN customer c ON co.customer_id = c.customer_id ";
+        if (saleId != null) {
+            sql += "WHERE c.assigned_to_user_id = ? ";
+        }
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            if (saleId != null) {
+                ps.setInt(1, saleId);
+            }
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("total_orders");
@@ -221,8 +217,18 @@ public class DashboardDAO extends DBContext {
     }
 
     public int getTotalCustomers() {
-        String sql = "SELECT COUNT(*) as total_customers FROM customer";
+        return getTotalCustomers(null);
+    }
+
+    public int getTotalCustomers(Integer saleId) {
+        String sql = "SELECT COUNT(*) as total_customers FROM customer ";
+        if (saleId != null) {
+            sql += "WHERE assigned_to_user_id = ? ";
+        }
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            if (saleId != null) {
+                ps.setInt(1, saleId);
+            }
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("total_customers");
@@ -243,6 +249,32 @@ public class DashboardDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return 0;
+    }
+    
+    public int getTotalQuotations(Integer saleId) {
+        String sql = "SELECT COUNT(*) FROM quotation q LEFT JOIN customer c ON q.customer_id = c.customer_id ";
+        if (saleId != null) {
+            sql += "WHERE c.assigned_to_user_id = ? ";
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            if (saleId != null) ps.setInt(1, saleId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    public int getTotalContracts(Integer saleId) {
+        String sql = "SELECT COUNT(*) FROM customer_contract cc LEFT JOIN customer c ON cc.customer_id = c.customer_id ";
+        if (saleId != null) {
+            sql += "WHERE c.assigned_to_user_id = ? ";
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            if (saleId != null) ps.setInt(1, saleId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
         return 0;
     }
 

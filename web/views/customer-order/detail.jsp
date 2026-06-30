@@ -41,12 +41,19 @@
                 <li><strong>Customer Name:</strong> ${order.customerUser.fullName}</li>
                 <li><strong>Tax Code:</strong> ${order.customer.taxCode}</li>
                 <li><strong>Status:</strong>
-                    <select name="status">
-                        <option value="PENDING" ${order.customerOrder.orderStatus == 'PENDING' ? 'selected' : ''}>PENDING</option>
-                        <option value="SHIPPING" ${order.customerOrder.orderStatus == 'SHIPPING' ? 'selected' : ''}>SHIPPING</option>
-                        <option value="COMPLETED" ${order.customerOrder.orderStatus == 'COMPLETED' ? 'selected' : ''}>COMPLETED</option>
-                    </select>
-                    <button type="submit">Update Status</button>
+                    <c:choose>
+                        <c:when test="${order.customerOrder.orderStatus == 'COMPLETED'}">
+                            <span style="font-weight: bold; color: #15803d; padding: 4px 10px; background-color: #dcfce7; border-radius: 999px; font-size: 13px;">COMPLETED</span>
+                        </c:when>
+                        <c:otherwise>
+                            <select name="status">
+                                <option value="PENDING" ${order.customerOrder.orderStatus == 'PENDING' ? 'selected' : ''}>PENDING</option>
+                                <option value="SHIPPING" ${order.customerOrder.orderStatus == 'SHIPPING' ? 'selected' : ''}>SHIPPING</option>
+                                <option value="COMPLETED" ${order.customerOrder.orderStatus == 'COMPLETED' ? 'selected' : ''}>COMPLETED</option>
+                            </select>
+                            <button type="submit">Update Status</button>
+                        </c:otherwise>
+                    </c:choose>
                 </li>
                 <c:if test="${order.customerOrder.orderStatus == 'COMPLETED'}">
                     <li style="margin-top: 15px;"><strong>Hành động:</strong>

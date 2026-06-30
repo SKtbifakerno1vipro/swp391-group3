@@ -15,12 +15,12 @@ public class DashboardService {
         return dashboardDAO.getTotalRevenue(userId);
     }
 
-    public int getTotalOrders() {
-        return dashboardDAO.getTotalOrders();
+    public int getTotalOrders(Integer userId) {
+        return dashboardDAO.getTotalOrders(userId);
     }
 
-    public int getTotalCustomers() {
-        return dashboardDAO.getTotalCustomers();
+    public int getTotalCustomers(Integer userId) {
+        return dashboardDAO.getTotalCustomers(userId);
     }
 
     public int getTotalProducts() {
