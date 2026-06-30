@@ -444,6 +444,43 @@ public class ContractDAO extends DBContext {
         return list;
     }
 
+    public List<ContractHistory> getContractHistoriesSince(Timestamp sinceTime) {
+        List<ContractHistory> list = new ArrayList<>();
+        String sql = "SELECT h.*, u.user_name, u.role_id AS changer_role_id, c.contract_number, cu.user_id AS customer_user_id "
+                + "FROM contract_edit_history h "
+                + "JOIN customer_contract c ON h.contract_id = c.customer_contract_id "
+                + "JOIN customer cu ON c.customer_id = cu.customer_id "
+                + "LEFT JOIN [user] u ON h.changed_by = u.user_id "
+                + "WHERE h.created_at > ? "
+                + "ORDER BY h.created_at ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, sinceTime);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ContractHistory h = new ContractHistory();
+                    h.setHistoryId(rs.getInt("history_id"));
+                    h.setContractId(rs.getInt("contract_id"));
+                    h.setFromStatus(rs.getString("from_status"));
+                    h.setToStatus(rs.getString("to_status"));
+                    h.setNote(rs.getString("note"));
+                    h.setChangedBy(rs.getObject("changed_by") != null ? rs.getInt("changed_by") : 0);
+                    h.setChangedByName(rs.getString("user_name"));
+                    // We temporarily store changer_role_id in EditStatus since it's a string, or just use Note. Let's add changerRoleId to ContractHistory model. Wait, I can just parse it into EditStatus.
+                    h.setEditStatus(rs.getString("changer_role_id"));
+                    if (rs.getTimestamp("created_at") != null) {
+                        h.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    }
+                    h.setContractNumber(rs.getString("contract_number"));
+                    h.setCustomerUserId(rs.getInt("customer_user_id"));
+                    list.add(h);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public int insertHistory(ContractHistory h) {
         String sql = "INSERT INTO contract_edit_history (contract_id, from_status, to_status, note, changed_by) VALUES (?,?,?,?,?)";
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
