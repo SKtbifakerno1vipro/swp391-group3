@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import service.ContractService;
+import service.QuotationService;
 import service.RoleService;
 import service.SignatureService;
 import service.UserService;
@@ -64,17 +65,22 @@ public class ContractDetailController extends HttpServlet {
         }
 
         String idStr = request.getParameter("id");
+        String quotationIdStr = request.getParameter("quotationId"); //quotation take from quotatuion detail
         boolean existSignature = false;
-        if (idStr != null && !idStr.isEmpty()) {
+
+        if ((idStr != null && !idStr.isEmpty()) || (quotationIdStr != null && !quotationIdStr.isEmpty())) {
             try {
-                int id = Integer.parseInt(idStr);
-                Contract contract = contractService.getContractById(id);
+
+                Contract contract = quotationIdStr != null
+                        ? contractService.getContractByQuotationId(Integer.parseInt(quotationIdStr))
+                        : contractService.getContractById(Integer.parseInt(idStr));
 
                 //check contract exist?
                 if (contract != null) {
+                    int contractId = contract.getContractId();
                     int userId = (user != null) ? user.getUserId() : 0;
                     int roleId = (user != null) ? user.getRoleId() : 0;
-                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(id, userId, roleId);
+                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(contractId, userId, roleId);
 
                     //nguyenkien - begin
                     String finalHtml = (contract.getContractContent() != null) ? contract.getContractContent() : "Not have any contract";
@@ -88,11 +94,11 @@ public class ContractDetailController extends HttpServlet {
                                 "$1" + uploadsUrl + "$2$3");
                         Signature existSign = null;
                         if (user != null) {
-                            existSign = sService.getSignatureByContractIdAndSignerId(id, user.getUserId());
+                            existSign = sService.getSignatureByContractIdAndSignerId(contractId, user.getUserId());
                         }
                         existSignature = (existSign != null);
                         request.setAttribute("signed", existSignature);
-                        List<Signature> sigList = sService.getSignaturesByContractId(id);
+                        List<Signature> sigList = sService.getSignaturesByContractId(contractId);
                         for (Signature sig : sigList) {
                             if (sig == null || sig.getSignerUserId() == null) {
                                 continue;
@@ -188,6 +194,7 @@ public class ContractDetailController extends HttpServlet {
                 item.setRevisionType("");
                 item.setRevisionDetail(note);
                 contractService.insertRevisionItem(item);
+
             }
 
             // update status of contract
@@ -204,7 +211,7 @@ public class ContractDetailController extends HttpServlet {
             // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
             contractService.noticeCustomerCheckContract(contractId, "http://localhost:9999/SWP391_GROUP3/");
-           
+
             // Save history work for manager approve contract
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
@@ -246,7 +253,7 @@ public class ContractDetailController extends HttpServlet {
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
-            
+
             contractService.updateStatus(contractId, "PENDING_REVIEW");
 
             // save work history for officer want manager check contract
