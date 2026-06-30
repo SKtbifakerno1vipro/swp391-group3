@@ -28,6 +28,7 @@
                 <span class="sidebar-text">Dashboard</span>
             </a>
             <c:choose>
+                
                 <c:when test="${sessionScope.user.roleId == 3}">
                     <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/customer/detail?id_cus=${sessionScope.customerId}" title="My Profile">
@@ -194,7 +195,7 @@
     </div>
 </aside>
 
-<!-- XHieu, this is realtime notification, contact me if you have a question-->
+<!--  this is realtime notification, contact XHieu if you have a question-->
 
 <c:if test="${not empty sessionScope.user}">
     <!-- Realtime Notification Toast Container -->
