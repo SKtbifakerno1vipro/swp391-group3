@@ -59,11 +59,9 @@ public class QuotationDAO extends DBContext {
         return list;
     }
 
-    public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate) {
-        return searchQuotations(searchText, status, fromDate, toDate, null);
-    }
 
-    public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate, Integer customerId) {
+    public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate, Integer saleId) {
+
         List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
                 + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
@@ -92,8 +90,10 @@ public class QuotationDAO extends DBContext {
             sql += " AND quotation.quotation_date <= ? ";
         }
 
-        if (customerId != null) {
-            sql += " AND quotation.customer_id = ? ";
+
+        if (saleId != null) {
+            sql += " AND customer.assigned_to_user_id = ? ";
+
         }
 
         sql += " ORDER BY quotation.quotation_date DESC";
@@ -114,8 +114,10 @@ public class QuotationDAO extends DBContext {
             if (toDate != null && !toDate.trim().isEmpty()) {
                 ps.setString(paramIndex++, toDate + " 23:59:59");
             }
-            if (customerId != null) {
-                ps.setInt(paramIndex++, customerId);
+
+            if (saleId != null) {
+                ps.setInt(paramIndex++, saleId);
+
             }
 
             ResultSet rs = ps.executeQuery();

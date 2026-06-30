@@ -44,10 +44,10 @@ public class AdminDashboardController extends HttpServlet {
 
         // Section 1: Summary Cards
         int totalUsers = dashboardDAO.getTotalUsers();
-        int totalCustomers = dashboardDAO.getTotalCustomers();
+        int totalCustomers = dashboardDAO.getTotalCustomers(null);
         int totalProducts = dashboardDAO.getTotalProducts();
         int totalContracts = dashboardDAO.getTotalContracts();
-        int totalOrders = dashboardDAO.getTotalOrders();
+        int totalOrders = dashboardDAO.getTotalOrders(null);
         int totalInvoices = dashboardDAO.getTotalInvoices();
 
         DashboardSummaryDTO summary = new DashboardSummaryDTO(

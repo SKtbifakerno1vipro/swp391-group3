@@ -24,12 +24,10 @@ public class QuotationService {
         return quotationDAO.getAllQuotations();
     }
 
-    public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate) {
-        return quotationDAO.searchQuotations(search, status, fromDate, toDate, null);
-    }
 
-    public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate, Integer customerId) {
-        return quotationDAO.searchQuotations(search, status, fromDate, toDate, customerId);
+    public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate, Integer saleId) {
+        return quotationDAO.searchQuotations(search, status, fromDate, toDate, saleId);
+
     }
 
     public List<CustomerDTO> getAllCustomers() {
