@@ -2,7 +2,9 @@ package controller.realtime;
 
 import dal.PaymentDAO;
 import dal.CustomerDAO;
+import dal.ContractDAO;
 import model.Payment;
+import model.ContractHistory;
 import model.User;
 import dto.CustomerDTO;
 import jakarta.servlet.ServletException;
@@ -22,6 +24,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
     
     private final PaymentDAO paymentDAO = new PaymentDAO();
     private final CustomerDAO customerDAO = new CustomerDAO();
+    private final ContractDAO contractDAO = new ContractDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -96,6 +99,79 @@ public class RealtimeNotificationServlet extends HttpServlet {
                     }
                 }
             }
+
+            // 3. Contract Workflow Notifications
+            List<ContractHistory> newHistories = contractDAO.getContractHistoriesSince(lastChecked);
+            for (ContractHistory h : newHistories) {
+                if (h.getCreatedAt() != null) {
+                    boolean shouldNotify = false;
+                    String title = "";
+                    String msg = "";
+                    String link = request.getContextPath() + "/contract-detail?id=" + h.getContractId();
+
+                    int changerRole = 0;
+                    try {
+                        if (h.getEditStatus() != null) changerRole = Integer.parseInt(h.getEditStatus());
+                    } catch(Exception ignored){}
+
+                    // A. Officer submits to Manager (DRAFT/PENDING_REVIEW -> PENDING_REVIEW by Officer)
+                    if ("PENDING_REVIEW".equals(h.getToStatus()) && changerRole == 5) {
+                        if (roleId == 2) { // Manager gets it
+                            shouldNotify = true;
+                            title = "Hợp đồng cần duyệt";
+                            msg = "Officer vừa gửi hợp đồng " + h.getContractNumber() + " để duyệt.";
+                        }
+                    }
+                    // B. Manager requests edit (-> PENDING_REVIEW by Manager)
+                    else if ("PENDING_REVIEW".equals(h.getToStatus()) && changerRole == 2) {
+                        if (roleId == 5) { // Officer gets it
+                            shouldNotify = true;
+                            title = "Yêu cầu sửa hợp đồng";
+                            msg = "Manager yêu cầu sửa hợp đồng " + h.getContractNumber() + ".";
+                        }
+                    }
+                    // C. Customer requests edit (-> PENDING_REVIEW by Customer)
+                    else if ("PENDING_REVIEW".equals(h.getToStatus()) && changerRole == 3) {
+                        if (roleId == 2 || roleId == 5) { // Manager & Officer get it
+                            shouldNotify = true;
+                            title = "Khách hàng yêu cầu sửa";
+                            msg = "Khách hàng yêu cầu sửa hợp đồng " + h.getContractNumber() + ".";
+                        }
+                    }
+                    // D. Manager approves (-> CUSTOMER_CHECK)
+                    else if ("CUSTOMER_CHECK".equals(h.getToStatus())) {
+                        if (roleId == 2) { // Manager
+                            shouldNotify = true;
+                            title = "Duyệt thành công";
+                            msg = "Đã gửi hợp đồng " + h.getContractNumber() + " cho khách hàng.";
+                        } else if (roleId == 3 && user.getUserId() == h.getCustomerUserId()) { // Customer
+                            shouldNotify = true;
+                            title = "Hợp đồng chờ ký";
+                            msg = "Hợp đồng " + h.getContractNumber() + " đã sẵn sàng. Vui lòng kiểm tra và ký.";
+                        }
+                    }
+                    // E. Customer approves/signs (-> APPROVED / SIGNED)
+                    else if (("APPROVED".equals(h.getToStatus()) || "SIGNED".equals(h.getToStatus())) && changerRole == 3) {
+                        if (roleId == 2 || roleId == 5) { // Manager & Officer
+                            shouldNotify = true;
+                            title = "Khách hàng đã chốt hợp đồng";
+                            msg = "Khách hàng đã chốt/ký hợp đồng " + h.getContractNumber() + ".";
+                        }
+                    }
+
+                    if (shouldNotify) {
+                        writer.write("event: notification\n");
+                        writer.write("data: {\"type\":\"info\",\"title\":\"" + escapeJson(title) + "\",\"message\":\"" + escapeJson(msg) + "\",\"link\":\"" + escapeJson(link) + "\"}\n\n");
+                    }
+
+                    Timestamp hTime = Timestamp.valueOf(h.getCreatedAt());
+                    Timestamp nextTime = new Timestamp(hTime.getTime() + 100);
+                    if (nextTime.after(lastChecked)) {
+                        lastChecked = nextTime;
+                    }
+                }
+            }
+
             writer.flush();
             response.flushBuffer();
 

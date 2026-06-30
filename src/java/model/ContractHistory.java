@@ -12,6 +12,11 @@ public class ContractHistory {
     private int changedBy;
     private String changedByName;
     private LocalDateTime createdAt;
+    
+    // Additional fields for realtime notifications
+    private int customerUserId;
+    private String contractNumber;
+
     private List<ContractRevisionItem> revisionItems;
 
     public ContractHistory() {
@@ -95,6 +100,22 @@ public class ContractHistory {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getCustomerUserId() {
+        return customerUserId;
+    }
+
+    public void setCustomerUserId(int customerUserId) {
+        this.customerUserId = customerUserId;
+    }
+
+    public String getContractNumber() {
+        return contractNumber;
+    }
+
+    public void setContractNumber(String contractNumber) {
+        this.contractNumber = contractNumber;
     }
 
     public List<ContractRevisionItem> getRevisionItems() {
