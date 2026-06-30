@@ -32,14 +32,26 @@ public class CustomerOrderListController extends HttpServlet {
         int pageSize = 10;
         List<CustomerOrderDTO> listOrder;
         int totalRecords;
+        
+        jakarta.servlet.http.HttpSession session = request.getSession();
+        model.User currentUser = (model.User) session.getAttribute("user");
+        int userId = 0;
+        String roleName = "";
+        if (currentUser != null) {
+            userId = currentUser.getUserId();
+            int roleId = currentUser.getRoleId();
+            service.RoleService roleService = new service.RoleService();
+            model.Role userRole = roleService.getRoleById(roleId);
+            roleName = userRole != null ? userRole.getRoleName() : "";
+        }
 
         if ("search".equals(action) && keyword != null && !keyword.trim().isEmpty()) {
             keyword = keyword.trim();           
-            listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize, sortBy, sortOrder);
-            totalRecords = customerOrderService.getTotalSearchCount(keyword);
+            listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize, sortBy, sortOrder, userId, roleName);
+            totalRecords = customerOrderService.getTotalSearchCount(keyword, userId, roleName);
         } else {
-            listOrder = customerOrderService.getOrdersByPage(pageIndex, pageSize, sortBy, sortOrder);
-            totalRecords = customerOrderService.getTotalOrderCount();
+            listOrder = customerOrderService.getOrdersByPage(pageIndex, pageSize, sortBy, sortOrder, userId, roleName);
+            totalRecords = customerOrderService.getTotalOrderCount(userId, roleName);
         }
 
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);

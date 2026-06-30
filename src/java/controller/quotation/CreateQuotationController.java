@@ -99,13 +99,23 @@ public class CreateQuotationController extends HttpServlet {
                     continue;
                 }
 
+                int requestedQty = Integer.parseInt(quantities[i]);
+                if (requestedQty > prod.getQuantityAvailable()) {
+                    request.setAttribute("error", "Sản phẩm '" + prod.getProductName()
+                            + "' không đủ số lượng trong kho. (Hiện tại trong kho chỉ còn "
+                            + prod.getQuantityAvailable() + " sản phẩm, nhưng bạn yêu cầu "
+                            + requestedQty + " sản phẩm).");
+                    doGet(request, response);
+                    return;
+                }
+
                 QuotationDetail detail = new QuotationDetail();
                 detail.setProductId(productId);
                 detail.setProductName(prod.getProductName());
                 detail.setUnit(prod.getUnit());
                 detail.setCostPrice(BigDecimal.valueOf(prod.getCostPrice()));
                 detail.setSellingPrice(BigDecimal.valueOf(prod.getSellingPrice()));
-                detail.setQuantity(Integer.parseInt(quantities[i]));
+                detail.setQuantity(requestedQty);
                 detail.setDiscountPercent(new BigDecimal(discountPercents[i]));
                 detail.setTaxPercent(new BigDecimal(taxPercents[i]));
 

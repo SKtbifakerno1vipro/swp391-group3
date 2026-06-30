@@ -4,6 +4,8 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import dal.EmailLogDAO;
 
 public class EmailUtils {
@@ -13,22 +15,15 @@ public class EmailUtils {
     private static final String HOSTNAME = "smtp.gmail.com";
     private static final String PORT = "587"; // Cổng TLS của Gmail
 
-    // Helper method to load email configuration from properties file
     private static Properties loadEmailProperties() {
         Properties props = new Properties();
-        try (InputStream input = EmailUtils.class.getClassLoader().getResourceAsStream("resources/EmailConfig.properties")) {
-            if (input != null) {
+        try {
+            // Lấy URL nơi chứa class file này khi chạy trên Web Server (đã build) (/WEB-INF/classes/)
+            java.io.File classesDir = new java.io.File(EmailUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            java.io.File webInfDir = classesDir.getParentFile();
+            java.io.File file = new java.io.File(webInfDir, "resources/EmailConfig.properties");
+            try (InputStream input = new java.io.FileInputStream(file)) {
                 props.load(input);
-                return props;
-            }
-        } catch (Exception ignored) {
-        }
-
-        try (InputStream input = EmailUtils.class.getClassLoader().getResourceAsStream("../../WEB-INF/EmailConfig.properties")) {
-            if (input != null) {
-                props.load(input);
-            } else {
-                System.out.println("[ERROR] EmailConfig.properties file not found!");
             }
         } catch (Exception e) {
             System.out.println("[ERROR] Failed to load EmailConfig.properties: " + e.getMessage());
@@ -37,7 +32,9 @@ public class EmailUtils {
         return props;
     }
 
-    public static boolean sendEmail(String toEmail, String subject, String content) {
+    private static final ExecutorService executor = Executors.newCachedThreadPool();
+
+    private static boolean sendEmailRaw(String toEmail, String subject, String content) throws Exception {
         // Read credentials from local properties file
         Properties config = loadEmailProperties();
         final String loginUser = config.getProperty("mail.smtp.user");
@@ -69,40 +66,63 @@ public class EmailUtils {
             }
         });
         session.setDebug(true);
-        try {
-            MimeMessage msg = new MimeMessage(session);
-            msg.addHeader("Content-Type", "text/html; charset=UTF-8");
 
-            // Đoi voi Gmail, senderEmail bat buoc phai trung khop voi loginUser (Email ca nhan cua ban)
-            msg.setFrom(new InternetAddress(senderEmail, senderName,"UTF-8"));
+        MimeMessage msg = new MimeMessage(session);
+        msg.addHeader("Content-Type", "text/html; charset=UTF-8");
 
-            msg.setSubject(subject, "UTF-8");
+        // Đoi voi Gmail, senderEmail bat buoc phai trung khop voi loginUser (Email ca nhan cua ban)
+        msg.setFrom(new InternetAddress(senderEmail, senderName,"UTF-8"));
 
-            
-            msg.setHeader("Content-Type", "text/html; charset=UTF-8");
-            msg.setHeader("Content-Transfer-Encoding", "quoted-printable");
-            
-            msg.setContent(content, "text/html; charset=UTF-8");
-            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
+        msg.setSubject(subject, "UTF-8");
 
-            System.out.println("[INFO] Attempting to send email to: " + toEmail);
-            Transport.send(msg);
-            System.out.println("[SUCCESS] Email sent successfully to: " + toEmail);
-            try {
-                emailLogDAO.insertLog(toEmail, subject, content, "SUCCESS");
-            } catch (Exception ex) {
-                System.out.println("[WARNING] Failed to write email log: " + ex.getMessage());
+        msg.setHeader("Content-Type", "text/html; charset=UTF-8");
+        msg.setHeader("Content-Transfer-Encoding", "quoted-printable");
+
+        msg.setContent(content, "text/html; charset=UTF-8");
+        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
+
+        System.out.println("[INFO] Attempting to send email to: " + toEmail);
+        Transport.send(msg);
+        return true;
+    }
+
+    public static void sendEmailAsync(final String toEmail, final String subject, final String content) {
+        executor.submit(() -> {
+            int maxRetries = 3;
+            int attempt = 0;
+            boolean sent = false;
+            while (attempt < maxRetries && !sent) {
+                attempt++;
+                try {
+                    System.out.println("[INFO] Async email send attempt " + attempt + " to: " + toEmail);
+                    sent = sendEmailRaw(toEmail, subject, content);
+                    if (sent) {
+                        System.out.println("[SUCCESS] Async email sent successfully to: " + toEmail);
+                        try {
+                            emailLogDAO.insertLog(toEmail, subject, content, "SUCCESS");
+                        } catch (Exception ex) {
+                            System.out.println("[WARNING] Failed to write email log: " + ex.getMessage());
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("[WARNING] Async email send attempt " + attempt + " failed for: " + toEmail + ". Error: " + e.getMessage());
+                    if (attempt >= maxRetries) {
+                        System.out.println("[SEVERE] Async email failed permanently after " + maxRetries + " attempts to: " + toEmail);
+                        try {
+                            emailLogDAO.insertLog(toEmail, subject, content, "FAILED");
+                        } catch (Exception ex) {
+                            System.out.println("[WARNING] Failed to write email log: " + ex.getMessage());
+                        }
+                    } else {
+                        try {
+                            Thread.sleep(5000); // Wait 5 seconds before retrying
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        }
+                    }
+                }
             }
-            return true;
-        } catch (Exception e) {
-            System.out.println("[SEVERE] Failed to send email to: " + toEmail + ". Error: " + e.getMessage());
-            e.printStackTrace();
-            try {
-                emailLogDAO.insertLog(toEmail, subject, content, "FAILED");
-            } catch (Exception ex) {
-                System.out.println("[WARNING] Failed to write email log: " + ex.getMessage());
-            }
-            return false;
-        }
+        });
     }
 }

@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import model.Invoice;
@@ -146,9 +147,30 @@ public class InvoiceDAO extends DBContext {
     }
 
     public List<Invoice> getInvoices(int totalRow, int page, int totalPage, int pageSize) {
+        return getInvoices(null, null, null, null, null, totalRow, page, totalPage, pageSize);
+    }
+
+    public List<Invoice> getInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, int totalRow, int page, int totalPage, int pageSize) {
         List<Invoice> list = new ArrayList<>();
         try {
             String sql = "select * from invoice WHERE 1 = 1";
+            if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
+                searchBuyerName = searchBuyerName.trim();
+                searchBuyerName.replaceAll("//s+", " ");
+                sql += " and buyer_name LIKE ?";
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                sql += " and invoice_status = ?";
+            }
+            if (type != null && !type.trim().isEmpty()) {
+                sql += " and invoice_type = ?";
+            }
+            if (startDate != null) {
+                sql += " and issue_date >= ?";
+            }
+            if (endDate != null) {
+                sql += " and issue_date <= ?";
+            }
             
             sql += " \n order by invoice_id desc";
 
@@ -160,6 +182,21 @@ public class InvoiceDAO extends DBContext {
             }
             PreparedStatement ps = connection.prepareStatement(sql);
             int index = 1;
+            if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
+                ps.setString(index++, "%" + searchBuyerName.trim() + "%");
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+            if (type != null && !type.trim().isEmpty()) {
+                ps.setString(index++, type);
+            }
+            if (startDate != null) {
+                ps.setTimestamp(index++, Timestamp.valueOf(startDate));
+            }
+            if (endDate != null) {
+                ps.setTimestamp(index++, Timestamp.valueOf(endDate));
+            }
 
             if ((page > 0 && page <= totalPage) && totalRow > 0) {
                 ps.setInt(index++, (int) ((page - 1) * pageSize));
@@ -177,9 +214,44 @@ public class InvoiceDAO extends DBContext {
     }
 
     public int countInvoices() {
+        return countInvoices(null, null, null, null, null);
+    }
+
+    public int countInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate) {
         try {
-            String sql = "select COUNT(*) as total from invoice";
+            String sql = "select COUNT(*) as total from invoice WHERE 1 = 1";
+            if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
+                sql += " and buyer_name LIKE ?";
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                sql += " and invoice_status = ?";
+            }
+            if (type != null && !type.trim().isEmpty()) {
+                sql += " and invoice_type = ?";
+            }
+            if (startDate != null) {
+                sql += " and issue_date >= ?";
+            }
+            if (endDate != null) {
+                sql += " and issue_date <= ?";
+            }
             PreparedStatement ps = connection.prepareStatement(sql);
+            int index = 1;
+            if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
+                ps.setString(index++, "%" + searchBuyerName.trim() + "%");
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+            if (type != null && !type.trim().isEmpty()) {
+                ps.setString(index++, type);
+            }
+            if (startDate != null) {
+                ps.setTimestamp(index++, Timestamp.valueOf(startDate));
+            }
+            if (endDate != null) {
+                ps.setTimestamp(index++, Timestamp.valueOf(endDate));
+            }
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("total");

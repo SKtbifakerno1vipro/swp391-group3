@@ -73,7 +73,7 @@
                 font-size: 0.9em;
                 border-radius: 0 8px 8px 0;
             }
-            
+
             .history-item {
                 border-bottom: 1px solid var(--line);
                 padding-bottom: 15px;
@@ -110,7 +110,7 @@
             .btn-secondary {
                 background: var(--muted) !important;
             }
-            
+
             @media (max-width: 900px) {
                 .layout-container {
                     grid-template-columns: 1fr;
@@ -149,45 +149,46 @@
     </head>
 
     <body>
-        <div class="dashboard-shell">
-            <jsp:include page="../shared/sidebar.jsp">
-                <jsp:param name="activeMenu" value="contracts" />
-            </jsp:include>
-            
+        <c:if test="${!isGuest}">
+            <div class="dashboard-shell">
+                <jsp:include page="../shared/sidebar.jsp">
+                    <jsp:param name="activeMenu" value="contracts" />
+                </jsp:include>
+            </c:if>
             <main class="main legacy-page">
                 <h2>No Contract: ${contract.contractNumber}</h2>
 
                 <div class="layout-container">
-                    <!-- COT 1: CONTENT (Left) -->
+                    <!-- COL 1: CONTENT (Left) -->
                     <div class="content-panel">
                         <c:if test="${errorSig != null}">
                             <div style="color: var(--danger); background: var(--danger-soft); padding: 10px; border-radius: 8px; margin-bottom: 15px;">${errorSig}</div>
                         </c:if>
-                        
+
                         <h3 style="margin-top: 0;">Content Details</h3>
                         <div style="background: var(--bg); padding: 15px; border: 1px solid var(--line); margin-bottom: 15px; border-radius: 12px;">
                             <p style="margin: 0 0 5px 0;"><strong>Customer:</strong> ${contract.customerName}</p>
                             <p style="margin: 0;"><strong>Storage type:</strong> ${contract.storageType}</p>
                         </div>
-                        
+
                         <div class="raw-content" style="border: 1px solid var(--line); padding: 20px; background: #fff; min-height: 500px; overflow-x: auto; border-radius: 12px;">
                             ${contract.contractContent}
                         </div>
                     </div>
 
-                    <!-- COT 2: ACTION + HISTORY (Right) -->
+                    <!-- COL 2: ACTION + HISTORY (Right) -->
                     <div class="right-panel">
-                        
+
                         <!-- ACTION BLOCK -->
                         <div class="action-section">
                             <h3 style="margin-top: 0;">Action For Contract</h3>
                             <p><strong>Status:</strong> <span style="color: var(--danger); font-weight: bold;">${contract.contractStatus}</span></p>
-                            
+
                             <c:choose>
                                 <c:when test="${isGuest}">
                                     <p style="color: var(--muted); font-size: 0.9em; line-height: 1.4; margin-top: 10px;">You need to login for request edit</p>
                                     <div class="action-btn-group">
-                                        <a href="login?redirect=contract-detail?id=${contract.contractId}" class="btn-full"><button type="button" style="width: 100%;">Đăng Nhập</button></a>
+                                        <a href="login?redirect=contract-detail?id=${contract.contractId}" class="btn-full"><button type="button" style="width: 100%;">Login</button></a>
                                     </div>
                                 </c:when>
                                 <c:otherwise>
@@ -255,44 +256,45 @@
                         <!-- TYPE NOTE BLOCK -->
                         <c:if test="${not isGuest && (( sessionScope.user.roleId == 2) || ( sessionScope.user.roleId == 3)) 
                                       && (contract.contractStatus== 'PENDING_REVIEW' ||contract.contractStatus== 'CUSTOMER_CHECK' ) }">
-                            <div class="type-note-section" style="margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 20px;">
-                                <h3 style="margin-top:0;">Type note</h3>
-                                <form method="POST" action="contract-detail" id="requestEditForm" style="background: none; border: none; box-shadow: none; padding: 0; margin: 0;">
-                                    <input type="hidden" name="action" value="request_edit" />
-                                    <input type="hidden" name="contractId" value="${contract.contractId}" />
-                                    <textarea name="revision_note" class="note-textarea" placeholder="Ex:&#10;price: change to 10000&#10;name: change to vtp neee" required></textarea>
-                                    <button type="submit" class="btn-tertiary" style="width: 100%;">Send note</button>
-                                </form>
-                            </div>
+                              <div class="type-note-section" style="margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 20px;">
+                                  <h3 style="margin-top:0;">Type note</h3>
+                                  <form method="POST" action="contract-detail" id="requestEditForm" style="background: none; border: none; box-shadow: none; padding: 0; margin: 0;">
+                                      <input type="hidden" name="action" value="request_edit" />
+                                      <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                      <textarea name="revision_note" class="note-textarea" placeholder="Ex:&#10;price: change to 10000&#10;name: change to vtp neee" required></textarea>
+                                      <button type="submit" class="btn-tertiary" style="width: 100%;">Send note</button>
+                                  </form>
+                              </div>
                         </c:if>
 
                         <!-- HISTORY BLOCK -->
-                        <div class="history-section">
-                            <h3 style="margin-top:0;">History request edit</h3>
-                            <c:choose>
-                                <c:when test="${not empty historyList}">
-                                    <c:forEach var="h" items="${historyList}">
-                                        <div class="history-item">
-                                            <p style="margin: 0 0 3px 0; color: var(--muted); font-size: 0.85em;">${h.getCreateTimeString()}</p>
-                                            <p style="margin: 0 0 3px 0; font-size: 0.9em;"><strong>Status:</strong> ${h.toStatus}</p>
-                                            <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>By:</strong> ${h.changedByName}</p>
-                                            <c:if test="${sessionScope.user.roleId == 5}">
-                                                <p style="margin: 0 0 5px 0; color: var(--danger); font-size: 0.9em;"><strong>Note:</strong> ${h.note}</p>
-                                            </c:if>
-                                            <c:if test="${not empty h.revisionItems}">
-                                                <c:forEach var="item" items="${h.revisionItems}">
-                                                    <div class="note-block">${item.revisionDetail}</div>
-                                                </c:forEach>
-                                            </c:if>
-                                        </div>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <p style="color: var(--muted); font-style: italic; font-size: 0.9em;">Not have any history</p>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-
+                        <c:if test="${!isGuest}">
+                            <div class="history-section">
+                                <h3 style="margin-top:0;">History request edit</h3>
+                                <c:choose>
+                                    <c:when test="${not empty historyList}">
+                                        <c:forEach var="h" items="${historyList}">
+                                            <div class="history-item">
+                                                <p style="margin: 0 0 3px 0; color: var(--muted); font-size: 0.85em;">${h.getCreateTimeString()}</p>
+                                                <p style="margin: 0 0 3px 0; font-size: 0.9em;"><strong>Status:</strong> ${h.toStatus}</p>
+                                                <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>By:</strong> ${h.changedByName}</p>
+                                                <c:if test="${sessionScope.user.roleId == 5}">
+                                                    <p style="margin: 0 0 5px 0; color: var(--danger); font-size: 0.9em;"><strong>Note:</strong> ${h.note}</p>
+                                                </c:if>
+                                                <c:if test="${not empty h.revisionItems}">
+                                                    <c:forEach var="item" items="${h.revisionItems}">
+                                                        <div class="note-block">${item.revisionDetail}</div>
+                                                    </c:forEach>
+                                                </c:if>
+                                            </div>
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <p style="color: var(--muted); font-style: italic; font-size: 0.9em;">Not have any history</p>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </c:if>
                     </div>
                 </div>
             </main>

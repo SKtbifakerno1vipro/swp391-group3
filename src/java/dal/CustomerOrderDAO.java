@@ -164,29 +164,6 @@ public class CustomerOrderDAO extends DBContext {
         return false;
     }
 
-    public boolean updateOrderDetailQuantity(int detailId, int quantity) {
-        String sql = "UPDATE customer_order_detail SET quantity = ? WHERE customer_order_detail_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, quantity);
-            ps.setInt(2, detailId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean deleteOrderDetail(int detailId) {
-        String sql = "DELETE FROM customer_order_detail WHERE customer_order_detail_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, detailId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public boolean deleteCustomerOrder(int orderId) {
         String deleteDetailsSql = "DELETE FROM customer_order_detail WHERE customer_order_id = ?";
         String deleteOrderSql = "DELETE FROM customer_order WHERE customer_order_id = ?";
@@ -274,8 +251,21 @@ public class CustomerOrderDAO extends DBContext {
         return list;
     }
 
-    public int getTotalOrders() {
-        String sql = "SELECT COUNT(*) FROM customer_order";
+    private String getRoleFilter(int userId, String roleName) {
+        if (userId > 0 && roleName != null) {
+            if (roleName.toLowerCase().contains("sale")) {
+                return " AND c.assigned_to_user_id = " + userId + " ";
+            } else if (roleName.toLowerCase().contains("customer")) {
+                return " AND c.user_id = " + userId + " ";
+            }
+        }
+        return "";
+    }
+
+    public int getTotalOrders(int userId, String roleName) {
+        String sql = "SELECT COUNT(*) FROM customer_order co " +
+                     "JOIN customer c ON co.customer_id = c.customer_id " +
+                     "WHERE 1=1 " + getRoleFilter(userId, roleName);
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -298,12 +288,14 @@ public class CustomerOrderDAO extends DBContext {
         return "ORDER BY " + col + " " + dir;
     }
 
-    public List<CustomerOrderDTO> getOrdersWithPaging(int pageIndex, int pageSize, String sortBy, String sortOrder) {
+    public List<CustomerOrderDTO> getOrdersWithPaging(int pageIndex, int pageSize, String sortBy, String sortOrder, int userId, String roleName) {
         List<CustomerOrderDTO> list = new ArrayList<>();
         String orderBy = getOrderByClause(sortBy, sortOrder);
+        String filter = getRoleFilter(userId, roleName);
         String sql = "SELECT co.*, c.tax_code, u.full_name FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "WHERE 1=1 " + filter
                 + orderBy + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (pageIndex - 1) * pageSize);
@@ -318,11 +310,11 @@ public class CustomerOrderDAO extends DBContext {
         return list;
     }
 
-    public int getTotalOrdersBySearch(String keyword) {
+    public int getTotalOrdersBySearch(String keyword, int userId, String roleName) {
         String sql = "SELECT COUNT(*) FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "WHERE u.full_name LIKE ? OR c.tax_code LIKE ?";
+                + "WHERE (u.full_name LIKE ? OR c.tax_code LIKE ?) " + getRoleFilter(userId, roleName);
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             String p = "%" + keyword + "%";
             ps.setString(1, p);
@@ -337,13 +329,14 @@ public class CustomerOrderDAO extends DBContext {
         return 0;
     }
 
-    public List<CustomerOrderDTO> searchOrdersWithPaging(String keyword, int pageIndex, int pageSize, String sortBy, String sortOrder) {
+    public List<CustomerOrderDTO> searchOrdersWithPaging(String keyword, int pageIndex, int pageSize, String sortBy, String sortOrder, int userId, String roleName) {
         List<CustomerOrderDTO> list = new ArrayList<>();
         String orderBy = getOrderByClause(sortBy, sortOrder);
+        String filter = getRoleFilter(userId, roleName);
         String sql = "SELECT co.*, c.tax_code, u.full_name FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "WHERE u.full_name LIKE ? OR c.tax_code LIKE ? "
+                + "WHERE (u.full_name LIKE ? OR c.tax_code LIKE ?) " + filter
                 + orderBy + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             String p = "%" + keyword + "%";

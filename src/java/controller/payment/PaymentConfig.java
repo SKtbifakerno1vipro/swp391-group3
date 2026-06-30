@@ -15,31 +15,18 @@ public class PaymentConfig {
 
     static {
         Properties props = new Properties();
-        boolean loaded = false;
-        try (InputStream input = PaymentConfig.class.getClassLoader().getResourceAsStream("resources/PaymentConfig.properties")) {
-            if (input != null) {
+        try {
+            java.io.File classesDir = new java.io.File(PaymentConfig.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            java.io.File webInfDir = classesDir.getParentFile();
+            java.io.File file = new java.io.File(webInfDir, "resources/PaymentConfig.properties");
+            try (InputStream input = new java.io.FileInputStream(file)) {
                 props.load(input);
                 vnp_PayUrl = props.getProperty("vnp_PayUrl");
                 vnp_TmnCode = props.getProperty("vnp_TmnCode");
                 vnp_HashSecret = props.getProperty("vnp_HashSecret");
-                loaded = true;
             }
-        } catch (Exception ignored) {
-        }
-
-        if (!loaded) {
-            try (InputStream input = PaymentConfig.class.getClassLoader().getResourceAsStream("../../WEB-INF/PaymentConfig.properties")) {
-                if (input != null) {
-                    props.load(input);
-                    vnp_PayUrl = props.getProperty("vnp_PayUrl");
-                    vnp_TmnCode = props.getProperty("vnp_TmnCode");
-                    vnp_HashSecret = props.getProperty("vnp_HashSecret");
-                } else {
-                    System.out.println("[ERROR] PaymentConfig.properties file not found!");
-                }
-            } catch (Exception e) {
-                System.out.println("[ERROR] Failed to load PaymentConfig.properties: " + e.getMessage());
-            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] Failed to load PaymentConfig.properties: " + e.getMessage());
         }
         // Kiểm tra tính hợp lệ của tham số cấu hình
         if (vnp_PayUrl == null || vnp_PayUrl.trim().isEmpty() ||

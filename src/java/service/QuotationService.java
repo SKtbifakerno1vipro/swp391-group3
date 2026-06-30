@@ -24,8 +24,8 @@ public class QuotationService {
         return quotationDAO.getAllQuotations();
     }
 
-    public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate) {
-        return quotationDAO.searchQuotations(search, status, fromDate, toDate);
+    public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate, Integer saleId) {
+        return quotationDAO.searchQuotations(search, status, fromDate, toDate, saleId);
     }
 
     public List<CustomerDTO> getAllCustomers() {
@@ -193,5 +193,9 @@ public class QuotationService {
 
     public boolean hasDraftQuotation(int customerId) {
         return quotationDAO.hasDraftQuotation(customerId);
+    }
+
+    public QuotationDetail getQuotationDetailByProduct(int quotationId, int productId) {
+        return quotationDAO.getQuotationDetailByProduct(quotationId, productId);
     }
 }

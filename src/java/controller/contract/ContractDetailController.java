@@ -33,6 +33,7 @@ public class ContractDetailController extends HttpServlet {
 
         String token = request.getParameter("token");
         String contractIdRaw = request.getParameter("id");
+
         boolean isGuest = false;
 
         if (user == null) {
@@ -71,10 +72,12 @@ public class ContractDetailController extends HttpServlet {
 
                 //check contract exist?
                 if (contract != null) {
-                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(id);
+                    int userId = (user != null) ? user.getUserId() : 0;
+                    int roleId = (user != null) ? user.getRoleId() : 0;
+                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(id, userId, roleId);
 
                     //nguyenkien - begin
-                    String finalHtml = contract.getContractContent();
+                    String finalHtml = (contract.getContractContent() != null) ? contract.getContractContent() : "Not have any contract";
                     String status = contract.getContractStatus();
                     boolean isApproved = "APPROVED".equals(status);
                     boolean isSigned = "SIGNED".equals(status);
@@ -115,7 +118,7 @@ public class ContractDetailController extends HttpServlet {
                     request.setAttribute("contract", contract);
                     request.setAttribute("historyList", historyList);
 
-                    // Set the status of contract 
+                    // Set status manager or customer can request edit
                     boolean canRequestEdit = "DRAFT".equals(status)
                             || "PENDING_REVIEW".equals(status);
                     boolean canCustomerCheck = "CUSTOMER_CHECK".equals(status);
@@ -148,7 +151,7 @@ public class ContractDetailController extends HttpServlet {
         }
 
         String action = request.getParameter("action");
-        
+
         int contractId = Integer.parseInt(request.getParameter("contractId"));
 
         // take contract with the id
@@ -169,7 +172,7 @@ public class ContractDetailController extends HttpServlet {
 
             String note = request.getParameter("revision_note");
 
-            // create history  with PENDING_REVIEW
+            // save work history  for customer or manager request edit
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
             h.setFromStatus(currentStatus);
@@ -177,7 +180,7 @@ public class ContractDetailController extends HttpServlet {
             h.setChangedBy(user.getUserId());
             int historyId = contractService.insertHistory(h);
 
-            //if have the content request edit then create revision history
+            //if manager or customer request edit then must insert revision item
             if (note != null && !note.trim().isEmpty() && historyId > 0) {
                 ContractRevisionItem item = new ContractRevisionItem();
                 item.setHistoryId(historyId);
@@ -201,39 +204,40 @@ public class ContractDetailController extends HttpServlet {
             // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
             contractService.noticeCustomerCheckContract(contractId, "http://localhost:9999/SWP391_GROUP3/");
-            // Lưu lịch sử
+           
+            // Save history work for manager approve contract
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("CUSTOMER_CHECK");
-            h.setNote("Manager đã phê duyệt hợp đồng. Chờ khách hàng kiểm tra.");
+            h.setNote("Manager had just approved contract. Waiting for customer check contract");
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
 
             response.sendRedirect("contract-detail?id=" + contractId);
 
-        } else if ("customer_approve".equals(action)) {
+        } else if ("customer_approve".equals(action)) { // if customer approve contract
             // BR: only CUSTOMER_CHECK can be approved by Customer
             if (!"CUSTOMER_CHECK".equals(contract.getContractStatus())) {
                 session.setAttribute("errorSig", "Contract must be in CUSTOMER_CHECK status before Customer can approve.");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
-            // Khách hàng đồng ý: Chuyển trạng thái sang APPROVED
+            // When customer approve, contract status will change to APPROVED
             contractService.updateStatus(contractId, "APPROVED");
 
-            // Lưu lịch sử
+            // Save history work for customer approve contract
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("APPROVED");
-            h.setNote("Khách hàng đã đồng ý với các điều khoản hợp đồng.");
+            h.setNote("Customer approved the contract.");
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
 
             response.sendRedirect("contract-detail?id=" + contractId);
 
-        } else if ("send_to_manager".equals(action)) {
+        } else if ("send_to_manager".equals(action)) { //if officier send to manager
             // BR: only DRAFT or PENDING_REVIEW can be sent to Manager
             String curStatus = contract.getContractStatus();
             if (!"DRAFT".equals(curStatus) && !"PENDING_REVIEW".equals(curStatus)) {
@@ -242,23 +246,22 @@ public class ContractDetailController extends HttpServlet {
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
-
-            // Cập nhật status
+            
             contractService.updateStatus(contractId, "PENDING_REVIEW");
 
-            // Lưu lịch sử
+            // save work history for officer want manager check contract
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("PENDING_REVIEW");
-            h.setNote("Admin Officer đã chỉnh sửa và gửi lại cho Manager.");
+            h.setNote("Admin Officer had just edited contract. Manager must check contract");
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
 
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else {
-            // Action không xác định
+            // Action not defined
             response.sendRedirect("contract-detail?id=" + contractId);
         }
     }

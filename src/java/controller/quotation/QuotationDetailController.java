@@ -89,18 +89,36 @@ public class QuotationDetailController extends HttpServlet {
                 int productId = Integer.parseInt(request.getParameter("productId"));
                 dal.ProductDAO productDAO = new dal.ProductDAO();
                 Product prod = productDAO.getProductById(productId);
-
-                QuotationDetail detail = new QuotationDetail();
-                if (prod != null) {
-                    detail.setProductId(productId);
-                    detail.setProductName(prod.getProductName());
-                    detail.setUnit(prod.getUnit());
-                    detail.setCostPrice(BigDecimal.valueOf(prod.getCostPrice()));
-                    detail.setSellingPrice(BigDecimal.valueOf(prod.getSellingPrice()));
+                if (prod == null) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
+                    return;
                 }
 
                 String qtyParam = request.getParameter("quantity");
-                detail.setQuantity(qtyParam != null && !qtyParam.isEmpty() ? Integer.parseInt(qtyParam) : 1);
+                int requestedQty = (qtyParam != null && !qtyParam.isEmpty()) ? Integer.parseInt(qtyParam) : 1;
+
+                // Check stock (considering already existing quantity in quotation)
+                int existingQty = 0;
+                QuotationDetail oldDetail = quotationService.getQuotationDetailByProduct(quotationId, productId);
+                if (oldDetail != null) {
+                    existingQty = oldDetail.getQuantity();
+                }
+                int totalRequestedQty = existingQty + requestedQty;
+
+                if (totalRequestedQty > prod.getQuantityAvailable()) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
+                            + "&message=stockError&stock=" + prod.getQuantityAvailable()
+                            + "&required=" + totalRequestedQty);
+                    return;
+                }
+
+                QuotationDetail detail = new QuotationDetail();
+                detail.setProductId(productId);
+                detail.setProductName(prod.getProductName());
+                detail.setUnit(prod.getUnit());
+                detail.setCostPrice(BigDecimal.valueOf(prod.getCostPrice()));
+                detail.setSellingPrice(BigDecimal.valueOf(prod.getSellingPrice()));
+                detail.setQuantity(requestedQty);
                 
                 String discountParam = request.getParameter("discountPercent");
                 detail.setDiscountPercent(discountParam != null && !discountParam.isEmpty() ? new BigDecimal(discountParam) : BigDecimal.ZERO);
@@ -131,6 +149,16 @@ public class QuotationDetailController extends HttpServlet {
                 QuotationDetail detail = buildDetailFromRequest(request);
                 detail.setQuotationDetailId(quotationDetailId);
                 detail.setQuotationId(quotationId);
+
+                // Check stock
+                dal.ProductDAO productDAO = new dal.ProductDAO();
+                Product prod = productDAO.getProductById(detail.getProductId());
+                if (prod != null && detail.getQuantity() > prod.getQuantityAvailable()) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
+                            + "&message=stockError&stock=" + prod.getQuantityAvailable()
+                            + "&required=" + detail.getQuantity());
+                    return;
+                }
 
                 boolean success = quotationService.updateQuotationDetail(detail, userId);
                 response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId

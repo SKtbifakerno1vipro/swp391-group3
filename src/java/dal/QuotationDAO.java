@@ -17,7 +17,7 @@ public class QuotationDAO extends DBContext {
     public List<Quotation> getAllQuotations() {
         List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
-                + "quotation.quotation_status, quotation.created_by, quotation.created_at, "
+                + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
                 + "customer.company_name, [user].user_name, "
                 + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract "
                 + "FROM quotation "
@@ -43,6 +43,7 @@ public class QuotationDAO extends DBContext {
                 quotation.setCustomerName(rs.getString("company_name"));
                 quotation.setCreatedByName(rs.getString("user_name"));
                 quotation.setHasContract(rs.getBoolean("has_contract"));
+                quotation.setTotalPrice(rs.getBigDecimal("total_price"));
                 list.add(quotation);
             }
         } catch (Exception e) {
@@ -51,10 +52,10 @@ public class QuotationDAO extends DBContext {
         return list;
     }
 
-    public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate) {
+    public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate, Integer saleId) {
         List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
-                + "quotation.quotation_status, quotation.created_by, quotation.created_at, "
+                + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
                 + "customer.company_name, [user].user_name, "
                 + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract "
                 + "FROM quotation "
@@ -79,6 +80,10 @@ public class QuotationDAO extends DBContext {
             sql += " AND quotation.quotation_date <= ? ";
         }
 
+        if (saleId != null) {
+            sql += " AND customer.assigned_to_user_id = ? ";
+        }
+
         sql += " ORDER BY quotation.quotation_date DESC";
 
         try {
@@ -97,6 +102,9 @@ public class QuotationDAO extends DBContext {
             if (toDate != null && !toDate.trim().isEmpty()) {
                 ps.setString(paramIndex++, toDate + " 23:59:59");
             }
+            if (saleId != null) {
+                ps.setInt(paramIndex++, saleId);
+            }
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -114,6 +122,7 @@ public class QuotationDAO extends DBContext {
                 quotation.setCustomerName(rs.getString("company_name"));
                 quotation.setCreatedByName(rs.getString("user_name"));
                 quotation.setHasContract(rs.getBoolean("has_contract"));
+                quotation.setTotalPrice(rs.getBigDecimal("total_price"));
                 list.add(quotation);
             }
         } catch (Exception e) {
@@ -149,7 +158,7 @@ public class QuotationDAO extends DBContext {
      */
     public Quotation getQuotationById(int quotationId) {
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
-                + "quotation.quotation_status, quotation.created_by, quotation.created_at, "
+                + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
                 + "customer.company_name, [user].user_name "
                 + "FROM quotation "
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
@@ -173,6 +182,7 @@ public class QuotationDAO extends DBContext {
                 }
                 quotation.setCustomerName(rs.getString("company_name"));
                 quotation.setCreatedByName(rs.getString("user_name"));
+                quotation.setTotalPrice(rs.getBigDecimal("total_price"));
                 return quotation;
             }
         } catch (Exception e) {
@@ -225,6 +235,9 @@ public class QuotationDAO extends DBContext {
             ps.setBigDecimal(9, detail.getTaxPercent());
 
             int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                updateQuotationTotalPrice(detail.getQuotationId());
+            }
             return affectedRows > 0;
         } catch (Exception e) {
             System.out.println("addQuotationDetail error: " + e.getMessage());
@@ -363,6 +376,9 @@ public class QuotationDAO extends DBContext {
             ps.setInt(5, detail.getQuotationDetailId());
 
             int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                updateQuotationTotalPrice(detail.getQuotationId());
+            }
             return affectedRows > 0;
         } catch (Exception e) {
             System.out.println("updateQuotationDetail error: " + e.getMessage());
@@ -386,6 +402,9 @@ public class QuotationDAO extends DBContext {
             ps.setInt(3, quotationId);
 
             int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                updateQuotationTotalPrice(quotationId);
+            }
             return affectedRows > 0;
         } catch (Exception e) {
             System.out.println("updateDiscountAndTaxForAll error: " + e.getMessage());
@@ -431,7 +450,7 @@ public class QuotationDAO extends DBContext {
     public List<Quotation> getQuotationsByCustomerId(int customerId) {
         List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
-                + "quotation.quotation_status, quotation.created_by, quotation.created_at, "
+                + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
                 + "customer.company_name, [user].user_name, "
                 + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract "
                 + "FROM quotation "
@@ -459,6 +478,7 @@ public class QuotationDAO extends DBContext {
                 quotation.setCustomerName(rs.getString("company_name"));
                 quotation.setCreatedByName(rs.getString("user_name"));
                 quotation.setHasContract(rs.getBoolean("has_contract"));
+                quotation.setTotalPrice(rs.getBigDecimal("total_price"));
                 list.add(quotation);
             }
         } catch (Exception e) {
@@ -472,19 +492,53 @@ public class QuotationDAO extends DBContext {
      * Xoa 1 dong san pham khoi quotation_detail.
      */
     public boolean deleteQuotationDetail(int quotationDetailId) {
-        String sql = "DELETE FROM quotation_detail WHERE quotation_detail_id = ?";
+        int quotationId = -1;
+        String getQuotationIdSql = "SELECT quotation_id FROM quotation_detail WHERE quotation_detail_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(getQuotationIdSql)) {
+            ps.setInt(1, quotationDetailId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    quotationId = rs.getInt("quotation_id");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error getting quotation_id before delete: " + e.getMessage());
+        }
 
+        String sql = "DELETE FROM quotation_detail WHERE quotation_detail_id = ?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, quotationDetailId);
 
             int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0 && quotationId != -1) {
+                updateQuotationTotalPrice(quotationId);
+            }
             return affectedRows > 0;
         } catch (Exception e) {
             System.out.println("deleteQuotationDetail error: " + e.getMessage());
         }
 
         return false;
+    }
+
+    public void updateQuotationTotalPrice(int quotationId) {
+        String sql = "UPDATE q "
+                + "SET q.total_price = COALESCE(("
+                + "    SELECT SUM("
+                + "        qd.quantity * qd.selling_price * (1.0 - COALESCE(qd.discount_percent, 0.0) / 100.0) * (1.0 + COALESCE(qd.tax_percent, 0.0) / 100.0)"
+                + "    ) "
+                + "    FROM quotation_detail qd "
+                + "    WHERE qd.quotation_id = q.quotation_id"
+                + "), 0.00) "
+                + "FROM quotation q "
+                + "WHERE q.quotation_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, quotationId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("updateQuotationTotalPrice error: " + e.getMessage());
+        }
     }
 
     public boolean hasDraftQuotation(int customerId) {

@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import model.*;
-import dal.*;
 import service.*;
 import dto.*;
 
@@ -28,6 +27,10 @@ public class DashboardController extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
+        if (user.getRoleId() == 1) {
+            response.sendRedirect(request.getContextPath() + "/admin-dashboard");
+            return;
+        }
         DashboardDAO dashboardDAO = new DashboardDAO();
         QuotationService quotationService = new QuotationService();
         CustomerService customerService = new CustomerService();
@@ -81,27 +84,30 @@ public class DashboardController extends HttpServlet {
 
         service.DashboardService dashboardService = new service.DashboardService();
 
-        Integer UserId = null;
-        if (user.getRoleId() == 4) {
-            UserId = user.getUserId();
+        service.RoleService roleService = new service.RoleService();
+        model.Role userRole = roleService.getRoleById(user.getRoleId());
+        String roleName = userRole != null ? userRole.getRoleName().toLowerCase() : "";
+
+        Integer saleId = null;
+        if (roleName.contains("sale")) {
+            saleId = user.getUserId();
         }
-
+        
         request.setAttribute("user", user);
-        request.setAttribute("totalCustomers", dashboardService.getTotalCustomers());
+        request.setAttribute("totalCustomers", dashboardService.getTotalCustomers(saleId));
         request.setAttribute("totalProducts", dashboardService.getTotalProducts());
-        request.setAttribute("totalQuotations", dashboardDAO.count("quotation"));
-        request.setAttribute("totalContracts", dashboardDAO.count("customer_contract"));
-        request.setAttribute("totalOrders", dashboardService.getTotalOrders());
-        request.setAttribute("totalRevenue", dashboardService.getTotalRevenue(UserId));
+        request.setAttribute("totalQuotations", dashboardDAO.getTotalQuotations(saleId));
+        request.setAttribute("totalContracts", dashboardDAO.getTotalContracts(saleId));
+        request.setAttribute("totalOrders", dashboardService.getTotalOrders(saleId));
+        request.setAttribute("totalRevenue", dashboardService.getTotalRevenue(saleId));
 
-        request.setAttribute("quotationStatusCounts", dashboardDAO.countByStatus("quotation", "quotation_status"));
-        request.setAttribute("contractStatusCounts", dashboardDAO.countByStatus("customer_contract", "contract_status"));
+        request.setAttribute("quotationStatusCounts", dashboardDAO.countByStatus("quotation", "quotation_status", saleId));
+        request.setAttribute("contractStatusCounts", dashboardDAO.countByStatus("customer_contract", "contract_status", saleId));
         request.setAttribute("orderStatusCounts", dashboardService.getOrderStatusStats());
 
-        request.setAttribute("recentContracts", dashboardDAO.getRecentContracts(5));
-        request.setAttribute("recentOrders", dashboardDAO.getRecentOrders(5));
-        request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
-
+        request.setAttribute("recentContracts", dashboardDAO.getRecentContracts(5, saleId));
+        request.setAttribute("recentOrders", dashboardDAO.getRecentOrders(5, saleId));
+        request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);       
     }
 
 }

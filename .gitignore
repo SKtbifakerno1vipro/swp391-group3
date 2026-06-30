@@ -38,14 +38,6 @@ Thumbs.db
 nbproject/
 nbproject/private/
 
-# email
-web/WEB-INF/EmailConfig.properties
-EmailConfig.properties
-
-# DBContext
-web/WEB-INF/ConnectDB.properties
-ConnectDB.properties
-
 # Resource
 resources/
 
