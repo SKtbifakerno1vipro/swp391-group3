@@ -9,10 +9,11 @@ public class RevenueDAO extends DBContext {
 
     public Map<String, Double> getRevenueByDay(String startDate, String endDate, Integer userId) {
         Map<String, Double> data = new LinkedHashMap<>();
-        String sql = "SELECT CAST(co.created_at AS DATE) as date, SUM(cod.quantity * cod.selling_price) as revenue " +
+        String sql = "SELECT CAST(co.created_at AS DATE) as date, SUM(cod.quantity * cod.selling_price * (1 - COALESCE(qd.discount_percent, 0) / 100.0)) as revenue " +
                      "FROM customer_order co " +
                      "JOIN customer_order_detail cod ON co.customer_order_id = cod.customer_order_id " +
-                     "WHERE co.order_status IN ('Completed', 'DELIVERED') ";
+                     "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id " +
+                     "WHERE co.order_status IN ('Completed', 'DELIVERED','SHIPPING') ";
         
         if (startDate != null && !startDate.isEmpty()) {
             sql += "AND co.created_at >= ? ";
@@ -49,10 +50,11 @@ public class RevenueDAO extends DBContext {
 
     public Map<String, Double> getRevenueByMonth(String startDate, String endDate, Integer userId) {
         Map<String, Double> data = new LinkedHashMap<>();
-        String sql = "SELECT FORMAT(co.created_at, 'yyyy-MM') as month, SUM(cod.quantity * cod.selling_price) as revenue " +
+        String sql = "SELECT FORMAT(co.created_at, 'yyyy-MM') as month, SUM(cod.quantity * cod.selling_price * (1 - COALESCE(qd.discount_percent, 0) / 100.0)) as revenue " +
                      "FROM customer_order co " +
                      "JOIN customer_order_detail cod ON co.customer_order_id = cod.customer_order_id " +
-                     "WHERE co.order_status IN ('Completed', 'DELIVERED') ";
+                     "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id " +
+                     "WHERE co.order_status IN ('Completed', 'DELIVERED','SHIPPING') ";
 
         if (startDate != null && !startDate.isEmpty()) {
             sql += "AND co.created_at >= ? ";
@@ -89,10 +91,11 @@ public class RevenueDAO extends DBContext {
 
     public Map<String, Double> getRevenueByYear(String startDate, String endDate, Integer userId) {
         Map<String, Double> data = new LinkedHashMap<>();
-        String sql = "SELECT YEAR(co.created_at) as year, SUM(cod.quantity * cod.selling_price) as revenue " +
+        String sql = "SELECT YEAR(co.created_at) as year, SUM(cod.quantity * cod.selling_price * (1 - COALESCE(qd.discount_percent, 0) / 100.0)) as revenue " +
                      "FROM customer_order co " +
                      "JOIN customer_order_detail cod ON co.customer_order_id = cod.customer_order_id " +
-                     "WHERE co.order_status IN ('Completed', 'DELIVERED') ";
+                     "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id " +
+                     "WHERE co.order_status IN ('Completed', 'DELIVERED','SHIPPING') ";
 
         if (startDate != null && !startDate.isEmpty()) {
             sql += "AND co.created_at >= ? ";

@@ -185,9 +185,10 @@ public class DashboardDAO extends DBContext {
     }
 
     public double getTotalRevenue(Integer userId) {
-        String sql = "SELECT SUM(cod.quantity * cod.selling_price) as total_revenue "
+        String sql = "SELECT SUM(cod.quantity * cod.selling_price * (1 - COALESCE(qd.discount_percent, 0) / 100.0)) as total_revenue "
                 + "FROM customer_order_detail cod "
                 + "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id "
+                + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
                 + "WHERE co.order_status IN ('COMPLETED','DELIVERED', 'SHIPPING')";
         if (userId != null) {
             sql += "AND co.created_by = ? ";
@@ -247,9 +248,10 @@ public class DashboardDAO extends DBContext {
 
     public Map<String, Double> getRevenueByMonth() {
         Map<String, Double> revenueMap = new LinkedHashMap<>();
-        String sql = "SELECT FORMAT(co.created_at, 'yyyy-MM') as month, SUM(cod.quantity * cod.selling_price) as revenue "
+        String sql = "SELECT FORMAT(co.created_at, 'yyyy-MM') as month, SUM(cod.quantity * cod.selling_price * (1 - COALESCE(qd.discount_percent, 0) / 100.0)) as revenue "
                 + "FROM customer_order_detail cod "
                 + "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id "
+                + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
                 + "WHERE co.order_status IN ('Completed', 'DELIVERED') "
                 + "GROUP BY FORMAT(co.created_at, 'yyyy-MM') "
                 + "ORDER BY month ASC";
@@ -305,10 +307,11 @@ public class DashboardDAO extends DBContext {
     public List<Map<String, Object>> getStaffPerformance() {
         List<Map<String, Object>> list = new ArrayList<>();
         String sql = "SELECT u.full_name, COUNT(DISTINCT co.customer_order_id) as total_orders, "
-                + "SUM(CASE WHEN co.order_status IN ('Completed', 'DELIVERED') THEN cod.quantity * cod.selling_price ELSE 0 END) as total_revenue "
+                + "SUM(CASE WHEN co.order_status IN ('Completed', 'DELIVERED') THEN cod.quantity * cod.selling_price * (1 - COALESCE(qd.discount_percent, 0) / 100.0) ELSE 0 END) as total_revenue "
                 + "FROM [user] u "
                 + "JOIN customer_order co ON u.user_id = co.created_by "
                 + "LEFT JOIN customer_order_detail cod ON co.customer_order_id = cod.customer_order_id "
+                + "LEFT JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
                 + "GROUP BY u.full_name "
                 + "ORDER BY total_revenue DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

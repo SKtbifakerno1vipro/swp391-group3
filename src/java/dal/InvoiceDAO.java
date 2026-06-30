@@ -155,6 +155,8 @@ public class InvoiceDAO extends DBContext {
         try {
             String sql = "select * from invoice WHERE 1 = 1";
             if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
+                searchBuyerName = searchBuyerName.trim();
+                searchBuyerName.replaceAll("//s+", " ");
                 sql += " and buyer_name LIKE ?";
             }
             if (status != null && !status.trim().isEmpty()) {

@@ -56,9 +56,6 @@ public class CustomerOrderService {
     public boolean updateOrderStatus(int orderId, String status) {
         return customerOrderDAO.updateOrderStatus(orderId, status);
     }
-    public boolean updateOrderDetailQuantity(int detailId, int quantity) {
-        return customerOrderDAO.updateOrderDetailQuantity(detailId, quantity);
-    }
     
     public boolean deleteCustomerOrder(int orderId) {
         return customerOrderDAO.deleteCustomerOrder(orderId);

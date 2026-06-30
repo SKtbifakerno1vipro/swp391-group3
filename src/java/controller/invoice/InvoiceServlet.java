@@ -134,9 +134,9 @@ public class InvoiceServlet extends HttpServlet {
             String buyerAddress = request.getParameter("buyerAddress");
             buyerPhone = request.getParameter("buyerPhone");
 
-            BigDecimal subTotal = new BigDecimal(request.getParameter("subTotal"));
-            BigDecimal taxAmount = new BigDecimal(request.getParameter("taxAmount"));
-            BigDecimal totalAmount = new BigDecimal(request.getParameter("totalAmount"));
+            BigDecimal subTotal = new BigDecimal(cleanNumberString(request.getParameter("subTotal")));
+            BigDecimal taxAmount = new BigDecimal(cleanNumberString(request.getParameter("taxAmount")));
+            BigDecimal totalAmount = new BigDecimal(cleanNumberString(request.getParameter("totalAmount")));
 
             String customerNote = request.getParameter("invoiceNotes");
             String internalNote = request.getParameter("internalNotes");
@@ -312,5 +312,13 @@ public class InvoiceServlet extends HttpServlet {
             }
             request.setAttribute("contract", contract);
         }
+    }
+
+    private String cleanNumberString(String value) {
+        if (value == null) {
+            return "0";
+        }
+        String cleaned = value.replaceAll("[,.\\s]", "");
+        return cleaned.isEmpty() ? "0" : cleaned;
     }
 }
