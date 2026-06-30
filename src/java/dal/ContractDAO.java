@@ -41,7 +41,6 @@ public class ContractDAO extends DBContext {
         return -1;
     }
 
-
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
             String fromDate, String toDate, String taxCode, String phone, String email) {
@@ -292,13 +291,32 @@ public class ContractDAO extends DBContext {
     }
 
     public Contract getContractByQuotationId(int quotationId) {
-        String sql = "SELECT * FROM customer_contract WHERE quotation_id = ?";
+        String sql = """
+                     SELECT *, cu.company_name FROM customer_contract  co 
+                      join dbo.customer cu on co.customer_id= cu.customer_id
+                      WHERE co.quotation_id = ?""";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, quotationId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Contract c = new Contract();
                     c.setContractId(rs.getInt("customer_contract_id"));
+                    c.setCustomerId(rs.getInt("customer_id"));
+                    c.setCustomerName(rs.getString("company_name"));
+                    c.setQuotationId(rs.getInt("quotation_id"));
+                    c.setContractNumber(rs.getString("contract_number"));
+                    c.setContractContent(rs.getString("contract_content"));
+                    c.setStorageType(rs.getString("storage_type"));
+                    c.setContractStatus(rs.getString("contract_status"));
+                    c.setCreatedBy(rs.getInt("created_by"));
+                    c.setUpdatedBy(rs.getInt("updated_by"));
+                    c.setToken(rs.getString("token"));
+                    if (rs.getTimestamp("created_at") != null) {
+                        c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    }
+                    if (rs.getTimestamp("updated_at") != null) {
+                        c.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                    }
                     return c;
                 }
             }
@@ -360,8 +378,6 @@ public class ContractDAO extends DBContext {
         return false;
     }
 
-
-
     //nguyenkien - begin
     public boolean updateContractContent(int contractId, String contractContent) {
         String sql = "UPDATE customer_contract SET contract_content = ?, updated_at = GETDATE() WHERE customer_contract_id = ?";
@@ -391,16 +407,25 @@ public class ContractDAO extends DBContext {
 
     //////////////////////////////detail contract
     // Lấy lịch sử và danh sách item liên quan
-    public List<ContractHistory> getHistoriesByContractId(int contractId) {
+    public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId) {
         List<ContractHistory> list = new ArrayList<>();
         String sql = "SELECT h.*, u.user_name "
                 + "FROM contract_edit_history h "
                 + " JOIN [user] u "
                 + "ON h.changed_by = u.user_id "
-                + "WHERE h.contract_id = ? "
-                + "ORDER BY h.created_at DESC";
+                + " JOIN customer_contract c ON h.contract_id = c.customer_contract_id "
+                + " JOIN customer cust ON c.customer_id = cust.customer_id "
+                + "WHERE h.contract_id = ? ";
+        if (userId != 0 && userId > 0 && roleId == 3) {
+            sql += " AND cust.user_id = ? AND u.role_id = 3 ";
+        }
+        sql += "ORDER BY h.created_at DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, contractId);
+            int index = 1;
+            ps.setInt(index++, contractId);
+            if (userId != 0 && userId > 0 && roleId == 3) {
+                ps.setInt(index++, userId);
+            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 ContractHistory h = new ContractHistory();
@@ -456,7 +481,7 @@ public class ContractDAO extends DBContext {
         String sql = "UPDATE customer_contract SET contract_status = ? WHERE customer_contract_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, newStatus);
-            
+
             ps.setInt(2, contractId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -490,7 +515,6 @@ public class ContractDAO extends DBContext {
     }
 
     public BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
-
         String sql = """
                      SELECT SUM(
                          (quantity * selling_price) 
@@ -499,7 +523,6 @@ public class ContractDAO extends DBContext {
                      ) as total_amount
                      FROM quotation_detail 
                      WHERE quotation_id = ?""";
-        
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, quotationId);

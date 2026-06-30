@@ -145,7 +145,7 @@ public class ContractSaveController extends HttpServlet {
                         insertHistoryForOfficier(c, "PENDING_REVIEW", "Admin officier submitted contract for manager review.", user.getUserId());
                         service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + c.getContractNumber() + " (ID: " + contractId + ")");
                     } else {
-                        // Status not DRAFT or PENDING_REVIEW, cannot submit
+                        System.out.println("Status not DRAFT or PENDING_REVIEW, cannot submit");
                     }
                 } else {
                     insertHistoryForOfficier(c, c.getContractStatus(), "User saved contract content.", user.getUserId());
@@ -163,6 +163,7 @@ public class ContractSaveController extends HttpServlet {
         int quotationId = Integer.parseInt(quotationIdStr);
         int customerId = Integer.parseInt(request.getParameter("customerId"));
 
+        //if existed one contract with quotation
         if (contractService.getContractByQuotationId(quotationId) != null) {
             request.setAttribute("errorMsg", "A contract for this quotation already exists!");
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);

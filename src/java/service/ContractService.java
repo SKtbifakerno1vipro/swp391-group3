@@ -88,8 +88,7 @@ public class ContractService {
         template = template.replace("{contract_number}",
                 newContractNumber);
 
-        BigDecimal total = contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) != null
-                ? contractDAO.calculateTotalAmountWithTaxAndDiscount(q.getQuotationId()) : BigDecimal.ZERO;
+        BigDecimal total = q.getTotalAmount();
         template = template.replace("{total_amount}",
                 String.format("%,.0f", total));
 
@@ -139,7 +138,7 @@ public class ContractService {
                 + "    </div>"
                 + "</body>"
                 + "</html>";
-        EmailUtils.sendEmailAsync(customer.getEmail(), subject, content);
+        EmailUtils.sendEmailAsync("omovie111@gmail.com", subject, content);
     }
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
@@ -165,8 +164,8 @@ public class ContractService {
         return contractDAO.insert(c);
     }
 
-    public List<ContractHistory> getHistoriesByContractId(int contractId) {
-        return contractDAO.getHistoriesByContractId(contractId);
+    public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId) {
+        return contractDAO.getHistoriesByContractId(contractId, userId, roleId);
     }
 
     public int insertHistory(ContractHistory h) {
@@ -188,8 +187,6 @@ public class ContractService {
     public Contract getContractByQuotationId(int quotationId) {
         return contractDAO.getContractByQuotationId(quotationId);
     }
-
-
 
     // nguyen kien - begin
     public boolean updateContractContent(int contractId, String contractContent) {

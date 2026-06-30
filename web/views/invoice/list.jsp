@@ -86,7 +86,7 @@
                                 <tr style="border: none;">
                                     <td style="border: none; padding: 5px;">Buyer Name:</td>
                                     <td style="border: none; padding: 5px;"><input type="text" name="searchBuyerName" value="${searchBuyerName}"></td>
-                                    
+
                                     <td style="border: none; padding: 5px; padding-left: 20px;">Status:</td>
                                     <td style="border: none; padding: 5px;">
                                         <select name="status">
@@ -96,7 +96,7 @@
                                             <option value="CANCELED" ${status == 'CANCELED' ? 'selected' : ''}>CANCELED</option>
                                         </select>
                                     </td>
-                                    
+
                                     <td style="border: none; padding: 5px; padding-left: 20px;">Type:</td>
                                     <td style="border: none; padding: 5px;">
                                         <select name="type">
@@ -109,10 +109,10 @@
                                 <tr style="border: none;">
                                     <td style="border: none; padding: 5px;">From Issue Date:</td>
                                     <td style="border: none; padding: 5px;"><input type="date" name="startDate" value="${startDate}"></td>
-                                    
+
                                     <td style="border: none; padding: 5px; padding-left: 20px;">To Issue Date:</td>
                                     <td style="border: none; padding: 5px;"><input type="date" name="endDate" value="${endDate}"></td>
-                                    
+
                                     <td colspan="2" style="border: none; padding: 5px; padding-left: 20px;">
                                         <input type="submit" value="Search" style="padding: 4px 12px;">
                                     </td>
@@ -158,17 +158,18 @@
                                                 ${i.invoiceStatus}
                                             </span>
                                         </td>
-                                        <td>
-                                            <a href="${pageContext.request.contextPath}/invoice?invoiceId=${i.invoiceId}">View</a>
-                                            <c:if test="${i.invoiceStatus != 'CANCELED'}">
-                                                |
-                                                <form action="${pageContext.request.contextPath}/invoice-list" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy hóa đơn này không?');">
-                                                    <input type="hidden" name="action" value="cancel">
-                                                    <input type="hidden" name="invoiceId" value="${i.invoiceId}">
-                                                    <input type="submit" value="Cancel" style="padding: 2px 6px; font-size: 11px;">
-                                                </form>
-                                            </c:if>
-                                        </td>
+                                         <td style="white-space: nowrap; vertical-align: middle;">
+                                             <div style="display: inline-flex; gap: 8px; align-items: center;">
+                                                 <a href="${pageContext.request.contextPath}/invoice?invoiceId=${i.invoiceId}" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">View</a>
+                                                 <c:if test="${i.invoiceStatus != 'CANCELED'}">
+                                                     <form action="${pageContext.request.contextPath}/invoice-list" method="post" style="display: inline; margin: 0; padding: 0; background: none; border: none; box-shadow: none;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy hóa đơn này không?');">
+                                                         <input type="hidden" name="action" value="cancel">
+                                                         <input type="hidden" name="invoiceId" value="${i.invoiceId}">
+                                                         <input type="submit" value="Cancel" style="padding: 4px 10px; font-size: 11px; background-color: var(--danger-soft); color: var(--danger); border: none; border-radius: 6px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-width: 50px; line-height: normal;">
+                                                     </form>
+                                                 </c:if>
+                                             </div>
+                                         </td>
                                     </tr>
                                 </c:forEach>
                             </table>

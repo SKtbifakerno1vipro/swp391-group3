@@ -5,16 +5,18 @@ public class QuotationHistory {
     private int quotationHistoryId;
     private int quotationId;
     private Integer createdBy; // Integer cho phep null, int thi khong.
+    private String createdByName; // Store user name
     private LocalDateTime createdAt;
     private String editHistory;
     
     public QuotationHistory(){   
     }
     
-    public QuotationHistory(int quotationHistoryId, int quotationId, Integer createdBy, LocalDateTime createdAt, String editHistory) {
+    public QuotationHistory(int quotationHistoryId, int quotationId, Integer createdBy, String createdByName, LocalDateTime createdAt, String editHistory) {
         this.quotationHistoryId = quotationHistoryId;
         this.quotationId = quotationId;
         this.createdBy = createdBy;
+        this.createdByName = createdByName;
         this.createdAt = createdAt;
         this.editHistory = editHistory;
     }
@@ -59,6 +61,12 @@ public class QuotationHistory {
         this.editHistory = editHistory;
     }
     
-    
+    public String getCreatedByName() {
+        return createdByName;
+    }
+
+    public void setCreatedByName(String createdByName) {
+        this.createdByName = createdByName;
+    }
 }
 

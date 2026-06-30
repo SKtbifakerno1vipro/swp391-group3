@@ -111,4 +111,8 @@ public class ContractCustomerDTO {
         }
         return "N/A";
     }
+
+    public String getFormattedCreatedAt() {
+        return getFormattedCreatedAtDate();
+    }
 }

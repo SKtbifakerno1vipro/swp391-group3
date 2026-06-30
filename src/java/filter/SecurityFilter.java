@@ -109,9 +109,12 @@ public class SecurityFilter implements Filter {
 
     private static final List<String> CUSTOMER_URLS = List.of(
             "/dashboard",
+            "/quotation-list",
             "/quotation-detail",
+            "/contract-list",
             "/contract-detail",
             "/customer/detail",
+            "/customer-order-list",
             "/payment",
             "/payment/list",
             "/payment/detail"

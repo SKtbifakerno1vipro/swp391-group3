@@ -103,8 +103,12 @@ public class DashboardController extends HttpServlet {
 
         request.setAttribute("recentContracts", dashboardDAO.getRecentContracts(5));
         request.setAttribute("recentOrders", dashboardDAO.getRecentOrders(5));
+        if (user.getRoleId() == 3) {
         request.getRequestDispatcher("/views/dashboard/admin-dashboard.jsp").forward(request, response);
-
+        }
+        if(user.getRoleId() == 4 || user.getRoleId() == 2){
+             request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
+        }
     }
 
 }

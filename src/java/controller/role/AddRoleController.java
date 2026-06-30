@@ -30,6 +30,7 @@ public class AddRoleController extends HttpServlet {
             throws ServletException, IOException {
         try {
             request.setCharacterEncoding("UTF-8");
+            response.setCharacterEncoding("UTF-8");
 
             // Lay role name
             String roleName = request.getParameter("roleName");
