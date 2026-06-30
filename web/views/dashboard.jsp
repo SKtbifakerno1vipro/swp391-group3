@@ -524,11 +524,11 @@
                     <div><p class="eyebrow">Sales Performance Dashboard</p><h1>Welcome back, <c:out value="${user.fullName}"/>.</h1><p>Overview of sales activity, revenue trends, and key performance indicators.</p></div><div class="top-actions"><a class="button" href="${pageContext.request.contextPath}/product-list"><span class="material-symbols-outlined">inventory_2</span>Products</a><a class="button primary" href="${pageContext.request.contextPath}/customer-order-list"><span class="material-symbols-outlined">shopping_cart</span>Orders</a></div></section>
 
                 <section class="metric-grid" aria-label="Dashboard metrics">
-                    <div class="metric-card info">
+                    <a class="metric-card info" href="${pageContext.request.contextPath}/revenue-report">
                         <div class="metric-icon"><span class="material-symbols-outlined">payments</span></div>
                         <p class="metric-value"><fmt:formatNumber value="${totalRevenue}" pattern="#,##0"/> ₫</p>
                         <p class="metric-label">Total Revenue</p>
-                    </div>
+                    </a>
                     <a class="metric-card" href="${pageContext.request.contextPath}/customer/list">
                         <div class="metric-icon"><span class="material-symbols-outlined">groups</span></div>
                         <p class="metric-value"><c:out value="${totalCustomers}"/></p>
