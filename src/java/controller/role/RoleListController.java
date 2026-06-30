@@ -1,6 +1,6 @@
 package controller.role;
 
-import dal.RoleDAO;
+import service.RoleService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,13 +14,13 @@ import model.Role;
 @WebServlet(name = "RoleListController", urlPatterns = {"/role-list"})
 public class RoleListController extends HttpServlet {
 
-    private final RoleDAO roleDAO = new RoleDAO();
+    private final RoleService roleService = new RoleService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        
+        response.setCharacterEncoding("UTF-8");
         // chuc nang cua searchtext
         String searchText = request.getParameter("search");
         if (searchText != null) {
@@ -30,11 +30,11 @@ public class RoleListController extends HttpServlet {
         List<Role> roles;
         // neu searchtext khong null va ko rong thi thuc hien chuc nang cua search role
         if (searchText != null && !searchText.isBlank()) {
-            roles = roleDAO.searchRole(searchText);
+            roles = roleService.searchRoles(searchText);
         }
         //neu khong thi van hien thi getAllRoles 
         else {
-            roles = roleDAO.getAllRoles();
+            roles = roleService.getAllRoles();
         }
         //chuc nang chia trang, 1 trang size bao nhieu
         int page = 1;
