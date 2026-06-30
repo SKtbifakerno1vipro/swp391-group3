@@ -16,6 +16,8 @@ public class QuotationListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         String searchText = request.getParameter("search");
         if (searchText != null) {
             searchText = searchText.trim().replaceAll("\\s+", " ");
@@ -25,8 +27,25 @@ public class QuotationListController extends HttpServlet {
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
         
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        model.User user = (session != null) ? (model.User) session.getAttribute("user") : null;
+        Integer customerId = null;
+        if (user != null && user.getRoleId() == 3) {
+            Object sessionCusId = session.getAttribute("customerId");
+            if (sessionCusId != null) {
+                customerId = (Integer) sessionCusId;
+            } else {
+                service.CustomerService customerService = new service.CustomerService();
+                dto.CustomerDTO customer = customerService.getCustomerDTOByUserId(user.getUserId());
+                if (customer != null) {
+                    customerId = customer.getCustomerId();
+                    session.setAttribute("customerId", customerId);
+                }
+            }
+        }
+
         QuotationService quotationService = new QuotationService();
-        List<Quotation> quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate);
+        List<Quotation> quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate, customerId);
 
         // Pagination
         int page = 1;

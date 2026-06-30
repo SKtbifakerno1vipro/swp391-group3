@@ -19,7 +19,8 @@ public class QuotationDAO extends DBContext {
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
                 + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
                 + "customer.company_name, [user].user_name, "
-                + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract "
+                + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract, "
+                + "customer_contract.customer_contract_id AS contract_id "
                 + "FROM quotation "
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
                 + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
@@ -38,12 +39,18 @@ public class QuotationDAO extends DBContext {
                 quotation.setQuotationStatus(rs.getString("quotation_status"));
                 quotation.setCreatedBy(rs.getInt("created_by"));
                 if (rs.getTimestamp("created_at") != null) {
-                quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 }
                 quotation.setCustomerName(rs.getString("company_name"));
                 quotation.setCreatedByName(rs.getString("user_name"));
                 quotation.setHasContract(rs.getBoolean("has_contract"));
                 quotation.setTotalPrice(rs.getBigDecimal("total_price"));
+                
+                int contractId = rs.getInt("contract_id");
+                if (!rs.wasNull()) {
+                    quotation.setContractId(contractId);
+                }
+                
                 list.add(quotation);
             }
         } catch (Exception e) {
@@ -53,11 +60,16 @@ public class QuotationDAO extends DBContext {
     }
 
     public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate) {
+        return searchQuotations(searchText, status, fromDate, toDate, null);
+    }
+
+    public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate, Integer customerId) {
         List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
                 + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
                 + "customer.company_name, [user].user_name, "
-                + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract "
+                + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract, "
+                + "customer_contract.customer_contract_id AS contract_id "
                 + "FROM quotation "
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
                 + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
@@ -80,6 +92,10 @@ public class QuotationDAO extends DBContext {
             sql += " AND quotation.quotation_date <= ? ";
         }
 
+        if (customerId != null) {
+            sql += " AND quotation.customer_id = ? ";
+        }
+
         sql += " ORDER BY quotation.quotation_date DESC";
 
         try {
@@ -98,6 +114,9 @@ public class QuotationDAO extends DBContext {
             if (toDate != null && !toDate.trim().isEmpty()) {
                 ps.setString(paramIndex++, toDate + " 23:59:59");
             }
+            if (customerId != null) {
+                ps.setInt(paramIndex++, customerId);
+            }
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -110,12 +129,18 @@ public class QuotationDAO extends DBContext {
                 quotation.setQuotationStatus(rs.getString("quotation_status"));
                 quotation.setCreatedBy(rs.getInt("created_by"));
                 if (rs.getTimestamp("created_at") != null) {
-                quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 }
                 quotation.setCustomerName(rs.getString("company_name"));
                 quotation.setCreatedByName(rs.getString("user_name"));
                 quotation.setHasContract(rs.getBoolean("has_contract"));
                 quotation.setTotalPrice(rs.getBigDecimal("total_price"));
+                
+                int contractId = rs.getInt("contract_id");
+                if (!rs.wasNull()) {
+                    quotation.setContractId(contractId);
+                }
+                
                 list.add(quotation);
             }
         } catch (Exception e) {
@@ -126,7 +151,9 @@ public class QuotationDAO extends DBContext {
 
     public List<QuotationHistory> getHistoryByQuotationId(int quotationId) {
         List<QuotationHistory> histories = new ArrayList<>();
-        String sql = "SELECT * FROM quotation_history WHERE quotation_id = ? ORDER BY created_at DESC";
+        String sql = "SELECT qh.*, u.user_name FROM quotation_history qh "
+                   + "LEFT JOIN [user] u ON qh.created_by = u.user_id "
+                   + "WHERE qh.quotation_id = ? ORDER BY qh.created_at DESC";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, quotationId);
@@ -136,6 +163,7 @@ public class QuotationDAO extends DBContext {
                 history.setQuotationHistoryId(rs.getInt("quotation_history_id"));
                 history.setQuotationId(rs.getInt("quotation_id"));
                 history.setCreatedBy(rs.getInt("created_by"));
+                history.setCreatedByName(rs.getString("user_name"));
                 history.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 history.setEditHistory(rs.getString("edit_history"));
                 histories.add(history);
@@ -445,7 +473,8 @@ public class QuotationDAO extends DBContext {
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
                 + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
                 + "customer.company_name, [user].user_name, "
-                + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract "
+                + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract, "
+                + "customer_contract.customer_contract_id AS contract_id "
                 + "FROM quotation "
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
                 + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
@@ -466,12 +495,18 @@ public class QuotationDAO extends DBContext {
                 quotation.setQuotationStatus(rs.getString("quotation_status"));
                 quotation.setCreatedBy(rs.getInt("created_by"));
                 if (rs.getTimestamp("created_at") != null) {
-                quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 }
                 quotation.setCustomerName(rs.getString("company_name"));
                 quotation.setCreatedByName(rs.getString("user_name"));
                 quotation.setHasContract(rs.getBoolean("has_contract"));
                 quotation.setTotalPrice(rs.getBigDecimal("total_price"));
+                
+                int contractId = rs.getInt("contract_id");
+                if (!rs.wasNull()) {
+                    quotation.setContractId(contractId);
+                }
+                
                 list.add(quotation);
             }
         } catch (Exception e) {

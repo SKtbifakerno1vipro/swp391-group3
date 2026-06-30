@@ -78,31 +78,33 @@
                     <button type="button" onclick="applyBulkDiscountAndTax()" style="margin-left: 15px; padding: 5px 10px; background-color: #008CBA; color: white; border: none; cursor: pointer;">Apply All</button>
                 </div>
 
-                <table border="1" cellpadding="7" cellspacing="0" id="productTable" style="width: 100%;">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Unit</th>
-                            <th>Cost Price</th>
-                            <th>Selling Price</th>
-                            <th>Quantity</th>
-                            <th>Discount %</th>
-                            <th>Tax %</th>
-                            <th>Line Total</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productRows">
-                        <%-- JS se add tung dong san pham vao day. --%>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="7" style="text-align: right;">Grand Total:</th>
-                            <th id="grandTotal">0</th>
-                            <th></th>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div style="overflow-x: auto; width: 100%; margin: 18px 0; border: 1px solid rgba(221, 213, 201, 0.85); border-radius: 8px;">
+                    <table border="1" cellpadding="7" cellspacing="0" id="productTable" style="width: 100%; min-width: 900px; margin: 0;">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Unit</th>
+                                <th>Cost Price</th>
+                                <th>Selling Price</th>
+                                <th>Quantity</th>
+                                <th>Discount %</th>
+                                <th>Tax %</th>
+                                <th>Line Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productRows">
+                            <%-- JS se add tung dong san pham vao day. --%>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="7" style="text-align: right;">Grand Total:</th>
+                                <th id="grandTotal">0</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
 
                 <br>
 
@@ -226,14 +228,14 @@
                         + productName
                         + '<input type="hidden" name="productId" value="' + productId + '">'
                         + '</td>'
-                        + '<td><input type="text" name="unit" value="' + unit + '" readonly style="width: 70px;"></td>'
-                        + '<td><input type="number" name="costPrice" min="0" step="0.01" value="' + costPrice + '" readonly></td>'
-                        + '<td><input type="number" name="sellingPrice" min="0" step="0.01" value="' + sellingPrice + '" readonly></td>'
-                        + '<td><input type="number" name="quantity" min="1" value="1" required oninput="calculateTotals()"></td>'
-                        + '<td><input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required oninput="calculateTotals()"></td>'
-                        + '<td><input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required oninput="calculateTotals()"></td>'
-                        + '<td class="lineTotal">0</td>'
-                        + '<td><button type="button" onclick="removeProductRow(this)">Remove</button></td>';
+                        + '<td><input type="text" name="unit" value="' + unit + '" readonly style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"></td>'
+                        + '<td><input type="number" name="costPrice" min="0" step="0.01" value="' + costPrice + '" readonly style="width: 100px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; background-color: #eee;"></td>'
+                        + '<td><input type="number" name="sellingPrice" min="0" step="0.01" value="' + sellingPrice + '" readonly style="width: 100px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; background-color: #eee;"></td>'
+                        + '<td><input type="number" name="quantity" min="1" value="1" required oninput="calculateTotals()" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"></td>'
+                        + '<td><input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required oninput="calculateTotals()" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"></td>'
+                        + '<td><input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required oninput="calculateTotals()" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"></td>'
+                        + '<td class="lineTotal" style="font-weight: bold; min-width: 100px;">0</td>'
+                        + '<td><button type="button" onclick="removeProductRow(this)" style="padding: 4px 8px; background-color: #ff4d4d; color: white; border: none; border-radius: 4px; cursor: pointer;">Remove</button></td>';
 
                     tbody.appendChild(row);
 

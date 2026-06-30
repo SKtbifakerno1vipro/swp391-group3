@@ -25,7 +25,11 @@ public class QuotationService {
     }
 
     public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate) {
-        return quotationDAO.searchQuotations(search, status, fromDate, toDate);
+        return quotationDAO.searchQuotations(search, status, fromDate, toDate, null);
+    }
+
+    public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate, Integer customerId) {
+        return quotationDAO.searchQuotations(search, status, fromDate, toDate, customerId);
     }
 
     public List<CustomerDTO> getAllCustomers() {

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -45,11 +46,12 @@
             </jsp:include>
             <main class="main legacy-page">
                 <h1>Quotation List</h1>
-                <c:if test="${sessionScope.user.roleId !=3}">
-                    <p><a href="${pageContext.request.contextPath}/quotation-create">Create New Quotation</a></p></c:if>
-                    <form action="quotation-list" method="GET">
-                        Customer Name:
-                        <input type="text" name="search" value="${searchText}" placeholder="Enter customer name">
+                <c:if test="${sessionScope.user.roleId != 3}">
+                    <p><a href="${pageContext.request.contextPath}/quotation-create">Create New Quotation</a></p>
+                </c:if>
+                <form action="quotation-list" method="GET">
+                    Customer Name:
+                    <input type="text" name="search" value="${searchText}" placeholder="Enter customer name">
 
                     Status:
                     <select name="status">
@@ -104,17 +106,25 @@
                                 <td>${quotation.createdByName}</td>
                                 <td>${quotation.createdAt}</td>
                                 <td>
-                                    <a href="quotation-detail?id=${quotation.quotationId}">View Detail</a>
+                                    <c:choose>
+                                        <c:when test="${quotation.hasContract && quotation.contractId != null}">
+                                            <a href="contract-detail?id=${quotation.contractId}">View Detail</a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="quotation-detail?id=${quotation.quotationId}">View Detail</a>
+                                        </c:otherwise>
+                                    </c:choose>
 
                                     <%-- Chi hien nut tao hop dong neu trang thai la ACCEPTED. --%>
                                     <c:if test="${quotation.quotationStatus == 'ACCEPTED'}">
                                         <c:choose>
-                                            <c:when test="${quotation.hasContract}">
-                                                | <a href="contract-detail?quotationId=${quotation.quotationId}" style="color: blue; font-weight: bold;">View Contract</a>
+                                            <c:when test="${quotation.hasContract && quotation.contractId != null}">
+                                                | <a href="contract-detail?id=${quotation.contractId}" style="color: blue; font-weight: bold;">View Contract</a>
                                             </c:when>
                                             <c:otherwise>
-                                                <c:if test="${sessionScope.user.roleId !=3}">
-                                                    | <a href="contract-save?quotationId=${quotation.quotationId}" style="color: green; font-weight: bold;">Create Contract</a></c:if>
+                                                <c:if test="${sessionScope.user.roleId != 3}">
+                                                    | <a href="contract-save?quotationId=${quotation.quotationId}" style="color: green; font-weight: bold;">Create Contract</a>
+                                                </c:if>
                                             </c:otherwise>
                                         </c:choose>
                                     </c:if>
@@ -124,29 +134,26 @@
                     </tbody>
                 </table>
 
-                <!--         Thanh phân trang giống Role module 
-                        <div class="pagination" style="margin-top: 20px;">
-                <c:if test="${currentPage > 1}">
-                    <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${currentPage - 1}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">&lt;</a>
-                </c:if>
-                <c:forEach begin="1" end="${totalPages}" var="i">
-                    <c:choose>
-                        <c:when test="${i == currentPage}">
-                            <span class="page-current">${i}</span>
-                        </c:when>
-                        <c:otherwise>
-                            <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${i}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">${i}</a>
-                        </c:otherwise>
-                    </c:choose>
-                </c:forEach>
-                <c:if test="${currentPage < totalPages}">
-                    <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${currentPage + 1}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">&gt;</a>
-                </c:if>
-            </div>-->
-
+                <%-- Thanh phan trang giong Role module --%>
+                <div class="pagination" style="margin-top: 20px;">
+                    <c:if test="${currentPage > 1}">
+                        <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${currentPage - 1}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">&lt;</a>
+                    </c:if>
+                    <c:forEach begin="1" end="${totalPages}" var="i">
+                        <c:choose>
+                            <c:when test="${i == currentPage}">
+                                <span class="page-current">${i}</span>
+                            </c:when>
+                            <c:otherwise>
+                                <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${i}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">${i}</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:forEach>
+                    <c:if test="${currentPage < totalPages}">
+                        <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${currentPage + 1}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">&gt;</a>
+                    </c:if>
+                </div>
             </main>
         </div>
     </body>
 </html>
-
-
