@@ -492,7 +492,7 @@
                                                             <td><span class="badge"
                                                                     style="background-color: #e2e3e5; color: #383d41;">${c.contractStatus}</span>
                                                             </td>
-                                                            <td>${c.formattedCreatedAt}</td>
+                                                            <td>${c.formattedCreatedAtDate}</td>
                                                             <td>
                                                                 <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}" class="btn-action-sm">View Details</a>
                                                             </td>

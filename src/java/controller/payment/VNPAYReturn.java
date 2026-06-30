@@ -80,24 +80,10 @@ public class VNPAYReturn extends HttpServlet {
             paymentId = Integer.parseInt(vnp_TxnRef);
         } catch (NumberFormatException ignored) {}
 
-        String newStatus = (isSignValid && "00".equals(vnp_ResponseCode)) ? "COMPLETED" : "FAILED";
-
         if (paymentId > 0) {
-            // Update existing payment status
-            paymentService.updatePaymentStatus(paymentId, newStatus);
+            resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId);
         } else {
-            // Fallback: insert new payment record
-            int contractId = paymentService.getAnyContractId();
-            Payment payment = new Payment();
-            payment.setCustomerContractId(contractId);
-            payment.setAmount(amountPaid);
-            payment.setPaymentType("VNPAY");
-            payment.setPaidAt("COMPLETED".equals(newStatus) ? LocalDateTime.now() : null);
-            payment.setPaymentStatus(newStatus);
-            payment.setCreatedBy(user != null ? user.getUserId() : null);
-            paymentId = paymentService.insertPayment(payment);
+            resp.sendRedirect(req.getContextPath() + "/payment/list");
         }
-
-        resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId);
     }
 }

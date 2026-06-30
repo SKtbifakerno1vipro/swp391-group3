@@ -68,6 +68,7 @@ public class VNPAYPayment extends HttpServlet {
 
         
         String contextPath = req.getContextPath();
+        // http://localhost:8080/swp391-group3/payment/return
         String returnUrl = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + contextPath + "/payment/return";
         vnp_Params.put("vnp_ReturnUrl", returnUrl);
 
