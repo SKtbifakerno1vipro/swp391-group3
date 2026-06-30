@@ -25,7 +25,9 @@
             </jsp:include>
             <main class="main legacy-page">
         <h1>Quotation List</h1>
+        <c:if test="${sessionScope.user.roleId != 3}">
         <p><a href="${pageContext.request.contextPath}/quotation-create">Create New Quotation</a></p>
+        </c:if>
         <form action="quotation-list" method="GET">
             Customer Name:
             <input type="text" name="search" value="${searchText}" placeholder="Enter customer name">
@@ -83,16 +85,25 @@
                         <td>${quotation.createdByName}</td>
                         <td>${quotation.createdAt}</td>
                         <td>
-                            <a href="quotation-detail?id=${quotation.quotationId}">View Detail</a>
+                            <c:choose>
+                                <c:when test="${quotation.hasContract && quotation.contractId != null}">
+                                    <a href="contract-detail?id=${quotation.contractId}">View Detail</a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="quotation-detail?id=${quotation.quotationId}">View Detail</a>
+                                </c:otherwise>
+                            </c:choose>
 
                             <%-- Chi hien nut tao hop dong neu trang thai la ACCEPTED. --%>
                             <c:if test="${quotation.quotationStatus == 'ACCEPTED'}">
                                 <c:choose>
-                                    <c:when test="${quotation.hasContract}">
-                                        | <a href="contract-detail?quotationId=${quotation.quotationId}" style="color: blue; font-weight: bold;">View Contract</a>
+                                    <c:when test="${quotation.hasContract && quotation.contractId != null}">
+                                        | <a href="contract-detail?id=${quotation.contractId}" style="color: blue; font-weight: bold;">View Contract</a>
                                     </c:when>
                                     <c:otherwise>
-                                        | <a href="contract-save?quotationId=${quotation.quotationId}" style="color: green; font-weight: bold;">Create Contract</a>
+                                        <c:if test="${sessionScope.user.roleId != 3}">
+                                            | <a href="contract-save?quotationId=${quotation.quotationId}" style="color: green; font-weight: bold;">Create Contract</a>
+                                        </c:if>
                                     </c:otherwise>
                                 </c:choose>
                             </c:if>

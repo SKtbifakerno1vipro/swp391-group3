@@ -25,32 +25,35 @@ public class QuotationDetailController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
         try {
             int quotationId = Integer.parseInt(request.getParameter("id"));
-
+            
             QuotationService quotationService = new QuotationService();
-
+            
             // Lay thong tin chung, san pham trong quotation, history va list product de add them.
             Quotation quotation = quotationService.getQuotationById(quotationId);
             List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotationId);
             List<QuotationHistory> histories = quotationService.getHistoryByQuotationId(quotationId);
             List<Product> products = quotationService.getAllProducts();
-
+            
             if (quotation == null) {
                 response.sendRedirect(request.getContextPath() + "/quotation-list");
                 return;
             }
-
+            
             request.setAttribute("message", request.getParameter("message"));
             request.setAttribute("quotation", quotation);
             request.setAttribute("details", details);
             request.setAttribute("histories", histories);
             request.setAttribute("products", products);
             request.getRequestDispatcher("/views/quotation/detail.jsp").forward(request, response);
-
+            
         } catch (Exception e) {
-            response.sendRedirect(request.getContextPath() + "/quotation-list");
+            e.printStackTrace();
+            throw new ServletException(e);
         }
     }
 
@@ -60,6 +63,8 @@ public class QuotationDetailController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
         int quotationId = 0;
@@ -68,6 +73,15 @@ public class QuotationDetailController extends HttpServlet {
             quotationId = Integer.parseInt(request.getParameter("quotationId"));
             QuotationService quotationService = new QuotationService();
             Integer userId = getCurrentUserId(request);
+
+            HttpSession session = request.getSession(false);
+            User user = (session != null) ? (User) session.getAttribute("user") : null;
+            if (user != null && user.getRoleId() == 3) {
+                if (!"accept".equals(action)) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
+                    return;
+                }
+            }
 
             if ("accept".equals(action)) {
                 quotationService.updateStatus(quotationId, "ACCEPTED", userId);

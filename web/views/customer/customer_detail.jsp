@@ -311,7 +311,7 @@
             <body>
                 <div class="dashboard-shell">
                     <jsp:include page="/views/shared/sidebar.jsp">
-                        <jsp:param name="activeMenu" value="customers" />
+                        <jsp:param name="activeMenu" value="${sessionScope.user.roleId == 3 ? 'profile' : 'customers'}" />
                     </jsp:include>
                     <main class="main legacy-page">
                         <div class="container">
@@ -578,20 +578,21 @@
                             </div>
 
                             <div class="btn-group">
-                                <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customerId}"
-                                    class="btn-edit">Edit Profile</a>
-                                <c:if test="${cusDTO.status == 'ACTIVE'}">
-                                    <a href="${pageContext.request.contextPath}/customer/detail?action=deactivate&id_cus=${cusDTO.customerId}"
-                                        class="btn-remove"
-                                        onclick="return confirm('Are you sure you want to deactivate this customer?');">Remove</a>
+                                <c:if test="${sessionScope.user.roleId != 3}">
+                                    <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customerId}"
+                                        class="btn-edit">Edit Profile</a>
+                                    <c:if test="${cusDTO.status == 'ACTIVE'}">
+                                        <a href="${pageContext.request.contextPath}/customer/detail?action=deactivate&id_cus=${cusDTO.customerId}"
+                                            class="btn-remove"
+                                            onclick="return confirm('Are you sure you want to deactivate this customer?');">Remove</a>
+                                    </c:if>
+                                    <c:if test="${cusDTO.status == 'INACTIVE'}">
+                                        <a href="${pageContext.request.contextPath}/customer/detail?action=activate&id_cus=${cusDTO.customerId}"
+                                            class="btn-activate"
+                                            onclick="return confirm('Are you sure you want to activate this customer?');">Activate</a>
+                                    </c:if>
+                                    <a href="${pageContext.request.contextPath}/customer/list" class="btn-back">Back to List</a>
                                 </c:if>
-                                <c:if test="${cusDTO.status == 'INACTIVE'}">
-                                    <a href="${pageContext.request.contextPath}/customer/detail?action=activate&id_cus=${cusDTO.customerId}"
-                                        class="btn-activate"
-                                        onclick="return confirm('Are you sure you want to activate this customer?');">Activate</a>
-                                </c:if>
-                                <a href="${pageContext.request.contextPath}/customer/list" class="btn-back">Back to
-                                    List</a>
                             </div>
                         </div>
 

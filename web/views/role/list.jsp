@@ -479,7 +479,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
 
-    //Code chuc nang
+    
     <body>
         <div class="role-shell">
             <jsp:include page="/views/shared/sidebar.jsp">
@@ -491,7 +491,7 @@
                     <div class="actions"><a class="button" href="${pageContext.request.contextPath}/dashboard"><span class="material-symbols-outlined">arrow_back</span>Dashboard</a><a class="button primary" href="${pageContext.request.contextPath}/add-role"><span class="material-symbols-outlined">add</span>Add Role</a></div>
                 </section>
                 
-                //3 o summary
+              
                 <section class="summary-grid">
                     <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">admin_panel_settings</span></div><p class="summary-value"><c:out value="${totalRoles}"/></p><p class="summary-label">Total matched roles</p></div>
                     <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">search</span></div><p class="summary-value"><c:out value="${empty searchText ? 'All' : '1'}"/></p><p class="summary-label"><c:out value="${empty searchText ? 'Showing all roles' : 'Search filter active'}"/></p></div>

@@ -53,64 +53,59 @@
                 <br>
 
                 <%-- Form them san pham moi vao quotation hien tai bang searchbar. --%>
-                <h2>Add Product</h2>
-                <form action="${pageContext.request.contextPath}/quotation-detail" method="post">
-                    <input type="hidden" name="quotationId" value="${quotation.quotationId}">
-                    <input type="hidden" name="productId" id="addProductId">
+                <c:if test="${sessionScope.user.roleId != 3}">
+                    <h2>Add Product</h2>
+                    <form action="${pageContext.request.contextPath}/quotation-detail" method="post">
+                        <input type="hidden" name="quotationId" value="${quotation.quotationId}">
+                        <input type="hidden" name="productId" id="addProductId">
 
-                    <label>Search Product:</label>
-                    <input type="text" id="addProductSearch" placeholder="Type product name..." autocomplete="off" onkeyup="showProductSuggestions()">
+                        <label>Search Product:</label>
+                        <input type="text" id="addProductSearch" placeholder="Type product name..." autocomplete="off" onkeyup="showProductSuggestions()">
 
-                    <%-- Hop goi y san pham sau khi search. --%>
-                    <div id="productSuggestions" style="border: 1px solid #ccc; max-width: 420px; display: none; background: white; position: absolute; z-index: 10;"></div>
+                        <%-- Hop goi y san pham sau khi search. --%>
+                        <div id="productSuggestions" style="border: 1px solid #ccc; max-width: 420px; display: none; background: white; position: absolute; z-index: 10;"></div>
 
-                    <span id="selectedProductName" style="font-weight: bold; color: green; margin-left: 10px;"></span>
+                        <span id="selectedProductName" style="font-weight: bold; color: green; margin-left: 10px;"></span>
 
-                    <br><br>
+                        <br><br>
 
-                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-                        <div>
-                            <label>Unit:</label>
-                            <input type="text" id="addUnit" readonly style="width: 75px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
+                        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                            <div>
+                                <label>Unit:</label>
+                                <input type="text" id="addUnit" readonly style="width: 75px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
+                            </div>
+                            <div>
+                                <label>Selling Price:</label>
+                                <input type="number" id="addSellingPrice" readonly style="width: 110px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
+                            </div>
+                            <div>
+                                <label>Quantity:</label>
+                                <input type="number" name="quantity" min="1" value="1" required style="width: 70px; padding: 4px;">
+                            </div>
                         </div>
-                        <c:if test="${sessionScope.user.roleId != 3}">
-                            <td>
-                            <fmt:formatNumber value="${detail.sellingPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
-                            <input type="hidden" name="sellingPrice" value="${detail.sellingPrice}">
-                        </td>
-                        </c:if>
-                        <div>
-                            <label>Selling Price:</label>
-                            <input type="number" id="addSellingPrice" readonly style="width: 110px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
-                        </div>
-                        <div>
-                            <label>Quantity:</label>
-                            <input type="number" name="quantity" min="1" value="1" required style="width: 70px; padding: 4px;">
-                        </div>
-                    </div>
+                        <br>
+                        <button type="submit" name="action" value="addProduct" onclick="return validateAddProductForm()">Add Product</button>
+                    </form>
                     <br>
-                    <button type="submit" name="action" value="addProduct" onclick="return validateAddProductForm()">Add Product</button>
-                </form>
-
-                <br>
+                </c:if>
 
                 <%-- Khoi nay hien thi va cho sua danh sach san pham trong quotation. --%>
-                <h2>Product Details</h2>
+                                <c:if test="${sessionScope.user.roleId != 3}">
+                    <div style="margin-bottom: 15px;">
+                        <form action="${pageContext.request.contextPath}/quotation-detail" method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="applyAll">
+                            <input type="hidden" name="quotationId" value="${quotation.quotationId}">
 
-                <div style="margin-bottom: 15px;">
-                    <form action="${pageContext.request.contextPath}/quotation-detail" method="post" style="display:inline;">
-                        <input type="hidden" name="action" value="applyAll">
-                        <input type="hidden" name="quotationId" value="${quotation.quotationId}">
+                            <label><strong>Discount %:</strong></label>
+                            <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required>
 
-                        <label><strong>Discount %:</strong></label>
-                        <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required>
+                            <label style="margin-left: 10px;"><strong>Tax %:</strong></label>
+                            <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required>
 
-                        <label style="margin-left: 10px;"><strong>Tax %:</strong></label>
-                        <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required>
-
-                        <button type="submit" style="margin-left: 10px;">Apply to All Products</button>
-                    </form>
-                </div>
+                            <button type="submit" style="margin-left: 10px;">Apply to All Products</button>
+                        </form>
+                    </div>
+                </c:if>
 
                 <table border="1" cellpadding="7" cellspacing="0" style="width: 100%;">
                     <thead>
@@ -125,55 +120,86 @@
                             <th>Discount %</th>
                             <th>Tax %</th>
                             <th>Amount</th>
-                            <th>Action</th>
+                                <c:if test="${sessionScope.user.roleId != 3}">
+                                <th>Action</th>
+                                </c:if>
                         </tr>
                     </thead>
                     <tbody>
                         <c:if test="${empty details}">
-                            <tr><td colspan="${sessionScope.user.roleId != 3 ? 9 : 8}" style="text-align: center;">No product details found.</td></tr>
+                            <tr><td colspan="${sessionScope.user.roleId != 3 ? 9 : 7}" style="text-align: center;">No product details found.</td></tr>
                         </c:if>
 
                         <c:forEach items="${details}" var="detail">
                             <tr>
-                        <form action="${pageContext.request.contextPath}/quotation-detail" method="post">
-                            <td>
-                                ${detail.productName}
-                                <input type="hidden" name="productId" value="${detail.productId}">
-                                <input type="hidden" name="productName" value="${detail.productName}">
-                            </td>
-                            <td>
-                                ${detail.unit}
+                            <form action="${pageContext.request.contextPath}/quotation-detail" method="post">
+                                <td>
+                                    ${detail.productName}
+                                    <input type="hidden" name="productId" value="${detail.productId}">
+                                    <input type="hidden" name="productName" value="${detail.productName}">
+                                </td>
+                                <td>${detail.unit}</td>
+                                <c:if test="${sessionScope.user.roleId != 3}">
+                                    <td>
+                                        <fmt:formatNumber value="${detail.costPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                    </td>
+                                </c:if>
+                                <td>
+                                    <fmt:formatNumber value="${detail.sellingPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                    <input type="hidden" name="sellingPrice" value="${detail.sellingPrice}">
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${sessionScope.user.roleId == 3}">
+                                            ${detail.quantity}
+                                        </c:when>
+                                        <c:otherwise>
+                                            <input type="number" name="quantity" min="1" value="${detail.quantity}" required style="width: 70px;">
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${sessionScope.user.roleId == 3}">
+                                            ${detail.discountPercent}
+                                        </c:when>
+                                        <c:otherwise>
+                                            <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="${detail.discountPercent}" required style="width: 70px;">
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${sessionScope.user.roleId == 3}">
+                                            ${detail.taxPercent}
+                                        </c:when>
+                                        <c:otherwise>
+                                            <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="${detail.taxPercent}" required style="width: 70px;">
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td><fmt:formatNumber value="${detail.amount}" type="number" minFractionDigits="2" maxFractionDigits="2" /></td>
+                                <c:if test="${sessionScope.user.roleId != 3}">
+                                    <td>
+                                        <input type="hidden" name="quotationId" value="${quotation.quotationId}">
+                                        <input type="hidden" name="quotationDetailId" value="${detail.quotationDetailId}">
+                                        <button type="submit" name="action" value="updateDetail">Save</button>
+                                        <button type="submit" name="action" value="deleteProduct" onclick="return confirm('Delete this product from quotation?')">Delete</button>
+                                    </td>
+                                </c:if>
+                            </form>
+                            </tr>
+                        </c:forEach>
+                        <!-- Grand Total Row -->
+                        <tr style="background-color: #f9f9f9;">
+                            <td colspan="${sessionScope.user.roleId != 3 ? 7 : 6}" style="text-align: right; font-weight: bold;">Grand Total:</td>
+                            <td style="font-weight: bold; color: #2e7d32;">
+                                <fmt:formatNumber value="${quotation.totalPrice != null ? quotation.totalPrice : 0}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
                             </td>
                             <c:if test="${sessionScope.user.roleId != 3}">
-                                <td>
-                                    <fmt:formatNumber value="${detail.costPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
-                                </td>
+                            <td></td>
                             </c:if>
-                            <td>
-                                <fmt:formatNumber value="${detail.sellingPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
-                                <input type="hidden" name="sellingPrice" value="${detail.sellingPrice}">
-                            </td>
-                            <td><input type="number" name="quantity" min="1" value="${detail.quantity}" required style="width: 70px;"></td>
-                            <td><input type="number" name="discountPercent" min="0" max="100" step="0.01" value="${detail.discountPercent}" required style="width: 70px;"></td>
-                            <td><input type="number" name="taxPercent" min="0" max="100" step="0.01" value="${detail.taxPercent}" required style="width: 70px;"></td>
-                            <td><fmt:formatNumber value="${detail.amount}" type="number" minFractionDigits="2" maxFractionDigits="2" /></td>
-                            <td>
-                                <input type="hidden" name="quotationId" value="${quotation.quotationId}">
-                                <input type="hidden" name="quotationDetailId" value="${detail.quotationDetailId}">
-                                <button type="submit" name="action" value="updateDetail">Save</button>
-                                <button type="submit" name="action" value="deleteProduct" onclick="return confirm('Delete this product from quotation?')">Delete</button>
-                            </td>
-                        </form>
                         </tr>
-                    </c:forEach>
-                    <!-- Grand Total Row -->
-                    <tr style="background-color: #f9f9f9;">
-                        <td colspan="${sessionScope.user.roleId != 3 ? 7 : 6}" style="text-align: right; font-weight: bold;">Grand Total:</td>
-                        <td style="font-weight: bold; color: #2e7d32;">
-                            <fmt:formatNumber value="${quotation.totalPrice != null ? quotation.totalPrice : 0}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
-                        </td>
-                        <td></td>
-                    </tr>
                     </tbody>
                 </table>
 
@@ -184,7 +210,7 @@
 
                 <table border="1" cellpadding="7" cellspacing="0" style="width: 100%;">
                     <thead>
-                        <tr><th>Time</th><th>User ID</th><th>History</th></tr>
+                        <tr><th>Time</th><th>User Name</th><th>History</th></tr>
                     </thead>
                     <tbody>
                         <c:if test="${empty histories}">
@@ -194,7 +220,7 @@
                         <c:forEach items="${histories}" var="history">
                             <tr>
                                 <td>${history.createdAt}</td>
-                                <td>${history.createdBy}</td>
+                                <td><c:out value="${history.createdByName != null ? history.createdByName : 'System'}"/></td>
                                 <td>${history.editHistory}</td>
                             </tr>
                         </c:forEach>

@@ -51,11 +51,44 @@ public class DetailCustomerController extends HttpServlet {
             }
         }
 
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        model.User user = (session != null) ? (model.User) session.getAttribute("user") : null;
+
         try {
-            int idCus = Integer.parseInt(request.getParameter("id_cus"));
+            String idCusParam = request.getParameter("id_cus");
+            int idCus = -1;
+            if (idCusParam == null || idCusParam.trim().isEmpty()) {
+                if (user != null && user.getRoleId() == 3) {
+                    dto.CustomerDTO customer = customerService.getCustomerDTOByUserId(user.getUserId());
+                    if (customer != null) {
+                        idCus = customer.getCustomerId();
+                    }
+                }
+            } else {
+                idCus = Integer.parseInt(idCusParam);
+            }
+
+            if (idCus == -1) {
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+                return;
+            }
+
+            // Security check: Customer can only view their own profile
+            if (user != null && user.getRoleId() == 3) {
+                dto.CustomerDTO customer = customerService.getCustomerDTOByUserId(user.getUserId());
+                if (customer == null || customer.getCustomerId() != idCus) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
+                    return;
+                }
+            }
+
             CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(idCus);
             if (cusDTO == null) {
-                response.sendRedirect(request.getContextPath() + "/customer/list");
+                if (user != null && user.getRoleId() == 3) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/customer/list");
+                }
                 return;
             }
             List<CustomerOrderDTO> listOrdersCus = customerOrderService.getListCustomerOrderDTOByCusId(idCus);
@@ -72,7 +105,11 @@ public class DetailCustomerController extends HttpServlet {
             request.setAttribute("listSales", customerService.getAllSalesExecutiveUsers());
             request.getRequestDispatcher("/views/customer/customer_detail.jsp").forward(request, response);
         } catch (NumberFormatException | NullPointerException e) {
-            response.sendRedirect(request.getContextPath() + "/customer/list");
+            if (user != null && user.getRoleId() == 3) {
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/customer/list");
+            }
         }
     }
 

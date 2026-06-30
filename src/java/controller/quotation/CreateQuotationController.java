@@ -23,6 +23,8 @@ public class CreateQuotationController extends HttpServlet {
     // Mo trang form tao quotation -> browser goi GET /quotation-create
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
         QuotationService quotationService = new QuotationService();
 
@@ -41,6 +43,8 @@ public class CreateQuotationController extends HttpServlet {
     // Nhan du lieu khi user bam nut submit form
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
         try {
             // Lay customer cua quotation.
