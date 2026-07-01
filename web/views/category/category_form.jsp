@@ -4,7 +4,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>${category != null ? 'Edit Category' : 'Add Category'}</title>
+    <title>${category != null ? 'Chỉnh sửa danh mục' : 'Thêm danh mục'}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
             <jsp:param name="activeMenu" value="categories"/>
         </jsp:include>
         <main class="main legacy-page">
-            <h2>${category != null ? 'Edit Category' : 'Add New Category'}</h2>
+            <h2>${category != null ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'}</h2>
 
             <c:if test="${not empty error}">
                 <div style="color: red; margin-bottom: 10px;">${error}</div>
@@ -30,17 +30,17 @@
                 </c:if>
 
                 <div style="margin-bottom: 10px;">
-                    <label for="categoryName">Category Name:</label><br/>
+                    <label for="categoryName">Tên danh mục:</label><br/>
                     <input type="text"
                            id="categoryName"
                            name="categoryName"
                            value="${category != null ? category.categoryName : categoryName}"
                            required
-                           placeholder="e.g. Bread, Cake...">
+                           placeholder="Ví dụ: Bánh mì, Bánh ngọt...">
                 </div>
 
-                <button type="submit">${category != null ? 'Update' : 'Add New'}</button>
-                <a href="${pageContext.request.contextPath}/category/list">Cancel</a>
+                <button type="submit">${category != null ? 'Cập nhật' : 'Thêm mới'}</button>
+                <a href="${pageContext.request.contextPath}/category/list">Hủy</a>
             </form>
         </main>
     </div>

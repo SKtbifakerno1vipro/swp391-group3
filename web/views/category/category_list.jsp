@@ -42,45 +42,45 @@
                     <jsp:param name="activeMenu" value="categories" />
                 </jsp:include>
                 <main class="main legacy-page">
-                    <h2>Manage Categories</h2>
-
+                    <h2>Quản lý danh mục</h2>
+ 
                     <c:if test="${param.status == 'add_success'}">
-                        <div style="color: green; margin-bottom: 10px;">Category added successfully!</div>
+                        <div style="color: green; margin-bottom: 10px;">Thêm danh mục thành công!</div>
                     </c:if>
                     <c:if test="${param.status == 'edit_success'}">
-                        <div style="color: green; margin-bottom: 10px;">Category updated successfully!</div>
+                        <div style="color: green; margin-bottom: 10px;">Cập nhật danh mục thành công!</div>
                     </c:if>
                     <c:if test="${param.status == 'delete_success'}">
-                        <div style="color: green; margin-bottom: 10px;">Category deleted successfully!</div>
+                        <div style="color: green; margin-bottom: 10px;">Xóa danh mục thành công!</div>
                     </c:if>
                     <c:if test="${param.status == 'delete_in_use'}">
-                        <div style="color: red; margin-bottom: 10px;">Cannot delete: Category still contains products.
+                        <div style="color: red; margin-bottom: 10px;">Không thể xóa: Danh mục vẫn còn chứa sản phẩm.
                         </div>
                     </c:if>
                     <c:if test="${param.status == 'not_found'}">
-                        <div style="color: red; margin-bottom: 10px;">Category not found!</div>
+                        <div style="color: red; margin-bottom: 10px;">Không tìm thấy danh mục!</div>
                     </c:if>
                     <c:if test="${param.status == 'delete_failed' || param.status == 'edit_failed'}">
-                        <div style="color: red; margin-bottom: 10px;">Operation failed! Please try again.</div>
+                        <div style="color: red; margin-bottom: 10px;">Thao tác thất bại! Vui lòng thử lại.</div>
                     </c:if>
 
                     <div style="margin-bottom: 15px;">
-                        <a href="${pageContext.request.contextPath}/category/create">Add Category</a> |
-                        <a href="${pageContext.request.contextPath}/product-list">Products</a>
+                        <a href="${pageContext.request.contextPath}/category/create">Thêm danh mục</a> |
+                        <a href="${pageContext.request.contextPath}/product-list">Sản phẩm</a>
                     </div>
 
                     <table>
                         <thead>
                             <tr>
-                                <th>Category ID</th>
-                                <th>Category Name</th>
-                                <th>Actions</th>
+                                <th>Mã danh mục</th>
+                                <th>Tên danh mục</th>
+                                <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:if test="${empty categoryList}">
                                 <tr>
-                                    <td colspan="3">No categories found.</td>
+                                    <td colspan="3">Không tìm thấy danh mục nào.</td>
                                 </tr>
                             </c:if>
 
@@ -90,9 +90,9 @@
                                     <td>${category.categoryName}</td>
                                     <td>
                                         <a
-                                            href="${pageContext.request.contextPath}/category/edit?categoryId=${category.categoryId}">Edit</a>
+                                            href="${pageContext.request.contextPath}/category/edit?categoryId=${category.categoryId}">Sửa</a>
                                         <a href="${pageContext.request.contextPath}/category/delete?categoryId=${category.categoryId}"
-                                            onclick="return confirm('Are you sure you want to delete this category?');">Delete</a>
+                                            onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này không?');">Xóa</a>
                                     </td>
                                 </tr>
                             </c:forEach>
