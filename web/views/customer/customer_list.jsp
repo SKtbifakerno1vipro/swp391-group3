@@ -235,7 +235,6 @@
                     <table>
                         <thead>
                             <tr>
-                            <tr>
                                 <th>Mã khách hàng</th>
                                 <th>Tên khách hàng</th>
                                 <th>Tên công ty</th>
