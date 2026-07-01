@@ -45,8 +45,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
         PrintWriter writer = response.getWriter();
         // Lùi mốc thời gian ban đầu lại 5 giây để quét bắt kịp các giao dịch trong lúc chuyển trang
         long startTime = System.currentTimeMillis() - 5000;
-        Timestamp lastCheckedPending = new Timestamp(startTime);
-        Timestamp lastCheckedCompleted = new Timestamp(startTime);
+        Timestamp lastCheckedPayment = new Timestamp(startTime);
         Timestamp lastCheckedCustomer = new Timestamp(startTime);
         Timestamp lastContractChecked = new Timestamp(startTime);
 
@@ -56,68 +55,45 @@ public class RealtimeNotificationServlet extends HttpServlet {
             int roleId = user.getRoleId();
 
             // 1. Payments Notifications
-            if (roleId == 3) {
-                // Customer:
+            List<Payment> myPayments = paymentDAO.getPaymentsSince(lastCheckedPayment, (roleId == 3 ? user.getUserId() : null));
+            java.time.LocalDateTime lastLdt = lastCheckedPayment.toLocalDateTime();
+            Timestamp maxPaymentTime = lastCheckedPayment;
+
+            for (Payment p : myPayments) {
                 // a. Contract Signed (new pending payments)
-                List<Payment> myPayments = paymentDAO.getPaymentsSince(lastCheckedPending, user.getUserId());
-                for (Payment p : myPayments) {
-                    if (p.getCreatedAt() != null && "PENDING".equals(p.getPaymentStatus())) {
+                if (p.getCreatedAt() != null && p.getCreatedAt().isAfter(lastLdt) && "PENDING".equals(p.getPaymentStatus())) {
+                    if (roleId == 3) {
                         writer.write("event: notification\n");
                         writer.write("data: " + formatCustomerPaymentJson(p, request.getContextPath()) + "\n\n");
+                    } else {
+                        writer.write("event: notification\n");
+                        writer.write("data: " + formatAdminContractSignedJson(p, request.getContextPath()) + "\n\n");
+                    }
 
-                        Timestamp pTime = Timestamp.valueOf(p.getCreatedAt());
-                        Timestamp nextTime = new Timestamp(pTime.getTime() + 100);
-                        if (nextTime.after(lastCheckedPending)) {
-                            lastCheckedPending = nextTime;
-                        }
+                    Timestamp pTime = Timestamp.valueOf(p.getCreatedAt());
+                    if (pTime.after(maxPaymentTime)) {
+                        maxPaymentTime = pTime;
                     }
                 }
 
                 // b. Payment Completed
-                List<Payment> completedPayments = paymentDAO.getCompletedPaymentsSince(lastCheckedCompleted, user.getUserId());
-                for (Payment p : completedPayments) {
-                    if (p.getPaidAt() != null) {
+                if (p.getPaidAt() != null && p.getPaidAt().isAfter(lastLdt) && "COMPLETED".equals(p.getPaymentStatus())) {
+                    if (roleId == 3) {
                         writer.write("event: notification\n");
                         writer.write("data: " + formatCustomerPaymentCompletedJson(p, request.getContextPath()) + "\n\n");
-
-                        Timestamp pTime = Timestamp.valueOf(p.getPaidAt());
-                        Timestamp nextTime = new Timestamp(pTime.getTime() + 100);
-                        if (nextTime.after(lastCheckedCompleted)) {
-                            lastCheckedCompleted = nextTime;
-                        }
-                    }
-                }
-            } else {
-                // Admin / Staff / Manager / Admin Officer:
-                // a. Contract Signed Notifications (new pending payments)
-                List<Payment> pendingPayments = paymentDAO.getPaymentsSince(lastCheckedPending, null);
-                for (Payment p : pendingPayments) {
-                    if (p.getCreatedAt() != null && "PENDING".equals(p.getPaymentStatus())) {
-                        writer.write("event: notification\n");
-                        writer.write("data: " + formatAdminContractSignedJson(p, request.getContextPath()) + "\n\n");
-
-                        Timestamp pTime = Timestamp.valueOf(p.getCreatedAt());
-                        Timestamp nextTime = new Timestamp(pTime.getTime() + 100);
-                        if (nextTime.after(lastCheckedPending)) {
-                            lastCheckedPending = nextTime;
-                        }
-                    }
-                }
-
-                // b. Completed Payment Notifications (completed payments)
-                List<Payment> completedPayments = paymentDAO.getCompletedPaymentsSince(lastCheckedCompleted, null);
-                for (Payment p : completedPayments) {
-                    if (p.getPaidAt() != null) {
+                    } else {
                         writer.write("event: notification\n");
                         writer.write("data: " + formatAdminPaymentCompletedJson(p, request.getContextPath()) + "\n\n");
+                    }
 
-                        Timestamp pTime = Timestamp.valueOf(p.getPaidAt());
-                        Timestamp nextTime = new Timestamp(pTime.getTime() + 100);
-                        if (nextTime.after(lastCheckedCompleted)) {
-                            lastCheckedCompleted = nextTime;
-                        }
+                    Timestamp pTime = Timestamp.valueOf(p.getPaidAt());
+                    if (pTime.after(maxPaymentTime)) {
+                        maxPaymentTime = pTime;
                     }
                 }
+            }
+            if (maxPaymentTime.after(lastCheckedPayment)) {
+                lastCheckedPayment = maxPaymentTime;
             }
 
             // 2. Customer Notifications (Admin: 1, Staff: 2)
@@ -129,9 +105,8 @@ public class RealtimeNotificationServlet extends HttpServlet {
                         writer.write("data: " + formatNewCustomerJson(c, request.getContextPath()) + "\n\n");
 
                         Timestamp cTime = Timestamp.valueOf(c.getUser().getCreateAt());
-                        Timestamp nextTime = new Timestamp(cTime.getTime() + 100);
-                        if (nextTime.after(lastCheckedCustomer)) {
-                            lastCheckedCustomer = nextTime;
+                        if (cTime.after(lastCheckedCustomer)) {
+                            lastCheckedCustomer = cTime;
                         }
                     }
                 }
