@@ -446,11 +446,14 @@ public class ContractDAO extends DBContext {
 
     public List<ContractHistory> getContractHistoriesSince(Timestamp sinceTime) {
         List<ContractHistory> list = new ArrayList<>();
-        String sql = "SELECT h.*, u.user_name, u.role_id AS changer_role_id, c.contract_number, cu.user_id AS customer_user_id "
+        String sql = "SELECT h.*, u.user_name, "
+                + "u.role_id AS changer_role_id, "
+                + "c.contract_number, "
+                + "cu.user_id AS customer_user_id "
                 + "FROM contract_edit_history h "
                 + "JOIN customer_contract c ON h.contract_id = c.customer_contract_id "
                 + "JOIN customer cu ON c.customer_id = cu.customer_id "
-                + "LEFT JOIN [user] u ON h.changed_by = u.user_id "
+                + "JOIN [user] u ON h.changed_by = u.user_id "
                 + "WHERE h.created_at > ? "
                 + "ORDER BY h.created_at ASC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

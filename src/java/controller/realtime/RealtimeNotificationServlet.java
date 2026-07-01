@@ -48,13 +48,14 @@ public class RealtimeNotificationServlet extends HttpServlet {
         Timestamp lastCheckedPending = new Timestamp(startTime);
         Timestamp lastCheckedCompleted = new Timestamp(startTime);
         Timestamp lastCheckedCustomer = new Timestamp(startTime);
+        Timestamp lastContractChecked = new Timestamp(startTime);
 
         System.out.println("[Realtime Servlet] Client connected: " + user.getUserName() + " (Role: " + user.getRoleId() + ")");
 
         while (!writer.checkError()) {
             int roleId = user.getRoleId();
 
-            // 1. Payments / Contracts Notifications
+            // 1. Payments Notifications
             if (roleId == 3) {
                 // Customer:
                 // a. Contract Signed (new pending payments)
@@ -137,7 +138,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
             }
 
             // 3. Contract Workflow Notifications
-            List<ContractHistory> newHistories = contractDAO.getContractHistoriesSince(lastChecked);
+            List<ContractHistory> newHistories = contractDAO.getContractHistoriesSince(lastContractChecked);
             for (ContractHistory h : newHistories) {
                 if (h.getCreatedAt() != null) {
                     boolean shouldNotify = false;
@@ -202,8 +203,8 @@ public class RealtimeNotificationServlet extends HttpServlet {
 
                     Timestamp hTime = Timestamp.valueOf(h.getCreatedAt());
                     Timestamp nextTime = new Timestamp(hTime.getTime() + 100);
-                    if (nextTime.after(lastChecked)) {
-                        lastChecked = nextTime;
+                    if (nextTime.after(lastContractChecked)) {
+                        lastContractChecked = nextTime;
                     }
                 }
             }
