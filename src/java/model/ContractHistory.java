@@ -14,6 +14,7 @@ public class ContractHistory {
     private LocalDateTime createdAt;
     
     // Additional fields for realtime notifications
+    private int changerRoleId;
     private int customerUserId;
     private String contractNumber;
 
@@ -108,6 +109,14 @@ public class ContractHistory {
 
     public void setCustomerUserId(int customerUserId) {
         this.customerUserId = customerUserId;
+    }
+
+    public int getChangerRoleId() {
+        return changerRoleId;
+    }
+
+    public void setChangerRoleId(int changerRoleId) {
+        this.changerRoleId = changerRoleId;
     }
 
     public String getContractNumber() {

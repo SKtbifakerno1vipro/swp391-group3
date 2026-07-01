@@ -446,8 +446,8 @@ public class ContractDAO extends DBContext {
 
     public List<ContractHistory> getContractHistoriesSince(Timestamp sinceTime) {
         List<ContractHistory> list = new ArrayList<>();
-        String sql = "SELECT h.*, u.user_name, "
-                + "u.role_id AS changer_role_id, "
+        String sql = "SELECT h.*, "
+                + "u.user_name, u.role_id AS changer_role_id, "
                 + "c.contract_number, "
                 + "cu.user_id AS customer_user_id "
                 + "FROM contract_edit_history h "
@@ -468,8 +468,7 @@ public class ContractDAO extends DBContext {
                     h.setNote(rs.getString("note"));
                     h.setChangedBy(rs.getObject("changed_by") != null ? rs.getInt("changed_by") : 0);
                     h.setChangedByName(rs.getString("user_name"));
-                    // We temporarily store changer_role_id in EditStatus since it's a string, or just use Note. Let's add changerRoleId to ContractHistory model. Wait, I can just parse it into EditStatus.
-                    h.setEditStatus(rs.getString("changer_role_id"));
+                    h.setChangerRoleId(rs.getInt("changer_role_id"));
                     if (rs.getTimestamp("created_at") != null) {
                         h.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     }
