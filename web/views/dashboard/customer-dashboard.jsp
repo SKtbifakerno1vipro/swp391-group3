@@ -209,11 +209,25 @@
                 color: var(--muted);
                 font-weight: 700;
                 font-size: 14px;
+                white-space: nowrap;
             }
-            .content-grid { 
+            .dashboard-shell .content-grid { 
                 display: grid; 
-                grid-template-columns: 1fr; 
+                grid-template-columns: repeat(2, minmax(0, 1fr)); 
                 gap: 20px; 
+            }
+            @media (max-width: 1180px) {
+                .dashboard-shell .content-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+            .dashboard-shell .metric-grid { 
+                grid-template-columns: repeat(2, minmax(0, 1fr)); 
+            }
+            @media (max-width: 820px) {
+                .dashboard-shell .metric-grid {
+                    grid-template-columns: 1fr;
+                }
             }
             .table-panel { padding: 22px; overflow: hidden; margin-bottom: 20px;}
             table { width: 100%; border-collapse: collapse; }
@@ -249,6 +263,8 @@
                 border-radius: 8px;
                 font-size: 12px;
                 transition: all 0.2s;
+                white-space: nowrap;
+                display: inline-block;
             }
             .btn-action:hover {
                 background: var(--primary);
@@ -440,7 +456,7 @@
                                         <c:forEach var="con" items="${recentContracts}">
                                             <tr>
                                                 <td>#<c:out value="${con.contractNumber}"/></td>
-                                                <td><c:out value="${con.formattedCreatedAt}"/></td>
+                                                <td><c:out value="${con.formattedCreatedAtDate}"/></td>
                                                 <td>
                                                     <c:choose>
                                                         <c:when test="${con.contractStatus == 'ACTIVE'}">
