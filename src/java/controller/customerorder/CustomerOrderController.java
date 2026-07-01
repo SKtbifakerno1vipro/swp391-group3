@@ -130,13 +130,13 @@ public class CustomerOrderController extends HttpServlet {
 
             List<CustomerOrderDTO> details = customerOrderService.getOrderDetails(orderId);
             
-            // Fetch total from quotation
-            java.math.BigDecimal quotationTotal = java.math.BigDecimal.ZERO;
-            if (order.getCustomerOrder() != null) {
-                
-                model.Contract contract = contractDao.getContractById(order.getCustomerOrder().getCustomerContractId());
-                if (contract != null) {
-                    quotationTotal = contractDao.calculateTotalAmountWithTaxAndDiscount(contract.getQuotationId());
+            // Calculate total from order details
+            double quotationTotal = 0;
+            if (details != null) {
+                for (CustomerOrderDTO item : details) {
+                    if (item.getDetail() != null) {
+                        quotationTotal += item.getDetail().getTotal();
+                    }
                 }
             }
             

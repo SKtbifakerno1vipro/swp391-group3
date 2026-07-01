@@ -121,7 +121,12 @@
                 </tr>
             </tfoot>
         </table>
-        <a href="${pageContext.request.contextPath}/customer-order-list">Back to List</a>
+        <div style="margin-top: 20px;">
+            <a href="${pageContext.request.contextPath}/customer-order-list" style="padding: 8px 15px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px;">Back to List</a>
+            <c:if test="${order.customerOrder.orderStatus == 'COMPLETED'}">
+                <a href="${pageContext.request.contextPath}/AcceptanceRecordController?orderId=${order.customerOrder.customerOrderId}" style="padding: 8px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; margin-left: 10px;">In Biên Bản Nghiệm Thu</a>
+            </c:if>
+        </div>
 
             </main>
         </div>

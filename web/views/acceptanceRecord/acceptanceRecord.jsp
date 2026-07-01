@@ -1,4 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -106,7 +108,10 @@
     </style>
 </head>
 <body>
-
+<div class="no-print" style="text-align: right; margin: 20px;">
+    <button onclick="window.print()" style="padding: 8px 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px;">🖨 In Biên Bản</button>
+    <button onclick="history.back()" style="padding: 8px 16px; cursor: pointer; margin-left: 10px; background: #6c757d; color: white; border: none; border-radius: 4px;">Quay Lại</button>
+</div>
 <div class="container">
     <div class="header">
         <div class="nation">Cộng hòa xã hội chủ nghĩa Việt Nam</div>
@@ -117,97 +122,93 @@
     <div class="title">Biên bản nghiệm thu</div>
 
     <div style="margin-bottom: 20px;">
-        Căn cứ hợp đồng số: <span class="dots" style="min-width: 100px;"></span> ngày <span class="dots" style="min-width: 50px;"></span>/<span class="dots" style="min-width: 50px;"></span>/<span class="dots" style="min-width: 50px;"></span> <br/>
-        Hôm nay, ngày <span class="dots" style="min-width: 50px;"></span>/<span class="dots" style="min-width: 50px;"></span>/<span class="dots" style="min-width: 50px;"></span> tại Công ty <span class="dots" style="min-width: 350px;"></span>, chúng tôi gồm có:
+        Căn cứ hợp đồng số: <strong>${order.customerOrder.customerContractId != 0 ? order.customerOrder.customerContractId : '......................'}</strong> <br/>
+        Hôm nay, ngày <strong>${day}</strong> tháng <strong>${month}</strong> năm <strong>${year}</strong>, chúng tôi gồm có:
     </div>
 
-    <div class="section-title">Bên A: CÔNG TY <span class="dots" style="min-width: 300px;"></span></div>
+    <div class="section-title">Bên A: <strong>${companyName != null ? companyName : 'Lê Quản Lý'}</strong></div>
     <table class="info-table">
         <tr>
             <td class="label">Đại diện:</td>
-            <td class="value"></td>
-            <td class="label" style="width: 10%; padding-left: 10px;">Chức vụ:</td>
-            <td class="value"></td>
+            <td class="value"><strong>${company_rep_name != null ? company_rep_name : 'Lê Quản Lý'}</strong></td>
         </tr>
         <tr>
             <td class="label">Địa chỉ:</td>
-            <td class="value" colspan="3"></td>
+            <td class="value" colspan="3"><strong>${companyAddress != null ? companyAddress : 'Lê Quản Lý'}</strong></td>
         </tr>
         <tr>
             <td class="label">Điện thoại:</td>
-            <td class="value" colspan="3"></td>
+            <td class="value" colspan="3"><strong>${companyPhone != null ? companyPhone : 'Lê Quản Lý'}</strong></td>
         </tr>
         <tr>
             <td class="label">Mã số thuế:</td>
-            <td class="value" colspan="3"></td>
-        </tr>
-        <tr>
-            <td class="label">Tên tài khoản ngân hàng:</td>
-            <td class="value" colspan="3"></td>
-        </tr>
-        <tr>
-            <td class="label">Số tài khoản:</td>
-            <td class="value"></td>
-            <td class="label" style="width: 10%; padding-left: 10px;">Ngân hàng:</td>
-            <td class="value">Chi nhánh <span class="dots" style="min-width: 100px;"></span></td>
+            <td class="value" colspan="3"><strong>${companyTaxCode != null ? companyTaxCode : 'Lê Quản Lý'}</strong></td>
         </tr>
     </table>
 
-    <div class="section-title">Bên B: CÔNG TY <span class="dots" style="min-width: 300px;"></span></div>
+    <div class="section-title">Bên B: <strong>${customerFull.user.fullName != null ? customerFull.user.fullName : order.customer.companyName}</strong></div>
     <table class="info-table">
         <tr>
             <td class="label">Đại diện:</td>
-            <td class="value"></td>
-            <td class="label" style="width: 10%; padding-left: 10px;">Chức vụ:</td>
-            <td class="value"></td>
+            <td class="value"><strong>${customerFull.user.fullName}</strong></td>
         </tr>
         <tr>
             <td class="label">Địa chỉ:</td>
-            <td class="value" colspan="3"></td>
+            <td class="value" colspan="3"><strong>${customerFull.user.address}</strong></td>
         </tr>
         <tr>
             <td class="label">Điện thoại:</td>
-            <td class="value" colspan="3"></td>
+            <td class="value" colspan="3"><strong>${customerFull.user.phone}</strong></td>
         </tr>
         <tr>
             <td class="label">Mã số thuế:</td>
-            <td class="value" colspan="3"></td>
-        </tr>
-        <tr>
-            <td class="label">Tên tài khoản ngân hàng:</td>
-            <td class="value" colspan="3"></td>
-        </tr>
-        <tr>
-            <td class="label">Số tài khoản:</td>
-            <td class="value"></td>
-            <td class="label" style="width: 10%; padding-left: 10px;">Ngân hàng:</td>
-            <td class="value">Chi nhánh <span class="dots" style="min-width: 100px;"></span></td>
+            <td class="value" colspan="3"><strong>${order.customer.taxCode}</strong></td>
         </tr>
     </table>
 
     <div class="section-title">Điều 1. Nội dung</div>
     <div class="content-block">
         <div class="content-line">
-            - Bên B bàn giao cho bên A:
-            <div class="line-dots"></div>
-            <div class="line-dots"></div>
+            - Bên A bàn giao cho bên B các sản phẩm theo đơn hàng <strong>#${order.customerOrder.customerOrderId}</strong>, bao gồm:
+            <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12pt;">
+                <tr>
+                    <th style="padding: 5px;">STT</th>
+                   
+                    <th style="padding: 5px;">Tên Hàng Hóa</th>
+                    <th style="padding: 5px;">ĐVT</th>
+                    <th style="padding: 5px;">Số lượng</th>
+                    <th style="padding: 5px;">Đơn giá</th>
+                    <th style="padding: 5px;">Giảm giá</th>
+                    <th style="padding: 5px;">Thuế</th>
+                    <th style="padding: 5px;">Thành tiền</th>
+                </tr>
+                <c:forEach var="item" items="${details}" varStatus="status">
+                <tr>
+                    <td style="padding: 5px; text-align: center;">${status.index + 1}</td>
+                   
+                    <td style="padding: 5px;">${item.product.productName}</td>
+                    <td style="padding: 5px; text-align: center;">${item.product.unit}</td>
+                    <td style="padding: 5px; text-align: center;">${item.detail.quantity}</td>
+                    <td style="padding: 5px; text-align: right;"><fmt:formatNumber value="${item.detail.sellingPrice}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                    <td style="padding: 5px; text-align: center;"><fmt:formatNumber value="${item.detail.discountPercent}" maxFractionDigits="2"/>%</td>
+                    <td style="padding: 5px; text-align: center;"><fmt:formatNumber value="${item.detail.taxPercent}" maxFractionDigits="2"/>%</td>
+                    <td style="padding: 5px; text-align: right;"><fmt:formatNumber value="${item.detail.total}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                </tr>
+                </c:forEach>
+            </table>
         </div>
         <div class="content-line">
-            - Bên A thanh toán cho bên B:
-            <div class="line-dots"></div>
-            <div class="line-dots"></div>
+            - Bên B thanh toán cho bên A tổng số tiền là: <strong><fmt:formatNumber value="${grandTotal}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></strong>
         </div>
         <div class="content-line">
-            - Xác nhận bàn giao:
-            <div class="line-dots"></div>
-            <div class="line-dots"></div>
+            - Xác nhận bàn giao: Bên B đã nhận đủ số lượng và chất lượng đúng như thỏa thuận.
         </div>
     </div>
 
     <div class="section-title">Điều 2. Kết luận</div>
     <div class="content-block">
         <div class="content-line">2.1. Bên A đã kiểm tra, thẩm định kỹ lưỡng chất lượng sản phẩm/dịch vụ.</div>
-        <div class="content-line">2.2. Kể từ khi bên A nhận đầy đủ số lượng sản phẩm/dịch vụ <span class="dots" style="min-width: 150px;"></span> đã bàn giao, Bên B hoàn toàn không chịu trách nhiệm về lỗi, chất lượng sản phẩm/dịch vụ.</div>
+        <div class="content-line">2.2. Kể từ khi bên A nhận đầy đủ số lượng sản phẩm/dịch vụ đã bàn giao, Bên B hoàn toàn không chịu trách nhiệm về lỗi, chất lượng sản phẩm/dịch vụ.</div>
         <div class="content-line">2.3. Bên A phải thanh toán hết cho bên B ngay sau khi biên bản nghiệm thu được ký kết, trừ trường hợp các bên có thỏa thuận khác.</div>
         <div class="content-line">2.4. Biên bản nghiệm thu này được lập thành 02 bản, mỗi bên giữ 01 bản và có giá trị pháp lý như nhau.</div>
     </div>
