@@ -43,12 +43,13 @@ public class RealtimeNotificationServlet extends HttpServlet {
         response.setHeader("Connection", "keep-alive");
 
         PrintWriter writer = response.getWriter();
-        // Lùi mốc thời gian ban đầu lại 5 giây để quét bắt kịp các giao dịch trong lúc chuyển trang
         long startTime = System.currentTimeMillis() - 5000;
         Timestamp lastCheckedPending = new Timestamp(startTime);
         Timestamp lastCheckedCompleted = new Timestamp(startTime);
         Timestamp lastCheckedCustomer = new Timestamp(startTime);
-        Timestamp lastContractChecked = new Timestamp(startTime);
+
+        // Quét theo ID thay vì mốc thời gian (Riêng cho Contract theo yêu cầu)
+        int lastContractHistoryId = contractDAO.getMaxContractHistoryId();
 
         System.out.println("[Realtime Servlet] Client connected: " + user.getUserName() + " (Role: " + user.getRoleId() + ")");
 
@@ -138,7 +139,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
             }
 
             // 3. Contract Workflow Notifications
-            List<ContractHistory> newHistories = contractDAO.getContractHistoriesSince(lastContractChecked);
+            List<ContractHistory> newHistories = contractDAO.getContractHistoriesSinceId(lastContractHistoryId);
             for (ContractHistory h : newHistories) {
                 if (h.getCreatedAt() != null) {
                     boolean shouldNotify = false;
@@ -200,21 +201,18 @@ public class RealtimeNotificationServlet extends HttpServlet {
 
                     if (shouldNotify) {
                         writer.write("event: notification\n");
-                        writer.write("data: {\"type\":\"info\",\"title\":\"" + escapeJson(title) + "\",\"message\":\""
-                                + escapeJson(msg) + "\",\"link\":\"" + escapeJson(link) + "\"}\n\n");
+                        writer.write("data: {\"type\":\"info\",\"title\":\"" + escapeJson(title)
+                                + "\",\"message\":\"" + escapeJson(msg)
+                                + "\",\"link\":\"" + escapeJson(link) + "\"}\n\n");
                     }
 
-                    Timestamp hTime = Timestamp.valueOf(h.getCreatedAt());
-                    Timestamp nextTime = new Timestamp(hTime.getTime() + 100);
-                    if (nextTime.after(lastContractChecked)) {
-                        lastContractChecked = nextTime;
+                    if (h.getHistoryId() > lastContractHistoryId) {
+                        lastContractHistoryId = h.getHistoryId();
                     }
-                    
-                    
+
                 }
             }
-            
-            
+
             writer.flush();
             response.flushBuffer();
             try {
@@ -222,8 +220,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
             } catch (InterruptedException e) {
                 break;
             }
-            
-            
+
         }
         System.out.println("[Realtime Servlet] Connection closed for user: " + user.getUserName());
     }
