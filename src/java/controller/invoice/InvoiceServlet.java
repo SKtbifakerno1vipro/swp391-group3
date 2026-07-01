@@ -118,13 +118,11 @@ public class InvoiceServlet extends HttpServlet {
         String buyerPhone = null;
 
         try {
-            // Retrieve basic identifiers
             String invoiceIdRaw = request.getParameter("invoiceId");
             int invoiceId = (invoiceIdRaw != null && !invoiceIdRaw.trim().isEmpty()) ? Integer.parseInt(invoiceIdRaw) : 0;
             int contractId = Integer.parseInt(request.getParameter("customerContractId"));
             orderId = Integer.parseInt(request.getParameter("customerOrderId"));
 
-            // Retrieve form values
             String invoiceStatus = request.getParameter("invoiceStatus");
             String invoiceType = request.getParameter("invoiceType");
             String invoiceSymbol = request.getParameter("invoiceSymbol");
@@ -150,10 +148,8 @@ public class InvoiceServlet extends HttpServlet {
             String customerNote = request.getParameter("invoiceNotes");
             String internalNote = request.getParameter("internalNotes");
 
-            // Identify current logged-in user from session
             Integer createdBy = user.getUserId();
 
-            // Instantiate and map Invoice properties
             invoice = new Invoice();
             invoice.setInvoiceId(invoiceId);
             invoice.setCustomerContractId(contractId);
@@ -161,7 +157,6 @@ public class InvoiceServlet extends HttpServlet {
             invoice.setInvoiceType(invoiceType);
             invoice.setInvoiceSymbol(invoiceSymbol);
 
-            // Handle status-based invoice properties
             if (invoiceId > 0) {
                 Invoice existingInvoice = iService.getInvoiceById(invoiceId);
                 if ("RELEASED".equals(invoiceStatus)) {
@@ -197,14 +192,12 @@ public class InvoiceServlet extends HttpServlet {
             invoice.setInternalNote(internalNote);
             invoice.setCreatedBy(createdBy);
 
-            // Execute Validation
             String errorMsg = iService.validateInvoice(invoice, buyerPhone);
             if (errorMsg != null) {
                 request.setAttribute("error", errorMsg);
                 request.setAttribute("invoice", invoice);
                 request.setAttribute("buyerPhone", buyerPhone);
 
-                // Inline Creator Name Resolution
                 Integer invoiceCreatorId = invoice.getCreatedBy();
                 if (invoiceCreatorId == null && user != null) {
                     invoiceCreatorId = user.getUserId();
@@ -225,10 +218,8 @@ public class InvoiceServlet extends HttpServlet {
             // Save to Database
             boolean success;
             if (invoiceId > 0) {
-                // If invoice already exists, perform update
                 success = iService.updateInvoice(invoice);
             } else {
-                // If new invoice, insert and check success status directly
                 success = iService.insertInvoice(invoice);
             }
 
@@ -239,7 +230,6 @@ public class InvoiceServlet extends HttpServlet {
                 request.setAttribute("invoice", invoice);
                 request.setAttribute("buyerPhone", buyerPhone);
 
-                // Inline Creator Name Resolution
                 Integer invoiceCreatorId = invoice.getCreatedBy();
                 if (invoiceCreatorId == null && user != null) {
                     invoiceCreatorId = user.getUserId();
@@ -262,7 +252,6 @@ public class InvoiceServlet extends HttpServlet {
             request.setAttribute("invoice", invoice);
             request.setAttribute("buyerPhone", buyerPhone);
 
-            // Inline Creator Name Resolution
             Integer invoiceCreatorId = (invoice != null) ? invoice.getCreatedBy() : null;
             if (invoiceCreatorId == null) {
                 invoiceCreatorId = user.getUserId();
@@ -295,12 +284,10 @@ public class InvoiceServlet extends HttpServlet {
             double taxTotal = iService.calculateTaxAmount(orderItems);
             double discountTotal = iService.calculateDiscountAmount(orderItems);
             double totalAmount = Double.parseDouble(String.format("%.2f", subTotal - discountTotal + taxTotal));
-
             CustomerDAO customerDAO = new CustomerDAO();
             CustomerDTO customerDto = customerDAO.getCustomerDTOById(orderDto.getCustomerOrder().getCustomerId());
 
-            ContractDAO contractDAO = new ContractDAO();
-            Contract contract = contractDAO.getContractById(orderDto.getCustomerOrder().getCustomerContractId());
+            
 
             request.setAttribute("order", orderDto.getCustomerOrder());
             request.setAttribute("orderDetails", orderItems);
@@ -313,7 +300,6 @@ public class InvoiceServlet extends HttpServlet {
                 request.setAttribute("customer", customerDto.getCustomer());
                 request.setAttribute("customerUser", customerDto.getUser());
             }
-            request.setAttribute("contract", contract);
         }
     }
 }

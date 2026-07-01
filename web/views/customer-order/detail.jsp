@@ -40,9 +40,8 @@
                         </li>
                         <c:if test="${order.customerOrder.orderStatus == 'COMPLETED'}">
                             <li style="margin-top: 15px;"><strong>Hành động:</strong>
-                                <c:set var="isExistInvoice" value="${isExistInvoice}" scope="session"/>
                                 <c:choose>
-                                    <c:when test="${isExistInvoice}">
+                                    <c:when test="${order.customerOrder.hasInvoice == true}">
                                         <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #0284c7; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);">
                                             <span class="material-symbols-outlined" style="font-size: 18px; color: white;">visibility</span> View Invoice
                                         </a>

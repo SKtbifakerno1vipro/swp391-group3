@@ -119,17 +119,8 @@ public class CustomerOrderController extends HttpServlet {
                     quotationTotal = contractDao.calculateTotalAmountWithTaxAndDiscount(contract.getQuotationId());
                 }
             }
-            Invoice invoice = null;
-            invoice = invoiceService.getInvoiceByOrderId(orderId);
-            if (invoice != null){
-                isExistInvoice = true;
-                if("CANCELED".equals(invoice.getInvoiceStatus())){
-                    isExistInvoice = false;
-                }
-            } 
             request.setAttribute("quotationTotal", quotationTotal);
             request.setAttribute("order", order);
-            request.setAttribute("isExistInvoice", isExistInvoice);
             request.setAttribute("details", details);
             request.getRequestDispatcher("/views/customer-order/detail.jsp").forward(request, response);
             

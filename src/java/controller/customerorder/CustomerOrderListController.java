@@ -9,11 +9,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.util.List;
+import model.Invoice;
+import service.InvoiceService;
 
 @WebServlet(name = "CustomerOrderListController", urlPatterns = {"/customer-order-list"})
 public class CustomerOrderListController extends HttpServlet {
 
     private final CustomerOrderService customerOrderService = new CustomerOrderService();
+    private final InvoiceService invoiceService = new InvoiceService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -41,9 +44,21 @@ public class CustomerOrderListController extends HttpServlet {
             listOrder = customerOrderService.getOrdersByPage(pageIndex, pageSize, sortBy, sortOrder);
             totalRecords = customerOrderService.getTotalOrderCount();
         }
-
+        for (CustomerOrderDTO customerOrderDTO : listOrder) {
+            Invoice invoice = null;
+            boolean isExistInvoice = false;
+            invoice = invoiceService.getInvoiceByOrderId(customerOrderDTO.getCustomerOrder().getCustomerOrderId());
+            if (invoice != null){
+                isExistInvoice = true;
+                if("CANCELED".equals(invoice.getInvoiceStatus())){
+                    isExistInvoice = false;
+                }
+            } 
+            customerOrderDTO.getCustomerOrder().setHasInvoice(isExistInvoice);
+        }
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-
+        
+        
         request.setAttribute("orders", listOrder);
         request.setAttribute("currentPage", pageIndex);
         request.setAttribute("totalPages", totalPages);

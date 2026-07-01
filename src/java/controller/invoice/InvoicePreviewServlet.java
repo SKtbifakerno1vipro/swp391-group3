@@ -155,78 +155,79 @@ public class InvoicePreviewServlet extends HttpServlet {
     }
 
     private String convertNumberToWords(long number) {
-    if (number == 0) return "Không đồng";
-    
-    String prefix = "";
-    if (number < 0) {
-        prefix = "âm ";
-        number = -number;
-    }
-
-    String[] units = {"", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"};
-    String[] scales = {"", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ", "tỷ tỷ"};
-
-    List<Integer> groups = new ArrayList<>();
-    long temp = number;
-    while (temp > 0) {
-        groups.add((int) (temp % 1000));
-        temp /= 1000;
-    }
-
-    StringBuilder result = new StringBuilder(prefix);
-
-    for (int i = groups.size() - 1; i >= 0; i--) {
-        int n = groups.get(i);
-
-        if (n == 0 && i != 3) {
-            continue;
+        if (number == 0) return "Không đồng";
+        
+        String prefix = "";
+        if (number < 0) {
+            prefix = "âm ";
+            number = -number;
         }
 
-        boolean showZeroHundred = (i < groups.size() - 1);
-        int hundred = n / 100;
-        int ten = (n % 100) / 10;
-        int unit = n % 10;
+        String[] units = {"", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"};
+        String[] scales = {"", "nghìn", "triệu", "tỷ", "nghìn", "triệu", "tỷ", "nghìn", "triệu", "tỷ"};
 
-        StringBuilder groupText = new StringBuilder();
-
-        if (hundred > 0) {
-            groupText.append(units[hundred]).append(" trăm ");
-        } else if (showZeroHundred && (ten > 0 || unit > 0)) {
-            groupText.append(" không trăm ");
+        List<Integer> groups = new ArrayList<>();
+        long temp = number;
+        while (temp > 0) {
+            groups.add((int) (temp % 1000));
+            temp /= 1000;
         }
 
-        if (ten > 1) {
-            groupText.append(units[ten]).append(" mươi ");
-        } else if (ten == 1) {
-            groupText.append(" mười ");
-        } else if (ten == 0 && unit > 0 && (hundred > 0 || showZeroHundred)) {
-            groupText.append(" lẻ ");
-        }
+        StringBuilder result = new StringBuilder(prefix);
 
-        if (unit == 5 && ten > 0) {
-            groupText.append(" lăm ");
-        } else if (unit == 1 && ten > 1) {
-            groupText.append(" mốt ");
-        } else if (unit > 0) {
-            groupText.append(units[unit]);
-        }
+        for (int i = groups.size() - 1; i >= 0; i--) {
+            int n = groups.get(i);
 
-        String groupStr = groupText.toString().trim();
-        //empty khi 1.000.000 (hun, ten, unit = 0)
-        if (!groupStr.isEmpty()) { 
-            result.append(groupStr).append(" ");
-            if (i < scales.length) {
-                result.append(scales[i]).append(" ");
+            if (n == 0 && i % 3 != 0) {
+                continue;
             }
-        } else if (i == 3) { 
-            result.append(scales[i]).append(" ");
+
+            boolean showZeroHundred = (i < groups.size() - 1);
+            int hundred = n / 100;
+            int ten = (n % 100) / 10;
+            int unit = n % 10;
+
+            StringBuilder groupText = new StringBuilder();
+
+            if (hundred > 0) {
+                groupText.append(units[hundred]).append(" trăm ");
+            } else if (showZeroHundred && (ten > 0 || unit > 0)) {
+                groupText.append(" không trăm ");
+            }
+
+            if (ten > 1) {
+                groupText.append(units[ten]).append(" mươi ");
+            } else if (ten == 1) {
+                groupText.append(" mười ");
+            } else if (ten == 0 && unit > 0 && (hundred > 0 || showZeroHundred)) {
+                groupText.append(" lẻ ");
+            }
+
+            if (unit == 5 && ten > 0) {
+                groupText.append(" lăm ");
+            } else if (unit == 1 && ten > 1) {
+                groupText.append(" mốt ");
+            } else if (unit > 0) {
+                groupText.append(units[unit]);
+            }
+
+            String groupStr = groupText.toString().trim();
+            if (!groupStr.isEmpty()) { 
+                result.append(groupStr).append(" ");
+                if (i < scales.length) {
+                    result.append(scales[i]).append(" ");
+                }
+            } else if (i > 0 && i % 3 == 0) { 
+                if (i < scales.length) {
+                    result.append(scales[i]).append(" ");
+                }
+            }
         }
+
+        String rawWords = result.toString().replaceAll("\\s+", " ").trim();
+        if (rawWords.isEmpty()) return "Không đồng";
+
+        return rawWords.substring(0, 1).toUpperCase() + rawWords.substring(1) + " đồng";
     }
-
-    String rawWords = result.toString().replaceAll("\\s+", " ").trim();
-    if (rawWords.isEmpty()) return "Không đồng";
-
-    return rawWords.substring(0, 1).toUpperCase() + rawWords.substring(1) + " đồng";
-}
 
 }

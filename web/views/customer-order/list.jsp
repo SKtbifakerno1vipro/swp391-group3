@@ -59,15 +59,6 @@
                     <% InvoiceService invService = new InvoiceService(); %>
                     <tbody>
                         <c:forEach var="item" items="${orders}">
-                            <%
-                                dto.CustomerOrderDTO itemDto = (dto.CustomerOrderDTO) pageContext.getAttribute("item");
-                                if (itemDto != null && itemDto.getCustomerOrder() != null) {
-                                    Invoice inv = invService.getInvoiceByOrderId(itemDto.getCustomerOrder().getCustomerOrderId());
-                                    pageContext.setAttribute("invOfOrder", inv);
-                                } else {
-                                    pageContext.removeAttribute("invOfOrder");
-                                }
-                            %>
                             <tr>
                                 <td>${item.customerOrder.customerOrderId}</td>
                                 <td>${item.customerUser.fullName}</td>
@@ -83,7 +74,7 @@
                                     <c:if test="${item.customerOrder.orderStatus == 'COMPLETED'}">
                                         |
                                         <c:choose>
-                                            <c:when test="${sessionScope.isExistInvoice == true}">
+                                            <c:when test="${item.customerOrder.hasInvoice == true}">
                                                 <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="color: #0284c7; font-weight: bold; text-decoration: none;">View Invoice</a>
                                             </c:when>
                                             <c:otherwise>
