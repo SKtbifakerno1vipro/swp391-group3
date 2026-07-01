@@ -467,13 +467,14 @@
                                                 <input type="text" name="unit" value="${item.unit}" style="text-align: center;" readonly>
                                             </td>
                                             <td>
-                                                <input type="number" name="quantity" class="row-qty text-right" value="<fmt:formatNumber value="${item.quantity}" pattern="#,##0"/>" readonly>
+                                                <input type="number" name="quantity" class="row-qty text-right" value="${item.quantity}" readonly>
                                             </td>
                                             <td>
-                                                <input type="number" name="sellingPrice" class="row-price text-right" value="<fmt:formatNumber value="${item.sellingPrice}" pattern="#,##0"/>" readonly>
+                                                <input type="number" name="sellingPrice" class="row-price text-right" value="${item.sellingPrice}" readonly>
                                             </td>
                                             <td>
-                                                <input type="text" name="lineAmount" class="row-amount text-right" value="<fmt:formatNumber value="${item.lineAmount}" pattern="#,##0"/>" readonly style="font-weight: 600;">
+                                                <input type="hidden" name="lineAmount" value="${item.lineAmount}">
+                                                <input type="text" class="row-amount text-right" value="<fmt:formatNumber value="${item.lineAmount}" pattern="#,##0"/>" readonly style="font-weight: 600;">
                                             </td>
                                             <td class="text-center">
                                                 <input type="text" name="discountPercent" class="row-discount-rate text-center" value="${empty item.discountPercent ? 0 : item.discountPercent}" readonly style="width: 40px; text-align: center; border: none; background: transparent; pointer-events: none;">%
@@ -482,7 +483,8 @@
                                                 <input type="text" name="taxPercent" class="row-tax-rate text-center" value="${empty item.taxPercent ? 0 : item.taxPercent}" readonly style="width: 40px; text-align: center; border: none; background: transparent; pointer-events: none;">%
                                             </td>
                                             <td>
-                                                <input type="text" name="lineTax" class="row-tax-val text-right" value="<fmt:formatNumber value="${item.lineTax}" pattern="#,##0"/>" readonly style="font-weight: 600;">
+                                                <input type="hidden" name="lineTax" value="${item.lineTax}">
+                                                <input type="text" class="row-tax-val text-right" value="<fmt:formatNumber value="${item.lineTax}" pattern="#,##0"/>" readonly style="font-weight: 600;">
                                             </td>
                                         </tr>
                                     </c:forEach>
@@ -510,21 +512,24 @@
                                 <div class="summary-row">
                                     <label>Sub-Total</label>
                                     <div class="value-box">
-                                        <input type="text" name="subTotal" id="subTotal" value="<fmt:formatNumber value="${subTotal}" pattern="#,##0"/>" readonly>
+                                        <input type="hidden" name="subTotal" value="${subTotal}">
+                                        <input type="text" id="subTotal" value="<fmt:formatNumber value="${subTotal}" pattern="#,##0"/>" readonly>
                                         <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
                                     </div>
                                 </div>
                                 <div class="summary-row">
                                     <label>Total Discount</label>
                                     <div class="value-box">
-                                        <input type="text" name="discountTotal" id="discountTotal" value="<fmt:formatNumber value="${discountTotal}" pattern="#,##0"/>" style="text-align: right;" readonly>
+                                        <input type="hidden" name="discountTotal" value="${discountTotal}">
+                                        <input type="text" id="discountTotal" value="<fmt:formatNumber value="${discountTotal}" pattern="#,##0"/>" style="text-align: right;" readonly>
                                         <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
                                     </div>
                                 </div>
                                 <div class="summary-row">
                                     <label>Total VAT</label>
                                     <div class="value-box">
-                                        <input type="text" name="taxAmount" id="taxAmount" value="<fmt:formatNumber value="${taxAmount}" pattern="#,##0"/>" readonly>
+                                        <input type="hidden" name="taxAmount" value="${taxAmount}">
+                                        <input type="text" id="taxAmount" value="<fmt:formatNumber value="${taxAmount}" pattern="#,##0"/>" readonly>
                                         <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
                                     </div>
                                 </div>
@@ -532,7 +537,8 @@
                                 <div class="summary-row summary-row-total">
                                     <label style="color: #dc2626; font-weight: 800; font-size: 14px;">Total Amount</label>
                                     <div class="value-box">
-                                        <input type="text" name="totalAmount" id="totalAmount" value="<fmt:formatNumber value="${totalAmount}" pattern="#,##0"/>" readonly>
+                                        <input type="hidden" name="totalAmount" value="${totalAmount}">
+                                        <input type="text" id="totalAmount" value="<fmt:formatNumber value="${totalAmount}" pattern="#,##0"/>" readonly>
                                         <span style="font-size: 11px; font-weight: bold; color: #dc2626;">VND</span>
                                     </div>
                                 </div>

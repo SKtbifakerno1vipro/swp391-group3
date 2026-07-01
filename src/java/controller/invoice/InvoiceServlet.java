@@ -35,8 +35,8 @@ public class InvoiceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
             response.sendRedirect("login");
             return;
         }
@@ -85,13 +85,12 @@ public class InvoiceServlet extends HttpServlet {
             }
         }
 
-        // Determine createdBy: check if invoice is null, get from session; otherwise get from invoice
         Integer createdBy = null;
         if (invoice != null) {
             createdBy = invoice.getCreatedBy();
         }
         if (createdBy == null) {
-            createdBy = currentUser.getUserId();
+            createdBy = user.getUserId();
         }
 
         if (createdBy != null) {
@@ -108,6 +107,12 @@ public class InvoiceServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login");
+            return;
+        }
         Invoice invoice = null;
         int orderId = 0;
         String buyerPhone = null;
@@ -134,17 +139,19 @@ public class InvoiceServlet extends HttpServlet {
             String buyerAddress = request.getParameter("buyerAddress");
             buyerPhone = request.getParameter("buyerPhone");
 
-            BigDecimal subTotal = new BigDecimal(request.getParameter("subTotal"));
-            BigDecimal taxAmount = new BigDecimal(request.getParameter("taxAmount"));
-            BigDecimal totalAmount = new BigDecimal(request.getParameter("totalAmount"));
+            String subTotalRaw = request.getParameter("subTotal");
+            String taxAmountRaw = request.getParameter("taxAmount");
+            String totalAmountRaw = request.getParameter("totalAmount");
+
+            double subTotal = (subTotalRaw != null && !subTotalRaw.isEmpty()) ? Double.parseDouble(subTotalRaw) : 0.0;
+            double taxAmount = (taxAmountRaw != null && !taxAmountRaw.isEmpty()) ? Double.parseDouble(taxAmountRaw) : 0.0;
+            double totalAmount = (totalAmountRaw != null && !totalAmountRaw.isEmpty()) ? Double.parseDouble(totalAmountRaw) : 0.0;
 
             String customerNote = request.getParameter("invoiceNotes");
             String internalNote = request.getParameter("internalNotes");
 
             // Identify current logged-in user from session
-            HttpSession session = request.getSession();
-            User user = (User) session.getAttribute("user");
-            Integer createdBy = (user != null) ? user.getUserId() : null;
+            Integer createdBy = user.getUserId();
 
             // Instantiate and map Invoice properties
             invoice = new Invoice();
@@ -258,11 +265,7 @@ public class InvoiceServlet extends HttpServlet {
             // Inline Creator Name Resolution
             Integer invoiceCreatorId = (invoice != null) ? invoice.getCreatedBy() : null;
             if (invoiceCreatorId == null) {
-                HttpSession session = request.getSession();
-                User sessionUser = (User) session.getAttribute("user");
-                if (sessionUser != null) {
-                    invoiceCreatorId = sessionUser.getUserId();
-                }
+                invoiceCreatorId = user.getUserId();
             }
             if (invoiceCreatorId != null) {
                 UserDAO userDAO = new UserDAO();

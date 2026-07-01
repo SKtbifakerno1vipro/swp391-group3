@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import model.Invoice;
+import service.InvoiceService;
 
 @WebServlet(name = "CustomerOrderController", urlPatterns = {"/customer-order"})
 public class CustomerOrderController extends HttpServlet {
@@ -31,6 +33,7 @@ public class CustomerOrderController extends HttpServlet {
     private final CustomerOrderService customerOrderService = new CustomerOrderService();
     private final CustomerService customerService = new CustomerService();
     private final ProductService productService = new ProductService();
+    private final InvoiceService invoiceService = new InvoiceService();
     private final int PAGE_SIZE = 10;
 
     @Override
@@ -97,6 +100,7 @@ public class CustomerOrderController extends HttpServlet {
             throws ServletException, IOException {
         try {
             int orderId = Integer.parseInt(idParam);
+            boolean isExistInvoice = false;
             CustomerOrderDTO order = customerOrderService.getCustomerOrderById(orderId);
             
             if (order == null) {
@@ -115,9 +119,17 @@ public class CustomerOrderController extends HttpServlet {
                     quotationTotal = contractDao.calculateTotalAmountWithTaxAndDiscount(contract.getQuotationId());
                 }
             }
-            
+            Invoice invoice = null;
+            invoice = invoiceService.getInvoiceByOrderId(orderId);
+            if (invoice != null){
+                isExistInvoice = true;
+                if("CANCELED".equals(invoice.getInvoiceStatus())){
+                    isExistInvoice = false;
+                }
+            } 
             request.setAttribute("quotationTotal", quotationTotal);
             request.setAttribute("order", order);
+            request.setAttribute("isExistInvoice", isExistInvoice);
             request.setAttribute("details", details);
             request.getRequestDispatcher("/views/customer-order/detail.jsp").forward(request, response);
             

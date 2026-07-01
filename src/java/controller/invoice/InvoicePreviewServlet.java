@@ -40,7 +40,7 @@ public class InvoicePreviewServlet extends HttpServlet {
                     int quantity = 0;
                     if (quantities != null && i < quantities.length && quantities[i] != null && !quantities[i].isEmpty()) {
                         try {
-                            quantity = (int) Double.parseDouble(cleanNumberString(quantities[i]));
+                            quantity = (int) Double.parseDouble(quantities[i]);
                         } catch (NumberFormatException e) {
                             quantity = 0;
                         }
@@ -48,7 +48,7 @@ public class InvoicePreviewServlet extends HttpServlet {
                     double sellingPrice = 0.0;
                     if (sellingPrices != null && i < sellingPrices.length && sellingPrices[i] != null && !sellingPrices[i].isEmpty()) {
                         try {
-                            sellingPrice = Double.parseDouble(cleanNumberString(sellingPrices[i]));
+                            sellingPrice = Double.parseDouble(sellingPrices[i]);
                         } catch (NumberFormatException e) {
                             sellingPrice = 0.0;
                         }
@@ -75,7 +75,7 @@ public class InvoicePreviewServlet extends HttpServlet {
                     double lineTax = 0.0;
                     if (lineTaxes != null && i < lineTaxes.length && lineTaxes[i] != null && !lineTaxes[i].isEmpty()) {
                         try {
-                            lineTax = Double.parseDouble(cleanNumberString(lineTaxes[i]));
+                            lineTax = Double.parseDouble(lineTaxes[i]);
                         } catch (NumberFormatException e) {
                             lineTax = (lineAmount - lineDiscount) * (taxPercent / 100.0);
                         }
@@ -118,12 +118,12 @@ public class InvoicePreviewServlet extends HttpServlet {
             String taxAmountRaw = request.getParameter("taxAmount");
             String totalAmountRaw = request.getParameter("totalAmount");
 
-            BigDecimal subTotal = (subTotalRaw != null && !subTotalRaw.isEmpty()) ? new BigDecimal(cleanNumberString(subTotalRaw)) : BigDecimal.ZERO;
-            BigDecimal discountTotal = (discountTotalRaw != null && !discountTotalRaw.isEmpty()) ? new BigDecimal(cleanNumberString(discountTotalRaw)) : BigDecimal.ZERO;
-            BigDecimal taxAmount = (taxAmountRaw != null && !taxAmountRaw.isEmpty()) ? new BigDecimal(cleanNumberString(taxAmountRaw)) : BigDecimal.ZERO;
-            BigDecimal totalAmount = (totalAmountRaw != null && !totalAmountRaw.isEmpty()) ? new BigDecimal(cleanNumberString(totalAmountRaw)) : BigDecimal.ZERO;
+            double subTotal = (subTotalRaw != null && !subTotalRaw.isEmpty()) ? Double.parseDouble(subTotalRaw) : 0.0;
+            double discountTotal = (discountTotalRaw != null && !discountTotalRaw.isEmpty()) ? Double.parseDouble(discountTotalRaw) : 0.0;
+            double taxAmount = (taxAmountRaw != null && !taxAmountRaw.isEmpty()) ? Double.parseDouble(taxAmountRaw) : 0.0;
+            double totalAmount = (totalAmountRaw != null && !totalAmountRaw.isEmpty()) ? Double.parseDouble(totalAmountRaw) : 0.0;
 
-            String amountInWords = convertNumberToWords(totalAmount.longValue());
+            String amountInWords = convertNumberToWords((long) totalAmount);
 
             request.setAttribute("invoiceType", invoiceType);
             request.setAttribute("invoiceSymbol", invoiceSymbol);
@@ -146,7 +146,6 @@ public class InvoicePreviewServlet extends HttpServlet {
             request.setAttribute("totalAmount", totalAmount);
             request.setAttribute("amountInWords", amountInWords);
 
-            // 4. Forward sang template.jsp
             request.getRequestDispatcher("/views/invoice/template.jsp").forward(request, response);
 
         } catch (Exception e) {
@@ -156,76 +155,78 @@ public class InvoicePreviewServlet extends HttpServlet {
     }
 
     private String convertNumberToWords(long number) {
-        if (number == 0) return "Không đồng";
-        String[] units = {"", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"};
-        String rawWords = formatWords(number, units).trim();
-        if (rawWords.isEmpty()) return "Không đồng";
-        // Capitalize the first letter
-        return rawWords.substring(0, 1).toUpperCase() + rawWords.substring(1) + " đồng";
+    if (number == 0) return "Không đồng";
+    
+    String prefix = "";
+    if (number < 0) {
+        prefix = "âm ";
+        number = -number;
     }
 
-    private String formatWords(long number, String[] units) {
-        if (number < 0) return "âm " + formatWords(-number, units);
-        if (number == 0) return "";
-        
-        if (number < 10) return units[(int)number];
-        if (number < 20) {
-            if (number == 10) return "mười";
-            if (number == 15) return "mười lăm";
-            return "mười " + units[(int)(number % 10)];
-        }
-        if (number < 100) {
-            long chuc = number / 10;
-            long dv = number % 10;
-            String chucStr = units[(int)chuc] + " mươi";
-            if (dv == 1) return chucStr + " mốt";
-            if (dv == 5) return chucStr + " lăm";
-            if (dv == 0) return chucStr;
-            return chucStr + " " + units[(int)dv];
-        }
-        if (number < 1000) {
-            long tram = number / 100;
-            long phanDu = number % 100;
-            String tramStr = units[(int)tram] + " trăm";
-            if (phanDu == 0) return tramStr;
-            if (phanDu < 10) return tramStr + " lẻ " + formatWords(phanDu, units);
-            return tramStr + " " + formatWords(phanDu, units);
-        }
-        if (number < 1000000) {
-            long nghin = number / 1000;
-            long phanDu = number % 1000;
-            String nghinStr = formatWords(nghin, units) + " nghìn";
-            if (phanDu == 0) return nghinStr;
-            if (phanDu < 100) {
-                if (phanDu < 10) return nghinStr + " không trăm lẻ " + formatWords(phanDu, units);
-                return nghinStr + " không trăm " + formatWords(phanDu, units);
-            }
-            return nghinStr + " " + formatWords(phanDu, units);
-        }
-        if (number < 1000000000L) {
-            long trieu = number / 1000000;
-            long phanDu = number % 1000000;
-            String trieuStr = formatWords(trieu, units) + " triệu";
-            if (phanDu == 0) return trieuStr;
-            if (phanDu < 100000) {
-                if (phanDu < 10) return trieuStr + " không trăm lẻ " + formatWords(phanDu, units);
-                return trieuStr + " không nghìn " + formatWords(phanDu, units);
-            }
-            return trieuStr + " " + formatWords(phanDu, units);
-        }
-        
-        long ty = number / 1000000000L;
-        long phanDu = number % 1000000000L;
-        String tyStr = formatWords(ty, units) + " tỷ";
-        if (phanDu == 0) return tyStr;
-        return tyStr + " " + formatWords(phanDu, units);
+    String[] units = {"", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"};
+    String[] scales = {"", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ", "tỷ tỷ"};
+
+    List<Integer> groups = new ArrayList<>();
+    long temp = number;
+    while (temp > 0) {
+        groups.add((int) (temp % 1000));
+        temp /= 1000;
     }
 
-    private String cleanNumberString(String value) {
-        if (value == null) {
-            return "0";
+    StringBuilder result = new StringBuilder(prefix);
+
+    for (int i = groups.size() - 1; i >= 0; i--) {
+        int n = groups.get(i);
+
+        if (n == 0 && i != 3) {
+            continue;
         }
-        String cleaned = value.replaceAll("[,.\\s]", "");
-        return cleaned.isEmpty() ? "0" : cleaned;
+
+        boolean showZeroHundred = (i < groups.size() - 1);
+        int hundred = n / 100;
+        int ten = (n % 100) / 10;
+        int unit = n % 10;
+
+        StringBuilder groupText = new StringBuilder();
+
+        if (hundred > 0) {
+            groupText.append(units[hundred]).append(" trăm ");
+        } else if (showZeroHundred && (ten > 0 || unit > 0)) {
+            groupText.append(" không trăm ");
+        }
+
+        if (ten > 1) {
+            groupText.append(units[ten]).append(" mươi ");
+        } else if (ten == 1) {
+            groupText.append(" mười ");
+        } else if (ten == 0 && unit > 0 && (hundred > 0 || showZeroHundred)) {
+            groupText.append(" lẻ ");
+        }
+
+        if (unit == 5 && ten > 0) {
+            groupText.append(" lăm ");
+        } else if (unit == 1 && ten > 1) {
+            groupText.append(" mốt ");
+        } else if (unit > 0) {
+            groupText.append(units[unit]);
+        }
+
+        String groupStr = groupText.toString().trim();
+        //empty khi 1.000.000 (hun, ten, unit = 0)
+        if (!groupStr.isEmpty()) { 
+            result.append(groupStr).append(" ");
+            if (i < scales.length) {
+                result.append(scales[i]).append(" ");
+            }
+        } else if (i == 3) { 
+            result.append(scales[i]).append(" ");
+        }
     }
+
+    String rawWords = result.toString().replaceAll("\\s+", " ").trim();
+    if (rawWords.isEmpty()) return "Không đồng";
+
+    return rawWords.substring(0, 1).toUpperCase() + rawWords.substring(1) + " đồng";
+}
+
 }

@@ -13,21 +13,18 @@ public class Invoice {
     private String invoiceType;
     private String invoiceSymbol;
     
-    // Seller info snapshot
     private String sellerName;
     private String sellerTaxCode;
     private String sellerAddress;
     private String sellerPhone;
     
-    // Buyer info snapshot
     private String buyerName;
     private String buyerTaxCode;
     private String buyerAddress;
     
-    // Financial summary snapshot
-    private BigDecimal subTotal;
-    private BigDecimal taxAmount;
-    private BigDecimal totalAmount;
+    private double subTotal;
+    private double taxAmount;
+    private double totalAmount;
     
     private Integer createdBy;
     private LocalDateTime createdAt;
@@ -158,27 +155,27 @@ public class Invoice {
         this.buyerAddress = buyerAddress;
     }
 
-    public BigDecimal getSubTotal() {
+    public double getSubTotal() {
         return subTotal;
     }
 
-    public void setSubTotal(BigDecimal subTotal) {
+    public void setSubTotal(double subTotal) {
         this.subTotal = subTotal;
     }
 
-    public BigDecimal getTaxAmount() {
+    public double getTaxAmount() {
         return taxAmount;
     }
 
-    public void setTaxAmount(BigDecimal taxAmount) {
+    public void setTaxAmount(double taxAmount) {
         this.taxAmount = taxAmount;
     }
 
-    public BigDecimal getTotalAmount() {
+    public double getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(BigDecimal totalAmount) {
+    public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
     }
 
