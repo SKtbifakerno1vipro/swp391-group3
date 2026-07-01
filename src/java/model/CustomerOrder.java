@@ -10,7 +10,8 @@ public class CustomerOrder {
     private String orderStatus;
     private Integer createdBy;
     private LocalDateTime createdAt;
-
+    private boolean hasInvoice;
+    
     public CustomerOrder() {}
 
     public int getCustomerOrderId() { return customerOrderId; }
@@ -25,6 +26,14 @@ public class CustomerOrder {
     public void setCreatedBy(Integer createdBy) { this.createdBy = createdBy; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public boolean isHasInvoice() {
+        return hasInvoice;
+    }
+
+    public void setHasInvoice(boolean hasInvoice) {
+        this.hasInvoice = hasInvoice;
+    }
 
     public String getFormattedCreatedAt() {
         if (this.createdAt != null) {

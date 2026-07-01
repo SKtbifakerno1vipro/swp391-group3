@@ -103,9 +103,9 @@ public class InvoiceDAO extends DBContext {
             ps.setString(13, invoice.getBuyerTaxCode());
             ps.setString(14, invoice.getBuyerAddress());
             
-            ps.setBigDecimal(15, invoice.getSubTotal());
-            ps.setBigDecimal(16, invoice.getTaxAmount());
-            ps.setBigDecimal(17, invoice.getTotalAmount());
+            ps.setDouble(15, invoice.getSubTotal());
+            ps.setDouble(16, invoice.getTaxAmount());
+            ps.setDouble(17, invoice.getTotalAmount());
             
             ps.setString(18, invoice.getCustomerNote());
             ps.setString(19, invoice.getInternalNote());
@@ -356,9 +356,9 @@ public class InvoiceDAO extends DBContext {
         invoice.setBuyerTaxCode(rs.getString("buyer_tax_code"));
         invoice.setBuyerAddress(rs.getString("buyer_address"));
         
-        invoice.setSubTotal(rs.getBigDecimal("sub_total"));
-        invoice.setTaxAmount(rs.getBigDecimal("tax_amount"));
-        invoice.setTotalAmount(rs.getBigDecimal("total_amount"));
+        invoice.setSubTotal(rs.getDouble("sub_total"));
+        invoice.setTaxAmount(rs.getDouble("tax_amount"));
+        invoice.setTotalAmount(rs.getDouble("total_amount"));
         
         invoice.setCustomerNote(rs.getString("customer_note"));
         invoice.setInternalNote(rs.getString("internal_note"));
