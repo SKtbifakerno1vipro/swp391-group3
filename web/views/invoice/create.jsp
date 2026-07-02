@@ -548,17 +548,15 @@
                     <div class="actions-bar">
                         <div class="actions-left">
                             <button type="button" class="btn-action" style="opacity: 0.6; pointer-events: none;"><span class="material-symbols-outlined" style="font-size: 16px;">build</span> Utilities <span style="font-size: 10px;">▼</span></button>
-                            <button type="submit" formaction="${pageContext.request.contextPath}/invoice/preview" formtarget="_blank" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">print</span> Preview Invoice</button>
+                            <button type="submit" formaction="${pageContext.request.contextPath}/preview" formtarget="_blank" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">print</span> Preview Invoice</button>
                         </div>
 
                         <div class="actions-right">
                             <c:choose>
                                 <c:when test="${empty invoice}">
-                                    <!-- Creation Mode: Only Save Draft -->
                                     <button type="button" class="btn-action" onclick="submitDraft()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Save Draft</button>
                                 </c:when>
                                 <c:otherwise>
-                                    <!-- Detail/Edit Mode -->
                                     <c:if test="${invoice.invoiceStatus == 'UNRELEASED'}">
                                         <button type="button" class="btn-action success" onclick="submitPublish()"><span class="material-symbols-outlined" style="font-size: 16px;">send</span> Release Invoice</button>
                                         <button type="button" class="btn-action" onclick="submitDraft()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Update Draft</button>

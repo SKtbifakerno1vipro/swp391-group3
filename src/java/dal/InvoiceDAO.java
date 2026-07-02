@@ -33,7 +33,6 @@ public class InvoiceDAO extends DBContext {
     }
 
     public String validateInvoice(Invoice invoice, String phone) {
-        // Validate Invoice No if set manually
         if (!"UNRELEASED".equals(invoice.getInvoiceStatus())) {
             String invoiceNo = invoice.getInvoiceNo();
             if (invoiceNo != null && !invoiceNo.trim().isEmpty() && !invoiceNo.equals("0") && !invoiceNo.startsWith("INV-")) {
@@ -42,8 +41,6 @@ public class InvoiceDAO extends DBContext {
                 }
             }
         }
-
-        // Validate Tax Code (Reference: Validation.validateTaxCode)
         String taxCode = invoice.getBuyerTaxCode();
         if (taxCode == null || taxCode.trim().isEmpty()) {
             return "Mã số thuế người mua không được để trống!";
@@ -53,7 +50,6 @@ public class InvoiceDAO extends DBContext {
             return "Mã số thuế không đúng định dạng (Phải gồm 10 số hoặc 13 số dạng XXXXXXXXXX-XXX)!";
         }
 
-        // Validate Phone (Reference: Validation.validatePhone)
         if (phone == null || phone.trim().isEmpty()) {
             return "Số điện thoại người mua không được để trống!";
         }
@@ -62,18 +58,35 @@ public class InvoiceDAO extends DBContext {
             return "Số điện thoại không đúng định dạng (Phải gồm đúng 10 chữ số)!";
         }
 
+        String symbol = invoice.getInvoiceSymbol();
+        if (symbol == null || symbol.trim().isEmpty()) {
+            return "Ký hiệu hóa đơn không được để trống!";
+        }
+        String trimmedSymbol = symbol.trim().toUpperCase();
+        if (!trimmedSymbol.matches("^(1K|2K)\\d{2}TYY$")) {
+            return "Ký hiệu hóa đơn không đúng định dạng (Phải có dạng 1K[năm]TYY cho VAT hoặc 2K[năm]TYY cho loại khác)!";
+        }
+        String type = invoice.getInvoiceType();
+        String expectedPrefix = "VAT".equalsIgnoreCase(type) ? "1K" : "2K";
+        if (!trimmedSymbol.startsWith(expectedPrefix)) {
+            return "Ký hiệu hóa đơn không khớp với loại hóa đơn (Loại " + (type != null ? type : "chưa xác định") + " phải bắt đầu bằng " + expectedPrefix + ")!";
+        }
+        int year = (invoice.getIssueDate() != null) ? invoice.getIssueDate().getYear() : java.time.LocalDate.now().getYear();
+        String yy = String.format("%02d", year % 100);
+        if (!trimmedSymbol.substring(2, 4).equals(yy)) {
+            return "Ký hiệu hóa đơn không khớp với năm phát hành (Phải chứa năm '" + yy + "')!";
+        }
+
         return null; // Valid
     }
 
     public boolean insertInvoice(Invoice invoice) {
-        // Generate invoice_symbol based on invoice_type and year
         String type = invoice.getInvoiceType();
         int year = (invoice.getIssueDate() != null) ? invoice.getIssueDate().getYear() : java.time.LocalDate.now().getYear();
         String yy = String.format("%02d", year % 100);
         String symbol = ("VAT".equalsIgnoreCase(type) ? "1K" : "2K") + yy + "TYY";
         invoice.setInvoiceSymbol(symbol);
 
-        // Auto-generate invoice_no if empty/invalid/default (only for non-draft invoices)
         if (!"UNRELEASED".equals(invoice.getInvoiceStatus())) {
             if (invoice.getInvoiceNo() == null || invoice.getInvoiceNo().trim().isEmpty() 
                     || invoice.getInvoiceNo().equals("0")

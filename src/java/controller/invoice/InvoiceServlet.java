@@ -16,12 +16,10 @@ import jakarta.servlet.http.HttpSession;
 
 import dal.CustomerOrderDAO;
 import dal.CustomerDAO;
-import dal.ContractDAO;
 import dal.UserDAO;
 import dto.CustomerOrderDTO;
 import dto.CustomerDTO;
 import dto.InvoiceItemDTO;
-import model.Contract;
 import model.Invoice;
 import model.User;
 import service.InvoiceService;

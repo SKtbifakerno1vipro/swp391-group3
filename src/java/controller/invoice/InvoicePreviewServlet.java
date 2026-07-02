@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import dto.InvoiceItemDTO;
 
-@WebServlet(name = "InvoicePreviewServlet", urlPatterns = {"/invoice/preview"})
+@WebServlet(name = "InvoicePreviewServlet", urlPatterns = {"/preview"})
 public class InvoicePreviewServlet extends HttpServlet {
 
     @Override
