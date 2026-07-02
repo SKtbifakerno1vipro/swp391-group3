@@ -11,8 +11,8 @@
                 <c:set var="isEdit" value="${not empty cusDTO}" />
                 <title>
                     <c:choose>
-                        <c:when test="${isEdit}">Edit Customer - Terra Enterprise</c:when>
-                        <c:otherwise>Create Customer</c:otherwise>
+                        <c:when test="${isEdit}">Chỉnh sửa khách hàng - Terra Enterprise</c:when>
+                        <c:otherwise>Tạo khách hàng</c:otherwise>
                     </c:choose>
                 </title>
 
@@ -183,24 +183,24 @@
                     <div class="container">
                         <c:choose>
                             <c:when test="${isEdit}">
-                                <h2>Edit Customer</h2>
+                                <h2>Chỉnh sửa khách hàng</h2>
                             </c:when>
                             <c:otherwise>
-                                <h1>Create Customer</h1>
+                                <h1>Tạo khách hàng</h1>
                             </c:otherwise>
                         </c:choose>
-
+ 
                         <c:if test="${not empty success}">
                             <div class="alert alert-success">
                                 <c:choose>
                                     <c:when test="${isEdit}">${success}</c:when>
-                                    <c:otherwise>Create successful</c:otherwise>
+                                    <c:otherwise>Tạo thành công</c:otherwise>
                                 </c:choose>
                             </div>
                         </c:if>
                         <c:if test="${not empty error}">
                             <div class="alert alert-danger">
-                                <strong>Error:</strong> ${error}
+                                <strong>Lỗi:</strong> ${error}
                                 <c:if test="${not empty errorDetail}">
                                     <br><small>${errorDetail}</small>
                                 </c:if>
@@ -217,19 +217,19 @@
 
                                     <%-- Hien thi Customer ID va User ID (Chi Edit moi thay) --%>
                                         <div class="form-group">
-                                            <label>Customer ID</label>
+                                            <label>Mã khách hàng</label>
                                             <input type="text" class="form-control" value="${cusDTO.customerId}"
                                                 readonly>
                                         </div>
 
                                         <div class="form-group">
-                                            <label>User ID</label>
+                                            <label>Mã người dùng</label>
                                             <input type="text" class="form-control" value="${cusDTO.userId}" readonly>
                                         </div>
                                 </c:if>
 
                                 <div class="form-group">
-                                    <label for="username">Username</label>
+                                    <label for="username">Tên đăng nhập</label>
                                     <input type="text" id="username" name="username" class="form-control"
                                         value="${isEdit ? cusDTO.userName : ''}" ${isEdit ? 'readonly' : '' } required>
                                 </div>
@@ -242,31 +242,31 @@
 
                                 <%-- Full Name --%>
                                     <div class="form-group">
-                                        <label for="fullname">Full Name</label>
+                                        <label for="fullname">Họ và tên</label>
                                         <input type="text" id="fullname" name="fullname" class="form-control"
                                             value="${isEdit ? cusDTO.fullName : ''}">
                                     </div>
 
                                     <%-- Phone --%>
                                         <div class="form-group">
-                                            <label for="phone">Phone</label>
+                                            <label for="phone">Số điện thoại</label>
                                             <input type="text" id="phone" name="phone" class="form-control"
                                                 value="${isEdit ? cusDTO.phone : ''}">
                                         </div>
 
                                         <%-- Status --%>
                                             <div class="form-group">
-                                                <label for="status">Status</label>
+                                                <label for="status">Trạng thái</label>
                                                 <select id="status" name="status" class="form-control">
                                                     <option value="ACTIVE" ${isEdit && cusDTO.status=='ACTIVE'
-                                                        ? 'selected' : '' }>ACTIVE</option>
+                                                        ? 'selected' : '' }>Hoạt động</option>
                                                     <option value="INACTIVE" ${isEdit && cusDTO.status=='INACTIVE'
-                                                        ? 'selected' : '' }>INACTIVE</option>
+                                                        ? 'selected' : '' }>Ngừng hoạt động</option>
                                                 </select>
                                             </div>
 
                                             <div class="form-group">
-                                                <label>Role</label>
+                                                <label>Vai trò</label>
                                                 <c:choose>
                                                     <c:when test="${isEdit}">
                                                         <c:forEach var="role" items="${roles}">
@@ -280,21 +280,21 @@
                                                     </c:when>
                                                     <c:otherwise>
                                                         <input type="hidden" name="roleId" value="${customerRoleId}">
-                                                        <span class="role-badge">Customer</span>
+                                                        <span class="role-badge">Khách hàng</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </div>
 
                                             <%-- Tax Code --%>
                                                 <div class="form-group">
-                                                    <label for="taxCode">Tax Code</label>
+                                                    <label for="taxCode">Mã số thuế</label>
                                                     <input type="text" id="taxCode" name="taxCode" class="form-control"
                                                         value="${isEdit ? cusDTO.taxCode : ''}" required>
                                                 </div>
-
+ 
                                                 <%-- Company Name --%>
                                                     <div class="form-group">
-                                                        <label for="companyName">Company Name</label>
+                                                        <label for="companyName">Tên công ty</label>
                                                         <input type="text" id="companyName" name="companyName"
                                                             class="form-control"
                                                             value="${isEdit ? cusDTO.companyName : ''}" required>
@@ -302,10 +302,10 @@
 
                                                     <%-- Customer Type--%>
                                                         <div class="form-group">
-                                                            <label for="customerType">Customer Type</label>
+                                                            <label for="customerType">Loại khách hàng</label>
                                                             <select id="customerType" name="customerType"
                                                                 class="form-control" ${isEdit ? 'required' : '' }>
-                                                                <option value="">-- Select Type --</option>
+                                                                <option value="">-- Chọn phân loại --</option>
                                                                 <c:forEach var="type" items="${listTypeCus}">
                                                                     <option value="${type}" ${isEdit &&
                                                                         cusDTO.customerType==type ? 'selected' : '' }>
@@ -316,11 +316,10 @@
 
                                                         <%-- Assigned To--%>
                                                             <div class="form-group">
-                                                                <label for="assignedToUserId">Assigned To (Logged-in
-                                                                    User ID: ${sessionScope.user.userId})</label>
+                                                                <label for="assignedToUserId">Giao cho (ID người dùng đã đăng nhập: ${sessionScope.user.userId})</label>
                                                                 <select id="assignedToUserId" name="assignedToUserId"
                                                                     class="form-control">
-                                                                    <option value="">-- None --</option>
+                                                                    <option value="">-- Không giao cho ai --</option>
                                                                     <c:forEach var="u" items="${users}">
                                                                         <option value="${u.userId}" ${(isEdit &&
                                                                             cusDTO.assignedToUserId==u.userId) ||
@@ -333,13 +332,13 @@
                                                                     </c:forEach>
                                                                 </select>
                                                             </div>
-
+ 
                                                             <%-- --%>
                                                                 <div class="btn-group">
                                                                     <button type="submit" class="btn-submit">${isEdit ?
-                                                                        'Save changes' : 'Create'}</button>
+                                                                        'Lưu thay đổi' : 'Tạo mới'}</button>
                                                                     <a href="${pageContext.request.contextPath}/customer/list"
-                                                                        class="btn-cancel">Cancel</a>
+                                                                        class="btn-cancel">Hủy</a>
                                                                 </div>
                         </form>
                     </div>
