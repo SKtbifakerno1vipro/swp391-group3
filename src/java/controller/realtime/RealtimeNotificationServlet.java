@@ -43,11 +43,12 @@ public class RealtimeNotificationServlet extends HttpServlet {
         response.setHeader("Connection", "keep-alive");
 
         PrintWriter writer = response.getWriter();
-        // Lùi mốc thời gian ban đầu lại 5 giây để quét bắt kịp các giao dịch trong lúc chuyển trang
         long startTime = System.currentTimeMillis() - 5000;
         Timestamp lastCheckedPayment = new Timestamp(startTime);
         Timestamp lastCheckedCustomer = new Timestamp(startTime);
-        Timestamp lastContractChecked = new Timestamp(startTime);
+
+        // Quét theo ID thay vì mốc thời gian (Riêng cho Contract theo yêu cầu)
+        int lastContractHistoryId = contractDAO.getMaxContractHistoryId();
 
         System.out.println("[Realtime Servlet] Client connected: " + user.getUserName() + " (Role: " + user.getRoleId() + ")");
 
@@ -113,7 +114,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
             }
 
             // 3. Contract Workflow Notifications
-            List<ContractHistory> newHistories = contractDAO.getContractHistoriesSince(lastContractChecked);
+            List<ContractHistory> newHistories = contractDAO.getContractHistoriesSinceId(lastContractHistoryId);
             for (ContractHistory h : newHistories) {
                 if (h.getCreatedAt() != null) {
                     boolean shouldNotify = false;
@@ -126,28 +127,28 @@ public class RealtimeNotificationServlet extends HttpServlet {
 
                     // A. Officer submits to Manager (DRAFT/PENDING_REVIEW -> PENDING_REVIEW by Officer)
                     if ("PENDING_REVIEW".equals(h.getToStatus()) && changerRole == 5) {
-                        if (roleId == 2) { // Manager gets it
+                        if (roleId == 2) {
                             shouldNotify = true;
                             title = "Hợp đồng cần duyệt";
                             msg = "Officer vừa gửi hợp đồng " + h.getContractNumber() + " để duyệt.";
                         }
                     } // B. Manager requests edit (-> PENDING_REVIEW by Manager)
                     else if ("PENDING_REVIEW".equals(h.getToStatus()) && changerRole == 2) {
-                        if (roleId == 5) { // Officer gets it
+                        if (roleId == 5) {
                             shouldNotify = true;
                             title = "Yêu cầu sửa hợp đồng";
                             msg = "Manager yêu cầu sửa hợp đồng " + h.getContractNumber() + ".";
                         }
                     } // C. Customer requests edit (-> PENDING_REVIEW by Customer)
                     else if ("PENDING_REVIEW".equals(h.getToStatus()) && changerRole == 3) {
-                        if (roleId == 2 || roleId == 5) { // Manager & Officer get it
+                        if (roleId == 2 || roleId == 5) {
                             shouldNotify = true;
                             title = "Khách hàng yêu cầu sửa";
                             msg = "Khách hàng yêu cầu sửa hợp đồng " + h.getContractNumber() + ".";
                         }
                     } // D. Manager approves (-> CUSTOMER_CHECK)
                     else if ("CUSTOMER_CHECK".equals(h.getToStatus())) {
-                        if (roleId == 2) { // Manager
+                        if (roleId == 2) {
                             shouldNotify = true;
                             title = "Duyệt thành công";
                             msg = "Đã gửi hợp đồng " + h.getContractNumber() + " cho khách hàng.";
@@ -158,14 +159,14 @@ public class RealtimeNotificationServlet extends HttpServlet {
                         }
                     } // E. Customer approves (-> APPROVED )
                     else if ("APPROVED".equals(h.getToStatus()) && changerRole == 3) {
-                        if (roleId == 2 || roleId == 5) { // Manager & Officer
+                        if (roleId == 2 || roleId == 5) {
                             shouldNotify = true;
                             title = "Khách hàng đã chốt hợp đồng";
                             msg = "Khách hàng đã chốt " + h.getContractNumber() + ".";
                         }
                     } // F. Customer and Manager signs (-> SIGNED)
                     else if ("SIGNED".equals(h.getToStatus())) {
-                        if (roleId == 2 || roleId == 5 || roleId == 6) { // Manager & Officer & Warehouse
+                        if (roleId == 2 || roleId == 5 || roleId == 6) {
                             shouldNotify = true;
                             title = "Cả hai bên đã ký hợp đồng";
                             msg = "Cả khách hàng và quản lý đã ký hợp đồng " + h.getContractNumber() + " thành công! "
@@ -175,21 +176,18 @@ public class RealtimeNotificationServlet extends HttpServlet {
 
                     if (shouldNotify) {
                         writer.write("event: notification\n");
-                        writer.write("data: {\"type\":\"info\",\"title\":\"" + escapeJson(title) + "\",\"message\":\""
-                                + escapeJson(msg) + "\",\"link\":\"" + escapeJson(link) + "\"}\n\n");
+                        writer.write("data: {\"type\":\"info\",\"title\":\"" + escapeJson(title)
+                                + "\",\"message\":\"" + escapeJson(msg)
+                                + "\",\"link\":\"" + escapeJson(link) + "\"}\n\n");
                     }
 
-                    Timestamp hTime = Timestamp.valueOf(h.getCreatedAt());
-                    Timestamp nextTime = new Timestamp(hTime.getTime() + 100);
-                    if (nextTime.after(lastContractChecked)) {
-                        lastContractChecked = nextTime;
+                    if (h.getHistoryId() > lastContractHistoryId) {
+                        lastContractHistoryId = h.getHistoryId();
                     }
-                    
-                    
+
                 }
             }
-            
-            
+
             writer.flush();
             response.flushBuffer();
             try {
@@ -197,8 +195,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
             } catch (InterruptedException e) {
                 break;
             }
-            
-            
+
         }
         System.out.println("[Realtime Servlet] Connection closed for user: " + user.getUserName());
     }

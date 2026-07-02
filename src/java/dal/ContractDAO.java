@@ -444,7 +444,21 @@ public class ContractDAO extends DBContext {
         return list;
     }
 
-    public List<ContractHistory> getContractHistoriesSince(Timestamp sinceTime) {
+
+    public int getMaxContractHistoryId() {
+        String sql = "select max(history_id) FROM contract_edit_history";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<ContractHistory> getContractHistoriesSinceId(int lastHistoryId) {
         List<ContractHistory> list = new ArrayList<>();
         String sql = "SELECT h.*, "
                 + "u.user_name, u.role_id AS changer_role_id, "
@@ -454,10 +468,10 @@ public class ContractDAO extends DBContext {
                 + "JOIN customer_contract c ON h.contract_id = c.customer_contract_id "
                 + "JOIN customer cu ON c.customer_id = cu.customer_id "
                 + "JOIN [user] u ON h.changed_by = u.user_id "
-                + "WHERE h.created_at > ? "
-                + "ORDER BY h.created_at ASC";
+                + "WHERE h.history_id > ? "
+                + "ORDER BY h.history_id ASC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setTimestamp(1, sinceTime);
+            ps.setInt(1, lastHistoryId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     ContractHistory h = new ContractHistory();

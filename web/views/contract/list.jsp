@@ -5,7 +5,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Contract List - Po Bread Sales</title>
+        <title>Danh sách hợp đồng - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -18,61 +18,70 @@
                 <jsp:param name="activeMenu" value="contracts"/>
             </jsp:include>
             <main class="main legacy-page">
-                <h2>Contract Management</h2>
+                <h2>Quản lý Hợp đồng</h2>
 
                 <form action="contract-list" method="GET">
-                    <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Contract number">
-                    <input type="text" name="customerName" value="${customerName}" placeholder="Customer name">
-                    <input type="text" name="customerTaxCode" value="${customerTaxCode}" placeholder="Customer tax code">
-                    <input type="text" name="customerPhone" value="${customerPhone}" placeholder="Customer phone">
-                    <input type="text" name="customerEmail" value="${customerEmail}" placeholder="Customer email">
+                    <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Mã hợp đồng">
+                    <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng">
+                    <input type="text" name="customerTaxCode" value="${customerTaxCode}" placeholder="Mã số thuế">
+                    <input type="text" name="customerPhone" value="${customerPhone}" placeholder="Số điện thoại">
+                    <input type="text" name="customerEmail" value="${customerEmail}" placeholder="Email">
                     <select name="status">
-                        <option value="">-- All statuses --</option>
-                        <option value="DRAFT" ${status == 'DRAFT' ? 'selected' : ''}>Draft</option>
-                        <option value="PENDING_REVIEW" ${status == 'PENDING_REVIEW' ? 'selected' : ''}>Pending Review</option>
-                        <option value="CUSTOMER_CHECK" ${status == 'CUSTOMER_CHECK' ? 'selected' : ''}>Customer Check</option>
-                        <option value="APPROVED" ${status == 'APPROVED' ? 'selected' : ''}>Approved</option>
-                        <option value="SIGNED" ${status == 'SIGNED' ? 'selected' : ''}>Signed</option>
+                        <option value="">-- Tất cả trạng thái --</option>
+                        <option value="DRAFT" ${status == 'DRAFT' ? 'selected' : ''}>Nháp</option>
+                        <option value="PENDING_REVIEW" ${status == 'PENDING_REVIEW' ? 'selected' : ''}>Chờ duyệt</option>
+                        <option value="CUSTOMER_CHECK" ${status == 'CUSTOMER_CHECK' ? 'selected' : ''}>Chờ khách hàng duyệt</option>
+                        <option value="APPROVED" ${status == 'APPROVED' ? 'selected' : ''}>Đã chốt</option>
+                        <option value="SIGNED" ${status == 'SIGNED' ? 'selected' : ''}>Đã ký</option>
                     </select>
                     <select name="storageType">
-                        <option value="">-- Storage type --</option>
-                        <option value="TEXT" ${storageType == 'TEXT' ? 'selected' : ''}>Text</option>
-                        <option value="IMAGE" ${storageType == 'IMAGE' ? 'selected' : ''}>Image scan</option>
+                        <option value="">-- Hình thức lưu trữ --</option>
+                        <option value="TEXT" ${storageType == 'TEXT' ? 'selected' : ''}>Văn bản</option>
+                        <option value="IMAGE" ${storageType == 'IMAGE' ? 'selected' : ''}>Ảnh scan</option>
                     </select>
                     <br>
-                    <label>From date</label>
+                    <label>Từ ngày</label>
                     <input type="date" name="fromDate" value="${fromDate}">
-                    <label>To date</label>
+                    <label>Đến ngày</label>
                     <input type="date" name="toDate" value="${toDate}">
-                    <button type="submit">Search</button>
-                    <a href="${pageContext.request.contextPath}/contract-list">Reset filters</a>
+                    <button type="submit">Tìm kiếm</button>
+                    <a href="${pageContext.request.contextPath}/contract-list">Xóa bộ lọc</a>
                 </form>
 
                 <table>
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Contract Number</th>
-                            <th>Customer</th>
-                            <th>Status</th>
-                            <th>Storage Type</th>
-                            <th>Tax Code</th>
-                            <th>Phone</th>
-                            <th>Created At</th>
+                            <th>Mã Hợp Đồng</th>
+                            <th>Khách hàng</th>
+                            <th>Trạng thái</th>
+                            <th>Hình thức lưu</th>
+                            <th>Mã số thuế</th>
+                            <th>Số điện thoại</th>
+                            <th>Ngày tạo</th>
                             <th>Email</th>
-                            <th>Actions</th>
+                            <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:if test="${empty list}">
-                            <tr><td colspan="9" style="text-align:center;">No contracts found.</td></tr>
+                            <tr><td colspan="9" style="text-align:center;">Không tìm thấy hợp đồng nào.</td></tr>
                         </c:if>
                         <c:forEach items="${list}" var="c">
                             <tr>
                                 <td>${c.contractId}</td>
                                 <td>${c.contractNumber}</td>
                                 <td>${c.customerName}</td>
-                                <td>${c.contractStatus}</td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${c.contractStatus == 'DRAFT'}">Nháp</c:when>
+                                        <c:when test="${c.contractStatus == 'PENDING_REVIEW'}">Chờ duyệt</c:when>
+                                        <c:when test="${c.contractStatus == 'CUSTOMER_CHECK'}">Chờ khách duyệt</c:when>
+                                        <c:when test="${c.contractStatus == 'APPROVED'}">Đã chốt</c:when>
+                                        <c:when test="${c.contractStatus == 'SIGNED'}">Đã ký</c:when>
+                                        <c:otherwise>${c.contractStatus}</c:otherwise>
+                                    </c:choose>
+                                </td>
                                 <td>${c.storageType}</td>
                                 <td>${c.taxCode}</td>
                                 <td>${c.phone}</td>
@@ -81,17 +90,17 @@
                                 <td>
                                     <c:if test="${sessionScope.user.roleId==5}">
                                         <c:if test="${c.contractStatus != 'SIGNED' && c.contractStatus !='APPROVED'}">
-                                            <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Edit</a> |      
+                                            <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Sửa</a> |      
                                         </c:if>                    
                                     </c:if>
-                                    <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">Details</a> 
+                                    <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">Chi tiết</a> 
                                     <c:if test="${c.contractStatus =='SIGNED'}">
                                         <c:choose>
                                             <c:when test="${c.orderId > 0}">
-                                                <a href="${pageContext.request.contextPath}/customer-order?id=${c.orderId}">| View Order</a>
+                                                <a href="${pageContext.request.contextPath}/customer-order?id=${c.orderId}">| Xem Đơn hàng</a>
                                             </c:when>
                                             <c:otherwise>
-                                                <a href="${pageContext.request.contextPath}//customer-order?contractId=${c.contractId}">| Create Order</a>
+                                                <a href="${pageContext.request.contextPath}//customer-order?contractId=${c.contractId}">| Tạo Đơn hàng</a>
                                             </c:otherwise>
                                         </c:choose>
                                     </c:if>
