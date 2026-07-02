@@ -66,10 +66,11 @@ public class RealtimeNotificationServlet extends HttpServlet {
                     if (roleId == 3) {
                         writer.write("event: notification\n");
                         writer.write("data: " + formatCustomerPaymentJson(p, request.getContextPath()) + "\n\n");
-                    } else {
-                        writer.write("event: notification\n");
-                        writer.write("data: " + formatAdminContractSignedJson(p, request.getContextPath()) + "\n\n");
                     }
+//                    else {
+//                        writer.write("event: notification\n");
+//                        writer.write("data: " + formatAdminContractSignedJson(p, request.getContextPath()) + "\n\n");
+//                    }
 
                     Timestamp pTime = Timestamp.valueOf(p.getCreatedAt());
                     if (pTime.after(maxPaymentTime)) {
@@ -154,8 +155,8 @@ public class RealtimeNotificationServlet extends HttpServlet {
                             msg = "Đã gửi hợp đồng " + h.getContractNumber() + " cho khách hàng.";
                         } else if (roleId == 3 && user.getUserId() == h.getCustomerUserId()) { // Customer
                             shouldNotify = true;
-                            title = "Hợp đồng chờ ký";
-                            msg = "Hợp đồng " + h.getContractNumber() + " đã sẵn sàng. Vui lòng kiểm tra và ký.";
+                            title = "Quý khách có hợp đồng cần xem";
+                            msg = "Hợp đồng " + h.getContractNumber() + " đã sẵn sàng. Vui lòng kiểm tra lại thông tin!";
                         }
                     } // E. Customer approves (-> APPROVED )
                     else if ("APPROVED".equals(h.getToStatus()) && changerRole == 3) {
@@ -223,17 +224,17 @@ public class RealtimeNotificationServlet extends HttpServlet {
         );
     }
 
-    private String formatAdminContractSignedJson(Payment p, String contextPath) {
-        String name = p.getCustomerName() != null ? p.getCustomerName() : "Khách hàng";
-        String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
-        return String.format(
-                "{\"type\":\"info\",\"title\":\"Ký hợp đồng\",\"message\":\"Khách hàng %s đã ký hợp đồng số %s.\",\"link\":\"%s/contract-detail?id=%d\",\"btnText\":\"Xem hợp đồng\",\"icon\":\"contract\",\"color\":\"#3b82f6\"}",
-                escapeJson(name),
-                escapeJson(contractNo),
-                contextPath,
-                p.getCustomerContractId()
-        );
-    }
+//    private String formatAdminContractSignedJson(Payment p, String contextPath) {
+//        String name = p.getCustomerName() != null ? p.getCustomerName() : "Khách hàng";
+//        String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
+//        return String.format(
+//                "{\"type\":\"info\",\"title\":\"Ký hợp đồng\",\"message\":\"Khách hàng %s đã ký hợp đồng số %s.\",\"link\":\"%s/contract-detail?id=%d\",\"btnText\":\"Xem hợp đồng\",\"icon\":\"contract\",\"color\":\"#3b82f6\"}",
+//                escapeJson(name),
+//                escapeJson(contractNo),
+//                contextPath,
+//                p.getCustomerContractId()
+//        );
+//    }
 
     private String formatCustomerPaymentCompletedJson(Payment p, String contextPath) {
         double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;

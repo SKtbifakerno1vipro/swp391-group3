@@ -5,6 +5,7 @@ import dto.DashboardSummaryDTO;
 import dto.RoleStatisticDTO;
 import dto.StatusStatisticDTO;
 import dto.ActivityDTO;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
@@ -603,6 +604,59 @@ public class DashboardDAO extends DBContext {
             }
         } catch (Exception e) {
             System.out.println("getRecentActivities error: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public Map<String, Object> getInvoiceSummaryForOfficer() {
+        Map<String, Object> summary = new HashMap<>();
+        String sql = "SELECT "
+                + "  COUNT(i.invoice_id) as total_invoices, "
+                + "  SUM(CASE WHEN p.payment_status = 'PAID' THEN i.total_amount ELSE 0 END) as paid_amount, "
+                + "  SUM(CASE WHEN p.payment_status = 'UNPAID' OR p.payment_status = 'PENDING' OR p.payment_status IS NULL THEN i.total_amount ELSE 0 END) as unpaid_amount "
+                + "FROM invoice i "
+                + "LEFT JOIN payment p ON i.invoice_id = p.invoice_id "
+                + "WHERE i.invoice_status != 'UNRELEASED'";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                summary.put("totalInvoices", rs.getInt("total_invoices"));
+                summary.put("paidAmount", rs.getBigDecimal("paid_amount") != null ? rs.getBigDecimal("paid_amount") : BigDecimal.ZERO);
+                summary.put("unpaidAmount", rs.getBigDecimal("unpaid_amount") != null ? rs.getBigDecimal("unpaid_amount") : BigDecimal.ZERO);
+            }
+        } catch (Exception e) {
+            System.out.println("getInvoiceSummaryForOfficer error: " + e.getMessage());
+        }
+        return summary;
+    }
+
+    public List<Map<String, Object>> getRecentInvoicesForOfficer(int limit) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT TOP (?) i.invoice_no, i.issue_date, i.total_amount, i.invoice_status, "
+                + "c.contract_number, cu.company_name, o.customer_order_id, p.payment_status "
+                + "FROM invoice i "
+                + "LEFT JOIN customer_contract c ON i.customer_contract_id = c.customer_contract_id "
+                + "LEFT JOIN customer cu ON c.customer_id = cu.customer_id "
+                + "LEFT JOIN customer_order o ON i.customer_order_id = o.customer_order_id "
+                + "LEFT JOIN payment p ON i.invoice_id = p.invoice_id "
+                + "ORDER BY i.issue_date DESC, i.invoice_id DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> inv = new HashMap<>();
+                    inv.put("invoiceNo", rs.getString("invoice_no"));
+                    inv.put("issueDate", rs.getDate("issue_date"));
+                    inv.put("totalAmount", rs.getBigDecimal("total_amount"));
+                    inv.put("invoiceStatus", rs.getString("invoice_status"));
+                    inv.put("contractNumber", rs.getString("contract_number"));
+                    inv.put("companyName", rs.getString("company_name"));
+                    inv.put("orderId", rs.getObject("customer_order_id"));
+                    inv.put("paymentStatus", rs.getString("payment_status"));
+                    list.add(inv);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getRecentInvoicesForOfficer error: " + e.getMessage());
         }
         return list;
     }
