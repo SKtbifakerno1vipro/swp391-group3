@@ -152,28 +152,28 @@ public class RealtimeNotificationServlet extends HttpServlet {
 
                     // A. Officer submits to Manager (DRAFT/PENDING_REVIEW -> PENDING_REVIEW by Officer)
                     if ("PENDING_REVIEW".equals(h.getToStatus()) && changerRole == 5) {
-                        if (roleId == 2) { // Manager gets it
+                        if (roleId == 2) {
                             shouldNotify = true;
                             title = "Hợp đồng cần duyệt";
                             msg = "Officer vừa gửi hợp đồng " + h.getContractNumber() + " để duyệt.";
                         }
                     } // B. Manager requests edit (-> PENDING_REVIEW by Manager)
                     else if ("PENDING_REVIEW".equals(h.getToStatus()) && changerRole == 2) {
-                        if (roleId == 5) { // Officer gets it
+                        if (roleId == 5) {
                             shouldNotify = true;
                             title = "Yêu cầu sửa hợp đồng";
                             msg = "Manager yêu cầu sửa hợp đồng " + h.getContractNumber() + ".";
                         }
                     } // C. Customer requests edit (-> PENDING_REVIEW by Customer)
                     else if ("PENDING_REVIEW".equals(h.getToStatus()) && changerRole == 3) {
-                        if (roleId == 2 || roleId == 5) { // Manager & Officer get it
+                        if (roleId == 2 || roleId == 5) {
                             shouldNotify = true;
                             title = "Khách hàng yêu cầu sửa";
                             msg = "Khách hàng yêu cầu sửa hợp đồng " + h.getContractNumber() + ".";
                         }
                     } // D. Manager approves (-> CUSTOMER_CHECK)
                     else if ("CUSTOMER_CHECK".equals(h.getToStatus())) {
-                        if (roleId == 2) { // Manager
+                        if (roleId == 2) {
                             shouldNotify = true;
                             title = "Duyệt thành công";
                             msg = "Đã gửi hợp đồng " + h.getContractNumber() + " cho khách hàng.";
@@ -184,14 +184,14 @@ public class RealtimeNotificationServlet extends HttpServlet {
                         }
                     } // E. Customer approves (-> APPROVED )
                     else if ("APPROVED".equals(h.getToStatus()) && changerRole == 3) {
-                        if (roleId == 2 || roleId == 5) { // Manager & Officer
+                        if (roleId == 2 || roleId == 5) {
                             shouldNotify = true;
                             title = "Khách hàng đã chốt hợp đồng";
                             msg = "Khách hàng đã chốt " + h.getContractNumber() + ".";
                         }
                     } // F. Customer and Manager signs (-> SIGNED)
                     else if ("SIGNED".equals(h.getToStatus())) {
-                        if (roleId == 2 || roleId == 5 || roleId == 6) { // Manager & Officer & Warehouse
+                        if (roleId == 2 || roleId == 5 || roleId == 6) {
                             shouldNotify = true;
                             title = "Cả hai bên đã ký hợp đồng";
                             msg = "Cả khách hàng và quản lý đã ký hợp đồng " + h.getContractNumber() + " thành công! "
