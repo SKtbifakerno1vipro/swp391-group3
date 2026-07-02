@@ -4,7 +4,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Update Password - Terra Enterprise</title>
+    <title>Cập nhật mật khẩu - Terra Enterprise</title>
     <style>
         .form-container {
             max-width: 450px;
@@ -89,20 +89,20 @@
 
 <body style="min-height: 100vh; background-color: var(--bg); display: flex; align-items: center; justify-content: center; padding: 20px; font-family: 'Nunito Sans', sans-serif; margin: 0;">
     <div class="form-container" style="background: var(--surface); border: 1px solid rgba(221, 213, 201, 0.85); border-radius: 22px; box-shadow: var(--shadow); padding: 30px; width: 100%; max-width: 450px; margin: 0;">
-        <h2>Update Password</h2>
+        <h2>Cập nhật mật khẩu</h2>
 
         <%-- Result messages --%>
         <c:if test="${not empty success}">
             <div class="alert alert-success">
                 ${success}
                 <c:if test="${isForgetFlowSuccess}">
-                    <br><a href="${pageContext.request.contextPath}/login" style="color: #155724; font-weight: bold; text-decoration: underline;">Log in now</a>
+                    <br><a href="${pageContext.request.contextPath}/login" style="color: #155724; font-weight: bold; text-decoration: underline;">Đăng nhập ngay</a>
                 </c:if>
             </div>
         </c:if>
         <c:if test="${not empty error}">
             <div class="alert alert-danger">
-                <strong>Error:</strong> ${error}
+                <strong>Lỗi:</strong> ${error}
                 <c:if test="${not empty errorDetail}">
                     <br><small>${errorDetail}</small>
                 </c:if>
@@ -114,22 +114,22 @@
 
             <c:if test="${empty sessionScope.forgetPass}">
                 <div class="form-group">
-                    <label for="currentPassword">Current Password:</label>
+                    <label for="currentPassword">Mật khẩu hiện tại:</label>
                     <input type="password" id="currentPassword" name="currentPassword" required>
                 </div>
             </c:if>
             
             <div class="form-group">
-                <label for="newPassword">New Password:</label>
+                <label for="newPassword">Mật khẩu mới:</label>
                 <input type="password" id="newPassword" name="newPassword" required>
             </div>
 
             <div class="form-group">
-                <label for="confirmPassword">Confirm New Password:</label>
+                <label for="confirmPassword">Xác nhận mật khẩu mới:</label>
                 <input type="password" id="confirmPassword" name="confirmPassword" required>
             </div>
 
-            <button type="submit" name="action" value="changePassword" class="btn-submit">Update Password</button>
+            <button type="submit" name="action" value="changePassword" class="btn-submit">Cập nhật mật khẩu</button>
         </form>
     </div>
 </body>
