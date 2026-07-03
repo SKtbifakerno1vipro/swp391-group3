@@ -99,6 +99,10 @@ public class ContractService {
         return contractDAO.validateToken(contractId, token);
     }
 
+    public String refreshContractToken(int contractId) {
+        return contractDAO.refreshContractToken(contractId);
+    }
+
     public void noticeCustomerCheckContract(int contractId, String baseUrl) {
         Contract contract = contractDAO.getContractById(contractId);
         CustomerDTO customer = contractDAO.getCustomerDTOByContractId(contractId);

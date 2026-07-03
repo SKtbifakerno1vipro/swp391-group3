@@ -13,8 +13,8 @@ public class ContractDAO extends DBContext {
 
     // CREATE
     public int insert(Contract c) {
-        String sql = "INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_status, contract_content, storage_type, created_by, token, created_at, updated_at) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+        String sql = "INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_status, contract_content, storage_type, created_by, token, token_expired_at, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, DATEADD(minute, 30, GETDATE()), GETDATE(), GETDATE())";
 
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, c.getCustomerId());
@@ -39,6 +39,21 @@ public class ContractDAO extends DBContext {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public String refreshContractToken(int contractId) {
+        String newToken = java.util.UUID.randomUUID().toString();
+        String sql = "UPDATE customer_contract SET token = ?, token_expired_at = DATEADD(minute, 30, GETDATE()) WHERE customer_contract_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newToken);
+            ps.setInt(2, contractId);
+            ps.executeUpdate();
+            return newToken;
+        } catch (Exception e) {
+            System.err.println("ContractDAO refreshContractToken error: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
@@ -275,7 +290,7 @@ public class ContractDAO extends DBContext {
      * @return
      */
     public boolean validateToken(int contractId, String token) {
-        String sql = "SELECT COUNT(*) FROM customer_contract WHERE customer_contract_id = ? AND token = ?";
+        String sql = "SELECT COUNT(*) FROM customer_contract WHERE customer_contract_id = ? AND token = ? AND (token_expired_at IS NULL OR token_expired_at > GETDATE())";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
             ps.setString(2, token);

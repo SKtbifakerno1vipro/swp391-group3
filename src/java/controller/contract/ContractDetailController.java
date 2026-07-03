@@ -150,8 +150,9 @@ public class ContractDetailController extends HttpServlet {
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+        boolean isGuest= Boolean.parseBoolean(request.getParameter("isGuest"));
         //user not login then return to login page
-        if (user == null) {
+        if (user == null && !isGuest) {
             response.sendRedirect("login");
             return;
         }
@@ -210,6 +211,7 @@ public class ContractDetailController extends HttpServlet {
             }
             // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
+            contractService.refreshContractToken(contractId); // Gen new token + 30m expire
             contractService.noticeCustomerCheckContract(contractId, "http://localhost:9999/SWP391_GROUP3/");
 
             // Save history work for manager approve contract

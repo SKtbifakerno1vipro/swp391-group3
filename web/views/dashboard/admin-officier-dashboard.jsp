@@ -84,15 +84,15 @@
                     <!-- Contract KPIs -->
                     <div class="kpi-card">
                         <h3>Awaiting Quotations</h3>
-                        <p style="color:var(--danger);">${awaitingQuotations}</p>
+                        <p style="color:${awaitingQuotations > 0 ? 'var(--danger)' : 'var(--muted)'};">${awaitingQuotations}</p>
                     </div>
                     <div class="kpi-card">
                         <h3>Contracts In Progress</h3>
-                        <p style="color:var(--tertiary);">${contractsInProgress}</p>
+                        <p style="color:${contractsInProgress > 0 ? 'var(--tertiary)' : 'var(--muted)'};">${contractsInProgress}</p>
                     </div>
                     <div class="kpi-card">
                         <h3>Active Contracts</h3>
-                        <p style="color:var(--primary);">${activeContracts}</p>
+                        <p style="color:${activeContracts > 0 ? 'var(--primary)' : 'var(--muted)'};">${activeContracts}</p>
                     </div>
                     <!-- Invoice KPIs -->
                     <div class="kpi-card">
@@ -101,13 +101,13 @@
                     </div>
                     <div class="kpi-card">
                         <h3>Total Paid Amount</h3>
-                        <p style="color:#4caf50;">
+                        <p style="color:${invoiceSummary.paidAmount > 0 ? '#4caf50' : 'var(--muted)'};">
                             <fmt:formatNumber value="${invoiceSummary.paidAmount}" type="number" maxFractionDigits="0"/>đ
                         </p>
                     </div>
                     <div class="kpi-card">
                         <h3>Total Unpaid Amount</h3>
-                        <p style="color:var(--danger);">
+                        <p style="color:${invoiceSummary.unpaidAmount > 0 ? 'var(--danger)' : 'var(--muted)'};">
                             <fmt:formatNumber value="${invoiceSummary.unpaidAmount}" type="number" maxFractionDigits="0"/>đ
                         </p>
                     </div>
@@ -138,10 +138,18 @@
                                 </thead>
                                 <tbody>
                                     <c:forEach var="c" items="${contractsNeedingAction}">
+                                        <c:set var="bg" value="var(--surface-strong)" />
+                                        <c:set var="col" value="var(--muted)" />
+                                        <c:choose>
+                                            <c:when test="${c.contractStatus == 'SIGNED' || c.contractStatus == 'APPROVED' || c.contractStatus == 'COMPLETED'}"><c:set var="bg" value="var(--primary-soft)" /><c:set var="col" value="var(--primary)" /></c:when>
+                                            <c:when test="${c.contractStatus == 'DRAFT'}"><c:set var="bg" value="var(--surface-strong)" /><c:set var="col" value="var(--muted)" /></c:when>
+                                            <c:when test="${c.contractStatus == 'PENDING_REVIEW' || c.contractStatus == 'CUSTOMER_CHECK'}"><c:set var="bg" value="#f9ebce" /><c:set var="col" value="var(--tertiary)" /></c:when>
+                                            <c:when test="${c.contractStatus == 'CANCELLED' || c.contractStatus == 'REJECTED'}"><c:set var="bg" value="#fbeaea" /><c:set var="col" value="var(--danger)" /></c:when>
+                                        </c:choose>
                                         <tr>
                                             <td style="font-weight:bold;">${c.contractNumber}</td>
                                             <td>${c.customerName}</td>
-                                            <td><span class="badge" style="background:var(--primary-soft); color:var(--primary);">${c.contractStatus}</span></td>
+                                            <td><span class="badge" style="background:${bg}; color:${col};">${c.contractStatus}</span></td>
                                             <td style="text-align:right;">
                                                 <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}" style="color:var(--primary); font-weight:bold;">Review</a>
                                             </td>
@@ -166,21 +174,28 @@
                                         <th>Contract</th>
                                         <th>Customer</th>
                                         <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Payment</th>
+                                        <th style="width:1%; white-space:nowrap;">Status</th>
+                                        <th style="width:1%; white-space:nowrap;">Payment</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <c:forEach var="i" items="${recentInvoices}">
+                                        <c:set var="ibg" value="var(--surface-strong)" />
+                                        <c:set var="icol" value="var(--muted)" />
+                                        <c:choose>
+                                            <c:when test="${i.invoiceStatus == 'PAID' || i.invoiceStatus == 'APPROVED' || i.invoiceStatus == 'COMPLETED'}"><c:set var="ibg" value="var(--primary-soft)" /><c:set var="icol" value="var(--primary)" /></c:when>
+                                            <c:when test="${i.invoiceStatus == 'PENDING' || i.invoiceStatus == 'UNRELEASED'}"><c:set var="ibg" value="#f9ebce" /><c:set var="icol" value="var(--tertiary)" /></c:when>
+                                            <c:when test="${i.invoiceStatus == 'CANCELLED' || i.invoiceStatus == 'OVERDUE'}"><c:set var="ibg" value="#fbeaea" /><c:set var="icol" value="var(--danger)" /></c:when>
+                                        </c:choose>
                                         <tr>
                                             <td style="font-weight:bold;">${i.invoiceNo}</td>
                                             <td>${i.contractNumber}</td>
-                                            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:80px;">${i.companyName}</td>
+                                            <td>${i.companyName}</td>
                                             <td style="color:var(--primary); font-weight:bold;">
                                                 <fmt:formatNumber value="${i.totalAmount}" type="number" maxFractionDigits="0"/>đ
                                             </td>
-                                            <td><span class="badge" style="background:var(--primary-soft); color:var(--primary);">${i.invoiceStatus}</span></td>
-                                            <td>
+                                            <td style="white-space:nowrap;"><span class="badge" style="background:${ibg}; color:${icol};">${i.invoiceStatus}</span></td>
+                                            <td style="white-space:nowrap;">
                                                 <span class="badge" style="
                                                     background:${i.paymentStatus == 'PAID' ? '#dcefe1' : (i.paymentStatus == 'UNPAID' ? '#fbeaea' : '#f0ece4')}; 
                                                     color:${i.paymentStatus == 'PAID' ? '#4a7c59' : (i.paymentStatus == 'UNPAID' ? '#b83230' : '#646b66')};">
@@ -202,11 +217,29 @@
 
         <!-- SCRIPT VẼ CHART -->
         <script>
-            const labels = [];
+            function getSemanticColor(status) {
+                if (['SIGNED', 'APPROVED', 'COMPLETED'].includes(status)) return '#4a7c59'; 
+                if (['DRAFT'].includes(status)) return '#646b66'; 
+                if (['PENDING_REVIEW', 'CUSTOMER_CHECK', 'AWAITING_QUOTATION'].includes(status)) return '#b1812f'; 
+                if (['CANCELLED', 'REJECTED'].includes(status)) return '#b83230'; 
+                return '#e4e0d8'; 
+            }
+
             const data = [];
+            const bgColors = [];
+            let totalCount = 0;
             <c:forEach items="${contractStatusCounts}" var="entry">
-                labels.push('${entry.key}');
                 data.push(${entry.value});
+                bgColors.push(getSemanticColor('${entry.key}'));
+                totalCount += ${entry.value};
+            </c:forEach>
+            const labels = [];
+            <c:forEach items="${contractStatusCounts}" var="entry">
+                {
+                    let val = ${entry.value};
+                    let pct = totalCount > 0 ? Math.round((val / totalCount) * 100) : 0;
+                    labels.push('${entry.key} (' + val + ' - ' + pct + '%)');
+                }
             </c:forEach>
 
             new Chart(document.getElementById('statusChart'), {
@@ -215,7 +248,7 @@
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: ['#4a7c59', '#b1812f', '#b83230', '#646b66', '#dcefe1', '#7a6148'],
+                        backgroundColor: bgColors,
                         borderWidth: 0,
                         hoverOffset: 4
                     }]

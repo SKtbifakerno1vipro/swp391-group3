@@ -252,17 +252,23 @@ public class DashboardDAO extends DBContext {
         }
         return 0;
     }
-    
+
     public int getTotalQuotations(Integer saleId) {
         String sql = "SELECT COUNT(*) FROM quotation q LEFT JOIN customer c ON q.customer_id = c.customer_id ";
         if (saleId != null) {
             sql += "WHERE c.assigned_to_user_id = ? ";
         }
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            if (saleId != null) ps.setInt(1, saleId);
+            if (saleId != null) {
+                ps.setInt(1, saleId);
+            }
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
@@ -272,10 +278,16 @@ public class DashboardDAO extends DBContext {
             sql += "WHERE c.assigned_to_user_id = ? ";
         }
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            if (saleId != null) ps.setInt(1, saleId);
+            if (saleId != null) {
+                ps.setInt(1, saleId);
+            }
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
@@ -485,11 +497,9 @@ public class DashboardDAO extends DBContext {
     }
 
     // --- System Admin Dashboard Specific Methods ---
-
     public int getTotalUsers() {
         String sql = "SELECT COUNT(*) FROM [user]";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -501,8 +511,7 @@ public class DashboardDAO extends DBContext {
 
     public int getTotalContracts() {
         String sql = "SELECT COUNT(*) FROM customer_contract";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -514,8 +523,7 @@ public class DashboardDAO extends DBContext {
 
     public int getTotalInvoices() {
         String sql = "SELECT COUNT(*) FROM invoice";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -528,15 +536,14 @@ public class DashboardDAO extends DBContext {
     public List<RoleStatisticDTO> getUsersByRole() {
         List<RoleStatisticDTO> list = new ArrayList<>();
         String sql = "SELECT r.role_name, COUNT(*) AS total "
-                   + "FROM [user] u "
-                   + "JOIN role r ON u.role_id = r.role_id "
-                   + "GROUP BY r.role_name";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                + "FROM [user] u "
+                + "JOIN role r ON u.role_id = r.role_id "
+                + "GROUP BY r.role_name";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(new RoleStatisticDTO(
-                    rs.getString("role_name"),
-                    rs.getInt("total")
+                        rs.getString("role_name"),
+                        rs.getInt("total")
                 ));
             }
         } catch (Exception e) {
@@ -548,14 +555,13 @@ public class DashboardDAO extends DBContext {
     public List<StatusStatisticDTO> getContractsByStatus() {
         List<StatusStatisticDTO> list = new ArrayList<>();
         String sql = "SELECT contract_status, COUNT(*) AS total "
-                   + "FROM customer_contract "
-                   + "GROUP BY contract_status";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                + "FROM customer_contract "
+                + "GROUP BY contract_status";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(new StatusStatisticDTO(
-                    rs.getString("contract_status"),
-                    rs.getInt("total")
+                        rs.getString("contract_status"),
+                        rs.getInt("total")
                 ));
             }
         } catch (Exception e) {
@@ -567,14 +573,13 @@ public class DashboardDAO extends DBContext {
     public List<StatusStatisticDTO> getOrdersByStatus() {
         List<StatusStatisticDTO> list = new ArrayList<>();
         String sql = "SELECT order_status, COUNT(*) AS total "
-                   + "FROM customer_order "
-                   + "GROUP BY order_status";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                + "FROM customer_order "
+                + "GROUP BY order_status";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(new StatusStatisticDTO(
-                    rs.getString("order_status"),
-                    rs.getInt("total")
+                        rs.getString("order_status"),
+                        rs.getInt("total")
                 ));
             }
         } catch (Exception e) {
@@ -586,20 +591,19 @@ public class DashboardDAO extends DBContext {
     public List<ActivityDTO> getRecentActivities() {
         List<ActivityDTO> list = new ArrayList<>();
         String sql = "SELECT TOP 10 sal.created_at, u.full_name, sal.action_type, sal.affected_object, sal.description "
-                   + "FROM system_audit_log sal "
-                   + "LEFT JOIN [user] u ON sal.user_id = u.user_id "
-                   + "ORDER BY sal.created_at DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                + "FROM system_audit_log sal "
+                + "LEFT JOIN [user] u ON sal.user_id = u.user_id "
+                + "ORDER BY sal.created_at DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 java.sql.Timestamp ts = rs.getTimestamp("created_at");
                 java.time.LocalDateTime ldt = (ts != null) ? ts.toLocalDateTime() : null;
                 list.add(new ActivityDTO(
-                    ldt,
-                    rs.getString("full_name"),
-                    rs.getString("action_type"),
-                    rs.getString("affected_object"),
-                    rs.getString("description")
+                        ldt,
+                        rs.getString("full_name"),
+                        rs.getString("action_type"),
+                        rs.getString("affected_object"),
+                        rs.getString("description")
                 ));
             }
         } catch (Exception e) {
