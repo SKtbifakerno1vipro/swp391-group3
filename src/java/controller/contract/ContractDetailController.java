@@ -150,9 +150,9 @@ public class ContractDetailController extends HttpServlet {
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        boolean isGuest= Boolean.parseBoolean(request.getParameter("isGuest"));
+
         //user not login then return to login page
-        if (user == null && !isGuest) {
+        if (user == null ) {
             response.sendRedirect("login");
             return;
         }
