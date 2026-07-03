@@ -183,12 +183,12 @@
                         <!-- ACTION BLOCK -->
                         <div class="action-section">
 
-
-                            <p style="color: var(--muted); font-size: 0.9em; line-height: 1.4; margin-top: 10px;">Bạn cần đăng nhập để có nhiều quyền hạn hơn!</p>
-                            <div class="action-btn-group">
-                                <a href="login?redirect=contract-detail?id=${contract.contractId}" class="btn-full"><button type="button" style="width: 100%;">Đăng nhập</button></a>
-                            </div>
-
+                            <c:if test="${isGuest}">
+                                <p style="color: var(--muted); font-size: 0.9em; line-height: 1.4; margin-top: 10px;">Bạn cần đăng nhập để có nhiều quyền hạn hơn!</p>
+                                <div class="action-btn-group">
+                                    <a href="login?redirect=contract-detail?id=${contract.contractId}" class="btn-full"><button type="button" style="width: 100%;">Đăng nhập</button></a>
+                                </div>
+                            </c:if>
                             <c:if test="${!isGuest}">
                                 <h3 style="margin-top: 0;">Hành động</h3>
                                 <p><strong>Trạng thái</strong> <span style="color: var(--danger); font-weight: bold;">${contract.contractStatus}</span></p>
