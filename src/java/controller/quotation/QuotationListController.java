@@ -29,23 +29,23 @@ public class QuotationListController extends HttpServlet {
         
         jakarta.servlet.http.HttpSession session = request.getSession(false);
         model.User user = (session != null) ? (model.User) session.getAttribute("user") : null;
-        Integer customerId = null;
-        if (user != null && user.getRoleId() == 3) {
-            Object sessionCusId = session.getAttribute("customerId");
-            if (sessionCusId != null) {
-                customerId = (Integer) sessionCusId;
-            } else {
-                service.CustomerService customerService = new service.CustomerService();
-                dto.CustomerDTO customer = customerService.getCustomerDTOByUserId(user.getUserId());
-                if (customer != null) {
-                    customerId = customer.getCustomerId();
-                    session.setAttribute("customerId", customerId);
-                }
-            }
+
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
         }
 
+        service.RoleService roleService = new service.RoleService();
+        model.Role userRole = roleService.getRoleById(user.getRoleId());
+        String roleName = userRole != null ? userRole.getRoleName().toLowerCase() : "";
+
+        Integer saleId = null;
+        if (roleName.contains("sale")) {
+            saleId = user.getUserId();
+        }
+        
         QuotationService quotationService = new QuotationService();
-        List<Quotation> quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate, customerId);
+        List<Quotation> quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate, saleId);
 
         // Pagination
         int page = 1;

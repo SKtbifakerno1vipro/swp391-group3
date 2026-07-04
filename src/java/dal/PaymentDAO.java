@@ -404,18 +404,20 @@ public class PaymentDAO extends DBContext {
                 "SELECT p.*, c.contract_number, u.full_name as customer_name "
                 + "FROM payment p "
                 + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
-                + "LEFT JOIN [user] u ON p.created_by = u.user_id "
-                + "WHERE p.created_at > ? "
+                + "JOIN customer cust ON c.customer_id = cust.customer_id "
+                + "JOIN [user] u ON cust.user_id = u.user_id "
+                + "WHERE (p.created_at > ? OR p.paid_at > ?) "
         );
         if (customerUserId != null) {
             sql.append("AND p.created_by = ? ");
         }
-        sql.append("ORDER BY p.created_at ASC");
+        sql.append("ORDER BY p.created_at ASC, p.paid_at ASC");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             ps.setTimestamp(1, sinceTime);
+            ps.setTimestamp(2, sinceTime);
             if (customerUserId != null) {
-                ps.setInt(2, customerUserId);
+                ps.setInt(3, customerUserId);
             }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

@@ -1,9 +1,10 @@
-package controller.signature;
+package controller.acceptanceRecord;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
+import controller.signature.*;
 import dto.CustomerDTO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -15,7 +16,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.util.List;
 import model.Contract;
-import model.ContractHistory;
 import model.Signature;
 import model.User;
 import service.PaymentService;
@@ -29,7 +29,7 @@ import service.UserService;
  *
  * @author ADMIN
  */
-@WebServlet(urlPatterns = {"/Signature"})
+@WebServlet(urlPatterns = {"/SignatureAcceptance"})
 public class SignatureServlet extends HttpServlet {
 
     private final SignatureService sService = new SignatureService();
@@ -152,9 +152,10 @@ public class SignatureServlet extends HttpServlet {
             if (!uploadBuildFile.exists()) {
                 uploadBuildFile.mkdirs();
             }
-
+            
+            
             File webFile = new File(new File(getServletContext().getRealPath("/")).getParentFile().getParentFile(), "web");
-
+            
             File uploadWebFile = new File(webFile, "uploads");
             if (!uploadWebFile.exists()) {
                 uploadWebFile.mkdirs();
@@ -204,6 +205,14 @@ public class SignatureServlet extends HttpServlet {
             }
             if (managerSigned && customerSigned) {
                 ctrService.updateStatus(contractId, "SIGNED");
+                
+                model.ContractHistory h = new model.ContractHistory();
+                h.setContractId(contractId);
+                h.setFromStatus(ctr.getContractStatus());
+                h.setToStatus("SIGNED");
+                h.setNote("Both Manager and Customer signed.");
+                h.setChangedBy(user.getUserId());
+                ctrService.insertHistory(h);
 
                 // Automatically create a PENDING payment record if it doesn't exist yet
                 paymentService.createPendingPaymentForContractIfNotExists(contractId);

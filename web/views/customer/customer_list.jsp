@@ -5,7 +5,7 @@
 
         <head>
             <meta charset="UTF-8">
-            <title>Customer List</title>
+            <title>Danh sách khách hàng</title>
             <style>
                 table {
                     width: 100%;
@@ -158,10 +158,10 @@
                     <jsp:param name="activeMenu" value="customers" />
                 </jsp:include>
                 <main class="main legacy-page">
-                    <h2>Customer Management (Member System)</h2>
+                    <h2>Quản lý khách hàng (Hệ thống thành viên)</h2>
 
                     <c:if test="${not empty success}">
-                        <div style="color: green; margin-bottom: 10px;">Edit successful</div>
+                        <div style="color: green; margin-bottom: 10px;">Chỉnh sửa thành công</div>
                     </c:if>
                     <c:if test="${not empty error}">
                         <div style="color: red; margin-bottom: 10px;">
@@ -173,30 +173,30 @@
                     </c:if>
 
                     <div style="margin-bottom: 15px;">
-                        <a href="${pageContext.request.contextPath}/customer/create">Add Customer</a>
+                        <a href="${pageContext.request.contextPath}/customer/create">Thêm khách hàng</a>
                     </div>
 
                     <form action="${pageContext.request.contextPath}/customer/list" method="GET"
                         class="search-form-responsive">
                         <!-- Row 1: Search Inputs -->
                         <div class="search-row">
-                            <span class="search-label">Search Filters:</span>
+                            <span class="search-label">Bộ lọc tìm kiếm:</span>
                             
                             <input type="text" name="searchName" value="${searchName}"
-                                placeholder="Enter name..." class="input-small" />
-                            <input type="text" name="searchSdt" value="${searchSdt}" placeholder="Enter phone..." class="input-small" />
+                                placeholder="Nhập tên..." class="input-small" />
+                            <input type="text" name="searchSdt" value="${searchSdt}" placeholder="Nhập số điện thoại..." class="input-small" />
                             <input type="text" name="searchEmail" value="${searchEmail}"
-                                placeholder="Enter email..." class="input-small" />
+                                placeholder="Nhập email..." class="input-small" />
                             <input type="text" name="searchMst" value="${searchMst}"
-                                placeholder="Enter tax code..." class="input-small" />
+                                placeholder="Nhập mã số thuế..." class="input-small" />
                         </div>
 
                         <!-- Row 2: Select options & Actions -->
                         <div class="search-row">
-                            <span class="search-label">Options:</span>
+                            <span class="search-label">Tùy chọn:</span>
                             
                             <select name="type" class="input-small">
-                                <option value="">-- All Types --</option>
+                                <option value="">-- Tất cả phân loại --</option>
                                 <c:forEach var="typeCus" items="${listTypeCus}">
                                     <option value="${typeCus}" ${type eq typeCus ? 'selected' : '' }>${typeCus}
                                     </option>
@@ -204,7 +204,7 @@
                             </select>
                             <c:if test="${sessionScope.user.roleId != 4}">
                                 <select name="assignedToUserId" class="input-small">
-                                    <option value="">-- All Sale Staff --</option>
+                                    <option value="">-- Tất cả nhân viên Sale --</option>
                                     <c:forEach var="sale" items="${listSales}">
                                         <option value="${sale.userId}" ${assignedToUserId eq sale.userId
                                             ? 'selected' : '' }>${sale.fullName}</option>
@@ -212,22 +212,22 @@
                                 </select>
                             </c:if>
                             <select name="searchStatus" class="input-small">
-                                <option value="">-- All Statuses --</option>
-                                <option value="ACTIVE" ${searchStatus eq 'ACTIVE' ? 'selected' : ''}>Active</option>
-                                <option value="INACTIVE" ${searchStatus eq 'INACTIVE' ? 'selected' : ''}>Inactive</option>
+                                <option value="">-- Tất cả trạng thái --</option>
+                                <option value="ACTIVE" ${searchStatus eq 'ACTIVE' ? 'selected' : ''}>Hoạt động</option>
+                                <option value="INACTIVE" ${searchStatus eq 'INACTIVE' ? 'selected' : ''}>Ngừng hoạt động</option>
                             </select>
-
-                            <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-left: 15px; letter-spacing: 0.05em; white-space: nowrap;">Show:</span>
+ 
+                            <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-left: 15px; letter-spacing: 0.05em; white-space: nowrap;">Hiển thị:</span>
                             <select name="pageSize" class="input-small" style="width: 100px !important;" onchange="this.form.submit()">
-                                <option value="5" ${pageSize == 5 ? 'selected' : ''}>5 items</option>
-                                <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 items</option>
-                                <option value="20" ${pageSize == 20 ? 'selected' : ''}>20 items</option>
+                                <option value="5" ${pageSize == 5 ? 'selected' : ''}>5 dòng</option>
+                                <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 dòng</option>
+                                <option value="20" ${pageSize == 20 ? 'selected' : ''}>20 dòng</option>
                             </select>
-                            <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">per page</span>
-
+                            <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">trên trang</span>
+ 
                             <div class="actions-group">
-                                <button type="submit" class="btn-search">Search</button>
-                                <a href="${pageContext.request.contextPath}/customer/list" class="btn-clear">Clear Filter</a>
+                                <button type="submit" class="btn-search">Tìm kiếm</button>
+                                <a href="${pageContext.request.contextPath}/customer/list" class="btn-clear">Xóa bộ lọc</a>
                             </div>
                         </div>
                     </form>
@@ -235,21 +235,21 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Customer ID</th>
-                                <th>Customer Name</th>
-                                <th>Company Name</th>
+                                <th>Mã khách hàng</th>
+                                <th>Tên khách hàng</th>
+                                <th>Tên công ty</th>
                                 <th>Email</th>
-                                <th>Phone Number</th>
-                                <th>Tax Code</th>
-                                <th>Status</th>
-                                <th>Last Updated</th>
-                                <th>Actions</th>
+                                <th>Số điện thoại</th>
+                                <th>Mã số thuế</th>
+                                <th>Trạng thái</th>
+                                <th>Cập nhật cuối</th>
+                                <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:if test="${empty customersDTOs}">
                                 <tr>
-                                    <td colspan="9" style="text-align: center;">No customer data found</td>
+                                    <td colspan="9" style="text-align: center;">Không tìm thấy dữ liệu khách hàng nào</td>
                                 </tr>
                             </c:if>
 
@@ -265,7 +265,7 @@
                                     <td>${cust.updateTimeString}</td>
                                     <td>
                                         <a
-                                            href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customerId}">Detail</a>
+                                            href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customerId}">Chi tiết</a>
                                     </td>
                                 </tr>
                             </c:forEach>

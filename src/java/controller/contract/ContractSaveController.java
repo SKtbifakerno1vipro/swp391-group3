@@ -119,7 +119,7 @@ public class ContractSaveController extends HttpServlet {
         String action = request.getParameter("action");
 
         if (contractContent == null || contractContent.trim().isEmpty()) {
-            request.setAttribute("errorMsg", "Contract content cannot be empty!");
+            request.setAttribute("errorMsg", "Nội dung hợp đồng không được để trống!");
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
             return;
         }
@@ -153,7 +153,7 @@ public class ContractSaveController extends HttpServlet {
                 }
                 response.sendRedirect("contract-detail?id=" + contractId);
             } else {
-                request.setAttribute("errorMsg", "Update failed!");
+                request.setAttribute("errorMsg", "Cập nhật thất bại!");
                 request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
             }
             return;
@@ -165,7 +165,7 @@ public class ContractSaveController extends HttpServlet {
 
         //if existed one contract with quotation
         if (contractService.getContractByQuotationId(quotationId) != null) {
-            request.setAttribute("errorMsg", "A contract for this quotation already exists!");
+            request.setAttribute("errorMsg", "Báo giá này đã có hợp đồng!");
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
             return;
         }
@@ -201,7 +201,7 @@ public class ContractSaveController extends HttpServlet {
             }
             response.sendRedirect("contract-detail?id=" + newId);
         } else {
-            request.setAttribute("errorMsg", "Creation failed!");
+            request.setAttribute("errorMsg", "Tạo hợp đồng thất bại!");
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
         }
     }

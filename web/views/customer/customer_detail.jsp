@@ -7,7 +7,7 @@
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Customer Details - Terra Enterprise</title>
+                <title>Chi tiết khách hàng - Terra Enterprise</title>
 
                 <link rel="preconnect" href="https://fonts.googleapis.com">
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -317,7 +317,7 @@
                         <div class="container">
                             <div class="header-section">
                                 <div>
-                                    <h1>Customer Profile</h1>
+                                    <h1>Hồ sơ khách hàng</h1>
                                     <span style="color: var(--muted); font-size: 14px;">ID:
                                         ${cusDTO.customerId} |
                                         User ID: ${cusDTO.userId}</span>
@@ -327,26 +327,26 @@
                                         cho rieng khach nay --%>
                                         <c:if test="${sessionScope.user.roleId == 4}">
                                             <a href="${pageContext.request.contextPath}/quotation/create?customerId=${cusDTO.customerId}"
-                                                class="btn-edit">+ Quick Quotation</a>
+                                                class="btn-edit">+ Báo giá nhanh</a>
                                         </c:if>
                                 </div>
                             </div>
 
                             <div class="kpi-container">
                                 <div class="kpi-card">
-                                    <div class="kpi-title">Total Orders Placed</div>
+                                    <div class="kpi-title">Tổng số đơn hàng</div>
                                     <div class="kpi-value">${listOrdersForCus != null ? listOrdersForCus.size() : 0}
-                                        Orders</div>
+                                        Đơn hàng</div>
                                 </div>
                                 <div class="kpi-card success">
-                                    <div class="kpi-title">Total Paid Amount</div>
+                                    <div class="kpi-title">Tổng số tiền đã thanh toán</div>
                                     <div class="kpi-value">
                                         <fmt:formatNumber value="${totalPaid != null ? totalPaid : 0}" type="currency"
                                             currencySymbol="VND" maxFractionDigits="0" />
                                     </div>
                                 </div>
                                 <div class="kpi-card warning">
-                                    <div class="kpi-title">Account Status</div>
+                                    <div class="kpi-title">Trạng thái tài khoản</div>
                                     <div class="kpi-value" style="font-size: 18px; padding-top: 2px;">
                                         <span
                                             class="badge ${cusDTO.status == 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">${cusDTO.status}</span>
@@ -356,48 +356,48 @@
 
                             <div class="info-grid">
                                 <div class="info-section">
-                                    <h3>Account & Contact Info</h3>
+                                    <h3>Thông tin tài khoản & Liên hệ</h3>
                                     <div class="info-row">
-                                        <div class="info-label">Username:</div>
+                                        <div class="info-label">Tên đăng nhập:</div>
                                         <div class="info-value">${cusDTO.userName}</div>
                                     </div>
                                     <div class="info-row">
-                                        <div class="info-label">Full Name:</div>
+                                        <div class="info-label">Họ và tên:</div>
                                         <div class="info-value">${not empty cusDTO.fullName ? cusDTO.fullName
                                             : 'N/A'}</div>
                                     </div>
                                     <div class="info-row">
-                                        <div class="info-label">Email Address:</div>
+                                        <div class="info-label">Địa chỉ Email:</div>
                                         <div class="info-value">${cusDTO.email}</div>
                                     </div>
                                     <div class="info-row">
-                                        <div class="info-label">Phone Number:</div>
+                                        <div class="info-label">Số điện thoại:</div>
                                         <div class="info-value">${not empty cusDTO.phone ? cusDTO.phone :
                                             'N/A'}</div>
                                     </div>
                                     <div class="info-row">
-                                        <div class="info-label">System Role:</div>
-                                        <div class="info-value"><span class="badge badge-role">Customer</span></div>
+                                        <div class="info-label">Vai trò hệ thống:</div>
+                                        <div class="info-value"><span class="badge badge-role">Khách hàng</span></div>
                                     </div>
                                 </div>
 
                                 <div class="info-section">
-                                    <h3>Commercial Profile</h3>
+                                    <h3>Hồ sơ thương mại</h3>
                                     <div class="info-row">
-                                        <div class="info-label">Company Name:</div>
+                                        <div class="info-label">Tên công ty:</div>
                                         <div class="info-value"><strong>${cusDTO.companyName}</strong></div>
                                     </div>
                                     <div class="info-row">
-                                        <div class="info-label">Tax Code:</div>
+                                        <div class="info-label">Mã số thuế:</div>
                                         <div class="info-value">${not empty cusDTO.taxCode ?
                                             cusDTO.taxCode : 'N/A'}</div>
                                     </div>
                                     <div class="info-row">
-                                        <div class="info-label">Customer Type:</div>
+                                        <div class="info-label">Loại khách hàng:</div>
                                         <div class="info-value">${cusDTO.customerType}</div>
                                     </div>
                                     <div class="info-row">
-                                        <div class="info-label">Assigned To Sale:</div>
+                                        <div class="info-label">Nhân viên Sale phụ trách:</div>
                                         <div class="info-value" style="color: var(--primary); font-weight: 700;">
                                             <c:choose>
                                                 <c:when test="${not empty cusDTO.assignedToUserId}">
@@ -408,7 +408,7 @@
                                                     </c:forEach>
                                                 </c:when>
                                                 <c:otherwise><span class="text-muted"
-                                                        style="font-weight: 400;">Unassigned</span></c:otherwise>
+                                                        style="font-weight: 400;">Chưa phân công</span></c:otherwise>
                                             </c:choose>
                                         </div>
                                     </div>
@@ -417,14 +417,14 @@
 
                             <div class="tabs-container">
                                 <ul class="tab-menu">
-                                    <li class="tab-item active" onclick="switchTab(event, 'quotationsTab')">Quotations
+                                    <li class="tab-item active" onclick="switchTab(event, 'quotationsTab')">Báo giá
                                         (${listQuotationsForCus != null ? listQuotationsForCus.size() : 0})</li>
-                                    <li class="tab-item" onclick="switchTab(event, 'contractsTab')">Contracts &
-                                        Signatures (${listContractsForCus != null ? listContractsForCus.size() : 0})
+                                    <li class="tab-item" onclick="switchTab(event, 'contractsTab')">Hợp đồng &
+                                        Chữ ký (${listContractsForCus != null ? listContractsForCus.size() : 0})
                                     </li>
-                                    <li class="tab-item" onclick="switchTab(event, 'ordersTab')">Orders Progress
+                                    <li class="tab-item" onclick="switchTab(event, 'ordersTab')">Tiến độ đơn hàng
                                         (${listOrdersForCus != null ? listOrdersForCus.size() : 0})</li>
-                                    <li class="tab-item" onclick="switchTab(event, 'billingTab')">Invoices & Payments
+                                    <li class="tab-item" onclick="switchTab(event, 'billingTab')">Hóa đơn & Thanh toán
                                     </li>
                                 </ul>
 
@@ -432,11 +432,11 @@
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>Quotation ID</th>
-                                                <th>Quotation Date</th>
-                                                <th>Status</th>
-                                                <th>Created By</th>
-                                                <th>Action</th>
+                                                <th>Mã báo giá</th>
+                                                <th>Ngày báo giá</th>
+                                                <th>Trạng thái</th>
+                                                <th>Tạo bởi</th>
+                                                <th>Hành động</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -452,14 +452,13 @@
                                                             <td>${not empty q.createdByName ? q.createdByName : 'N/A'}
                                                             </td>
                                                             <td><a href="${pageContext.request.contextPath}/quotation-detail?id=${q.quotationId}"
-                                                                    class="btn-action-sm">View Details</a></td>
+                                                                    class="btn-action-sm">Xem chi tiết</a></td>
                                                         </tr>
                                                     </c:forEach>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <tr>
-                                                        <td colspan="5" class="no-data">No quotations recorded for this
-                                                            client.
+                                                        <td colspan="5" class="no-data">Chưa có báo giá nào được ghi nhận cho khách hàng này.
                                                         </td>
                                                     </tr>
                                                 </c:otherwise>
@@ -472,10 +471,10 @@
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>Contract No.</th>
-                                                <th>Status</th>
-                                                <th>Created At</th>
-                                                <th>Action</th>
+                                                <th>Số hợp đồng</th>
+                                                <th>Trạng thái</th>
+                                                <th>Ngày tạo</th>
+                                                <th>Hành động</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -492,16 +491,16 @@
                                                             <td><span class="badge"
                                                                     style="background-color: #e2e3e5; color: #383d41;">${c.contractStatus}</span>
                                                             </td>
-                                                            <td>${c.formattedCreatedAt}</td>
+                                                            <td>${c.formattedCreatedAtDate}</td>
                                                             <td>
-                                                                <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}" class="btn-action-sm">View Details</a>
+                                                                <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}" class="btn-action-sm">Xem chi tiết</a>
                                                             </td>
                                                         </tr>
                                                     </c:forEach>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <tr>
-                                                        <td colspan="4" class="no-data">No legal contracts initialized.
+                                                        <td colspan="4" class="no-data">Chưa có hợp đồng nào được khởi tạo.
                                                         </td>
                                                     </tr>
                                                 </c:otherwise>
@@ -514,10 +513,10 @@
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>Order ID</th>
-                                                <th>Date Created</th>
-                                                <th>Current Status</th>
-                                                <th>Handler</th>
+                                                <th>Mã đơn hàng</th>
+                                                <th>Ngày tạo</th>
+                                                <th>Trạng thái hiện tại</th>
+                                                <th>Hành động</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -531,16 +530,13 @@
                                                                     style="background-color: #e2e3e5; color: #383d41;">${o.customerOrder.orderStatus}</span>
                                                             </td>
                                                             <td><a href="${pageContext.request.contextPath}/customer-order?id=${o.customerOrder.customerOrderId}"
-                                                                    class="btn-action-sm">View
-                                                                    Details
-                                                                </a></td>
+                                                                    class="btn-action-sm">Xem chi tiết</a></td>
                                                         </tr>
                                                     </c:forEach>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <tr>
-                                                        <td colspan="4" class="no-data">No product orders have been
-                                                            executed.
+                                                        <td colspan="4" class="no-data">Chưa có đơn hàng nào được thực hiện.
                                                         </td>
                                                     </tr>
                                                 </c:otherwise>
@@ -553,11 +549,11 @@
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>Invoice No.</th>
-                                                <th>Issue Date</th>
-                                                <th>Amount Paid</th>
-                                                <th>Payment Type</th>
-                                                <th>Payment Status</th>
+                                                <th>Số hóa đơn</th>
+                                                <th>Ngày phát hành</th>
+                                                <th>Số tiền đã thanh toán</th>
+                                                <th>Phương thức thanh toán</th>
+                                                <th>Trạng thái thanh toán</th>
                                             </tr>
                                         </thead>
                                         <tbody style="background: none;">
@@ -567,8 +563,7 @@
                                                 </c:when>
                                                 <c:otherwise>
                                                     <tr>
-                                                        <td colspan="5" class="no-data">No financial statements or
-                                                            payments found.</td>
+                                                        <td colspan="5" class="no-data">Không tìm thấy báo cáo tài chính hoặc khoản thanh toán nào.</td>
                                                     </tr>
                                                 </c:otherwise>
                                             </c:choose>
@@ -580,18 +575,18 @@
                             <div class="btn-group">
                                 <c:if test="${sessionScope.user.roleId != 3}">
                                     <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customerId}"
-                                        class="btn-edit">Edit Profile</a>
+                                        class="btn-edit">Chỉnh sửa hồ sơ</a>
                                     <c:if test="${cusDTO.status == 'ACTIVE'}">
                                         <a href="${pageContext.request.contextPath}/customer/detail?action=deactivate&id_cus=${cusDTO.customerId}"
                                             class="btn-remove"
-                                            onclick="return confirm('Are you sure you want to deactivate this customer?');">Remove</a>
+                                            onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa khách hàng này không?');">Vô hiệu hóa</a>
                                     </c:if>
                                     <c:if test="${cusDTO.status == 'INACTIVE'}">
                                         <a href="${pageContext.request.contextPath}/customer/detail?action=activate&id_cus=${cusDTO.customerId}"
                                             class="btn-activate"
-                                            onclick="return confirm('Are you sure you want to activate this customer?');">Activate</a>
+                                            onclick="return confirm('Bạn có chắc chắn muốn kích hoạt khách hàng này không?');">Kích hoạt</a>
                                     </c:if>
-                                    <a href="${pageContext.request.contextPath}/customer/list" class="btn-back">Back to List</a>
+                                    <a href="${pageContext.request.contextPath}/customer/list" class="btn-back">Quay lại danh sách</a>
                                 </c:if>
                             </div>
                         </div>

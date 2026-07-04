@@ -9,11 +9,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.util.List;
+import model.Invoice;
+import service.InvoiceService;
 
 @WebServlet(name = "CustomerOrderListController", urlPatterns = {"/customer-order-list"})
 public class CustomerOrderListController extends HttpServlet {
 
     private final CustomerOrderService customerOrderService = new CustomerOrderService();
+    private final InvoiceService invoiceService = new InvoiceService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -32,18 +35,42 @@ public class CustomerOrderListController extends HttpServlet {
         int pageSize = 10;
         List<CustomerOrderDTO> listOrder;
         int totalRecords;
+        
+        jakarta.servlet.http.HttpSession session = request.getSession();
+        model.User currentUser = (model.User) session.getAttribute("user");
+        int userId = 0;
+        String roleName = "";
+        if (currentUser != null) {
+            userId = currentUser.getUserId();
+            int roleId = currentUser.getRoleId();
+            service.RoleService roleService = new service.RoleService();
+            model.Role userRole = roleService.getRoleById(roleId);
+            roleName = userRole != null ? userRole.getRoleName() : "";
+        }
 
         if ("search".equals(action) && keyword != null && !keyword.trim().isEmpty()) {
             keyword = keyword.trim();           
-            listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize, sortBy, sortOrder);
-            totalRecords = customerOrderService.getTotalSearchCount(keyword);
+            listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize, sortBy, sortOrder, userId, roleName);
+            totalRecords = customerOrderService.getTotalSearchCount(keyword, userId, roleName);
         } else {
-            listOrder = customerOrderService.getOrdersByPage(pageIndex, pageSize, sortBy, sortOrder);
-            totalRecords = customerOrderService.getTotalOrderCount();
+            listOrder = customerOrderService.getOrdersByPage(pageIndex, pageSize, sortBy, sortOrder, userId, roleName);
+            totalRecords = customerOrderService.getTotalOrderCount(userId, roleName);
         }
-
+        for (CustomerOrderDTO customerOrderDTO : listOrder) {
+            Invoice invoice = null;
+            boolean isExistInvoice = false;
+            invoice = invoiceService.getInvoiceByOrderId(customerOrderDTO.getCustomerOrder().getCustomerOrderId());
+            if (invoice != null){
+                isExistInvoice = true;
+                if("CANCELED".equals(invoice.getInvoiceStatus())){
+                    isExistInvoice = false;
+                }
+            } 
+            customerOrderDTO.getCustomerOrder().setHasInvoice(isExistInvoice);
+        }
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-
+        
+        
         request.setAttribute("orders", listOrder);
         request.setAttribute("currentPage", pageIndex);
         request.setAttribute("totalPages", totalPages);

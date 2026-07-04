@@ -28,6 +28,7 @@
                 <span class="sidebar-text">Dashboard</span>
             </a>
             <c:choose>
+                
                 <c:when test="${sessionScope.user.roleId == 3}">
                     <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/customer/detail?id_cus=${sessionScope.customerId}" title="My Profile">
@@ -74,7 +75,7 @@
                     <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/invoice-list" title="My Invoices">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt</span></div>
-                        <span class="sidebar-text">My Invoices</span>
+                        <span class="sidebar-text">Invoices</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/payment/list" title="Payments">
@@ -194,7 +195,7 @@
     </div>
 </aside>
 
-<!-- XHieu, this is realtime notification, contact me if you have a question-->
+<!--  this is realtime notification, contact XHieu if you have a question-->
 
 <c:if test="${not empty sessionScope.user}">
     <!-- Realtime Notification Toast Container -->

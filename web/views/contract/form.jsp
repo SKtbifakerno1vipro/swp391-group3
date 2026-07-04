@@ -1,11 +1,11 @@
-Shortcuts<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>${contract == null ? 'Create' : 'Edit'} Contract</title>
+        <title>${contract == null ? 'Tạo mới' : 'Chỉnh sửa'} Hợp đồng</title>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
         <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet">
@@ -108,7 +108,7 @@ Shortcuts<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
                     <div style="color: var(--danger); border: 1px solid var(--danger); padding: 10px; margin-bottom: 15px; border-radius: 12px; background: var(--danger-soft);">${errorMsg}</div>
                 </c:if>
 
-                <h2>${contract == null ? 'Create Contract' : 'Edit Contract'}</h2>
+                <h2>${contract == null ? 'Tạo mới Hợp đồng' : 'Chỉnh sửa Hợp đồng'}</h2>
 
                 <div class="layout-container">
                     <div class="content-panel">
@@ -120,10 +120,10 @@ Shortcuts<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
                             <input type="hidden" name="contractContent" id="contractContentInput">
 
                             <c:if test="${not empty contract.contractNumber}">
-                                <p><strong>Contract Number:</strong> ${contract.contractNumber}</p>
+                                <p><strong>Mã Hợp đồng:</strong> ${contract.contractNumber}</p>
                             </c:if>
 
-                            <label style="font-weight:bold; display:block; margin-top: 15px;">Contract Content:</label>
+                            <label style="font-weight:bold; display:block; margin-top: 15px;">Nội dung Hợp đồng:</label>
                             <div id="contract-body" class="raw-content" contenteditable="${editable ? 'true' : 'false'}"
                                  style="background: ${editable ? 'white' : '#f9f9f9'};">
                                 ${not empty contract.contractContent ? contract.contractContent : templateContent}
@@ -131,17 +131,17 @@ Shortcuts<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
                             <div style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
                                 <c:if test="${editable}">
-                                    <button type="button" onclick="submitForm('save')">Save Changes</button>
+                                    <button type="button" onclick="submitForm('save')">Lưu thay đổi</button>
 
                                     <c:if test="${contract != null}">
                                         <!--officier-->
                                         <c:if test="${sessionScope.user.roleId == 5}">
-                                            <button type="button" style="background: var(--tertiary);" onclick="submitForm('submit_for_review')">Send to review</button>
+                                            <button type="button" style="background: var(--tertiary);" onclick="submitForm('submit_for_review')">Gửi yêu cầu duyệt</button>
                                         </c:if>
                                     </c:if>
                                 </c:if>
 
-                                <a href="contract-list" style="margin-left: 10px; color: var(--primary); font-weight: 600;">Back to contract list</a>
+                                <a href="contract-list" style="margin-left: 10px; color: var(--primary); font-weight: 600;">Quay lại danh sách</a>
                             </div>
 
                             <script>
@@ -157,32 +157,32 @@ Shortcuts<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
                     <div class="shortcut-panel">
                         <h3 style="margin-top: 0; font-size: 1.1em; color: var(--primary); display: flex; align-items: center; gap: 6px;">
                             <span class="material-symbols-outlined" style="font-size: 20px;">keyboard</span>
-                            Shortcuts
+                            Phím tắt
                         </h3>
-                        <p style="color: var(--muted); font-size: 0.85em; margin-bottom: 15px;">Use these shortcuts while editing contract content:</p>
+                        <p style="color: var(--muted); font-size: 0.85em; margin-bottom: 15px;">Sử dụng các phím tắt trong khi chỉnh sửa:</p>
                         
                         <div class="shortcut-item">
-                            <span>Bold</span>
+                            <span>In đậm</span>
                             <kbd>Ctrl + B</kbd>
                         </div>
                         <div class="shortcut-item">
-                            <span>Italic</span>
+                            <span>In nghiêng</span>
                             <kbd>Ctrl + I</kbd>
                         </div>
                         <div class="shortcut-item">
-                            <span>Underline</span>
+                            <span>Gạch chân</span>
                             <kbd>Ctrl + U</kbd>
                         </div>
                         <div class="shortcut-item">
-                            <span>Undo</span>
+                            <span>Hoàn tác (Undo)</span>
                             <kbd>Ctrl + Z</kbd>
                         </div>
                         <div class="shortcut-item">
-                            <span>Redo</span>
+                            <span>Làm lại (Redo)</span>
                             <kbd>Ctrl + Y</kbd>
                         </div>
                         <div class="shortcut-item" style="margin-top: 15px; border-top: 1px solid var(--line); border-bottom: none; padding-top: 15px; display: block; color: var(--muted); font-size: 0.85em;">
-                            <i>Note: These are native browser shortcuts that work inside the editor.</i>
+                            <i>Lưu ý: Đây là các phím tắt mặc định của trình duyệt hỗ trợ bên trong vùng soạn thảo.</i>
                         </div>
                     </div>
                 </div>

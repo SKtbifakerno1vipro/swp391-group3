@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import model.Invoice;
+import service.InvoiceService;
 
 @WebServlet(name = "CustomerOrderController", urlPatterns = {"/customer-order"})
 public class CustomerOrderController extends HttpServlet {
@@ -31,6 +33,7 @@ public class CustomerOrderController extends HttpServlet {
     private final CustomerOrderService customerOrderService = new CustomerOrderService();
     private final CustomerService customerService = new CustomerService();
     private final ProductService productService = new ProductService();
+    private final InvoiceService invoiceService = new InvoiceService();
     private final int PAGE_SIZE = 10;
 
     @Override
@@ -97,6 +100,7 @@ public class CustomerOrderController extends HttpServlet {
             throws ServletException, IOException {
         try {
             int orderId = Integer.parseInt(idParam);
+            boolean isExistInvoice = false;
             CustomerOrderDTO order = customerOrderService.getCustomerOrderById(orderId);
             
             if (order == null) {
@@ -104,18 +108,41 @@ public class CustomerOrderController extends HttpServlet {
                 return;
             }
 
-            List<CustomerOrderDTO> details = customerOrderService.getOrderDetails(orderId);
-            
-            // Fetch total from quotation
-            java.math.BigDecimal quotationTotal = java.math.BigDecimal.ZERO;
-            if (order.getCustomerOrder() != null) {
+            HttpSession session = request.getSession();
+            model.User currentUser = (model.User) session.getAttribute("user");
+            if (currentUser != null && order.getCustomer() != null) {
+                int roleId = currentUser.getRoleId();
+                int userId = currentUser.getUserId();
                 
-                model.Contract contract = contractDao.getContractById(order.getCustomerOrder().getCustomerContractId());
-                if (contract != null) {
-                    quotationTotal = contractDao.calculateTotalAmountWithTaxAndDiscount(contract.getQuotationId());
+                service.RoleService roleService = new service.RoleService();
+                model.Role userRole = roleService.getRoleById(roleId);
+                String roleName = userRole != null ? userRole.getRoleName().toLowerCase() : "";
+                
+                if (roleName.contains("sale")) {
+                    Integer assignedTo = order.getCustomer().getAssignedToUserId();
+                    if (assignedTo == null || assignedTo != userId) {
+                        response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                        return;
+                    }
+                } else if (roleName.contains("customer")) {
+                    if (order.getCustomer().getUserId() == null || order.getCustomer().getUserId() != userId) {
+                        response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                        return;
+                    }
                 }
             }
+
+            List<CustomerOrderDTO> details = customerOrderService.getOrderDetails(orderId);
             
+            // Calculate total from order details
+            double quotationTotal = 0;
+            if (details != null) {
+                for (CustomerOrderDTO item : details) {
+                    if (item.getDetail() != null) {
+                        quotationTotal += item.getDetail().getTotal();
+                    }
+                }
+            }
             request.setAttribute("quotationTotal", quotationTotal);
             request.setAttribute("order", order);
             request.setAttribute("details", details);
@@ -290,6 +317,13 @@ public class CustomerOrderController extends HttpServlet {
             throws IOException {
         int orderId = Integer.parseInt(request.getParameter("orderId"));
         String status = request.getParameter("status");
+        
+        dto.CustomerOrderDTO order = customerOrderService.getCustomerOrderById(orderId);
+        if (order != null && "COMPLETED".equals(order.getCustomerOrder().getOrderStatus())) {
+            response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
+            return;
+        }
+        
         customerOrderService.updateOrderStatus(orderId, status);
         
         HttpSession session = request.getSession();
