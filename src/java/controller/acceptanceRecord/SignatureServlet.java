@@ -206,6 +206,14 @@ public class SignatureServlet extends HttpServlet {
             if (managerSigned && customerSigned) {
                 ctrService.updateStatus(contractId, "SIGNED");
                 
+                model.ContractHistory h = new model.ContractHistory();
+                h.setContractId(contractId);
+                h.setFromStatus(ctr.getContractStatus());
+                h.setToStatus("SIGNED");
+                h.setNote("Both Manager and Customer signed.");
+                h.setChangedBy(user.getUserId());
+                ctrService.insertHistory(h);
+
                 // Automatically create a PENDING payment record if it doesn't exist yet
                 paymentService.createPendingPaymentForContractIfNotExists(contractId);
             }

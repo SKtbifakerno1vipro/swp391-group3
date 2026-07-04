@@ -22,6 +22,15 @@ public class Contract {
     private String contractContent;
     private String storageType;
     private String token;
+    private LocalDateTime tokenExpiredAt;
+
+    public LocalDateTime getTokenExpiredAt() {
+        return tokenExpiredAt;
+    }
+
+    public void setTokenExpiredAt(LocalDateTime tokenExpiredAt) {
+        this.tokenExpiredAt = tokenExpiredAt;
+    }
 
     public String getToken() {
         return token;

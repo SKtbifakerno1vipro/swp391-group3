@@ -150,6 +150,7 @@ public class ContractDetailController extends HttpServlet {
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+
         //user not login then return to login page
         if (user == null) {
             response.sendRedirect("login");
@@ -204,12 +205,13 @@ public class ContractDetailController extends HttpServlet {
         } else if ("approve".equals(action)) { //when manager approve that contract
             // BR: only PENDING_REVIEW status + approved by Manager
             if (!"PENDING_REVIEW".equals(contract.getContractStatus())) {
-                session.setAttribute("errorSig", "Manager could be Admin officier check first");
+                session.setAttribute("errorSig", "Cần được Quản lý hoặc Nhân viên Admin kiểm tra trước");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
             // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
+            contractService.refreshContractToken(contractId); // Gen new token + 30m expire
             contractService.noticeCustomerCheckContract(contractId, "http://localhost:9999/SWP391_GROUP3/");
 
             // Save history work for manager approve contract
@@ -226,7 +228,7 @@ public class ContractDetailController extends HttpServlet {
         } else if ("customer_approve".equals(action)) { // if customer approve contract
             // BR: only CUSTOMER_CHECK can be approved by Customer
             if (!"CUSTOMER_CHECK".equals(contract.getContractStatus())) {
-                session.setAttribute("errorSig", "Contract must be in CUSTOMER_CHECK status before Customer can approve.");
+                session.setAttribute("errorSig", "Hợp đồng phải ở trạng thái Chờ khách hàng duyệt trước khi Khách hàng có thể chốt.");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
@@ -249,7 +251,7 @@ public class ContractDetailController extends HttpServlet {
             String curStatus = contract.getContractStatus();
             if (!"DRAFT".equals(curStatus) && !"PENDING_REVIEW".equals(curStatus)) {
                 session.setAttribute("errorSig",
-                        "Contract must be in DRAFT or PENDING_REVIEW status before sending to Manager.");
+                        "Hợp đồng phải ở trạng thái Nháp hoặc Chờ duyệt trước khi gửi cho Quản lý.");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
@@ -265,6 +267,17 @@ public class ContractDetailController extends HttpServlet {
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
 
+            response.sendRedirect("contract-detail?id=" + contractId);
+
+        } else if ("send_final_contract".equals(action)) {
+            if (!"SIGNED".equals(contract.getContractStatus())) {
+                session.setAttribute("errorSig", "Hợp đồng chưa được ký hoàn tất.");
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+            String token = contractService.refreshContractToken(contractId);
+            contractService.noticeSendFinalContractPdf(contractId, token);
+            
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else {

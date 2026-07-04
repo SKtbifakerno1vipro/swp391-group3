@@ -6,7 +6,7 @@
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Login - Po Bread Sales</title>
+            <title>Đăng nhập - Po Bread Sales</title>
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link
@@ -349,11 +349,9 @@
                                     alt="Po Bread logo">
                             </div>
                             <h1>Po Bread</h1>
-                            <p>Sales Process Digitalization System for managing customers, products, quotations,
-                                contracts and orders.</p>
+                            <p>Hệ thống số hóa quy trình bán hàng: Quản lý khách hàng, sản phẩm, báo giá, hợp đồng và đơn hàng.</p>
                             <div class="brand-badges">
-                                <span class="brand-badge"><span class="material-symbols-outlined">verified</span>Trusted
-                                    Portal</span>
+                                <span class="brand-badge"><span class="material-symbols-outlined">verified</span>Cổng truy cập an toàn</span>
                                 <span class="brand-badge"><span class="material-symbols-outlined">bakery_dining</span>Po
                                     Bread Team</span>
                             </div>
@@ -363,36 +361,34 @@
 
                     <section class="form-panel">
                         <div class="form-inner">
-                            <p class="eyebrow">Enterprise Portal</p>
-                            <h2>Welcome back</h2>
-                            <p class="subtitle">Sign in with your account to continue managing the Po Bread sales
-                                workflow.</p>
+                            <p class="eyebrow">Cổng nội bộ Doanh nghiệp</p>
+                            <h2>Chào mừng trở lại</h2>
+                            <p class="subtitle">Đăng nhập vào tài khoản của bạn để tiếp tục quản lý quy trình bán hàng của Po Bread.</p>
 
                             <form action="${pageContext.request.contextPath}/login" method="post">
                                 <div class="field">
-                                    <label for="username">Username</label>
+                                    <label for="username">Tài khoản</label>
                                     <div class="input-wrap">
                                         <span class="material-symbols-outlined">person</span>
                                         <input type="text" id="username" name="username" required
-                                            placeholder="Enter username" autocomplete="username">
+                                            placeholder="Nhập tài khoản" autocomplete="username">
                                     </div>
                                 </div>
 
                                 <div class="field">
-                                    <label for="password">Password</label>
+                                    <label for="password">Mật khẩu</label>
                                     <div class="input-wrap">
                                         <span class="material-symbols-outlined">lock</span>
                                         <input type="password" id="password" name="password" required
-                                            placeholder="Enter password" autocomplete="current-password">
+                                            placeholder="Nhập mật khẩu" autocomplete="current-password">
                                     </div>
                                 </div>
 
                                 <div class="form-row">
-                                    <span>Secure employee access</span>
-                                    <a href="${pageContext.request.contextPath}/auth/forgot">Forgot password?</a>
+                                    <a href="${pageContext.request.contextPath}/auth/forgot">Quên mật khẩu?</a>
                                 </div>
 
-                                <button class="submit-btn" type="submit">Login</button>
+                                <button class="submit-btn" type="submit">Đăng nhập</button>
 
                                 <c:if test="${not empty error}">
                                     <div class="error-message">
