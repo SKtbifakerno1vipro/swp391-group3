@@ -44,7 +44,7 @@ public class DashboardController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/login?error=customer_not_found");
                 return;
             }
-            int customerId = customer.getCustomerId();
+            int customerId = customer.getCustomer().getCustomerId();
             session.setAttribute("customerId", customerId);
             request.setAttribute("customer", customer);
 

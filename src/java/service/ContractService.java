@@ -18,17 +18,17 @@ public class ContractService {
             String template, Properties config) {
 
         template = template.replace("{customer_name}",
-                cust.getCompanyName() != null ? cust.getCompanyName() : "");
+                cust.getCustomer().getCompanyName() != null ? cust.getCustomer().getCompanyName() : "");
         template = template.replace("{customer_address}",
-                cust.getAddress() != null ? cust.getAddress() : "");
+                cust.getUser().getAddress() != null ? cust.getUser().getAddress() : "");
         template = template.replace("{customer_phone}",
-                cust.getPhone() != null ? cust.getPhone() : "");
+                cust.getUser().getPhone() != null ? cust.getUser().getPhone() : "");
         template = template.replace("{customer_tax}",
-                cust.getTaxCode() != null ? cust.getTaxCode() : "");
+                cust.getCustomer().getTaxCode() != null ? cust.getCustomer().getTaxCode() : "");
         template = template.replace("{user_full_name}",
-                cust.getFullName() != null ? cust.getFullName() : "");
+                cust.getUser().getFullName() != null ? cust.getUser().getFullName() : "");
         template = template.replace("{tax_code_B}",
-                cust.getTaxCode() != null ? cust.getTaxCode() : "");
+                cust.getCustomer().getTaxCode() != null ? cust.getCustomer().getTaxCode() : "");
 
         template = template.replace("{company_name}",
                 config.getProperty("company_name", ""));
@@ -120,7 +120,7 @@ public class ContractService {
                 + "            <p style=\"color: #888888; margin: 5px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;\">Thông Báo Hệ Thống</p>"
                 + "        </div>"
                 + "        <div style=\"margin-bottom: 24px;\">"
-                + "            <h3 style=\"color: #333333; margin-top: 0;\">Kính chào Quý khách, <span style=\"color: #4A7C59;\">" + customer.getCompanyName() + "</span>!</h3>"
+                + "            <h3 style=\"color: #333333; margin-top: 0;\">Kính chào Quý khách, <span style=\"color: #4A7C59;\">" + customer.getCustomer().getCompanyName() + "</span>!</h3>"
                 + "            <p style=\"color: #555555; font-size: 15px;\">Yêu cầu kiểm tra thông tin hợp đồng số <strong>" + contract.getContractNumber() + "</strong> đã được khởi tạo và sẵn sàng để Quý khách xem xét.</p>"
                 + "            <p style=\"color: #555555; font-size: 15px;\">Vui lòng nhấp vào nút bên dưới để truy cập hệ thống và kiểm tra nội dung hợp đồng trước khi thực hiện ký kết:</p>"
                 + "        </div>"
