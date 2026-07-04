@@ -152,7 +152,7 @@ public class ContractDetailController extends HttpServlet {
         User user = (User) session.getAttribute("user");
 
         //user not login then return to login page
-        if (user == null ) {
+        if (user == null) {
             response.sendRedirect("login");
             return;
         }
@@ -267,6 +267,17 @@ public class ContractDetailController extends HttpServlet {
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
 
+            response.sendRedirect("contract-detail?id=" + contractId);
+
+        } else if ("send_final_contract".equals(action)) {
+            if (!"SIGNED".equals(contract.getContractStatus())) {
+                session.setAttribute("errorSig", "Hợp đồng chưa được ký hoàn tất.");
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+            String token = contractService.refreshContractToken(contractId);
+            contractService.noticeSendFinalContractPdf(contractId, token);
+            
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else {

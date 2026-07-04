@@ -240,6 +240,17 @@
                                                 </c:if>
                                             </c:if>
                                         </c:when>
+
+                                        <c:when test="${contract.contractStatus == 'SIGNED'}">
+                                            <p style="color: var(--primary); text-align: center; font-weight: bold; margin: 10px 0;">Hợp đồng đã ký hoàn tất</p>
+                                            <c:if test="${sessionScope.user.roleId == 2}">
+                                                <form method="POST" action="contract-detail" style="margin-bottom: 10px;">
+                                                    <input type="hidden" name="action" value="send_final_contract" />
+                                                    <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                                    <button type="submit" class="btn-full" style="background: var(--primary);">Gửi file hoàn thiện</button>
+                                                </form>
+                                            </c:if>
+                                        </c:when>
                                     </c:choose>
 
                                     <a href="export-pdf?id=${contract.contractId}" class="btn-full" style="text-decoration:none;">
@@ -254,7 +265,7 @@
                             </div>
 
                             <!-- TYPE NOTE BLOCK -->
-                            <c:if test="${not isGuest && (( sessionScope.user.roleId == 2) || ( sessionScope.user.roleId == 3))
+                            <c:if test="${(( sessionScope.user.roleId == 2) || ( sessionScope.user.roleId == 3))
                                           && (contract.contractStatus== 'PENDING_REVIEW' ||contract.contractStatus== 'CUSTOMER_CHECK' ) }">
                                   <div class="type-note-section" style="margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 20px;">
                                       <h3 style="margin-top:0;">Ghi chú</h3>

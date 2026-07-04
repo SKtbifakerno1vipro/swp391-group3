@@ -282,6 +282,42 @@ public class ContractDAO extends DBContext {
         return null;
     }
 
+    public Contract getContractByToken(String token) {
+        String sql = """
+                     SELECT *, cu.company_name FROM customer_contract  co 
+                     join dbo.customer cu on co.customer_id= cu.customer_id
+                     WHERE token = ?""";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, token);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Contract c = new Contract();
+                    c.setContractId(rs.getInt("customer_contract_id"));
+                    c.setCustomerId(rs.getInt("customer_id"));
+                    c.setCustomerName(rs.getString("company_name"));
+                    c.setQuotationId(rs.getInt("quotation_id"));
+                    c.setContractNumber(rs.getString("contract_number"));
+                    c.setContractContent(rs.getString("contract_content"));
+                    c.setStorageType(rs.getString("storage_type"));
+                    c.setContractStatus(rs.getString("contract_status"));
+                    c.setCreatedBy(rs.getInt("created_by"));
+                    c.setUpdatedBy(rs.getInt("updated_by"));
+                    c.setToken(rs.getString("token"));
+                    if (rs.getTimestamp("created_at") != null) {
+                        c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    }
+                    if (rs.getTimestamp("updated_at") != null) {
+                        c.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                    }
+                    return c;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * created by vtpp that function validate token when user is guest
      *
