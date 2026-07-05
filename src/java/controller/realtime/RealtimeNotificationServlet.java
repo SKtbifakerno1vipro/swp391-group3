@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @WebServlet(name = "RealtimeNotificationServlet", urlPatterns = {"/realtime/notifications"})
@@ -55,66 +54,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
         while (!writer.checkError()) {
             int roleId = user.getRoleId();
 
-            // 1. Payments Notifications
-            List<Payment> myPayments = paymentDAO.getPaymentsSince(lastCheckedPayment, (roleId == 3 ? user.getUserId() : null));
-            java.time.LocalDateTime lastLdt = lastCheckedPayment.toLocalDateTime();
-            Timestamp maxPaymentTime = lastCheckedPayment;
-
-            for (Payment p : myPayments) {
-                // a. Contract Signed (new pending payments)
-                if (p.getCreatedAt() != null && p.getCreatedAt().isAfter(lastLdt) && "PENDING".equals(p.getPaymentStatus())) {
-                    if (roleId == 3) {
-                        writer.write("event: notification\n");
-                        writer.write("data: " + formatCustomerPaymentJson(p, request.getContextPath()) + "\n\n");
-                    }
-//                    else {
-//                        writer.write("event: notification\n");
-//                        writer.write("data: " + formatAdminContractSignedJson(p, request.getContextPath()) + "\n\n");
-//                    }
-
-                    Timestamp pTime = Timestamp.valueOf(p.getCreatedAt());
-                    if (pTime.after(maxPaymentTime)) {
-                        maxPaymentTime = pTime;
-                    }
-                }
-
-                // b. Payment Completed
-                if (p.getPaidAt() != null && p.getPaidAt().isAfter(lastLdt) && "COMPLETED".equals(p.getPaymentStatus())) {
-                    if (roleId == 3) {
-                        writer.write("event: notification\n");
-                        writer.write("data: " + formatCustomerPaymentCompletedJson(p, request.getContextPath()) + "\n\n");
-                    } else {
-                        writer.write("event: notification\n");
-                        writer.write("data: " + formatAdminPaymentCompletedJson(p, request.getContextPath()) + "\n\n");
-                    }
-
-                    Timestamp pTime = Timestamp.valueOf(p.getPaidAt());
-                    if (pTime.after(maxPaymentTime)) {
-                        maxPaymentTime = pTime;
-                    }
-                }
-            }
-            if (maxPaymentTime.after(lastCheckedPayment)) {
-                lastCheckedPayment = maxPaymentTime;
-            }
-
-            // 2. Customer Notifications (Admin: 1, Staff: 2)
-            if (roleId == 1 || roleId == 2) {
-                List<CustomerDTO> newCustomers = customerDAO.getCustomersSince(lastCheckedCustomer);
-                for (CustomerDTO c : newCustomers) {
-                    if (c.getUser() != null && c.getUser().getCreateAt() != null) {
-                        writer.write("event: notification\n");
-                        writer.write("data: " + formatNewCustomerJson(c, request.getContextPath()) + "\n\n");
-
-                        Timestamp cTime = Timestamp.valueOf(c.getUser().getCreateAt());
-                        if (cTime.after(lastCheckedCustomer)) {
-                            lastCheckedCustomer = cTime;
-                        }
-                    }
-                }
-            }
-
-            // 3. Contract Workflow Notifications
+            //  Contract Workflow Notifications
             List<ContractHistory> newHistories = contractDAO.getContractHistoriesSinceId(lastContractHistoryId);
             for (ContractHistory h : newHistories) {
                 if (h.getCreatedAt() != null) {
@@ -189,6 +129,112 @@ public class RealtimeNotificationServlet extends HttpServlet {
                 }
             }
 
+            // Payments Notifications
+            List<Payment> myPayments = paymentDAO.getPaymentsSince(lastCheckedPayment, (roleId == 3 ? user.getUserId() : null));
+
+            for (Payment p : myPayments) {
+                boolean shouldNotify = false;
+                String type = "success";
+                String title = "";
+                String msg = "";
+                String link = request.getContextPath() + "/payment/detail?id=" + p.getPaymentId();
+                String btnText = null;
+
+                double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;
+                String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
+
+                // a. Contract Signed (new pending payments)
+                if ("PENDING".equals(p.getPaymentStatus())) {
+                    if (roleId == 3) {
+                        shouldNotify = true;
+                        title = "Ký hợp đồng thành công";
+                        msg = String.format("Hợp đồng số %s trị giá %,.0f VNĐ vừa được ký.<br>Hãy nhấn vào 'Thanh toán' để hoàn tất thủ tục.", contractNo, amt);
+                        btnText = "Thanh toán";
+                    }
+
+                    if (p.getCreatedAt() != null) {
+                        Timestamp pTime = Timestamp.valueOf(p.getCreatedAt());
+                        if (pTime.after(lastCheckedPayment)) {
+                            lastCheckedPayment = pTime;
+                        }
+                    }
+                } // b. Payment Completed
+                else if ("COMPLETED".equals(p.getPaymentStatus())) {
+                    if (roleId == 3) {
+                        shouldNotify = true;
+                        title = "Thanh toán thành công";
+                        msg = String.format("Bạn đã thanh toán thành công %,.0f VNĐ cho hợp đồng số %s.", amt, contractNo);
+                        btnText = "Chi tiết";
+                    } else { // Admin or Staff
+                        String name = p.getCustomerName() != null ? p.getCustomerName() : "Khách hàng";
+                        shouldNotify = true;
+                        title = "Thanh toán thành công";
+                        msg = String.format("Khách hàng %s đã thanh toán %,.0f VNĐ cho hợp đồng số %s.", name, amt, contractNo);
+                        btnText = "Chi tiết";
+                    }
+
+                    if (p.getPaidAt() != null) {
+                        Timestamp pTime = Timestamp.valueOf(p.getPaidAt());
+                        if (pTime.after(lastCheckedPayment)) {
+                            lastCheckedPayment = pTime;
+                        }
+                    }
+                }
+
+                // Chuyển đổi định dạng và gửi đi
+                if (shouldNotify) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("{\"type\":\"").append(escapeJson(type)).append("\"");
+                    sb.append(",\"title\":\"").append(escapeJson(title)).append("\"");
+                    sb.append(",\"message\":\"").append(escapeJson(msg)).append("\"");
+                    sb.append(",\"link\":\"").append(escapeJson(link)).append("\"");
+                    if (btnText != null) {
+                        sb.append(",\"btnText\":\"").append(escapeJson(btnText)).append("\"");
+                    }
+                    sb.append("}");
+
+                    writer.write("event: notification\n");
+                    writer.write("data: " + sb.toString() + "\n\n");
+                }
+            }
+
+            //  Customer Notifications (Admin: 1, Staff: 2)
+            if (roleId == 1 || roleId == 2) {
+                List<CustomerDTO> newCustomers = customerDAO.getCustomersSince(lastCheckedCustomer);
+                for (CustomerDTO c : newCustomers) {
+                    boolean shouldNotify = false;
+                    String type = "info";
+                    String title = "";
+                    String msg = "";
+                    String link = request.getContextPath() + "/customer/list";
+
+                    if (c.getUser() != null && c.getUser().getCreateAt() != null) {
+                        shouldNotify = true;
+                        title = "Thành viên mới";
+                        String name = c.getUser().getFullName() != null ? c.getUser().getFullName() : "Khách hàng mới";
+                        msg = String.format("Khách hàng %s vừa đăng ký tài khoản thành công.", name);
+
+                        Timestamp cTime = Timestamp.valueOf(c.getUser().getCreateAt());
+                        if (cTime.after(lastCheckedCustomer)) {
+                            lastCheckedCustomer = cTime;
+                        }
+                    }
+
+                    // Chuyển đổi định dạng và gửi đi
+                    if (shouldNotify) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("{\"type\":\"").append(escapeJson(type)).append("\"");
+                        sb.append(",\"title\":\"").append(escapeJson(title)).append("\"");
+                        sb.append(",\"message\":\"").append(escapeJson(msg)).append("\"");
+                        sb.append(",\"link\":\"").append(escapeJson(link)).append("\"");
+                        sb.append("}");
+
+                        writer.write("event: notification\n");
+                        writer.write("data: " + sb.toString() + "\n\n");
+                    }
+                }
+            }
+
             writer.flush();
             response.flushBuffer();
             try {
@@ -212,62 +258,50 @@ public class RealtimeNotificationServlet extends HttpServlet {
                 .replace("\t", "\\t");
     }
 
-    private String formatCustomerPaymentJson(Payment p, String contextPath) {
-        double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;
-        String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
-        return String.format(
-                "{\"type\":\"success\",\"title\":\"Ký hợp đồng thành công\",\"message\":\"Hợp đồng số %s trị giá %,.0f VNĐ vừa được ký.<br>Hãy nhấn vào \'Thanh toán\' để hoàn tất thủ tục.\",\"link\":\"%s/payment/detail?id=%d\",\"btnText\":\"Thanh toán\"}",
-                escapeJson(contractNo),
-                amt,
-                contextPath,
-                p.getPaymentId()
-        );
-    }
-
-//    private String formatAdminContractSignedJson(Payment p, String contextPath) {
-//        String name = p.getCustomerName() != null ? p.getCustomerName() : "Khách hàng";
+//    private String formatCustomerPaymentJson(Payment p, String contextPath) {
+//        double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;
 //        String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
 //        return String.format(
-//                "{\"type\":\"info\",\"title\":\"Ký hợp đồng\",\"message\":\"Khách hàng %s đã ký hợp đồng số %s.\",\"link\":\"%s/contract-detail?id=%d\",\"btnText\":\"Xem hợp đồng\",\"icon\":\"contract\",\"color\":\"#3b82f6\"}",
-//                escapeJson(name),
+//                "{\"type\":\"success\",\"title\":\"Ký hợp đồng thành công\",\"message\":\"Hợp đồng số %s trị giá %,.0f VNĐ vừa được ký.<br>Hãy nhấn vào \'Thanh toán\' để hoàn tất thủ tục.\",\"link\":\"%s/payment/detail?id=%d\",\"btnText\":\"Thanh toán\"}",
 //                escapeJson(contractNo),
+//                amt,
 //                contextPath,
-//                p.getCustomerContractId()
+//                p.getPaymentId()
 //        );
 //    }
-
-    private String formatCustomerPaymentCompletedJson(Payment p, String contextPath) {
-        double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;
-        String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
-        return String.format(
-                "{\"type\":\"success\",\"title\":\"Thanh toán thành công\",\"message\":\"Bạn đã thanh toán thành công %,.0f VNĐ cho hợp đồng số %s.\",\"link\":\"%s/payment/detail?id=%d\",\"btnText\":\"Chi tiết\",\"icon\":\"payments\",\"color\":\"#10b981\"}",
-                amt,
-                escapeJson(contractNo),
-                contextPath,
-                p.getPaymentId()
-        );
-    }
-
-    private String formatAdminPaymentCompletedJson(Payment p, String contextPath) {
-        String name = p.getCustomerName() != null ? p.getCustomerName() : "Khách hàng";
-        double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;
-        String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
-        return String.format(
-                "{\"type\":\"success\",\"title\":\"Thanh toán thành công\",\"message\":\"Khách hàng %s đã thanh toán %,.0f VNĐ cho hợp đồng số %s.\",\"link\":\"%s/payment/detail?id=%d\",\"btnText\":\"Chi tiết\",\"icon\":\"payments\",\"color\":\"#10b981\"}",
-                escapeJson(name),
-                amt,
-                escapeJson(contractNo),
-                contextPath,
-                p.getPaymentId()
-        );
-    }
-
-    private String formatNewCustomerJson(CustomerDTO c, String contextPath) {
-        String name = (c.getUser() != null && c.getUser().getFullName() != null) ? c.getUser().getFullName() : "Khách hàng mới";
-        return String.format(
-                "{\"type\":\"info\",\"title\":\"Thành viên mới\",\"message\":\"Khách hàng %s vừa đăng ký tài khoản thành công.\",\"link\":\"%s/customer/list\"}",
-                escapeJson(name),
-                contextPath
-        );
-    }
+//
+//    private String formatCustomerPaymentCompletedJson(Payment p, String contextPath) {
+//        double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;
+//        String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
+//        return String.format(
+//                "{\"type\":\"success\",\"title\":\"Thanh toán thành công\",\"message\":\"Bạn đã thanh toán thành công %,.0f VNĐ cho hợp đồng số %s.\",\"link\":\"%s/payment/detail?id=%d\",\"btnText\":\"Chi tiết\",\"icon\":\"payments\",\"color\":\"#10b981\"}",
+//                amt,
+//                escapeJson(contractNo),
+//                contextPath,
+//                p.getPaymentId()
+//        );
+//    }
+//
+//    private String formatAdminPaymentCompletedJson(Payment p, String contextPath) {
+//        String name = p.getCustomerName() != null ? p.getCustomerName() : "Khách hàng";
+//        double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;
+//        String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
+//        return String.format(
+//                "{\"type\":\"success\",\"title\":\"Thanh toán thành công\",\"message\":\"Khách hàng %s đã thanh toán %,.0f VNĐ cho hợp đồng số %s.\",\"link\":\"%s/payment/detail?id=%d\",\"btnText\":\"Chi tiết\",\"icon\":\"payments\",\"color\":\"#10b981\"}",
+//                escapeJson(name),
+//                amt,
+//                escapeJson(contractNo),
+//                contextPath,
+//                p.getPaymentId()
+//        );
+//    }
+//
+//    private String formatNewCustomerJson(CustomerDTO c, String contextPath) {
+//        String name = (c.getUser() != null && c.getUser().getFullName() != null) ? c.getUser().getFullName() : "Khách hàng mới";
+//        return String.format(
+//                "{\"type\":\"info\",\"title\":\"Thành viên mới\",\"message\":\"Khách hàng %s vừa đăng ký tài khoản thành công.\",\"link\":\"%s/customer/list\"}",
+//                escapeJson(name),
+//                contextPath
+//        );
+//    }
 }

@@ -60,6 +60,18 @@
             th { padding:10px 8px; font-size: 13px; position: sticky; top: 0; background: var(--surface); z-index: 1; border-bottom: 2px solid var(--line); color:var(--muted); }
             td { padding:10px 8px; font-size: 13px; border-bottom: 1px solid var(--line); }
             .badge { padding:4px 6px; border-radius:6px; font-size:11px; font-weight:bold; }
+            
+            @media (max-width: 1200px) {
+                .kpi-row { grid-template-columns: repeat(3, 1fr); }
+                .content-grid { grid-template-columns: 1fr; }
+                .content-grid .content-card { min-height: 350px; }
+                .main { overflow-y: auto; }
+            }
+            @media (max-width: 768px) {
+                .dashboard-shell { grid-template-columns: 1fr; }
+                .sidebar { display: none; }
+                .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            }
         </style>
     </head>
     <body>
