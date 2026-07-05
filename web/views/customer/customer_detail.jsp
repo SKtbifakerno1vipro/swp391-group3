@@ -319,16 +319,16 @@
                                 <div>
                                     <h1>Hồ sơ khách hàng</h1>
                                     <span style="color: var(--muted); font-size: 14px;">ID:
-                                        ${cusDTO.customerId} |
-                                        User ID: ${cusDTO.userId}</span>
+                                        ${cusDTO.customer.customerId} |
+                                        User ID: ${cusDTO.user.userId}</span>
                                 </div>
                                 <div>
                                     <%-- THEM BAO VE NGHIEP VU: Neu la Sale Staff thi cho phep bam nut tao bao gia nhanh
                                         cho rieng khach nay --%>
-                                        <c:if test="${sessionScope.user.roleId == 4}">
-                                            <a href="${pageContext.request.contextPath}/quotation/create?customerId=${cusDTO.customerId}"
-                                                class="btn-edit">+ Báo giá nhanh</a>
-                                        </c:if>
+                                         <c:if test="${sessionScope.user.roleId == 4}">
+                                             <a href="${pageContext.request.contextPath}/quotation/create?customerId=${cusDTO.customer.customerId}"
+                                                 class="btn-edit">+ Báo giá nhanh</a>
+                                         </c:if>
                                 </div>
                             </div>
 
@@ -348,8 +348,8 @@
                                 <div class="kpi-card warning">
                                     <div class="kpi-title">Trạng thái tài khoản</div>
                                     <div class="kpi-value" style="font-size: 18px; padding-top: 2px;">
-                                        <span
-                                            class="badge ${cusDTO.status == 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">${cusDTO.status}</span>
+                                         <span
+                                             class="badge ${cusDTO.user.status == 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">${cusDTO.user.status}</span>
                                     </div>
                                 </div>
                             </div>
@@ -359,21 +359,21 @@
                                     <h3>Thông tin tài khoản & Liên hệ</h3>
                                     <div class="info-row">
                                         <div class="info-label">Tên đăng nhập:</div>
-                                        <div class="info-value">${cusDTO.userName}</div>
+                                        <div class="info-value">${cusDTO.user.userName}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Họ và tên:</div>
-                                        <div class="info-value">${not empty cusDTO.fullName ? cusDTO.fullName
-                                            : 'N/A'}</div>
+                                        <div class="info-value">${not empty cusDTO.user.fullName ? cusDTO.user.fullName
+                                             : 'N/A'}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Địa chỉ Email:</div>
-                                        <div class="info-value">${cusDTO.email}</div>
+                                        <div class="info-value">${cusDTO.user.email}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Số điện thoại:</div>
-                                        <div class="info-value">${not empty cusDTO.phone ? cusDTO.phone :
-                                            'N/A'}</div>
+                                        <div class="info-value">${not empty cusDTO.user.phone ? cusDTO.user.phone :
+                                             'N/A'}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Vai trò hệ thống:</div>
@@ -385,31 +385,31 @@
                                     <h3>Hồ sơ thương mại</h3>
                                     <div class="info-row">
                                         <div class="info-label">Tên công ty:</div>
-                                        <div class="info-value"><strong>${cusDTO.companyName}</strong></div>
+                                        <div class="info-value"><strong>${cusDTO.customer.companyName}</strong></div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Mã số thuế:</div>
-                                        <div class="info-value">${not empty cusDTO.taxCode ?
-                                            cusDTO.taxCode : 'N/A'}</div>
+                                        <div class="info-value">${not empty cusDTO.customer.taxCode ?
+                                             cusDTO.customer.taxCode : 'N/A'}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Loại khách hàng:</div>
-                                        <div class="info-value">${cusDTO.customerType}</div>
+                                        <div class="info-value">${cusDTO.customer.customerType}</div>
                                     </div>
                                     <div class="info-row">
                                         <div class="info-label">Nhân viên Sale phụ trách:</div>
                                         <div class="info-value" style="color: var(--primary); font-weight: 700;">
-                                            <c:choose>
-                                                <c:when test="${not empty cusDTO.assignedToUserId}">
-                                                    <c:forEach var="u" items="${listSales}">
-                                                        <c:if test="${cusDTO.assignedToUserId == u.userId}">
-                                                            ${u.fullName} (${u.userName})
-                                                        </c:if>
-                                                    </c:forEach>
-                                                </c:when>
-                                                <c:otherwise><span class="text-muted"
-                                                        style="font-weight: 400;">Chưa phân công</span></c:otherwise>
-                                            </c:choose>
+                                             <c:choose>
+                                                 <c:when test="${not empty cusDTO.customer.assignedToUserId}">
+                                                     <c:forEach var="u" items="${listSales}">
+                                                         <c:if test="${cusDTO.customer.assignedToUserId == u.userId}">
+                                                             ${u.fullName} (${u.userName})
+                                                         </c:if>
+                                                     </c:forEach>
+                                                 </c:when>
+                                                 <c:otherwise><span class="text-muted"
+                                                         style="font-weight: 400;">Chưa phân công</span></c:otherwise>
+                                             </c:choose>
                                         </div>
                                     </div>
                                 </div>
@@ -574,15 +574,15 @@
 
                             <div class="btn-group">
                                 <c:if test="${sessionScope.user.roleId != 3}">
-                                    <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customerId}"
+                                    <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customer.customerId}"
                                         class="btn-edit">Chỉnh sửa hồ sơ</a>
-                                    <c:if test="${cusDTO.status == 'ACTIVE'}">
-                                        <a href="${pageContext.request.contextPath}/customer/detail?action=deactivate&id_cus=${cusDTO.customerId}"
+                                    <c:if test="${cusDTO.user.status == 'ACTIVE'}">
+                                        <a href="${pageContext.request.contextPath}/customer/detail?action=deactivate&id_cus=${cusDTO.customer.customerId}"
                                             class="btn-remove"
                                             onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa khách hàng này không?');">Vô hiệu hóa</a>
                                     </c:if>
-                                    <c:if test="${cusDTO.status == 'INACTIVE'}">
-                                        <a href="${pageContext.request.contextPath}/customer/detail?action=activate&id_cus=${cusDTO.customerId}"
+                                    <c:if test="${cusDTO.user.status == 'INACTIVE'}">
+                                        <a href="${pageContext.request.contextPath}/customer/detail?action=activate&id_cus=${cusDTO.customer.customerId}"
                                             class="btn-activate"
                                             onclick="return confirm('Bạn có chắc chắn muốn kích hoạt khách hàng này không?');">Kích hoạt</a>
                                     </c:if>

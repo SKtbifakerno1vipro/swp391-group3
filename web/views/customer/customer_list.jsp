@@ -255,17 +255,17 @@
 
                             <c:forEach var="cust" items="${customersDTOs}">
                                 <tr>
-                                    <td>${cust.customerId}</td>
-                                    <td><strong>${cust.fullName}</strong></td>
-                                    <td>${cust.companyName}</td>
-                                    <td>${cust.email}</td>
-                                    <td>${cust.phone}</td>
-                                    <td>${cust.taxCode}</td>
-                                    <td><span>${cust.status}</span></td>
-                                    <td>${cust.updateTimeString}</td>
+                                    <td>${cust.customer.customerId}</td>
+                                    <td><strong>${cust.user.fullName}</strong></td>
+                                    <td>${cust.customer.companyName}</td>
+                                    <td>${cust.user.email}</td>
+                                    <td>${cust.user.phone}</td>
+                                    <td>${cust.customer.taxCode}</td>
+                                    <td><span>${cust.user.status}</span></td>
+                                    <td>${cust.user.updateTimeString}</td>
                                     <td>
                                         <a
-                                            href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customerId}">Chi tiết</a>
+                                            href="${pageContext.request.contextPath}/customer/detail?id_cus=${cust.customer.customerId}">Chi tiết</a>
                                     </td>
                                 </tr>
                             </c:forEach>
