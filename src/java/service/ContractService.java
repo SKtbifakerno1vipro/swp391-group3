@@ -169,7 +169,7 @@ public class ContractService {
                 + "            <p style=\"color: #888888; margin: 5px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;\">Thông Báo Hệ Thống</p>"
                 + "        </div>"
                 + "        <div style=\"margin-bottom: 24px;\">"
-                + "            <h3 style=\"color: #333333; margin-top: 0;\">Kính chào Quý khách, <span style=\"color: #4A7C59;\">" + customer.getCompanyName() + "</span>!</h3>"
+                + "            <h3 style=\"color: #333333; margin-top: 0;\">Kính chào Quý khách, <span style=\"color: #4A7C59;\">" + customer.getCustomer().getCompanyName() + "</span>!</h3>"
                 + "            <p style=\"color: #555555; font-size: 15px;\">Hợp đồng số <strong>" + contract.getContractNumber() + "</strong> đã được hai bên ký kết hoàn tất.</p>"
                 + "            <p style=\"color: #555555; font-size: 15px;\">Vui lòng nhấp vào nút bên dưới để tải trực tiếp bản mềm Hợp đồng (PDF) về máy tính của Quý khách để lưu trữ:</p>"
                 + "        </div>"
