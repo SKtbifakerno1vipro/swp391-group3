@@ -247,7 +247,7 @@
                                                 <form method="POST" action="contract-detail" style="margin-bottom: 10px;">
                                                     <input type="hidden" name="action" value="send_final_contract" />
                                                     <input type="hidden" name="contractId" value="${contract.contractId}" />
-                                                    <button type="submit" class="btn-full" style="background: var(--primary);">Gửi file hoàn thiện</button>
+                                                    <button type="submit" class="btn-full" style="background: var(--primary);">Gửi hợp đồng hoàn thiện</button>
                                                 </form>
                                             </c:if>
                                         </c:when>
