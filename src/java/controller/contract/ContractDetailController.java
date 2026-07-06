@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import service.ContractService;
-import service.QuotationService;
 import service.RoleService;
 import service.SignatureService;
 import service.UserService;
@@ -150,6 +149,7 @@ public class ContractDetailController extends HttpServlet {
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+
         //user not login then return to login page
         if (user == null) {
             response.sendRedirect("login");
@@ -210,6 +210,7 @@ public class ContractDetailController extends HttpServlet {
             }
             // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
+            contractService.refreshContractToken(contractId); // Gen new token + 30m expire
             contractService.noticeCustomerCheckContract(contractId, "http://localhost:9999/SWP391_GROUP3/");
 
             // Save history work for manager approve contract
@@ -265,6 +266,17 @@ public class ContractDetailController extends HttpServlet {
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
 
+            response.sendRedirect("contract-detail?id=" + contractId);
+
+        } else if ("send_final_contract".equals(action)) {
+            if (!"SIGNED".equals(contract.getContractStatus())) {
+                session.setAttribute("errorSig", "Hợp đồng chưa được ký hoàn tất.");
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+            String token = contractService.refreshContractToken(contractId);
+            contractService.noticeSendFinalContractPdf(contractId, token);
+            
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else {

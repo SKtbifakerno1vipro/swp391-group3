@@ -191,6 +191,7 @@ CREATE TABLE customer_contract (
 	contract_content nvarchar(max),
     storage_type VARCHAR(10) NOT NULL DEFAULT 'TEXT',
     token VARCHAR(255) UNIQUE,
+    token_expired_at DATETIME,
 
     created_by INT,
 	updated_by INT,
@@ -339,9 +340,9 @@ CREATE TABLE payment (
     amount DECIMAL(18,2) CHECK (amount > 0),
     payment_type VARCHAR(50),
     payment_status VARCHAR(20),
-    paid_at DATETIME,
+    paid_at DATETIME2(6),
     created_by INT,
-    created_at DATETIME DEFAULT GETDATE(),
+    created_at DATETIME2(6) DEFAULT SYSDATETIME(),
     FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),
     FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id),
     FOREIGN KEY (created_by) REFERENCES [user](user_id)
@@ -506,7 +507,7 @@ DECLARE @O1 INT = SCOPE_IDENTITY();
 INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (@O1, @QD1, 100, 15000, 22000);
 INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, sub_total, tax_amount, total_amount, created_by) 
 VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2090000.00, 209000.00, 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
-INSERT INTO payment (customer_contract_id, invoice_id, amount, payment_type, payment_status, paid_at, created_by) VALUES (@C1, SCOPE_IDENTITY(), 2299000.00, 'BANK_TRANSFER', 'COMPLETED', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
+INSERT INTO payment (customer_contract_id, invoice_id, amount, payment_type, payment_status, paid_at, created_by) VALUES (@C1, SCOPE_IDENTITY(), 2299000.00, 'BANK_TRANSFER', 'COMPLETED', SYSDATETIME(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 GO
 
 -- 8. QUY TRINH HOP DONG 02: KHACH HANG 02 (ĐANG TRANG THAI KHACH YEU CAU SUA - REVISION)

@@ -44,7 +44,7 @@ public class DashboardController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/login?error=customer_not_found");
                 return;
             }
-            int customerId = customer.getCustomerId();
+            int customerId = customer.getCustomer().getCustomerId();
             session.setAttribute("customerId", customerId);
             request.setAttribute("customer", customer);
 
@@ -77,7 +77,8 @@ public class DashboardController extends HttpServlet {
             request.setAttribute("draftContracts", dashboardDAO.countDraftContracts());
             request.setAttribute("contractStatusCounts", dashboardDAO.countContractStatusForOfficer());
             request.setAttribute("contractsNeedingAction", dashboardDAO.getContractNeedingAction(5));
-            System.out.println(dashboardDAO.getContractNeedingAction(5));
+            request.setAttribute("invoiceSummary", dashboardDAO.getInvoiceSummaryForOfficer());
+            request.setAttribute("recentInvoices", dashboardDAO.getRecentInvoicesForOfficer(10));
             request.getRequestDispatcher("/views/dashboard/admin-officier-dashboard.jsp").forward(request, response);
             return;
         }

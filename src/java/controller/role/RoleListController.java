@@ -23,9 +23,10 @@ public class RoleListController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         // chuc nang cua searchtext
         String searchText = request.getParameter("search");
-        if (searchText != null) {
-            searchText = searchText.trim().replaceAll("\\s+", " ");
-        }
+       
+            if (searchText != null) {
+                searchText = searchText.trim().replaceAll("\\s+", " ");
+            }
 
         List<Role> roles;
         // neu searchtext khong null va ko rong thi thuc hien chuc nang cua search role
@@ -50,6 +51,7 @@ public class RoleListController extends HttpServlet {
         }
 // thuat toan chia trang 
         int totalRoles = roles.size();
+        //tinh tong trang
         int totalPages = (int) Math.ceil((double) totalRoles / pageSize);
         if (totalPages == 0) {
             totalPages = 1;
@@ -60,7 +62,7 @@ public class RoleListController extends HttpServlet {
         if (page > totalPages) {
             page = totalPages;
         }
-
+//tinh vi tri cat 
         int fromIndex = Math.min((page - 1) * pageSize, totalRoles);
         int toIndex = Math.min(fromIndex + pageSize, totalRoles);
         List<Role> roleList = totalRoles == 0 ? Collections.emptyList() : roles.subList(fromIndex, toIndex);

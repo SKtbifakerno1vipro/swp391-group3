@@ -59,6 +59,8 @@
                 <th style="border: 1px solid black; padding: 5px;">Đơn vị tính</th>
                 <th style="border: 1px solid black; padding: 5px;">Số lượng</th>
                 <th style="border: 1px solid black; padding: 5px;">Đơn giá</th>
+                <th style="border: 1px solid black; padding: 5px;">Giảm giá</th>
+                <th style="border: 1px solid black; padding: 5px;">Thuế</th>
                 <th style="border: 1px solid black; padding: 5px;">Thành tiền</th>
             </tr>
         </thead>

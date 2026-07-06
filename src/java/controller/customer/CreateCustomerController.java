@@ -96,10 +96,10 @@ public class CreateCustomerController extends HttpServlet {
 
             String msg = customerService.createCustomerDTO(u, c);
 
-            if (msg == null || msg.trim().isEmpty()) {
+            if ("SUCCESS".equals(msg)) {
                 request.setAttribute("success", true);
             } else {
-                request.setAttribute("error", "Create failed."+ msg + (customerService.getLastError() != null ? customerService.getLastError() : "Unknown error"));
+                request.setAttribute("error", "Create failed. " + (msg != null ? msg : (customerService.getLastError() != null ? customerService.getLastError() : "Unknown error")));
             }
         } catch (NumberFormatException ex) {
             request.setAttribute("error", "Create failed");

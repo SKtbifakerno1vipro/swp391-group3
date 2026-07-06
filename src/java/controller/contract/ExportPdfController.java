@@ -29,22 +29,31 @@ public class ExportPdfController extends HttpServlet {
             throws ServletException, IOException {
 
         String idParam = request.getParameter("id");
-        if (idParam == null) {
-            System.out.println("Missing id parameter");
-            return;
+        
+        String tokenParam = request.getParameter("token");// need to guest download contract
+        Contract contract = null;
+
+        if (tokenParam != null && !tokenParam.isEmpty()) {
+            contract = contractDAO.getContractByToken(tokenParam);
+            if (contract != null) {
+                if (!contractDAO.validateToken(contract.getContractId(), tokenParam)) {
+                    response.setContentType("text/plain;charset=UTF-8");
+                    response.getWriter().write("Link tải file đã hết hạn hoặc không hợp lệ!");
+                    return;
+                }
+            }
+        } else if (idParam != null && !idParam.isEmpty()) {
+            try {
+                int contractId = Integer.parseInt(idParam);
+                contract = contractDAO.getContractById(contractId);
+            } catch (Exception e) {
+                System.out.println("Invalid id");
+            }
         }
 
-        int contractId = 0;
-        try {
-            contractId = Integer.parseInt(idParam);
-        } catch (Exception e) {
-            System.out.println("Invalid id");
-            return;
-        }
-
-        Contract contract = contractDAO.getContractById(contractId);
         if (contract == null) {
-            System.out.println("Contract not found");
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("Không tìm thấy hợp đồng hợp lệ!");
             return;
         }
 
@@ -65,7 +74,7 @@ public class ExportPdfController extends HttpServlet {
         // Services needed
         RoleService rService = new RoleService();
         UserService uService = new UserService();
-        List<Signature> sigList = sService.getSignaturesByContractId(contractId);
+        List<Signature> sigList = sService.getSignaturesByContractId(contract.getContractId());
         for (Signature sig : sigList) {
             if (sig == null || sig.getFileName() == null) {
                 continue;
@@ -82,6 +91,7 @@ public class ExportPdfController extends HttpServlet {
             }
         }
 
+        html = html.replace("border: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0,0,0,0.1);", "");
         String xhtml = html.replaceAll("<(br|hr|img|input|meta|link)([^>]*?)(?<!/)>", "<$1$2/>");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -107,8 +117,10 @@ public class ExportPdfController extends HttpServlet {
         }
 
         // 5. Trả PDF về trình duyệt
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=\"Contract_" + contract.getContractNumber() + ".pdf\"");
+        String safeFileName = contract.getContractNumber().replaceAll("[\\\\/:*?\"<>|]", "-");
+        String encodedFileName = java.net.URLEncoder.encode("Contract_" + safeFileName + ".pdf", "UTF-8").replaceAll("\\+", "%20");
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName);
         response.setContentLength(baos.size());
 
         try (OutputStream os = response.getOutputStream()) {

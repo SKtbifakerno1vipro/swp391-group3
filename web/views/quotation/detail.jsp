@@ -164,7 +164,7 @@
                                             ${detail.discountPercent}
                                         </c:when>
                                         <c:otherwise>
-                                            <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="${detail.discountPercent}" required style="width: 70px;">
+                                            <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="${detail.discountPercent}" readonly style="width: 70px;">
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
@@ -174,7 +174,7 @@
                                             ${detail.taxPercent}
                                         </c:when>
                                         <c:otherwise>
-                                            <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="${detail.taxPercent}" required style="width: 70px;">
+                                            <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="${detail.taxPercent}" readonly style="width: 70px;">
                                         </c:otherwise>
                                     </c:choose>
                                 </td>

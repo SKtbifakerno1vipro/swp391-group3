@@ -18,17 +18,17 @@ public class ContractService {
             String template, Properties config) {
 
         template = template.replace("{customer_name}",
-                cust.getCompanyName() != null ? cust.getCompanyName() : "");
+                cust.getCustomer().getCompanyName() != null ? cust.getCustomer().getCompanyName() : "");
         template = template.replace("{customer_address}",
-                cust.getAddress() != null ? cust.getAddress() : "");
+                cust.getUser().getAddress() != null ? cust.getUser().getAddress() : "");
         template = template.replace("{customer_phone}",
-                cust.getPhone() != null ? cust.getPhone() : "");
+                cust.getUser().getPhone() != null ? cust.getUser().getPhone() : "");
         template = template.replace("{customer_tax}",
-                cust.getTaxCode() != null ? cust.getTaxCode() : "");
+                cust.getCustomer().getTaxCode() != null ? cust.getCustomer().getTaxCode() : "");
         template = template.replace("{user_full_name}",
-                cust.getFullName() != null ? cust.getFullName() : "");
+                cust.getUser().getFullName() != null ? cust.getUser().getFullName() : "");
         template = template.replace("{tax_code_B}",
-                cust.getTaxCode() != null ? cust.getTaxCode() : "");
+                cust.getCustomer().getTaxCode() != null ? cust.getCustomer().getTaxCode() : "");
 
         template = template.replace("{company_name}",
                 config.getProperty("company_name", ""));
@@ -62,6 +62,10 @@ public class ContractService {
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>").append(item.getQuantity()).append("</td>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:right;'>")
                         .append(String.format("%,.0f", price)).append("</td>")
+                        .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>")
+                        .append(item.getDiscountPercent()).append("%").append("</td>")
+                        .append("<td style='border: 1px solid black; padding: 5px; text-align:center;'>")
+                        .append(item.getTaxPercent()).append("%").append("</td>")
                         .append("<td style='border: 1px solid black; padding: 5px; text-align:right;'>")
                         .append(String.format("%,.0f", subtotal)).append("</td>")
                         .append("</tr>");
@@ -99,6 +103,10 @@ public class ContractService {
         return contractDAO.validateToken(contractId, token);
     }
 
+    public String refreshContractToken(int contractId) {
+        return contractDAO.refreshContractToken(contractId);
+    }
+
     public void noticeCustomerCheckContract(int contractId, String baseUrl) {
         Contract contract = contractDAO.getContractById(contractId);
         CustomerDTO customer = contractDAO.getCustomerDTOByContractId(contractId);
@@ -120,7 +128,7 @@ public class ContractService {
                 + "            <p style=\"color: #888888; margin: 5px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;\">Thông Báo Hệ Thống</p>"
                 + "        </div>"
                 + "        <div style=\"margin-bottom: 24px;\">"
-                + "            <h3 style=\"color: #333333; margin-top: 0;\">Kính chào Quý khách, <span style=\"color: #4A7C59;\">" + customer.getCompanyName() + "</span>!</h3>"
+                + "            <h3 style=\"color: #333333; margin-top: 0;\">Kính chào Quý khách, <span style=\"color: #4A7C59;\">" + customer.getCustomer().getCompanyName() + "</span>!</h3>"
                 + "            <p style=\"color: #555555; font-size: 15px;\">Yêu cầu kiểm tra thông tin hợp đồng số <strong>" + contract.getContractNumber() + "</strong> đã được khởi tạo và sẵn sàng để Quý khách xem xét.</p>"
                 + "            <p style=\"color: #555555; font-size: 15px;\">Vui lòng nhấp vào nút bên dưới để truy cập hệ thống và kiểm tra nội dung hợp đồng trước khi thực hiện ký kết:</p>"
                 + "        </div>"
@@ -138,7 +146,46 @@ public class ContractService {
                 + "    </div>"
                 + "</body>"
                 + "</html>";
+//        EmailUtils.sendEmailAsync(customer.getEmail(), subject, content);
         EmailUtils.sendEmailAsync("omovie111@gmail.com", subject, content);
+    }
+
+    public void noticeSendFinalContractPdf(int contractId, String token) {
+        Contract contract = contractDAO.getContractById(contractId);
+        CustomerDTO customer = contractDAO.getCustomerDTOByContractId(contractId);
+        String secureUrl = "http://localhost:9999/SWP391_GROUP3/export-pdf?token=" + token;
+        String subject = "Công Ty TNHH Pơ Bread - Gửi bản sao Hợp đồng (Đã Ký) cho Quý khách lưu trữ";
+
+        String content = "<!DOCTYPE html>"
+                + "<html>"
+                + "<head>"
+                + "    <meta charset=\"UTF-8\">"
+                + "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+                + "</head>"
+                + "<body style=\"margin: 0; padding: 20px; background-color: #f4f5f7;\">"
+                + "    <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e0e0e0; border-radius: 16px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);\">"
+                + "        <div style=\"text-align: center; margin-bottom: 24px; border-bottom: 2px solid #eaeaea; padding-bottom: 16px;\">"
+                + "            <h2 style=\"color: #4A7C59; margin: 0; font-size: 26px; font-weight: 700; font-family: Georgia, serif;\">Pơ Bread</h2>"
+                + "            <p style=\"color: #888888; margin: 5px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;\">Thông Báo Hệ Thống</p>"
+                + "        </div>"
+                + "        <div style=\"margin-bottom: 24px;\">"
+                + "            <h3 style=\"color: #333333; margin-top: 0;\">Kính chào Quý khách, <span style=\"color: #4A7C59;\">" + customer.getCustomer().getCompanyName() + "</span>!</h3>"
+                + "            <p style=\"color: #555555; font-size: 15px;\">Hợp đồng số <strong>" + contract.getContractNumber() + "</strong> đã được hai bên ký kết hoàn tất.</p>"
+                + "            <p style=\"color: #555555; font-size: 15px;\">Vui lòng nhấp vào nút bên dưới để tải trực tiếp bản mềm Hợp đồng (PDF) về máy tính của Quý khách để lưu trữ:</p>"
+                + "        </div>"
+                + "        <div style=\"text-align: center; margin-bottom: 28px;\">"
+                + "            <a href=\"" + secureUrl + "\" style=\"display: inline-block; padding: 12px 30px; background-color: #4A7C59; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 15px; box-shadow: 0 4px 8px rgba(74, 124, 89, 0.25);\">"
+                + "                Tải File Hợp Đồng PDF"
+                + "            </a>"
+                + "        </div>"
+                + "        <div style=\"border-top: 1px solid #eaeaea; padding-top: 20px; color: #888888; font-size: 12px; text-align: center;\">"
+                + "            <p style=\"margin: 0;\">Đây là email tự động từ hệ thống quản lý hợp đồng Pơ Bread. Vui lòng không phản hồi trực tiếp email này.</p>"
+                + "        </div>"
+                + "    </div>"
+                + "</body>"
+                + "</html>";
+        EmailUtils.sendEmailAsync("omovie111@gmail.com", subject, content);
+//        EmailUtils.sendEmailAsync(customer.getEmail(), subject, content);
     }
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,

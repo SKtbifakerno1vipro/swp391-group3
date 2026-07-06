@@ -75,7 +75,7 @@
                     <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/invoice-list" title="My Invoices">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt</span></div>
-                        <span class="sidebar-text">My Invoices</span>
+                        <span class="sidebar-text">Invoices</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/payment/list" title="Payments">

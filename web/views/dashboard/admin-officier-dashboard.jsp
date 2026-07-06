@@ -18,7 +18,7 @@
             body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font-family:'Nunito Sans',Arial,sans-serif; }
             a { color:inherit; text-decoration:none; }
             .material-symbols-outlined { font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; font-size:22px; line-height:1; letter-spacing:normal; text-transform:none; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; word-wrap:normal; direction:ltr; -webkit-font-feature-settings:'liga'; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24; width:1em; min-width:1em; overflow:hidden; }
-            .dashboard-shell { display:grid; grid-template-columns:260px minmax(0,1fr); min-height:100vh; }
+            .dashboard-shell { display:grid; grid-template-columns:260px minmax(0,1fr); height:100vh; overflow:hidden; }
             .sidebar { position:sticky; top:0; height:100vh; padding:28px 18px; background:linear-gradient(180deg,#f7f2eb 0%,#f2ede5 100%); border-right:1px solid var(--line); display:flex; flex-direction:column; gap:28px; overflow-y:auto; }
             .sidebar::-webkit-scrollbar { width:6px; }
             .sidebar::-webkit-scrollbar-track { background:transparent; }
@@ -37,12 +37,45 @@
             .sidebar-footer { position:relative; z-index:1; margin-top:auto; padding-top:18px; border-top:1px solid var(--line); }
             .user-card { display:flex; gap:12px; align-items:center; padding:12px; border-radius:18px; background:var(--surface); }
             .avatar { width:42px; height:42px; border-radius:50%; display:grid; place-items:center; background:var(--primary); color:white; font-weight:800; text-transform:uppercase;}
-            .main { min-width:0; padding:26px 34px 38px; }
-            .topbar { display:flex; justify-content:space-between; gap:18px; align-items:center; margin-bottom:30px; }
-            .eyebrow { margin:0 0 6px; color:var(--primary); font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-size:12px; }
+            .main { min-width:0; padding:20px 24px; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+            .topbar { display:flex; justify-content:space-between; gap:18px; align-items:center; margin-bottom:16px; flex-shrink:0; }
+            .eyebrow { margin:0 0 4px; color:var(--primary); font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-size:11px; }
             h1,h2 { font-family:'Literata',Georgia,serif; }
-            h1 { margin:0; font-size:clamp(30px,4vw,44px); line-height:1.1; }
-            .topbar p { margin:8px 0 0; color:var(--muted); }
+            h1 { margin:0; font-size:clamp(24px,3vw,32px); line-height:1.1; }
+            .topbar p { margin:4px 0 0; color:var(--muted); font-size:14px; }
+            
+            .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; flex-shrink: 0; }
+            .kpi-card { padding: 14px; background: var(--surface); border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+            .kpi-card h3 { margin: 0 0 6px; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .kpi-card p { margin: 0; font-size: 24px; font-weight: 800; line-height: 1; }
+            
+            .content-grid { display: grid; grid-template-columns: 1fr 1.2fr 1.8fr; gap: 16px; flex: 1; min-height: 0; }
+            .content-card { background: var(--surface); padding: 16px; border-radius: 12px; border: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; }
+            .content-card h3 { margin: 0 0 12px 0; font-size: 16px; flex-shrink:0; }
+            .table-wrapper { flex: 1; overflow-y: auto; padding-right:4px; }
+            .table-wrapper::-webkit-scrollbar { width:6px; }
+            .table-wrapper::-webkit-scrollbar-track { background:transparent; }
+            .table-wrapper::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.1); border-radius:3px; }
+            table { width:100%; text-align:left; border-collapse: separate; border-spacing: 0; }
+            th { padding:10px 8px; font-size: 13px; position: sticky; top: 0; background: var(--surface); z-index: 1; border-bottom: 2px solid var(--line); color:var(--muted); }
+            td { padding:10px 8px; font-size: 13px; border-bottom: 1px solid var(--line); }
+            .badge { padding:4px 6px; border-radius:6px; font-size:11px; font-weight:bold; }
+            
+            @media (max-width: 1200px) {
+                .kpi-row { grid-template-columns: repeat(3, 1fr); }
+                .content-grid { grid-template-columns: 1fr; }
+                .content-grid .content-card { min-height: 350px; }
+                .main { overflow-y: auto; }
+            }
+            @media (max-width: 768px) {
+                .dashboard-shell { grid-template-columns: 80px 1fr; }
+                .sidebar-text { display: none; }
+                .sidebar { padding: 28px 10px; align-items: center; }
+                .nav-link { padding: 12px; justify-content: center; }
+                .user-card { padding: 8px; justify-content: center; }
+                .brand { padding: 0; justify-content: center; }
+                .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            }
         </style>
     </head>
     <body>
@@ -62,64 +95,137 @@
                     </div>
                 </div>
 
-                <!-- 1. KHU VỰC KPI -->
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:30px;">
-                    <div style="padding:20px; background:var(--surface); border-radius:16px; border:1px solid var(--line); box-shadow:var(--shadow);">
-                        <h3 style="margin:0 0 10px; color:var(--muted); font-size:14px;">Awaiting Quotations</h3>
-                        <p style="margin:0; font-size:36px; font-weight:800; color:var(--danger);">${awaitingQuotations}</p>
-                        <small style="color:var(--muted);">Báo giá chờ làm hợp đồng</small>
+                <!-- KPI ROW (6 Cards) -->
+                <div class="kpi-row">
+                    <!-- Contract KPIs -->
+                    <div class="kpi-card">
+                        <h3>Awaiting Quotations</h3>
+                        <p style="color:${awaitingQuotations > 0 ? 'var(--danger)' : 'var(--muted)'};">${awaitingQuotations}</p>
                     </div>
-                    <div style="padding:20px; background:var(--surface); border-radius:16px; border:1px solid var(--line); box-shadow:var(--shadow);">
-                        <h3 style="margin:0 0 10px; color:var(--muted); font-size:14px;">Contracts In Progress</h3>
-                        <p style="margin:0; font-size:36px; font-weight:800; color:var(--tertiary);">${contractsInProgress}</p>
-                        <small style="color:var(--muted);">Đang xử lý / chờ duyệt</small>
+                    <div class="kpi-card">
+                        <h3>Contracts In Progress</h3>
+                        <p style="color:${contractsInProgress > 0 ? 'var(--tertiary)' : 'var(--muted)'};">${contractsInProgress}</p>
                     </div>
-                    <div style="padding:20px; background:var(--surface); border-radius:16px; border:1px solid var(--line); box-shadow:var(--shadow);">
-                        <h3 style="margin:0 0 10px; color:var(--muted); font-size:14px;">Active Contracts</h3>
-                        <p style="margin:0; font-size:36px; font-weight:800; color:var(--primary);">${activeContracts}</p>
-                        <small style="color:var(--muted);">Đã ký kết / hiệu lực</small>
+                    <div class="kpi-card">
+                        <h3>Active Contracts</h3>
+                        <p style="color:${activeContracts > 0 ? 'var(--primary)' : 'var(--muted)'};">${activeContracts}</p>
+                    </div>
+                    <!-- Invoice KPIs -->
+                    <div class="kpi-card">
+                        <h3>Total Invoices</h3>
+                        <p style="color:var(--primary);">${invoiceSummary.totalInvoices != null ? invoiceSummary.totalInvoices : 0}</p>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Total Paid Amount</h3>
+                        <p style="color:${invoiceSummary.paidAmount > 0 ? '#4caf50' : 'var(--muted)'};">
+                            <fmt:formatNumber value="${invoiceSummary.paidAmount}" type="number" maxFractionDigits="0"/>đ
+                        </p>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Total Unpaid Amount</h3>
+                        <p style="color:${invoiceSummary.unpaidAmount > 0 ? 'var(--danger)' : 'var(--muted)'};">
+                            <fmt:formatNumber value="${invoiceSummary.unpaidAmount}" type="number" maxFractionDigits="0"/>đ
+                        </p>
                     </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns: 1fr 2fr; gap: 20px;">
-                    <!-- 2. BIỂU ĐỒ TRẠNG THÁI -->
-                    <div style="background:var(--surface); padding:24px; border-radius:16px; border:1px solid var(--line); display:flex; flex-direction:column;">
-                        <h3 style="margin-top:0;">Contract Status</h3>
-                        <div style="position:relative; height:300px; width:100%; flex:1; display:flex; justify-content:center; align-items:center;">
+                <!-- CONTENT GRID (3 Columns) -->
+                <div class="content-grid">
+                    <!-- Column 1: Biểu đồ -->
+                    <div class="content-card">
+                        <h3>Contract Status</h3>
+                        <div style="position:relative; width:100%; flex:1; display:flex; justify-content:center; align-items:center; min-height:0;">
                             <canvas id="statusChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- 3. DANH SÁCH NHẮC VIỆC -->
-                    <div style="background:var(--surface); padding:24px; border-radius:16px; border:1px solid var(--line);">
-                        <h3 style="margin-top:0;">Contracts Needing Action</h3>
-                        <table style="width:100%; text-align:left; border-collapse: collapse;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid var(--line); color:var(--muted);">
-                                    <th style="padding:12px 10px;">ID</th>
-                                    <th style="padding:12px 10px;">Company</th>
-                                    <th style="padding:12px 10px;">Status</th>
-                                    <th style="padding:12px 10px; text-align:right;">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="c" items="${contractsNeedingAction}">
-                                    <tr style="border-bottom: 1px solid var(--line);">
-                                        <td style="padding:12px 10px; font-weight:bold;">${c.contractNumber}</td>
-                                        <td style="padding:12px 10px;">${c.customerName}</td>
-                                        <td style="padding:12px 10px;">
-                                            <span style="padding:4px 8px; background:var(--primary-soft); color:var(--primary); border-radius:6px; font-size:12px; font-weight:bold;">${c.contractStatus}</span>
-                                        </td>
-                                        <td style="padding:12px 10px; text-align:right;">
-                                            <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}" style="color:var(--primary); font-weight:bold;">Review &rarr;</a>
-                                        </td>
+                    <!-- Column 2: Nhắc việc -->
+                    <div class="content-card">
+                        <h3>Contracts Needing Action</h3>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Company</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Action</th>
                                     </tr>
-                                </c:forEach>
-                                <c:if test="${empty contractsNeedingAction}">
-                                    <tr><td colspan="4" style="padding:20px; text-align:center; color:var(--muted);">No pending actions. Great job!</td></tr>
-                                </c:if>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="c" items="${contractsNeedingAction}">
+                                        <c:set var="bg" value="var(--surface-strong)" />
+                                        <c:set var="col" value="var(--muted)" />
+                                        <c:choose>
+                                            <c:when test="${c.contractStatus == 'SIGNED' || c.contractStatus == 'APPROVED' || c.contractStatus == 'COMPLETED'}"><c:set var="bg" value="var(--primary-soft)" /><c:set var="col" value="var(--primary)" /></c:when>
+                                            <c:when test="${c.contractStatus == 'DRAFT'}"><c:set var="bg" value="var(--surface-strong)" /><c:set var="col" value="var(--muted)" /></c:when>
+                                            <c:when test="${c.contractStatus == 'PENDING_REVIEW' || c.contractStatus == 'CUSTOMER_CHECK'}"><c:set var="bg" value="#f9ebce" /><c:set var="col" value="var(--tertiary)" /></c:when>
+                                            <c:when test="${c.contractStatus == 'CANCELLED' || c.contractStatus == 'REJECTED'}"><c:set var="bg" value="#fbeaea" /><c:set var="col" value="var(--danger)" /></c:when>
+                                        </c:choose>
+                                        <tr>
+                                            <td style="font-weight:bold;">${c.contractNumber}</td>
+                                            <td>${c.customerName}</td>
+                                            <td><span class="badge" style="background:${bg}; color:${col};">${c.contractStatus}</span></td>
+                                            <td style="text-align:right;">
+                                                <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}" style="color:var(--primary); font-weight:bold;">Review</a>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                    <c:if test="${empty contractsNeedingAction}">
+                                        <tr><td colspan="4" style="text-align:center; color:var(--muted); padding:20px;">No pending actions. Great job!</td></tr>
+                                    </c:if>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+            
+                    <!-- Column 3: Hóa đơn gần đây -->
+                    <div class="content-card">
+                        <h3>Recent Invoices</h3>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Invoice No</th>
+                                        <th>Contract</th>
+                                        <th>Customer</th>
+                                        <th>Amount</th>
+                                        <th style="width:1%; white-space:nowrap;">Status</th>
+                                        <th style="width:1%; white-space:nowrap;">Payment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="i" items="${recentInvoices}">
+                                        <c:set var="ibg" value="var(--surface-strong)" />
+                                        <c:set var="icol" value="var(--muted)" />
+                                        <c:choose>
+                                            <c:when test="${i.invoiceStatus == 'PAID' || i.invoiceStatus == 'APPROVED' || i.invoiceStatus == 'COMPLETED'}"><c:set var="ibg" value="var(--primary-soft)" /><c:set var="icol" value="var(--primary)" /></c:when>
+                                            <c:when test="${i.invoiceStatus == 'PENDING' || i.invoiceStatus == 'UNRELEASED'}"><c:set var="ibg" value="#f9ebce" /><c:set var="icol" value="var(--tertiary)" /></c:when>
+                                            <c:when test="${i.invoiceStatus == 'CANCELLED' || i.invoiceStatus == 'OVERDUE'}"><c:set var="ibg" value="#fbeaea" /><c:set var="icol" value="var(--danger)" /></c:when>
+                                        </c:choose>
+                                        <tr>
+                                            <td style="font-weight:bold;">${i.invoiceNo}</td>
+                                            <td>${i.contractNumber}</td>
+                                            <td>${i.companyName}</td>
+                                            <td style="color:var(--primary); font-weight:bold;">
+                                                <fmt:formatNumber value="${i.totalAmount}" type="number" maxFractionDigits="0"/>đ
+                                            </td>
+                                            <td style="white-space:nowrap;"><span class="badge" style="background:${ibg}; color:${icol};">${i.invoiceStatus}</span></td>
+                                            <td style="white-space:nowrap;">
+                                                <span class="badge" style="
+                                                    background:${i.paymentStatus == 'PAID' ? '#dcefe1' : (i.paymentStatus == 'UNPAID' ? '#fbeaea' : '#f0ece4')}; 
+                                                    color:${i.paymentStatus == 'PAID' ? '#4a7c59' : (i.paymentStatus == 'UNPAID' ? '#b83230' : '#646b66')};">
+                                                    ${i.paymentStatus != null ? i.paymentStatus : 'UNPAID'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                    <c:if test="${empty recentInvoices}">
+                                        <tr><td colspan="6" style="text-align:center; color:var(--muted); padding:20px;">No invoices found.</td></tr>
+                                    </c:if>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -127,11 +233,29 @@
 
         <!-- SCRIPT VẼ CHART -->
         <script>
-            const labels = [];
+            function getSemanticColor(status) {
+                if (['SIGNED', 'APPROVED', 'COMPLETED'].includes(status)) return '#4a7c59'; 
+                if (['DRAFT'].includes(status)) return '#646b66'; 
+                if (['PENDING_REVIEW', 'CUSTOMER_CHECK', 'AWAITING_QUOTATION'].includes(status)) return '#b1812f'; 
+                if (['CANCELLED', 'REJECTED'].includes(status)) return '#b83230'; 
+                return '#e4e0d8'; 
+            }
+
             const data = [];
+            const bgColors = [];
+            let totalCount = 0;
             <c:forEach items="${contractStatusCounts}" var="entry">
-                labels.push('${entry.key}');
                 data.push(${entry.value});
+                bgColors.push(getSemanticColor('${entry.key}'));
+                totalCount += ${entry.value};
+            </c:forEach>
+            const labels = [];
+            <c:forEach items="${contractStatusCounts}" var="entry">
+                {
+                    let val = ${entry.value};
+                    let pct = totalCount > 0 ? Math.round((val / totalCount) * 100) : 0;
+                    labels.push('${entry.key} (' + val + ' - ' + pct + '%)');
+                }
             </c:forEach>
 
             new Chart(document.getElementById('statusChart'), {
@@ -140,7 +264,7 @@
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: ['#4a7c59', '#b1812f', '#b83230', '#646b66', '#dcefe1', '#7a6148'],
+                        backgroundColor: bgColors,
                         borderWidth: 0,
                         hoverOffset: 4
                     }]

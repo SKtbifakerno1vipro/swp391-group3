@@ -5,7 +5,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Edit User - Po Bread Sales</title>
+        <title>Sửa Người dùng - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -152,27 +152,27 @@
         <div class="dashboard-shell">
             <jsp:include page="/views/shared/sidebar.jsp"><jsp:param name="activeMenu" value="users"/></jsp:include>
                 <main class="main legacy-page">
-                    <section class="page-top"><div><p class="eyebrow">Access Control</p><h1>Edit User</h1><p>Update account information, role and status.</p></div><div class="actions"><a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Back to users</a></div></section>
+                    <section class="page-top"><div><p class="eyebrow">Quản lý Truy cập</p><h1>Sửa Người dùng</h1><p>Cập nhật thông tin tài khoản, vai trò và trạng thái.</p></div><div class="actions"><a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Trở lại danh sách</a></div></section>
                 <form class="panel" action="${pageContext.request.contextPath}/edit-user" method="post">
                     <input type="hidden" name="id" value="${u.userId}">
-                    <div class="panel-head"><h2><c:out value="${u.fullName}"/></h2><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Save changes</button></div>
+                    <div class="panel-head"><h2><c:out value="${u.fullName}"/></h2><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu thay đổi</button></div>
                     <div class="panel-body">
                         <c:if test="${not empty error}"><div class="alert"><c:out value="${error}"/></div></c:if>
                             <div class="form-grid">
-                                <div class="field"><label>Username</label><input type="text" name="userName" value="${u.userName}" required></div>
-                            <div class="field"><label>Full name</label><input type="text" name="fullName" value="${u.fullName}" required></div>
+                                <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" required></div>
+                            <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required></div>
                             <div class="field"><label>Email</label><input type="email" name="email" value="${u.email}" required></div>
-                            <div class="field"><label>Phone</label><input type="text" name="phone" value="${u.phone}" required></div>
-                            <div class="field"><label>Address</label><input type="text" name="address" value="${u.address}"></div>
-                            <div class="field"><label>Gender</label><select name="gender"><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Male</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Female</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Other</option></select></div>
-                            <div class="field"><label>Role</label><select name="roleId" required><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
-                            <div class="field"><label>Status</label><select name="status"><option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>Active</option><option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>Inactive</option></select></div>
-                            <div class="field"><label>Created By</label><span class="readonly-value"><c:set var="creator" value="${userService.getUserById(u.createdBy)}" /><c:out value="${creator != null ? creator.userName : (u.createdBy == 0 ? 'N/A' : u.createdBy)}"/></span></div>
-                            <div class="field"><label>Created At</label><span class="readonly-value"><c:out value="${u.createTimeString}"/></span></div>
-                            <div class="field"><label>Updated By</label><span class="readonly-value"><c:set var="updator" value="${userService.getUserById(u.updatedBy)}" /><c:out value="${updator != null ? updator.userName : (u.updatedBy == 0 ? 'N/A' : u.updatedBy)}"/></span></div>
-                            <div class="field"><label>Updated At</label><span class="readonly-value"><c:out value="${u.updateTimeString}"/></span></div>
+                            <div class="field"><label>Số điện thoại</label><input type="text" name="phone" value="${u.phone}" required></div>
+                            <div class="field"><label>Địa chỉ</label><input type="text" name="address" value="${u.address}"></div>
+                            <div class="field"><label>Giới tính</label><select name="gender"><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Nam</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Nữ</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Khác</option></select></div>
+                            <div class="field"><label>Vai trò</label><select name="roleId" required><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
+                            <div class="field"><label>Trạng thái</label><select name="status"><option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option><option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>Khóa</option></select></div>
+                            <div class="field"><label>Người tạo</label><span class="readonly-value"><c:set var="creator" value="${userService.getUserById(u.createdBy)}" /><c:out value="${creator != null ? creator.userName : (u.createdBy == 0 ? 'N/A' : u.createdBy)}"/></span></div>
+                            <div class="field"><label>Ngày tạo</label><span class="readonly-value"><c:out value="${u.createTimeString}"/></span></div>
+                            <div class="field"><label>Người cập nhật</label><span class="readonly-value"><c:set var="updator" value="${userService.getUserById(u.updatedBy)}" /><c:out value="${updator != null ? updator.userName : (u.updatedBy == 0 ? 'N/A' : u.updatedBy)}"/></span></div>
+                            <div class="field"><label>Ngày cập nhật</label><span class="readonly-value"><c:out value="${u.updateTimeString}"/></span></div>
                         </div>
-                        <div class="actions" style="margin-top:24px"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Save changes</button><a class="button danger" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">close</span>Cancel</a></div>
+                        <div class="actions" style="margin-top:24px"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu thay đổi</button><a class="button danger" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">close</span>Hủy</a></div>
                     </div>
                 </form>
             </main>
