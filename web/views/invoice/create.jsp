@@ -547,7 +547,6 @@
 
                     <div class="actions-bar">
                         <div class="actions-left">
-                            <button type="button" class="btn-action" style="opacity: 0.6; pointer-events: none;"><span class="material-symbols-outlined" style="font-size: 16px;">build</span> Utilities <span style="font-size: 10px;">▼</span></button>
                             <button type="submit" formaction="${pageContext.request.contextPath}/preview" formtarget="_blank" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">print</span> Preview Invoice</button>
                         </div>
 
