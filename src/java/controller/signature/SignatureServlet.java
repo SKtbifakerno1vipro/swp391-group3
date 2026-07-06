@@ -205,6 +205,17 @@ public class SignatureServlet extends HttpServlet {
             if (managerSigned && customerSigned) {
                 ctrService.updateStatus(contractId, "SIGNED");
 
+                //when customer and manager signed then insert to history, for notification
+                ContractHistory history = new ContractHistory();
+                history.setContractId(contractId);
+                history.setFromStatus("APPROVED");
+                history.setToStatus("SIGNED");
+                history.setNote("Cả 2 bên đã ký hoàn tất");
+                User currentUser = (User) request.getSession().getAttribute("user");
+                history.setChangedBy(currentUser != null ? currentUser.getUserId() : 0);
+
+                ctrService.insertHistory(history);
+
                 // Automatically create a PENDING payment record if it doesn't exist yet
                 paymentService.createPendingPaymentForContractIfNotExists(contractId);
             }

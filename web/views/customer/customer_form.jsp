@@ -212,55 +212,55 @@
 
                             <%-- Neu la EDIT thi moi sinh ra 2 the hidden ID nay --%>
                                 <c:if test="${isEdit}">
-                                    <input type="hidden" name="customerId" value="${cusDTO.customerId}" />
-                                    <input type="hidden" name="userId" value="${cusDTO.userId}" />
+                                    <input type="hidden" name="customerId" value="${cusDTO.customer.customerId}" />
+                                    <input type="hidden" name="userId" value="${cusDTO.user.userId}" />
 
                                     <%-- Hien thi Customer ID va User ID (Chi Edit moi thay) --%>
                                         <div class="form-group">
                                             <label>Mã khách hàng</label>
-                                            <input type="text" class="form-control" value="${cusDTO.customerId}"
+                                            <input type="text" class="form-control" value="${cusDTO.customer.customerId}"
                                                 readonly>
                                         </div>
 
                                         <div class="form-group">
                                             <label>Mã người dùng</label>
-                                            <input type="text" class="form-control" value="${cusDTO.userId}" readonly>
+                                            <input type="text" class="form-control" value="${cusDTO.user.userId}" readonly>
                                         </div>
                                 </c:if>
 
                                 <div class="form-group">
                                     <label for="username">Tên đăng nhập</label>
                                     <input type="text" id="username" name="username" class="form-control"
-                                        value="${isEdit ? cusDTO.userName : ''}" ${isEdit ? 'readonly' : '' } required>
+                                        value="${isEdit ? cusDTO.user.userName : ''}" ${isEdit ? 'readonly' : '' } required>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input type="email" id="email" name="email" class="form-control"
-                                        value="${isEdit ? cusDTO.email : ''}" ${isEdit ? 'readonly' : '' } required>
+                                        value="${isEdit ? cusDTO.user.email : ''}" ${isEdit ? 'readonly' : '' } required>
                                 </div>
 
                                 <%-- Full Name --%>
                                     <div class="form-group">
                                         <label for="fullname">Họ và tên</label>
                                         <input type="text" id="fullname" name="fullname" class="form-control"
-                                            value="${isEdit ? cusDTO.fullName : ''}">
+                                            value="${isEdit ? cusDTO.user.fullName : ''}">
                                     </div>
 
                                     <%-- Phone --%>
                                         <div class="form-group">
                                             <label for="phone">Số điện thoại</label>
                                             <input type="text" id="phone" name="phone" class="form-control"
-                                                value="${isEdit ? cusDTO.phone : ''}">
+                                                value="${isEdit ? cusDTO.user.phone : ''}">
                                         </div>
 
                                         <%-- Status --%>
                                             <div class="form-group">
                                                 <label for="status">Trạng thái</label>
                                                 <select id="status" name="status" class="form-control">
-                                                    <option value="ACTIVE" ${isEdit && cusDTO.status=='ACTIVE'
+                                                    <option value="ACTIVE" ${isEdit && cusDTO.user.status=='ACTIVE'
                                                         ? 'selected' : '' }>Hoạt động</option>
-                                                    <option value="INACTIVE" ${isEdit && cusDTO.status=='INACTIVE'
+                                                    <option value="INACTIVE" ${isEdit && cusDTO.user.status=='INACTIVE'
                                                         ? 'selected' : '' }>Ngừng hoạt động</option>
                                                 </select>
                                             </div>
@@ -270,7 +270,7 @@
                                                 <c:choose>
                                                     <c:when test="${isEdit}">
                                                         <c:forEach var="role" items="${roles}">
-                                                            <c:if test="${role.roleId == cusDTO.roleId}">
+                                                            <c:if test="${role.roleId == cusDTO.user.roleId}">
                                                                 <input type="text" class="form-control"
                                                                     value="${role.roleName}" readonly>
                                                                 <input type="hidden" name="roleId"
@@ -289,7 +289,7 @@
                                                 <div class="form-group">
                                                     <label for="taxCode">Mã số thuế</label>
                                                     <input type="text" id="taxCode" name="taxCode" class="form-control"
-                                                        value="${isEdit ? cusDTO.taxCode : ''}" required>
+                                                        value="${isEdit ? cusDTO.customer.taxCode : ''}" required>
                                                 </div>
  
                                                 <%-- Company Name --%>
@@ -297,7 +297,7 @@
                                                         <label for="companyName">Tên công ty</label>
                                                         <input type="text" id="companyName" name="companyName"
                                                             class="form-control"
-                                                            value="${isEdit ? cusDTO.companyName : ''}" required>
+                                                            value="${isEdit ? cusDTO.customer.companyName : ''}" required>
                                                     </div>
 
                                                     <%-- Customer Type--%>
@@ -308,7 +308,7 @@
                                                                 <option value="">-- Chọn phân loại --</option>
                                                                 <c:forEach var="type" items="${listTypeCus}">
                                                                     <option value="${type}" ${isEdit &&
-                                                                        cusDTO.customerType==type ? 'selected' : '' }>
+                                                                        cusDTO.customer.customerType==type ? 'selected' : '' }>
                                                                         ${type}</option>
                                                                 </c:forEach>
                                                             </select>
@@ -322,7 +322,7 @@
                                                                     <option value="">-- Không giao cho ai --</option>
                                                                     <c:forEach var="u" items="${users}">
                                                                         <option value="${u.userId}" ${(isEdit &&
-                                                                            cusDTO.assignedToUserId==u.userId) ||
+                                                                            cusDTO.customer.assignedToUserId==u.userId) ||
                                                                             (!isEdit &&
                                                                             sessionScope.user.userId==u.userId)
                                                                             ? 'selected' : '' }>

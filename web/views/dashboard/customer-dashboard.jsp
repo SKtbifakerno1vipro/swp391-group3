@@ -323,7 +323,7 @@
                         <p>Chào mừng bạn quay trở lại với cổng quản lý thông tin khách hàng của Po Bread.</p>
                     </div>
                     <div class="top-actions">
-                        <a class="button" href="${pageContext.request.contextPath}/customer/detail?id_cus=${customer.customerId}" id="btn-view-profile">
+                        <a class="button" href="${pageContext.request.contextPath}/customer/detail?id_cus=${customer.customer.customerId}" id="btn-view-profile">
                             <span class="material-symbols-outlined">account_circle</span>Thông tin cá nhân
                         </a>
                         <a class="button primary" href="${pageContext.request.contextPath}/tool/auto-generate" id="btn-auto-generator">
@@ -346,7 +346,7 @@
                                 Danh sách hợp đồng
                                 <span>Xem & duyệt hợp đồng đã soạn thảo</span>
                             </a>
-                            <a class="quick-link" href="${pageContext.request.contextPath}/customer/detail?id_cus=${customer.customerId}" id="link-profile">
+                            <a class="quick-link" href="${pageContext.request.contextPath}/customer/detail?id_cus=${customer.customer.customerId}" id="link-profile">
                                 Thông tin tài khoản
                                 <span>Cập nhật thông tin đại lý/doanh nghiệp</span>
                             </a>

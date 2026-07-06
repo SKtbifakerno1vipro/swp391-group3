@@ -61,7 +61,7 @@ public class DetailCustomerController extends HttpServlet {
                 if (user != null && user.getRoleId() == 3) {
                     dto.CustomerDTO customer = customerService.getCustomerDTOByUserId(user.getUserId());
                     if (customer != null) {
-                        idCus = customer.getCustomerId();
+                        idCus = customer.getCustomer().getCustomerId();
                     }
                 }
             } else {
@@ -76,7 +76,7 @@ public class DetailCustomerController extends HttpServlet {
             // Security check: Customer can only view their own profile
             if (user != null && user.getRoleId() == 3) {
                 dto.CustomerDTO customer = customerService.getCustomerDTOByUserId(user.getUserId());
-                if (customer == null || customer.getCustomerId() != idCus) {
+                if (customer == null || customer.getCustomer().getCustomerId() != idCus) {
                     response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
                     return;
                 }
@@ -94,7 +94,7 @@ public class DetailCustomerController extends HttpServlet {
             List<CustomerOrderDTO> listOrdersCus = customerOrderService.getListCustomerOrderDTOByCusId(idCus);
             List<Quotation> listQuotationsForCus = quotationService.getQuotationsByCustomerId(idCus);
             List<ContractCustomerDTO> listContractsForCus = contractService.searchContracts(
-                    null, null, null, null, 1, 1000, cusDTO.getUserId(), 3,
+                    null, null, null, null, 1, 1000, cusDTO.getUser().getUserId(), 3,
                     null, null, null, null, null
             );
             
