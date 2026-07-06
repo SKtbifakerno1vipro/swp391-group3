@@ -49,7 +49,7 @@ public class QuotationListController extends HttpServlet {
 
         // Pagination
         int page = 1;
-        int pageSize = 10;
+        int pageSize = 2;
         String pageParam = request.getParameter("page");
 
         if (pageParam != null && !pageParam.isBlank()) {
@@ -66,10 +66,10 @@ public class QuotationListController extends HttpServlet {
             totalPages = 1;
         }
         if (page < 1) {
-            page = 1;
         }
         if (page > totalPages) {
             page = totalPages;
+            page = 1;
         }
 
         int fromIndex = Math.min((page - 1) * pageSize, totalQuotations);
