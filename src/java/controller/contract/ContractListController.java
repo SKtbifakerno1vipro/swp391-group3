@@ -38,15 +38,15 @@ public class ContractListController extends HttpServlet {
         }
 
         // 1. Take value to filter
-        String contractNumber = request.getParameter("contractNumber");
-        String customerName = request.getParameter("customerName");
+        String contractNumber = request.getParameter("contractNumber") != null ? request.getParameter("contractNumber").trim().replaceAll("\\s+", "") : null;
+        String customerName = request.getParameter("customerName") != null ? request.getParameter("customerName").trim().replaceAll("\\s+", " ") : null;
         String status = request.getParameter("status");
         String storageType = request.getParameter("storageType");
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
-        String taxcode = request.getParameter("customerTaxCode");
-        String phone = request.getParameter("customerPhone");
-        String email = request.getParameter("customerEmail");
+        String taxcode = request.getParameter("customerTaxCode") != null ? request.getParameter("customerTaxCode").trim().replaceAll("\\s+", "") : null;
+        String phone = request.getParameter("customerPhone") != null ? request.getParameter("customerPhone").trim().replaceAll("\\s+", "") : null;
+        String email = request.getParameter("customerEmail") != null ? request.getParameter("customerEmail").trim().replaceAll("\\s+", "") : null;
         
         // 2. validate page index
         int pageIndex = 1;
@@ -64,9 +64,6 @@ public class ContractListController extends HttpServlet {
         //defaul page size is 10
         int pageSize = 10;
 
-        List<ContractCustomerDTO> list = contractService.searchContracts(contractNumber, customerName, status, storageType, pageIndex,
-                pageSize, currentUser.getUserId(), currentUser.getRoleId(), fromDate, toDate, taxcode, phone, email);
-
         int totalRecord = contractService.getTotalContracts(contractNumber, customerName, status, storageType, pageIndex,
                 pageSize, currentUser.getUserId(), currentUser.getRoleId(),
                 fromDate, toDate, taxcode, phone, email);
@@ -77,6 +74,9 @@ public class ContractListController extends HttpServlet {
         if (pageIndex > endPage && endPage > 0) {
             pageIndex = endPage;
         }
+
+        List<ContractCustomerDTO> list = contractService.searchContracts(contractNumber, customerName, status, storageType, pageIndex,
+                pageSize, currentUser.getUserId(), currentUser.getRoleId(), fromDate, toDate, taxcode, phone, email);
 
         request.setAttribute("list", list);
         request.setAttribute("endPage", endPage);

@@ -3,9 +3,9 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Customer Order List</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Customer Order List</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,38 +13,37 @@
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&amp;display=block" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
-<body>
+    <body>
         <div class="dashboard-shell">
             <jsp:include page="/views/shared/sidebar.jsp">
                 <jsp:param name="activeMenu" value="orders"/>
             </jsp:include>
             <main class="main legacy-page">
-    <h2>Customer Order List</h2>
-    <form action="customer-order-list" method="GET" style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
-        <input type="hidden" name="search" value="search">
-        <div>
-            <input type="text" placeholder="Search by name or tax code" name="keyword" value="${keyword}" style="padding: 6px; width: 220px;">
-        </div>
-        <div>
-            <label for="sortBy" style="font-weight: bold; margin-right: 5px;">Sort by:</label>
-            <select name="sortBy" id="sortBy" style="padding: 6px;">
-                <option value="orderId" ${sortBy == 'orderId' ? 'selected' : ''}>Order ID</option>
-                <option value="customerName" ${sortBy == 'customerName' ? 'selected' : ''}>Customer Name</option>
-                <option value="taxCode" ${sortBy == 'taxCode' ? 'selected' : ''}>Tax Code</option>
-                <option value="status" ${sortBy == 'status' ? 'selected' : ''}>Status</option>
-            </select>
-        </div>
-        <div>
-            <label for="sortOrder" style="font-weight: bold; margin-right: 5px;">Order:</label>
-            <select name="sortOrder" id="sortOrder" style="padding: 6px;">
-                <option value="asc" ${sortOrder == 'asc' ? 'selected' : ''}>Ascending</option>
-                <option value="desc" ${sortOrder == 'desc' ? 'selected' : ''}>Descending</option>
-            </select>
-        </div>
-        <button type="submit" style="padding: 6px 15px; cursor: pointer;">Search/Filter</button>
-    </form>
-    <br>
-
+                <h2>Customer Order List</h2>
+                <form action="customer-order-list" method="GET" style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                    <input type="hidden" name="search" value="search">
+                    <div>
+                        <input type="text" placeholder="Search by name or tax code" name="keyword" value="${keyword}" style="padding: 6px; width: 220px;">
+                    </div>
+                    <div>
+                        <label for="sortBy" style="font-weight: bold; margin-right: 5px;">Sort by:</label>
+                        <select name="sortBy" id="sortBy" style="padding: 6px;">
+                            <option value="orderId" ${sortBy == 'orderId' ? 'selected' : ''}>Order ID</option>
+                            <option value="customerName" ${sortBy == 'customerName' ? 'selected' : ''}>Customer Name</option>
+                            <option value="taxCode" ${sortBy == 'taxCode' ? 'selected' : ''}>Tax Code</option>
+                            <option value="status" ${sortBy == 'status' ? 'selected' : ''}>Status</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="sortOrder" style="font-weight: bold; margin-right: 5px;">Order:</label>
+                        <select name="sortOrder" id="sortOrder" style="padding: 6px;">
+                            <option value="asc" ${sortOrder == 'asc' ? 'selected' : ''}>Ascending</option>
+                            <option value="desc" ${sortOrder == 'desc' ? 'selected' : ''}>Descending</option>
+                        </select>
+                    </div>
+                    <button type="submit" style="padding: 6px 15px; cursor: pointer;">Search/Filter</button>
+                </form>
+                <br>
     <table border="1" cellpadding="10" cellspacing="0">
         <thead>
             <tr>
@@ -83,9 +82,7 @@
                             <c:if test="${item.customerOrder.orderStatus != 'SHIPPING'}">
                                <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>    
                             </c:if>
-                         
                         </c:if>
-                        
                         <c:if test="${item.customerOrder.orderStatus == 'COMPLETED'}">
                             |
                             <c:choose>
@@ -108,24 +105,24 @@
         </tbody>
     </table>
 
-    <div>
-        <c:if test="${totalPages > 1}">
-            <c:set var="queryParams" value="search=${action}&keyword=${keyword}&sortBy=${sortBy}&sortOrder=${sortOrder}" />
+                <div>
+                    <c:if test="${totalPages > 1}">
+                        <c:set var="queryParams" value="search=${action}&keyword=${keyword}&sortBy=${sortBy}&sortOrder=${sortOrder}" />
 
-            <c:if test="${currentPage > 1}">
-                <a href="customer-order-list?page=${currentPage - 1}&${queryParams}">Previous</a>
-            </c:if>
+                        <c:if test="${currentPage > 1}">
+                            <a href="customer-order-list?page=${currentPage - 1}&${queryParams}">Previous</a>
+                        </c:if>
 
-            <c:forEach begin="1" end="${totalPages}" var="i">
-                <a href="customer-order-list?page=${i}&${queryParams}"
-                   style="margin: 0 5px; ${i == currentPage ? 'font-weight:bold; color:red;' : ''}">${i}</a>
-            </c:forEach>
+                        <c:forEach begin="1" end="${totalPages}" var="i">
+                            <a href="customer-order-list?page=${i}&${queryParams}"
+                               style="margin: 0 5px; ${i == currentPage ? 'font-weight:bold; color:red;' : ''}">${i}</a>
+                        </c:forEach>
 
-            <c:if test="${currentPage < totalPages}">
-                <a href="customer-order-list?page=${currentPage + 1}&${queryParams}">Next</a>
-            </c:if>
-        </c:if>
-    </div>
+                        <c:if test="${currentPage < totalPages}">
+                            <a href="customer-order-list?page=${currentPage + 1}&${queryParams}">Next</a>
+                        </c:if>
+                    </c:if>
+                </div>
 
             </main>
         </div>

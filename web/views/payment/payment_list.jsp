@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Payment - Po Bread Sales</title>
+        <title>Thanh toán - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -185,52 +185,52 @@
                 <jsp:param name="activeMenu" value="payments"/>
             </jsp:include>
             <main class="main legacy-page">
-                <h2>Payment Management</h2>
-
+                <h2>Quản lý thanh toán</h2>
+ 
                 <form action="${pageContext.request.contextPath}/payment/list" method="GET" class="search-form-responsive">
                     <!-- Row 1: Basic search (Contract, Customer Name, Status) -->
                     <div class="search-row">
-                        <span class="search-label">Search Payments:</span>
+                        <span class="search-label">Tìm kiếm thanh toán:</span>
                         
-                        <input type="text" name="customerName" value="${customerName}" placeholder="Customer Name..." class="input-small" />
+                        <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng..." class="input-small" />
                         
-                        <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Contract No..." class="input-small" />
+                        <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Số hợp đồng..." class="input-small" />
                         
                         <select name="status" class="input-small">
-                            <option value="">-- Status --</option>
-                            <option value="PENDING" ${status eq 'PENDING' ? 'selected' : ''}>Pending</option>
-                            <option value="COMPLETED" ${status eq 'COMPLETED' ? 'selected' : ''}>Completed</option>
-                            <option value="FAILED" ${status eq 'FAILED' ? 'selected' : ''}>Failed</option>
+                            <option value="">-- Trạng thái --</option>
+                            <option value="PENDING" ${status eq 'PENDING' ? 'selected' : ''}>Chờ thanh toán</option>
+                            <option value="COMPLETED" ${status eq 'COMPLETED' ? 'selected' : ''}>Đã hoàn tất</option>
+                            <option value="FAILED" ${status eq 'FAILED' ? 'selected' : ''}>Thất bại</option>
                         </select>
                     </div>
 
                     <!-- Row 2: Date filter -->
                     <div class="search-row">
-                        <span class="range-title">Date:</span>
-                        <input type="datetime-local" name="startDate" value="${startDate}" title="Paid Start Date" class="input-small" />
-                        <span class="range-separator">to</span>
-                        <input type="datetime-local" name="endDate" value="${endDate}" title="Paid End Date" class="input-small" />
+                        <span class="range-title">Ngày:</span>
+                        <input type="datetime-local" name="startDate" value="${startDate}" title="Ngày bắt đầu" class="input-small" />
+                        <span class="range-separator">đến</span>
+                        <input type="datetime-local" name="endDate" value="${endDate}" title="Ngày kết thúc" class="input-small" />
                     </div>
 
                     <!-- Row 3: Amount filter & Buttons -->
                     <div class="search-row">
-                        <span class="range-title">Amount:</span>
-                        <input type="number" step="0.01" name="minAmount" value="${minAmount}" placeholder="Min..." class="input-small" />
-                        <span class="range-separator">to</span>
-                        <input type="number" step="0.01" name="maxAmount" value="${maxAmount}" placeholder="Max..." class="input-small" />
+                        <span class="range-title">Số tiền:</span>
+                        <input type="number" step="0.01" name="minAmount" value="${minAmount}" placeholder="Tối thiểu..." class="input-small" />
+                        <span class="range-separator">đến</span>
+                        <input type="number" step="0.01" name="maxAmount" value="${maxAmount}" placeholder="Tối đa..." class="input-small" />
                         
-                        <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-left: 15px; letter-spacing: 0.05em;">Show:</span>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-left: 15px; letter-spacing: 0.05em;">Hiển thị:</span>
                         <select name="pageSize" class="input-small" style="width: 100px !important;" onchange="this.form.submit()">
-                            <option value="5" ${pageSize == 5 ? 'selected' : ''}>5 items</option>
-                            <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 items</option>
-                            <option value="15" ${pageSize == 15 ? 'selected' : ''}>15 items</option>
-                            <option value="25" ${pageSize == 25 ? 'selected' : ''}>25 items</option>
+                            <option value="5" ${pageSize == 5 ? 'selected' : ''}>5 dòng</option>
+                            <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 dòng</option>
+                            <option value="15" ${pageSize == 15 ? 'selected' : ''}>15 dòng</option>
+                            <option value="25" ${pageSize == 25 ? 'selected' : ''}>25 dòng</option>
                         </select>
-                        <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">per page</span>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">trên trang</span>
                         
                         <div class="actions-group">
-                            <button type="submit" class="btn-search">Search</button>
-                            <a href="${pageContext.request.contextPath}/payment/list" class="btn-clear">Clear Filters</a>
+                            <button type="submit" class="btn-search">Tìm kiếm</button>
+                            <a href="${pageContext.request.contextPath}/payment/list" class="btn-clear">Xóa bộ lọc</a>
                         </div>
                     </div>
                 </form>
@@ -238,21 +238,22 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Transaction ID</th>
-                            <th>Contract Number</th>
-                            <th>Customer Name</th>
-                            <th>Amount</th>
-                            <th>Payment Type</th>
-                            <th>Status</th>
-                            <th>Created Date</th>
-                            <th>Processed Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:if test="${empty list}">
-                            <tr><td colspan="9" style="text-align:center;">No payment transactions recorded.</td></tr>
-                        </c:if>
+                    <tr>
+                        <th>Mã giao dịch</th>
+                        <th>Số hợp đồng</th>
+                        <th>Tên khách hàng</th>
+                        <th>Số tiền</th>
+                        <th>Phương thức thanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th>Ngày thanh toán</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:if test="${empty list}">
+                        <tr><td colspan="9" style="text-align:center;">Không có giao dịch thanh toán nào được ghi nhận.</td></tr>
+                    </c:if>
                         <c:forEach items="${list}" var="p">
                             <tr>
                                 <td>${p.paymentId}</td>
@@ -272,7 +273,7 @@
                                             ${p.customerName}
                                         </c:when>
                                         <c:otherwise>
-                                            System / Anonymous
+                                            Hệ thống / Vô danh
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
@@ -285,10 +286,10 @@
                                 <td>
                                     <c:choose>
                                         <c:when test="${p.paymentStatus == 'COMPLETED'}">
-                                            <span class="badge badge-success">Completed</span>
+                                            <span class="badge badge-success">Đã thanh toán</span>
                                         </c:when>
                                         <c:when test="${p.paymentStatus == 'FAILED'}">
-                                            <span class="badge badge-danger">Failed</span>
+                                            <span class="badge badge-danger">Thất bại</span>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="badge badge-warning">${p.paymentStatus}</span>
@@ -298,7 +299,7 @@
                                 <td>${p.formattedCreatedAt}</td>
                                 <td>${p.formattedPaidAt}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/payment/detail?id=${p.paymentId}" style="color: #0284c7; text-decoration: none; font-weight: bold;">View Details</a>
+                                    <a href="${pageContext.request.contextPath}/payment/detail?id=${p.paymentId}" style="color: #0284c7; text-decoration: none; font-weight: bold;">Xem chi tiết</a>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -310,10 +311,10 @@
                         <c:set var="queryParams" value="&customerName=${customerName}&contractNumber=${contractNumber}&status=${status}&startDate=${startDate}&endDate=${endDate}&minAmount=${minAmount}&maxAmount=${maxAmount}&pageSize=${pageSize}" />
                         
                         <a class="page-link ${currentPage == 1 ? 'disabled' : ''}" 
-                           href="${pageContext.request.contextPath}/payment/list?page=1${queryParams}">First</a>
+                           href="${pageContext.request.contextPath}/payment/list?page=1${queryParams}">Đầu</a>
                         
                         <a class="page-link ${currentPage == 1 ? 'disabled' : ''}" 
-                           href="${pageContext.request.contextPath}/payment/list?page=${currentPage - 1}${queryParams}">Prev</a>
+                           href="${pageContext.request.contextPath}/payment/list?page=${currentPage - 1}${queryParams}">Trước</a>
                         
                         <c:forEach begin="1" end="${totalPages}" var="i">
                             <c:choose>
@@ -328,10 +329,10 @@
                         </c:forEach>
                         
                         <a class="page-link ${currentPage == totalPages ? 'disabled' : ''}" 
-                           href="${pageContext.request.contextPath}/payment/list?page=${currentPage + 1}${queryParams}">Next</a>
+                           href="${pageContext.request.contextPath}/payment/list?page=${currentPage + 1}${queryParams}">Tiếp</a>
                         
                         <a class="page-link ${currentPage == totalPages ? 'disabled' : ''}" 
-                           href="${pageContext.request.contextPath}/payment/list?page=${totalPages}${queryParams}">Last</a>
+                           href="${pageContext.request.contextPath}/payment/list?page=${totalPages}${queryParams}">Cuối</a>
                     </div>
                 </c:if>
             </main>

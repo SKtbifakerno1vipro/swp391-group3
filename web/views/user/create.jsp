@@ -5,7 +5,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Create User - Po Bread Sales</title>
+        <title>Thêm Người dùng - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -137,20 +137,20 @@
         <div class="dashboard-shell">
             <jsp:include page="/views/shared/sidebar.jsp"><jsp:param name="activeMenu" value="users"/></jsp:include>
                 <main class="main legacy-page">
-                    <section class="page-top"><div><p class="eyebrow">Access Control</p><h1>Create User</h1><p>Create a new employee account and assign a system role.</p></div><div class="actions"><a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Back to users</a></div></section>
+                    <section class="page-top"><div><p class="eyebrow">Quản lý Truy cập</p><h1>Thêm Người dùng</h1><p>Tạo tài khoản nhân viên mới và gán vai trò hệ thống.</p></div><div class="actions"><a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Trở lại danh sách</a></div></section>
                 <form class="panel" action="${pageContext.request.contextPath}/edit-user" method="post">
-                    <div class="panel-head"><h2>Account Information</h2><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Create user</button></div>
+                    <div class="panel-head"><h2>Thông tin tài khoản</h2></div>
                     <div class="panel-body">
                         <c:if test="${not empty error}"><div class="alert"><c:out value="${error}"/></div></c:if>
                             <div class="form-grid">
-                                <div class="field"><label>Username</label><input type="text" name="userName" value="${u.userName}" required></div>
-                            <div class="field"><label>Full name</label><input type="text" name="fullName" value="${u.fullName}" required></div>
+                                <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" required></div>
+                            <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required></div>
                             <div class="field"><label>Email</label><input type="email" name="email" value="${u.email}" required></div>
-                            <div class="field"><label>Phone</label><input type="text" name="phone" value="${u.phone}" required></div>
-                            <div class="field"><label>Gender</label><select name="gender"><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Male</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Female</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Other</option></select></div>
-                            <div class="field"><label>Role</label><select name="roleId" required><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
+                            <div class="field"><label>Số điện thoại</label><input type="text" name="phone" value="${u.phone}" required></div>
+                            <div class="field"><label>Giới tính</label><select name="gender"><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Nam</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Nữ</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Khác</option></select></div>
+                            <div class="field"><label>Vai trò</label><select name="roleId" required><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
                             </div>
-                            <div class="actions" style="margin-top:24px"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Create user</button><a class="button danger" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">close</span>Cancel</a></div>
+                            <div class="actions" style="margin-top:24px"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu tài khoản</button><a class="button danger" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">close</span>Hủy</a></div>
                     </div>
                 </form>
             </main>

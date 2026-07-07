@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.util.List;
 import model.Contract;
+import model.ContractHistory;
 import model.Signature;
 import model.User;
 import service.PaymentService;
@@ -151,10 +152,9 @@ public class SignatureServlet extends HttpServlet {
             if (!uploadBuildFile.exists()) {
                 uploadBuildFile.mkdirs();
             }
-            
-            
+
             File webFile = new File(new File(getServletContext().getRealPath("/")).getParentFile().getParentFile(), "web");
-            
+
             File uploadWebFile = new File(webFile, "uploads");
             if (!uploadWebFile.exists()) {
                 uploadWebFile.mkdirs();
@@ -204,7 +204,18 @@ public class SignatureServlet extends HttpServlet {
             }
             if (managerSigned && customerSigned) {
                 ctrService.updateStatus(contractId, "SIGNED");
-                
+
+                //when customer and manager signed then insert to history, for notification
+                ContractHistory history = new ContractHistory();
+                history.setContractId(contractId);
+                history.setFromStatus("APPROVED");
+                history.setToStatus("SIGNED");
+                history.setNote("Cả 2 bên đã ký hoàn tất");
+                User currentUser = (User) request.getSession().getAttribute("user");
+                history.setChangedBy(currentUser != null ? currentUser.getUserId() : 0);
+
+                ctrService.insertHistory(history);
+
                 // Automatically create a PENDING payment record if it doesn't exist yet
                 paymentService.createPendingPaymentForContractIfNotExists(contractId);
             }

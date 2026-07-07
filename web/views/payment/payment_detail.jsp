@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Payment Details - Po Bread Sales</title>
+        <title>Chi tiết thanh toán - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -125,23 +125,23 @@
                 <jsp:param name="activeMenu" value="payments"/>
             </jsp:include>
             <main class="main legacy-page">
-                <h2>Transaction Confirmation</h2>
+                <h2>Xác nhận giao dịch</h2>
                 
                 <div class="receipt-container">
                     <div class="receipt-header">
                         <span class="material-symbols-outlined" style="font-size: 3rem; color: #10b981;">check_circle</span>
-                        <h3 class="receipt-title">Transaction Receipt</h3>
-                        <p class="receipt-subtitle">Reference: PAY-${payment.paymentId}</p>
+                        <h3 class="receipt-title">Biên lai giao dịch</h3>
+                        <p class="receipt-subtitle">Mã tham chiếu: PAY-${payment.paymentId}</p>
                     </div>
                     
                     <div class="receipt-body">
                         <div class="receipt-row">
-                            <span class="label">Payment ID</span>
+                            <span class="label">Mã thanh toán</span>
                             <span class="value">#${payment.paymentId}</span>
                         </div>
                         
                         <div class="receipt-row">
-                            <span class="label">Contract / Order ID</span>
+                            <span class="label">Mã hợp đồng / đơn hàng</span>
                             <span class="value">
                                 <c:choose>
                                     <c:when test="${not empty payment.contractNumber}">
@@ -157,45 +157,45 @@
                         </div>
                         
                         <div class="receipt-row">
-                            <span class="label">Customer Name</span>
+                            <span class="label">Tên khách hàng</span>
                             <span class="value">
                                 <c:choose>
                                     <c:when test="${not empty payment.customerName}">
                                         ${payment.customerName}
                                     </c:when>
                                     <c:otherwise>
-                                        System / Anonymous
+                                        Hệ thống / Vô danh
                                     </c:otherwise>
                                 </c:choose>
                             </span>
                         </div>
 
                         <div class="receipt-row">
-                            <span class="label">Payment Type</span>
+                            <span class="label">Phương thức thanh toán</span>
                             <span class="value">${payment.paymentType}</span>
                         </div>
 
                         <div class="receipt-row">
-                            <span class="label">Paid Amount</span>
+                            <span class="label">Số tiền đã trả</span>
                             <span class="value" style="color: #10b981; font-size: 1.15rem;">
                                 <fmt:formatNumber value="${payment.amount}" type="number"/> VNĐ
                             </span>
                         </div>
 
                         <div class="receipt-row">
-                            <span class="label">Transaction Date</span>
+                            <span class="label">Ngày giao dịch</span>
                             <span class="value">${payment.formattedPaidAt}</span>
                         </div>
 
                         <div class="receipt-row">
-                            <span class="label">Status</span>
+                            <span class="label">Trạng thái</span>
                             <span class="value">
                                 <c:choose>
                                     <c:when test="${payment.paymentStatus == 'COMPLETED'}">
-                                        <span class="badge badge-success">COMPLETED</span>
+                                        <span class="badge badge-success">ĐÃ HOÀN TẤT</span>
                                     </c:when>
                                     <c:when test="${payment.paymentStatus == 'FAILED'}">
-                                        <span class="badge badge-danger">FAILED</span>
+                                        <span class="badge badge-danger">THẤT BẠI</span>
                                     </c:when>
                                     <c:otherwise>
                                         <span class="badge badge-warning">${payment.paymentStatus}</span>
@@ -212,7 +212,7 @@
                                 <input type="hidden" name="amount" value="${payment.amount.longValue()}">
                                 <button type="submit" class="btn-pay" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #10b981; color: #ffffff; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); width: 100%; box-sizing: border-box;">
                                     <span class="material-symbols-outlined">payment</span>
-                                    Pay with VNPay
+                                    Thanh toán qua VNPay
                                 </button>
                             </form>
                         </c:if>

@@ -1,11 +1,11 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+﻿<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>User Management - Po Bread Sales</title>
+        <title>Quản lý Người dùng - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -252,12 +252,12 @@
             <main class="main legacy-page">
                 <section class="page-top">
                     <div>
-                        <p class="eyebrow">Access Control</p>
-                        <h1>User Management</h1>
-                        <p>Manage employee accounts, roles, contact information and account status.</p>
+                        <p class="eyebrow">Quản lý Truy cập</p>
+                        <h1>Quản lý Người dùng</h1>
+                        <p>Quản lý tài khoản, vai trò, thông tin liên lạc và trạng thái của người dùng.</p>
                     </div>
                     <div class="actions">
-                        <a class="button primary" href="${pageContext.request.contextPath}/edit-user"><span class="material-symbols-outlined">person_add</span>Create User</a>
+                        <a class="button primary" href="${pageContext.request.contextPath}/edit-user"><span class="material-symbols-outlined">person_add</span>Thêm Người dùng</a>
                     </div>
                 </section>
 
@@ -266,20 +266,20 @@
                     <div class="toolbar">
                         <form method="get" action="${pageContext.request.contextPath}/user-list">
                             <div class="filter-grid">
-                                <div class="field"><label>Full name</label><input type="text" name="searchName" value="${searchName}" placeholder="Search name"></div>
-                                <div class="field"><label>Phone</label><input type="text" name="searchPhone" value="${searchPhone}" placeholder="Search phone"></div>
-                                <div class="field"><label>Email</label><input type="text" name="searchEmail" value="${searchEmail}" placeholder="Search email"></div>
-                                <div class="field"><label>Role</label><select name="roleId"><option value="0">All roles</option><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${r.roleId == roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
-                                <div class="field"><label>Status</label><select name="status"><option value="" ${empty status ? 'selected' : ''}>All statuses</option><option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Active</option><option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>Inactive</option></select></div>
-                                <div class="actions"><button class="button primary" type="submit"><span class="material-symbols-outlined">search</span>Search</button><a class="button" href="${pageContext.request.contextPath}/user-list">Reset</a></div>
+                                <div class="field"><label>Họ và tên</label><input type="text" name="searchName" value="${searchName}" placeholder="Tìm tên"></div>
+                                <div class="field"><label>Số điện thoại</label><input type="text" name="searchPhone" value="${searchPhone}" placeholder="Tìm SĐT"></div>
+                                <div class="field"><label>Email</label><input type="text" name="searchEmail" value="${searchEmail}" placeholder="Tìm email"></div>
+                                <div class="field"><label>Vai trò</label><select name="roleId"><option value="0">Tất cả vai trò</option><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${r.roleId == roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
+                                <div class="field"><label>Trạng thái</label><select name="status"><option value="" ${empty status ? 'selected' : ''}>Tất cả trạng thái</option><option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option><option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>Khóa</option></select></div>
+                                <div class="actions"><button class="button primary" type="submit"><span class="material-symbols-outlined">search</span>Tìm kiếm</button><a class="button" href="${pageContext.request.contextPath}/user-list">Đặt lại</a></div>
                             </div>
                         </form>
                     </div>
                     <div class="table-wrap">
                         <table>
-                            <thead><tr><th>ID</th><th>Full Name</th><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>ID</th><th>Họ Tên</th><th>Tài khoản</th><th>Email</th><th>Số điện thoại</th><th>Vai trò</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
                             <tbody>
-                                <c:if test="${empty users}"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted);font-weight:600;">No users found.</td></tr></c:if>
+                                <c:if test="${empty users}"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted);font-weight:600;">Không tìm thấy người dùng.</td></tr></c:if>
                                 <c:forEach var="u" items="${users}">
                                     <tr class="table-row">
                                         <td style="color:var(--muted);font-weight:800;font-size:13px;">#<c:out value="${u.userId}"/></td>
@@ -288,8 +288,8 @@
                                         <td style="color:var(--text-light, #6b7280);"><c:out value="${u.email}"/></td>
                                         <td style="color:var(--text-light, #6b7280);"><c:out value="${u.phone}"/></td>
                                         <td style="font-weight:700;"><c:out value="${u.roleName}"/></td>
-                                        <td><span class="status-pill ${u.status == 'ACTIVE' ? 'status-active' : 'status-inactive'}"><c:out value="${u.status}"/></span></td>
-                                        <td><div class="row-actions"><a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">edit</span>Edit</a><form action="${pageContext.request.contextPath}/user-list" method="post" style="display:inline;"><input type="hidden" name="userId" value="${u.userId}"><input type="hidden" name="status" value="${u.status}"><button class="chip ${u.status == 'ACTIVE' ? 'danger' : 'primary'}" type="submit"><span class="material-symbols-outlined">${u.status == 'ACTIVE' ? 'lock' : 'lock_open'}</span>${u.status == 'ACTIVE' ? 'Ban' : 'Unban'}</button></form></div></td>
+                                        <td><span class="status-pill ${u.status == 'ACTIVE' ? 'status-active' : 'status-inactive'}"><c:out value="${u.status == 'ACTIVE' ? 'Hoạt động' : 'Khóa'}"/></span></td>
+                                        <td><div class="row-actions"><a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">edit</span>Sửa</a><a class="chip ${u.status == 'ACTIVE' ? 'danger' : 'primary'}" href="javascript:void(0);" onclick="document.getElementById('form_status_${u.userId}').submit();"><span class="material-symbols-outlined">${u.status == 'ACTIVE' ? 'lock' : 'lock_open'}</span>${u.status == 'ACTIVE' ? 'Khóa' : 'Mở Khóa'}</a><form id="form_status_${u.userId}" action="${pageContext.request.contextPath}/user-list" method="post" style="display:none;"><input type="hidden" name="userId" value="${u.userId}"><input type="hidden" name="status" value="${u.status}"></form></div></td>
                                     </tr>
                                 </c:forEach>
                             </tbody>

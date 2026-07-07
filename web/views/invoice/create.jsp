@@ -342,226 +342,232 @@
                         </div>
                     </c:if>
 
-                        <c:set var="isReadOnly" value="${not empty invoice && invoice.invoiceStatus != 'UNRELEASED'}"/>
-                        <input type="hidden" name="invoiceId" value="${invoice.invoiceId}">
-                        <input type="hidden" name="customerContractId" id="customerContractId" value="${not empty invoice ? invoice.customerContractId : contract.contractId}">
-                        <input type="hidden" name="customerOrderId" id="customerOrderId" value="${not empty invoice ? invoice.customerOrderId : order.customerOrderId}">
-                        <input type="hidden" name="sellerName" value="${not empty invoice ? invoice.sellerName : companyName}">
-                        <input type="hidden" name="sellerTaxCode" value="${not empty invoice ? invoice.sellerTaxCode : companyTaxCode}">
-                        <input type="hidden" name="sellerAddress" value="${not empty invoice ? invoice.sellerAddress : companyAddress}">
-                        <input type="hidden" name="sellerPhone" id="sellerPhone" value="${not empty invoice ? invoice.sellerPhone : companyPhone}">
-                        <input type="hidden" name="invoiceStatus" id="invoiceStatus" value="${not empty invoice ? invoice.invoiceStatus : 'UNRELEASED'}">
+                    <c:set var="isReadOnly" value="${not empty invoice && invoice.invoiceStatus != 'UNRELEASED'}"/>
+                    <input type="hidden" name="invoiceId" value="${invoice.invoiceId}">
+                    <input type="hidden" name="customerContractId" id="customerContractId" value="${not empty invoice ? invoice.customerContractId : order.customerContractId}">
+                    <input type="hidden" name="customerOrderId" id="customerOrderId" value="${not empty invoice ? invoice.customerOrderId : order.customerOrderId}">
+                    <input type="hidden" name="sellerName" value="${not empty invoice ? invoice.sellerName : companyName}">
+                    <input type="hidden" name="sellerTaxCode" value="${not empty invoice ? invoice.sellerTaxCode : companyTaxCode}">
+                    <input type="hidden" name="sellerAddress" value="${not empty invoice ? invoice.sellerAddress : companyAddress}">
+                    <input type="hidden" name="sellerPhone" id="sellerPhone" value="${not empty invoice ? invoice.sellerPhone : companyPhone}">
+                    <input type="hidden" name="invoiceStatus" id="invoiceStatus" value="${not empty invoice ? invoice.invoiceStatus : 'UNRELEASED'}">
 
-                        <div class="buyer-info-grid">
-                            <div>
-                                <div class="buyer-group form-group">
-                                    <label>Customer Code</label>
-                                    <div class="input-wrapper">
-                                        <input type="text" id="buyerCode" value="KH-${not empty customer ? customer.customerId : order.customerId}" readonly>
-                                    </div>
-                                </div>
-                                <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Tax Code</label>
-                                    <div class="input-wrapper">
-                                        <input type="text" name="buyerTaxCode" id="buyerTaxCode" value="${not empty invoice ? invoice.buyerTaxCode : customer.taxCode}" ${isReadOnly ? 'readonly' : ''}>
-                                    </div>
-                                </div>
-                                <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Buyer Company</label>
-                                    <div class="input-wrapper">
-                                        <input type="text" name="buyerName" id="buyerName" value="${not empty invoice ? invoice.buyerName : customer.companyName}" ${isReadOnly ? 'readonly' : ''}>
-                                    </div>
-                                </div>
-                                <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Phone Number</label>
-                                    <div class="input-wrapper">
-                                        <input type="text" name="buyerPhone" id="buyerPhone" value="${not empty buyerPhone ? buyerPhone : customerUser.phone}" ${isReadOnly ? 'readonly' : ''}>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="buyer-group form-group">
-                                    <label for="invoiceType">* Invoice Template</label>
-                                    <div class="input-wrapper">
-                                        <select name="invoiceType" id="invoiceType" onchange="onInvoiceTypeChange()" ${isReadOnly ? 'disabled' : ''}>
-                                            <option value="VAT" ${(not empty invoice ? invoice.invoiceType : (empty invoiceType ? 'VAT' : invoiceType)) == 'VAT' ? 'selected' : ''}>1 - VAT Invoice</option>
-                                            <option value="SALES" ${(not empty invoice ? invoice.invoiceType : (empty invoiceType ? 'VAT' : invoiceType)) == 'SALES' ? 'selected' : ''}>2 - Sales Invoice</option>
-                                        </select>
-                                        <c:if test="${isReadOnly}">
-                                            <input type="hidden" name="invoiceType" value="${not empty invoice ? invoice.invoiceType : 'VAT'}">
-                                        </c:if>
-                                    </div>
-                                </div>
-                                <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Invoice Symbol</label>
-                                    <div class="input-wrapper">
-                                        <input type="text" name="invoiceSymbol" id="invoiceSymbol" value="${not empty invoice ? invoice.invoiceSymbol : (empty invoiceSymbol ? defaultSymbol : invoiceSymbol)}" required maxlength="10" ${isReadOnly ? 'readonly' : ''}>
-                                    </div>
-                                </div>
-                                <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Invoice Number</label>
-                                    <div class="input-wrapper">
-                                        <input type="text" id="invoiceNoDisplay" value="${(not empty invoice && invoice.invoiceStatus != 'UNRELEASED') ? invoice.invoiceNo : 'Not assigned (Auto-generated)'}" readonly style="color: #dc2626; font-weight: bold; background: #f8fafc;">
-                                        <input type="hidden" name="invoiceNo" id="invoiceNo" value="${not empty invoice ? invoice.invoiceNo : '0'}">
-                                    </div>
-                                </div>
-                                <div class="buyer-group form-group" style="margin-top: 15px;">
-                                    <label>Invoice Date</label>
-                                    <div class="input-wrapper">
-                                        <input type="text" id="issueDateDisplay" value="${(not empty invoice && invoice.issueDate != null) ? invoice.issueDate : 'Auto-retrieved upon release'}" readonly style="background: #f8fafc; color: #64748b;">
-                                        <input type="hidden" name="issueDate" id="issueDate" value="${(not empty invoice && invoice.issueDate != null) ? invoice.issueDate : ''}">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="buyer-group form-group full-width-field" style="margin-top: 10px;">
-                                <label style="width: 110px;">Buyer Address</label>
+                    <div class="buyer-info-grid">
+                        <div>
+                            <div class="buyer-group form-group">
+                                <label>Customer Code</label>
                                 <div class="input-wrapper">
-                                    <input type="text" name="buyerAddress" id="buyerAddress" value="${not empty invoice ? invoice.buyerAddress : customerUser.address}" ${isReadOnly ? 'readonly' : ''}>
+                                    <input type="text" id="buyerCode" value="KH-${not empty customer ? customer.customerId : order.customerId}" readonly>
+                                </div>
+                            </div>
+                            <div class="buyer-group form-group" style="margin-top: 15px;">
+                                <label>Tax Code</label>
+                                <div class="input-wrapper">
+                                    <input type="text" name="buyerTaxCode" id="buyerTaxCode" value="${not empty invoice ? invoice.buyerTaxCode : customer.taxCode}" ${isReadOnly ? 'readonly' : ''}>
+                                </div>
+                            </div>
+                            <div class="buyer-group form-group" style="margin-top: 15px;">
+                                <label>Buyer Company</label>
+                                <div class="input-wrapper">
+                                    <input type="text" name="buyerName" id="buyerName" value="${not empty invoice ? invoice.buyerName : customer.companyName}" ${isReadOnly ? 'readonly' : ''}>
+                                </div>
+                            </div>
+                            <div class="buyer-group form-group" style="margin-top: 15px;">
+                                <label>Phone Number</label>
+                                <div class="input-wrapper">
+                                    <input type="text" name="buyerPhone" id="buyerPhone" value="${not empty buyerPhone ? buyerPhone : customerUser.phone}" ${isReadOnly ? 'readonly' : ''}>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="table-controls">
-                            <div class="table-controls-left">
-                                <span style="font-weight: bold; color: var(--primary);">List of Goods & Services from Order</span>
-                            </div>
-                            <div class="table-controls-right">
-                                <label><input type="checkbox" checked disabled> Unit price, quantity locked</label>
-                                <span class="material-symbols-outlined" style="color: #cbd5e1;">settings</span>
-                            </div>
-                        </div>
-
-                        <div class="product-table-wrapper">
-                            <table class="product-table" id="productTable">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 10%;" class="text-center">Item Code</th>
-                                        <th style="width: 25%;">Goods & Services Name</th>
-                                        <th style="width: 8%;">Unit</th>
-                                        <th style="width: 7%;" class="text-right">Quantity</th>
-                                        <th style="width: 10%;" class="text-right">Unit Price</th>
-                                        <th style="width: 10%;" class="text-right">Line Amount</th>
-                                        <th style="width: 10%;" class="text-center">(%) Discount</th>
-                                        <th style="width: 10%;" class="text-center">(%) VAT</th>
-                                        <th style="width: 10%;" class="text-right">VAT Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="productTableBody">
-                                    <c:if var="hasNoItems" test="${empty orderDetails}">
-                                        <tr id="emptyRowPlaceholder">
-                                            <td colspan="9" class="text-center" style="color: var(--muted); padding: 15px;">
-                                                No item data available.
-                                            </td>
-                                        </tr>
+                        <div>
+                            <div class="buyer-group form-group">
+                                <label for="invoiceType">* Invoice Template</label>
+                                <div class="input-wrapper">
+                                    <select name="invoiceType" id="invoiceType" onchange="onInvoiceTypeChange()" ${isReadOnly ? 'disabled' : ''}>
+                                        <option value="VAT" ${(not empty invoice ? invoice.invoiceType : (empty invoiceType ? 'VAT' : invoiceType)) == 'VAT' ? 'selected' : ''}>1 - VAT Invoice</option>
+                                        <option value="SALES" ${(not empty invoice ? invoice.invoiceType : (empty invoiceType ? 'VAT' : invoiceType)) == 'SALES' ? 'selected' : ''}>2 - Sales Invoice</option>
+                                    </select>
+                                    <c:if test="${isReadOnly}">
+                                        <input type="hidden" name="invoiceType" value="${not empty invoice ? invoice.invoiceType : 'VAT'}">
                                     </c:if>
-                                    <c:forEach var="item" items="${orderDetails}">
-                                        <tr class="product-row">
-                                            <td class="text-center">
-                                                <input type="text" name="productId" value="${item.productId}" style="text-align: center;" readonly>
-                                            </td>
-                                            <td>
-                                                <input type="text" name="productName" value="${item.productName}" readonly>
-                                            </td>
-                                            <td>
-                                                <input type="text" name="unit" value="${item.unit}" style="text-align: center;" readonly>
-                                            </td>
-                                            <td>
-                                                <input type="number" name="quantity" class="row-qty text-right" value="<fmt:formatNumber value="${item.quantity}" pattern="#,##0"/>" readonly>
-                                            </td>
-                                            <td>
-                                                <input type="number" name="sellingPrice" class="row-price text-right" value="<fmt:formatNumber value="${item.sellingPrice}" pattern="#,##0"/>" readonly>
-                                            </td>
-                                            <td>
-                                                <input type="text" name="lineAmount" class="row-amount text-right" value="<fmt:formatNumber value="${item.lineAmount}" pattern="#,##0"/>" readonly style="font-weight: 600;">
-                                            </td>
-                                            <td class="text-center">
-                                                <input type="text" name="discountPercent" class="row-discount-rate text-center" value="${empty item.discountPercent ? 0 : item.discountPercent}" readonly style="width: 40px; text-align: center; border: none; background: transparent; pointer-events: none;">%
-                                            </td>
-                                            <td class="text-center">
-                                                <input type="text" name="taxPercent" class="row-tax-rate text-center" value="${empty item.taxPercent ? 0 : item.taxPercent}" readonly style="width: 40px; text-align: center; border: none; background: transparent; pointer-events: none;">%
-                                            </td>
-                                            <td>
-                                                <input type="text" name="lineTax" class="row-tax-val text-right" value="<fmt:formatNumber value="${item.lineTax}" pattern="#,##0"/>" readonly style="font-weight: 600;">
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="summary-layout">
-                            <!-- Left notes & words -->
-                            <div class="summary-notes">
-                                <div class="summary-notes-group">
-                                    <label for="invoiceNotes">Customer Notes</label>
-                                    <textarea id="invoiceNotes" name="invoiceNotes" rows="2" placeholder="Notes printed on invoice for customer..." ${isReadOnly ? 'readonly' : ''}>${not empty invoice ? invoice.customerNote : ''}</textarea>
-                                </div>
-                                <div class="summary-notes-group">
-                                    <label for="internalNotes">Internal Notes</label>
-                                    <textarea id="internalNotes" name="internalNotes" rows="2" placeholder="Internal notes for staff..." ${isReadOnly ? 'readonly' : ''}>${not empty invoice ? invoice.internalNote : ''}</textarea>
-                                </div>
-                                <div class="money-in-words" id="moneyInWords">
-                                    Amount in words: <em>Zero dong</em>
                                 </div>
                             </div>
-
-                            <div class="summary-values">
-                                <div class="summary-row">
-                                    <label>Sub-Total</label>
-                                    <div class="value-box">
-                                        <input type="text" name="subTotal" id="subTotal" value="<fmt:formatNumber value="${subTotal}" pattern="#,##0"/>" readonly>
-                                        <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
-                                    </div>
+                            <div class="buyer-group form-group" style="margin-top: 15px;">
+                                <label>Invoice Symbol</label>
+                                <div class="input-wrapper">
+                                    <input type="text" name="invoiceSymbol" id="invoiceSymbol" value="${not empty invoice ? invoice.invoiceSymbol : (empty invoiceSymbol ? defaultSymbol : invoiceSymbol)}" required maxlength="10" ${isReadOnly ? 'readonly' : ''}>
                                 </div>
-                                <div class="summary-row">
-                                    <label>Total Discount</label>
-                                    <div class="value-box">
-                                        <input type="text" name="discountTotal" id="discountTotal" value="<fmt:formatNumber value="${discountTotal}" pattern="#,##0"/>" style="text-align: right;" readonly>
-                                        <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
-                                    </div>
+                            </div>
+                            <div class="buyer-group form-group" style="margin-top: 15px;">
+                                <label>Invoice Number</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="invoiceNoDisplay" value="${(not empty invoice && invoice.invoiceStatus != 'UNRELEASED') ? invoice.invoiceNo : 'Not assigned (Auto-generated)'}" readonly style="color: #dc2626; font-weight: bold; background: #f8fafc;">
+                                    <input type="hidden" name="invoiceNo" id="invoiceNo" value="${not empty invoice ? invoice.invoiceNo : '0'}">
                                 </div>
-                                <div class="summary-row">
-                                    <label>Total VAT</label>
-                                    <div class="value-box">
-                                        <input type="text" name="taxAmount" id="taxAmount" value="<fmt:formatNumber value="${taxAmount}" pattern="#,##0"/>" readonly>
-                                        <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
-                                    </div>
-                                </div>
-
-                                <div class="summary-row summary-row-total">
-                                    <label style="color: #dc2626; font-weight: 800; font-size: 14px;">Total Amount</label>
-                                    <div class="value-box">
-                                        <input type="text" name="totalAmount" id="totalAmount" value="<fmt:formatNumber value="${totalAmount}" pattern="#,##0"/>" readonly>
-                                        <span style="font-size: 11px; font-weight: bold; color: #dc2626;">VND</span>
-                                    </div>
+                            </div>
+                            <div class="buyer-group form-group" style="margin-top: 15px;">
+                                <label>Invoice Date</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="issueDateDisplay" value="${(not empty invoice && invoice.issueDate != null) ? invoice.issueDate : 'Auto-retrieved upon release'}" readonly style="background: #f8fafc; color: #64748b;">
+                                    <input type="hidden" name="issueDate" id="issueDate" value="${(not empty invoice && invoice.issueDate != null) ? invoice.issueDate : ''}">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="actions-bar">
-                            <div class="actions-left">
-                                <button type="button" class="btn-action" style="opacity: 0.6; pointer-events: none;"><span class="material-symbols-outlined" style="font-size: 16px;">build</span> Utilities <span style="font-size: 10px;">▼</span></button>
-                                <button type="submit" formaction="${pageContext.request.contextPath}/invoice/preview" formtarget="_blank" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">print</span> Preview Invoice</button>
+                        <div class="buyer-group form-group full-width-field" style="margin-top: 10px;">
+                            <label style="width: 110px;">Buyer Address</label>
+                            <div class="input-wrapper">
+                                <input type="text" name="buyerAddress" id="buyerAddress" value="${not empty invoice ? invoice.buyerAddress : customerUser.address}" ${isReadOnly ? 'readonly' : ''}>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-controls">
+                        <div class="table-controls-left">
+                            <span style="font-weight: bold; color: var(--primary);">List of Goods & Services from Order</span>
+                        </div>
+                        <div class="table-controls-right">
+                            <label><input type="checkbox" checked disabled> Unit price, quantity locked</label>
+                            <span class="material-symbols-outlined" style="color: #cbd5e1;">settings</span>
+                        </div>
+                    </div>
+
+                    <div class="product-table-wrapper">
+                        <table class="product-table" id="productTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%;" class="text-center">Item Code</th>
+                                    <th style="width: 25%;">Goods & Services Name</th>
+                                    <th style="width: 8%;">Unit</th>
+                                    <th style="width: 7%;" class="text-right">Quantity</th>
+                                    <th style="width: 10%;" class="text-right">Unit Price</th>
+                                    <th style="width: 10%;" class="text-right">Line Amount</th>
+                                    <th style="width: 10%;" class="text-center">(%) Discount</th>
+                                    <th style="width: 10%;" class="text-center">(%) VAT</th>
+                                    <th style="width: 10%;" class="text-right">VAT Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productTableBody">
+                                <c:if var="hasNoItems" test="${empty orderDetails}">
+                                    <tr id="emptyRowPlaceholder">
+                                        <td colspan="9" class="text-center" style="color: var(--muted); padding: 15px;">
+                                            No item data available.
+                                        </td>
+                                    </tr>
+                                </c:if>
+                                <c:forEach var="item" items="${orderDetails}">
+                                    <tr class="product-row">
+                                        <td class="text-center">
+                                            <input type="text" name="productId" value="${item.productId}" style="text-align: center;" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="productName" value="${item.productName}" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="unit" value="${item.unit}" style="text-align: center;" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="number" name="quantity" class="row-qty text-right" value="${item.quantity}" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="number" name="sellingPrice" class="row-price text-right" value="${item.sellingPrice}" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="hidden" name="lineAmount" value="${item.lineAmount}">
+                                            <input type="text" class="row-amount text-right" value="<fmt:formatNumber value="${item.lineAmount}" pattern="#,##0"/>" readonly style="font-weight: 600;">
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="text" name="discountPercent" class="row-discount-rate text-center" value="${empty item.discountPercent ? 0 : item.discountPercent}" readonly style="width: 40px; text-align: center; border: none; background: transparent; pointer-events: none;">%
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="text" name="taxPercent" class="row-tax-rate text-center" value="${empty item.taxPercent ? 0 : item.taxPercent}" readonly style="width: 40px; text-align: center; border: none; background: transparent; pointer-events: none;">%
+                                        </td>
+                                        <td>
+                                            <input type="hidden" name="lineTax" value="${item.lineTax}">
+                                            <input type="text" class="row-tax-val text-right" value="<fmt:formatNumber value="${item.lineTax}" pattern="#,##0"/>" readonly style="font-weight: 600;">
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="summary-layout">
+                        <!-- Left notes & words -->
+                        <div class="summary-notes">
+                            <div class="summary-notes-group">
+                                <label for="invoiceNotes">Customer Notes</label>
+                                <textarea id="invoiceNotes" name="invoiceNotes" rows="2" placeholder="Notes printed on invoice for customer..." ${isReadOnly ? 'readonly' : ''}>${not empty invoice ? invoice.customerNote : ''}</textarea>
+                            </div>
+                            <div class="summary-notes-group">
+                                <label for="internalNotes">Internal Notes</label>
+                                <textarea id="internalNotes" name="internalNotes" rows="2" placeholder="Internal notes for staff..." ${isReadOnly ? 'readonly' : ''}>${not empty invoice ? invoice.internalNote : ''}</textarea>
+                            </div>
+                            <div class="money-in-words" id="moneyInWords">
+                                Amount in words: <em>Zero dong</em>
+                            </div>
+                        </div>
+
+                        <div class="summary-values">
+                            <div class="summary-row">
+                                <label>Sub-Total</label>
+                                <div class="value-box">
+                                    <input type="hidden" name="subTotal" value="${subTotal}">
+                                    <input type="text" id="subTotal" value="<fmt:formatNumber value="${subTotal}" pattern="#,##0"/>" readonly>
+                                    <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
+                                </div>
+                            </div>
+                            <div class="summary-row">
+                                <label>Total Discount</label>
+                                <div class="value-box">
+                                    <input type="hidden" name="discountTotal" value="${discountTotal}">
+                                    <input type="text" id="discountTotal" value="<fmt:formatNumber value="${discountTotal}" pattern="#,##0"/>" style="text-align: right;" readonly>
+                                    <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
+                                </div>
+                            </div>
+                            <div class="summary-row">
+                                <label>Total VAT</label>
+                                <div class="value-box">
+                                    <input type="hidden" name="taxAmount" value="${taxAmount}">
+                                    <input type="text" id="taxAmount" value="<fmt:formatNumber value="${taxAmount}" pattern="#,##0"/>" readonly>
+                                    <span style="font-size: 11px; font-weight: bold; color: var(--muted);">VND</span>
+                                </div>
                             </div>
 
-                            <div class="actions-right">
-                                <c:choose>
-                                    <c:when test="${empty invoice}">
-                                        <!-- Creation Mode: Only Save Draft -->
-                                        <button type="button" class="btn-action" onclick="submitDraft()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Save Draft</button>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <!-- Detail/Edit Mode -->
-                                        <c:if test="${invoice.invoiceStatus == 'UNRELEASED'}">
-                                            <button type="button" class="btn-action success" onclick="submitPublish()"><span class="material-symbols-outlined" style="font-size: 16px;">send</span> Release Invoice</button>
-                                            <button type="button" class="btn-action" onclick="submitDraft()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Update Draft</button>
-                                        </c:if>
-                                    </c:otherwise>
-                                </c:choose>
-                                <a href="${pageContext.request.contextPath}/invoice-list" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">close</span> Close</a>
+                            <div class="summary-row summary-row-total">
+                                <label style="color: #dc2626; font-weight: 800; font-size: 14px;">Total Amount</label>
+                                <div class="value-box">
+                                    <input type="hidden" name="totalAmount" value="${totalAmount}">
+                                    <input type="text" id="totalAmount" value="<fmt:formatNumber value="${totalAmount}" pattern="#,##0"/>" readonly>
+                                    <span style="font-size: 11px; font-weight: bold; color: #dc2626;">VND</span>
+                                </div>
                             </div>
-                    </form>
+                        </div>
+                    </div>
+
+                    <div class="actions-bar">
+                        <div class="actions-left">
+                            <button type="button" class="btn-action" style="opacity: 0.6; pointer-events: none;"><span class="material-symbols-outlined" style="font-size: 16px;">build</span> Utilities <span style="font-size: 10px;">▼</span></button>
+                            <button type="submit" formaction="${pageContext.request.contextPath}/invoice/preview" formtarget="_blank" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">print</span> Preview Invoice</button>
+                        </div>
+
+                        <div class="actions-right">
+                            <c:choose>
+                                <c:when test="${empty invoice}">
+                                    <!-- Creation Mode: Only Save Draft -->
+                                    <button type="button" class="btn-action" onclick="submitDraft()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Save Draft</button>
+                                </c:when>
+                                <c:otherwise>
+                                    <!-- Detail/Edit Mode -->
+                                    <c:if test="${invoice.invoiceStatus == 'UNRELEASED'}">
+                                        <button type="button" class="btn-action success" onclick="submitPublish()"><span class="material-symbols-outlined" style="font-size: 16px;">send</span> Release Invoice</button>
+                                        <button type="button" class="btn-action" onclick="submitDraft()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Update Draft</button>
+                                    </c:if>
+                                </c:otherwise>
+                            </c:choose>
+                            <a href="${pageContext.request.contextPath}/invoice-list" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">close</span> Close</a>
+                        </div>
+                </form>
             </main>
         </div>
 
@@ -607,57 +613,78 @@
             }
 
             function numberToWords(number) {
-                if (number === 0) return "Không đồng";
-                
-                const units = ["", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
-                const places = ["", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ"];
-                
-                function readThreeDigits(n, showZeroHundred) {
-                    let hundred = Math.floor(n / 100);
-                    let ten = Math.floor((n % 100) / 10);
-                    let unit = n % 10;
-                    let text = "";
-                    
-                    if (hundred > 0 || showZeroHundred) {
-                        text += units[hundred] + " trăm ";
-                    }
-                    
-                    if (ten > 1) {
-                        text += units[ten] + " mươi ";
-                    } else if (ten === 1) {
-                        text += "mười ";
-                    } else if (ten === 0 && unit > 0 && (hundred > 0 || showZeroHundred)) {
-                        text += "lẻ ";
-                    }
-                    
-                    if (unit === 5 && ten > 0) {
-                        text += "lăm";
-                    } else if (unit === 1 && ten > 1) {
-                        text += "mốt";
-                    } else if (unit > 0) {
-                        text += units[unit];
-                    }
-                    return text.trim();
+                if (number === 0)
+                    return "Không đồng";
+
+                let prefix = "";
+                if (number < 0) {
+                    prefix = "âm ";
+                    number = -number;
                 }
-                
+                const units = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
+                const places = ["", "nghìn", "triệu", "tỷ", "nghìn", "triệu", "tỷ", "nghìn", "triệu", "tỷ"];
+
                 let numStr = Math.round(number).toString();
                 let groups = [];
                 while (numStr.length > 0) {
                     groups.push(parseInt(numStr.slice(-3), 10));
                     numStr = numStr.slice(0, -3);
                 }
-                
+
                 let words = [];
-                for (let i = 0; i < groups.length; i++) {
-                    let groupVal = groups[i];
-                    if (groupVal > 0) {
-                        let groupText = readThreeDigits(groupVal, i < groups.length - 1);
-                        let placeText = places[i] ? " " + places[i] : "";
-                        words.unshift(groupText + placeText);
+                for (let i = groups.length - 1; i >= 0; i--) {
+                    let n = groups[i];
+
+                    if (n === 0 && i % 3 !== 0) {
+                        continue;
+                    }
+
+                    let showZeroHundred = (i < groups.length - 1);
+                    let hundred = Math.floor(n / 100);
+                    let ten = Math.floor((n % 100) / 10);
+                    let unit = n % 10;
+
+                    let groupText = "";
+
+                    if (hundred > 0) {
+                        groupText += units[hundred] + " trăm ";
+                    } else if (showZeroHundred && (ten > 0 || unit > 0)) {
+                        groupText += "không trăm ";
+                    }
+
+                    if (ten > 1) {
+                        groupText += units[ten] + " mươi ";
+                    } else if (ten === 1) {
+                        groupText += "mười ";
+                    } else if (ten === 0 && unit > 0 && (hundred > 0 || showZeroHundred)) {
+                        groupText += "lẻ ";
+                    }
+
+                    if (unit === 5 && ten > 0) {
+                        groupText += "lăm";
+                    } else if (unit === 1 && ten > 1) {
+                        groupText += "mốt";
+                    } else if (unit > 0) {
+                        groupText += units[unit];
+                    }
+
+                    let groupStr = groupText.trim();
+                    if (groupStr !== "") {
+                        let text = groupStr;
+                        if (places[i]) {
+                            text += " " + places[i];
+                        }
+                        words.push(text);
+                    } else if (i > 0 && i % 3 === 0) {
+                        words.push(places[i]);
                     }
                 }
-                
-                let result = words.join(" ").replace(/\s+/g, " ").trim();
+
+                let rawWords = prefix + words.join(" ");
+                let result = rawWords.replace(/\s+/g, " ").trim();
+                if (result === "")
+                    return "Không đồng";
+
                 return result.charAt(0).toUpperCase() + result.slice(1) + " đồng";
             }
         </script>

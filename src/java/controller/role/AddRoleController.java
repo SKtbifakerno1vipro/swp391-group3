@@ -35,16 +35,6 @@ public class AddRoleController extends HttpServlet {
             // Lay role name
             String roleName = request.getParameter("roleName");
 
-            // Lay danh sach permission IDs tu checkbox
-            String[] permissionIdValues = request.getParameterValues("permissionIds");
-            List<Integer> permissionIds = new ArrayList<>();
-
-            if (permissionIdValues != null) {
-                for (String val : permissionIdValues) {
-                    permissionIds.add(Integer.parseInt(val));
-                }
-            }
-
             // Validate: Kiem tra rong
             if (roleName == null || roleName.trim().isEmpty()) {
                 request.setAttribute("error", "Vui lòng nhập tên Role!");
@@ -68,6 +58,16 @@ public class AddRoleController extends HttpServlet {
             // Tao role moi va lay ID
             int newRoleId = roleService.createRole(roleName);
 
+            // Lay danh sach permission IDs tu checkbox
+            String[] permissionIdValues = request.getParameterValues("permissionIds");
+            List<Integer> permissionIds = new ArrayList<>();
+
+            if (permissionIdValues != null) {
+                for (String val : permissionIdValues) {
+                    permissionIds.add(Integer.parseInt(val));
+                }
+            }
+            
             if (newRoleId > 0) {
                 // Them permissions cho role vua tao
                 if (!permissionIds.isEmpty()) {

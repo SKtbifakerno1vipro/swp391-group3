@@ -218,14 +218,14 @@ public class CustomerService {
     public void deactivateCustomer(int customerId) {
         CustomerDTO customer = getCustomerDTOByCusId(customerId);
         if (customer != null) {
-            userService.banUser(customer.getUserId(), "INACTIVE");
+            userService.banUser(customer.getUser().getUserId(), "INACTIVE");
         }
     }
 
     public void activateCustomer(int customerId) {
         CustomerDTO customer = getCustomerDTOByCusId(customerId);
         if (customer != null) {
-            userService.banUser(customer.getUserId(), "ACTIVE");
+            userService.banUser(customer.getUser().getUserId(), "ACTIVE");
         }
     }
 

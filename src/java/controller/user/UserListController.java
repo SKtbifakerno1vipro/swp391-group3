@@ -27,12 +27,17 @@ public class UserListController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        
+        if (currentUser.getRoleId() != 1 && currentUser.getRoleId() != 2) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+            return;
+        }
 
         String roleIdString = request.getParameter("roleId");
         String status = request.getParameter("status");
-        String searchEmail = request.getParameter("searchEmail");
-        String searchPhone = request.getParameter("searchPhone");
-        String searchName = request.getParameter("searchName");
+        String searchEmail = request.getParameter("searchEmail") != null ? request.getParameter("searchEmail").trim().replaceAll("\\s+", "") : null;
+        String searchPhone = request.getParameter("searchPhone") != null ? request.getParameter("searchPhone").trim().replaceAll("\\s+", "") : null;
+        String searchName = request.getParameter("searchName") != null ? request.getParameter("searchName").trim().replaceAll("\\s+", " ") : null;
         int roleId = 0;
         if (roleIdString != null && !roleIdString.trim().isEmpty()) {
             try {

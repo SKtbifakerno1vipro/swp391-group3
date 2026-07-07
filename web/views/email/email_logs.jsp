@@ -5,7 +5,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Email Logs</title>
+    <title>Nhật ký Email</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -198,38 +198,38 @@
             <jsp:param name="activeMenu" value="emailLogs"/>
         </jsp:include>
         <main class="main legacy-page">
-            <h2>Email Activity Logs</h2>
-            <p style="color: var(--muted); margin-bottom: 20px;">Review all outgoing system email communications (such as password recovery OTPs).</p>
+            <h2>Nhật ký hoạt động Email</h2>
+            <p style="color: var(--muted); margin-bottom: 20px;">Xem lại tất cả các liên lạc email gửi đi của hệ thống (như mã OTP khôi phục mật khẩu).</p>
             
             <form action="${pageContext.request.contextPath}/email/logs" method="GET" class="search-form-responsive">
                 <!-- Row 1: Basic search -->
                 <div class="search-row">
-                    <span class="search-label">Search Filters:</span>
-                    <input type="text" name="searchEmail" value="${searchEmail}" placeholder="Recipient Email..." class="input-small" />
-                    <input type="text" name="searchUsername" value="${searchUsername}" placeholder="Recipient Username..." class="input-small" />
+                    <span class="search-label">Bộ lọc tìm kiếm:</span>
+                    <input type="text" name="searchEmail" value="${searchEmail}" placeholder="Email người nhận..." class="input-small" />
+                    <input type="text" name="searchUsername" value="${searchUsername}" placeholder="Tên đăng nhập người nhận..." class="input-small" />
                 </div>
 
                 <!-- Row 2: Date filter -->
                 <div class="search-row">
-                    <span class="range-title">Date:</span>
-                    <input type="datetime-local" name="startDate" value="${startDate}" title="From Date/Time" class="input-small" />
-                    <span class="range-separator">to</span>
-                    <input type="datetime-local" name="endDate" value="${endDate}" title="To Date/Time" class="input-small" />
+                    <span class="range-title">Ngày:</span>
+                    <input type="datetime-local" name="startDate" value="${startDate}" title="Từ ngày/giờ" class="input-small" />
+                    <span class="range-separator">đến</span>
+                    <input type="datetime-local" name="endDate" value="${endDate}" title="Đến ngày/giờ" class="input-small" />
                 </div>
 
                 <!-- Row 3: Page Size & Action Buttons -->
                 <div class="search-row">
-                    <span class="range-title">Show:</span>
+                    <span class="range-title">Hiển thị:</span>
                     <select name="pageSize" class="input-small" style="width: 100px !important;" onchange="this.form.submit()">
-                        <option value="5" ${pageSize == 5 ? 'selected' : ''}>5 items</option>
-                        <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 items</option>
-                        <option value="20" ${pageSize == 20 ? 'selected' : ''}>20 items</option>
+                        <option value="5" ${pageSize == 5 ? 'selected' : ''}>5 dòng</option>
+                        <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 dòng</option>
+                        <option value="20" ${pageSize == 20 ? 'selected' : ''}>20 dòng</option>
                     </select>
-                    <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">per page</span>
+                    <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">trên trang</span>
 
                     <div class="actions-group">
-                        <button type="submit" class="btn-search">Search</button>
-                        <a href="${pageContext.request.contextPath}/email/logs" class="btn-clear">Clear Filter</a>
+                        <button type="submit" class="btn-search">Tìm kiếm</button>
+                        <a href="${pageContext.request.contextPath}/email/logs" class="btn-clear">Xóa bộ lọc</a>
                     </div>
                 </div>
             </form>
@@ -237,19 +237,20 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Log ID</th>
-                        <th>Recipient Email</th>
-                        <th>Recipient Username</th>
-                        <th>Subject</th>
-                        <th>Content Preview</th>
-                        <th>Sent At</th>
-                        <th>Status</th>
+                    <tr>
+                        <th>Mã nhật ký</th>
+                        <th>Email người nhận</th>
+                        <th>Tên đăng nhập</th>
+                        <th>Tiêu đề</th>
+                        <th>Xem trước nội dung</th>
+                        <th>Thời gian gửi</th>
+                        <th>Trạng thái</th>
                     </tr>
                 </thead>
                 <tbody>
                     <c:if test="${empty emailLogs}">
                         <tr>
-                            <td colspan="7" style="text-align: center;">No email logs found.</td>
+                            <td colspan="7" style="text-align: center;">Không tìm thấy nhật ký email nào.</td>
                         </tr>
                     </c:if>
                     <c:forEach var="log" items="${emailLogs}">
@@ -259,7 +260,7 @@
                             <td><c:out value="${not empty log.userName ? log.userName : 'N/A'}"/></td>
                             <td>${log.subject}</td>
                             <td class="content-cell" onclick="showModal('${log.logId}')">
-                                Click to view content
+                                Nhấn để xem nội dung
                                 <span id="preview-${log.logId}" style="display:none;"><c:out value="${log.content}" escapeXml="false"/></span>
                             </td>
                             <td>
@@ -331,7 +332,7 @@
     <div id="emailModal" class="modal"> <!-- 100% man hinh -->
         <div class="modal-content">     <!-- chiem 1 phan man hinh -->
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h3 style="font-family: 'Literata', Georgia, serif; margin-top: 0;">Email Content Details</h3>
+            <h3 style="font-family: 'Literata', Georgia, serif; margin-top: 0;">Chi tiết nội dung Email</h3>
             <hr style="border: 0; border-top: 1px solid var(--line); margin: 15px 0;">
             <div id="modalBody" style="background: #fff; padding: 15px; border-radius: 12px; border: 1px solid var(--line); max-height: 400px; overflow-y: auto;">
             </div>

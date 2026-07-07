@@ -68,13 +68,4 @@ public class CustomerOrderDTO {
         this.customerUser = customerUser;
     }
 
-    private model.Invoice invoice;
-
-    public model.Invoice getInvoice() {
-        return invoice;
-    }
-
-    public void setInvoice(model.Invoice invoice) {
-        this.invoice = invoice;
-    }
 }

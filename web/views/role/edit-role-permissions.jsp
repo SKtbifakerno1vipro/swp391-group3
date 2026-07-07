@@ -441,6 +441,7 @@
                     <div><p class="eyebrow">Access Control</p><h1>Edit Permissions</h1><p>Update the permission set for <strong><c:out value="${role.roleName}"/></strong>.</p></div>
                     <div class="actions"><a class="button" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">arrow_back</span>Role detail</a></div>
                 </section>
+                <!-- request về edit role -->
                 <form class="panel" action="${pageContext.request.contextPath}/edit-role-permissions" method="post">
                     <input type="hidden" name="roleId" value="${role.roleId}">
                     <div class="panel-head"><h2><c:out value="${role.roleName}"/> Permissions</h2><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Save permissions</button></div>
