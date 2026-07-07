@@ -130,8 +130,8 @@
             const labels = [];
             const data = [];
             <c:forEach items="${contractStatusCounts}" var="entry">
-                labels.push('${entry.key}');
-                data.push(${entry.value});
+                labels.push('${entry.status}');
+                data.push(${entry.total});
             </c:forEach>
 
             new Chart(document.getElementById('statusChart'), {

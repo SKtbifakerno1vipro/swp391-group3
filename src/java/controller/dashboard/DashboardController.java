@@ -12,6 +12,7 @@ import java.util.List;
 import model.*;
 import service.*;
 import dto.*;
+import dto.StatusStatisticDTO; // Force recompile after DAO signature change
 
 @WebServlet(name = "DashboardController", urlPatterns = {"/dashboard"})
 public class DashboardController extends HttpServlet {
@@ -107,7 +108,7 @@ public class DashboardController extends HttpServlet {
 
         request.setAttribute("recentContracts", dashboardDAO.getRecentContracts(5, saleId));
         request.setAttribute("recentOrders", dashboardDAO.getRecentOrders(5, saleId));
-        request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);       
+        request.getRequestDispatcher("/views/dashboard/manager-dashboard.jsp").forward(request, response);       
     }
 
 }

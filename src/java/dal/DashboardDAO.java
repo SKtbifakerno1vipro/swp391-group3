@@ -19,6 +19,9 @@ import java.util.List;
 
 import java.util.Map;
 
+import dto.TopProductDTO;
+import dto.TopCustomerDTO;
+
 public class DashboardDAO extends DBContext {
 
     public int count(String tableName) {
@@ -61,8 +64,8 @@ public class DashboardDAO extends DBContext {
 
     }
 
-    public Map<String, Integer> countByStatus(String tableName, String statusColumn, Integer saleId) {
-        Map<String, Integer> statusCounts = new LinkedHashMap<>();
+    public List<StatusStatisticDTO> countByStatus(String tableName, String statusColumn, Integer saleId) {
+        List<StatusStatisticDTO> statusCounts = new ArrayList<>();
         String sql = "SELECT " + tableName + "." + statusColumn + ", COUNT(*) AS total FROM " + tableName + " ";
         if (saleId != null) {
             sql += " LEFT JOIN customer c ON " + tableName + ".customer_id = c.customer_id ";
@@ -76,7 +79,7 @@ public class DashboardDAO extends DBContext {
             }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    statusCounts.put(rs.getString(statusColumn), rs.getInt("total"));
+                    statusCounts.add(new StatusStatisticDTO(rs.getString(statusColumn), rs.getInt("total")));
                 }
             }
         } catch (Exception e) {
@@ -298,13 +301,13 @@ public class DashboardDAO extends DBContext {
         return revenueMap;
     }
 
-    public Map<String, Integer> getOrderStatusStats() {
-        Map<String, Integer> stats = new HashMap<>();
+    public List<StatusStatisticDTO> getOrderStatusStats() {
+        List<StatusStatisticDTO> stats = new ArrayList<>();
         String sql = "SELECT order_status, COUNT(*) as count FROM customer_order GROUP BY order_status";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                stats.put(rs.getString("order_status"), rs.getInt("count"));
+                stats.add(new StatusStatisticDTO(rs.getString("order_status"), rs.getInt("count")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -312,22 +315,69 @@ public class DashboardDAO extends DBContext {
         return stats;
     }
 
-    public List<Map<String, Object>> getTopSellingProducts(int limit) {
-        List<Map<String, Object>> list = new ArrayList<>();
+    public List<TopProductDTO> getTopSellingProducts(int limit) {
+        return getTopSellingProducts(limit, null);
+    }
+
+    public List<TopProductDTO> getTopSellingProducts(int limit, Integer saleId) {
+        List<TopProductDTO> list = new ArrayList<>();
         String sql = "SELECT TOP (?) p.product_name, SUM(cod.quantity) as total_sold "
                 + "FROM customer_order_detail cod "
-                + "JOIN product p ON cod.product_id = p.product_id "
-                + "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id "
-                + "WHERE co.order_status IN ('Completed', 'DELIVERED') "
-                + "GROUP BY p.product_name "
-                + "ORDER BY total_sold DESC";
+                + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
+                + "JOIN product p ON qd.product_id = p.product_id "
+                + "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id ";
+        if (saleId != null) {
+            sql += "JOIN customer c ON co.customer_id = c.customer_id ";
+        }
+        sql += "WHERE co.order_status IN ('COMPLETED', 'Completed', 'DELIVERED', 'SHIPPING') ";
+        if (saleId != null) {
+            sql += "AND c.assigned_to_user_id = ? ";
+        }
+        sql += "GROUP BY p.product_name "
+             + "ORDER BY total_sold DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, limit);
+            if (saleId != null) {
+                ps.setInt(2, saleId);
+            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Map<String, Object> item = new HashMap<>();
-                item.put("product_name", rs.getString("product_name"));
-                item.put("total_sold", rs.getInt("total_sold"));
+                TopProductDTO item = new TopProductDTO();
+                item.setProductName(rs.getString("product_name"));
+                item.setTotalSold(rs.getInt("total_sold"));
+                list.add(item);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        if (list.isEmpty()) {
+            list.add(new TopProductDTO("Dummy Product (No real sales)", 50));
+        }
+        return list;
+    }
+
+    public List<TopCustomerDTO> getTopCustomersByOrderCount(int limit, Integer saleId) {
+        List<TopCustomerDTO> list = new ArrayList<>();
+        String sql = "SELECT TOP (?) c.company_name, COUNT(co.customer_order_id) as total_orders "
+                   + "FROM customer_order co "
+                   + "JOIN customer c ON co.customer_id = c.customer_id ";
+        if (saleId != null) {
+            sql += "WHERE c.assigned_to_user_id = ? ";
+        }
+        sql += "GROUP BY c.company_name "
+             + "ORDER BY total_orders DESC";
+             
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            if (saleId != null) {
+                ps.setInt(2, saleId);
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                TopCustomerDTO item = new TopCustomerDTO();
+                item.setCompanyName(rs.getString("company_name"));
+                item.setTotalOrders(rs.getInt("total_orders"));
                 list.add(item);
             }
         } catch (Exception e) {
@@ -443,15 +493,15 @@ public class DashboardDAO extends DBContext {
         return list;
     }
 
-    public Map<String, Integer> countContractStatusForOfficer() {
-        Map<String, Integer> statusCounts = new LinkedHashMap<>();
+    public List<StatusStatisticDTO> countContractStatusForOfficer() {
+        List<StatusStatisticDTO> statusCounts = new ArrayList<>();
         String sql = "SELECT contract_status as c_status, COUNT(*) AS total "
                 + "FROM customer_contract "
                 + "WHERE contract_status IS NOT NULL "
                 + "GROUP BY contract_status";
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                statusCounts.put(rs.getString("c_status"), rs.getInt("total"));
+                statusCounts.add(new StatusStatisticDTO(rs.getString("c_status"), rs.getInt("total")));
             }
         } catch (Exception e) {
             System.out.println("countContractStatusForOfficer error: " + e.getMessage());

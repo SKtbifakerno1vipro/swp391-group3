@@ -78,8 +78,14 @@
                         <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
                     </td>
                     <td>
-                        <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">View</a> |
-                        <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
+                        <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">View</a>
+                        <c:if test="${item.customerOrder.orderStatus != 'COMPLETED'}">
+                            <c:if test="${item.customerOrder.orderStatus != 'SHIPPING'}">
+                               <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>    
+                            </c:if>
+                         
+                        </c:if>
+                        
                         <c:if test="${item.customerOrder.orderStatus == 'COMPLETED'}">
                             |
                             <c:choose>
