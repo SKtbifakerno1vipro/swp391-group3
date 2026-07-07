@@ -27,6 +27,11 @@ public class UserListController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        
+        if (currentUser.getRoleId() != 1 && currentUser.getRoleId() != 2) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+            return;
+        }
 
         String roleIdString = request.getParameter("roleId");
         String status = request.getParameter("status");

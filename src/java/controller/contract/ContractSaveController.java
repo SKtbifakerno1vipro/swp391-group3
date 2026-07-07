@@ -133,6 +133,13 @@ public class ContractSaveController extends HttpServlet {
                 return;
             }
 
+            String currentStatus = c.getContractStatus();
+            if (!"DRAFT".equals(currentStatus) && !"PENDING_REVIEW".equals(currentStatus)) {
+                request.setAttribute("errorMsg", "Hợp đồng đã chốt, không được phép chỉnh sửa nội dung!");
+                request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+                return;
+            }
+
             c.setContractContent(contractContent);
             c.setUpdatedBy(user.getUserId());
             boolean updatecontractSucessful = contractService.update(c);
