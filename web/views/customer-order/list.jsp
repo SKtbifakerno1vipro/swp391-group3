@@ -78,18 +78,23 @@
                     </td>
                     <td>
                         <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">View</a>
-                        <c:if test="${item.customerOrder.orderStatus != 'COMPLETED'}">
-                            <c:if test="${item.customerOrder.orderStatus != 'SHIPPING'}">
-                               <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>    
+                        <c:if test="${sessionScope.user.roleId != 3}">
+                            <c:if test="${item.customerOrder.orderStatus != 'COMPLETED'}">
+                                <c:if test="${item.customerOrder.orderStatus != 'SHIPPING'}">
+                                   <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>    
+                                </c:if>
                             </c:if>
                         </c:if>
                         <c:if test="${item.customerOrder.orderStatus == 'COMPLETED'}">
-                            |
                             <c:choose>
                                 <c:when test="${empty invOfOrder}">
-                                    <a href="${pageContext.request.contextPath}/invoice?orderId=${item.customerOrder.customerOrderId}" style="color: #16a34a; font-weight: bold; text-decoration: none;">Create Invoice</a>
+                                    <c:if test="${sessionScope.user.roleId != 3}">
+                                        |
+                                        <a href="${pageContext.request.contextPath}/invoice?orderId=${item.customerOrder.customerOrderId}" style="color: #16a34a; font-weight: bold; text-decoration: none;">Create Invoice</a>
+                                    </c:if>
                                 </c:when>
                                 <c:otherwise>
+                                    |
                                     <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="color: #0284c7; font-weight: bold; text-decoration: none;">View Invoice</a>
                                 </c:otherwise>
                             </c:choose>

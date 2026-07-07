@@ -115,6 +115,7 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/customer/detail",
             "/customer-order-list",
+            "/customer-order",
             "/payment",
             "/payment/list",
             "/payment/detail"
@@ -252,6 +253,14 @@ public class SecurityFilter implements Filter {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
         System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
 
+        // Check if the path is explicitly allowed by the hardcoded fallback lists first
+        if (roleId == ROLE_SYSTEM_ADMIN && SYSTEM_ADMIN_URLS.contains(cleanPath)) return true;
+        if (roleId == ROLE_MANAGER && MANAGER_URLS.contains(cleanPath)) return true;
+        if (roleId == ROLE_CUSTOMER && CUSTOMER_URLS.contains(cleanPath)) return true;
+        if (roleId == ROLE_SALE_STAFF && SALE_STAFF_URLS.contains(cleanPath)) return true;
+        if (roleId == ROLE_ADMIN_OFFICER && ADMIN_OFFICER_URLS.contains(cleanPath)) return true;
+        if (roleId == ROLE_WAREHOUSE_STAFF && WAREHOUSE_STAFF_URLS.contains(cleanPath)) return true;
+
         String requiredPermission = getRequiredPermission(cleanPath, req);
         if (requiredPermission != null) {
             Role role = roleDAO.getRoleDetail(roleId);
@@ -265,26 +274,6 @@ public class SecurityFilter implements Filter {
                 System.out.println("Role " + roleId + " DOES NOT HAVE database permission: " + requiredPermission);
                 return false;
             }
-        }
-
-        // Fallback for URLs not mapped to a specific permission in the database
-        if (roleId == ROLE_SYSTEM_ADMIN) {
-            return SYSTEM_ADMIN_URLS.contains(cleanPath);
-        }
-        if (roleId == ROLE_MANAGER) {
-            return MANAGER_URLS.contains(cleanPath);
-        }
-        if (roleId == ROLE_CUSTOMER) {
-            return CUSTOMER_URLS.contains(cleanPath);
-        }
-        if (roleId == ROLE_SALE_STAFF) {
-            return SALE_STAFF_URLS.contains(cleanPath);
-        }
-        if (roleId == ROLE_ADMIN_OFFICER) {
-            return ADMIN_OFFICER_URLS.contains(cleanPath);
-        }
-        if (roleId == ROLE_WAREHOUSE_STAFF) {
-            return WAREHOUSE_STAFF_URLS.contains(cleanPath);
         }
 
         return false;
