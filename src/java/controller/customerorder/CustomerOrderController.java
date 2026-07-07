@@ -47,9 +47,10 @@ public class CustomerOrderController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        
 
         String action = request.getParameter("action");
-        if ("delete_order".equals(action)) {
+        if ("delete_order".equals(action) ) {
             String idParam = request.getParameter("id");
             if (idParam != null && !idParam.isBlank()) {
                 try {

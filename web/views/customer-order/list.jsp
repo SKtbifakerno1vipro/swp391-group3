@@ -44,54 +44,66 @@
                     <button type="submit" style="padding: 6px 15px; cursor: pointer;">Search/Filter</button>
                 </form>
                 <br>
-
-                <table border="1" cellpadding="10" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Customer Name</th>
-                            <th>Tax Code</th>
-                            <th>Status</th>
-                            <th>Created At</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <% InvoiceService invService = new InvoiceService(); %>
-                    <tbody>
-                        <c:forEach var="item" items="${orders}">
-                            <tr>
-                                <td>${item.customerOrder.customerOrderId}</td>
-                                <td>${item.customerUser.fullName}</td>
-                                <td>${item.customer.taxCode}</td>
-                                <td>${item.customerOrder.orderStatus}</td>
-                                <td>
-                                    <fmt:parseDate value="${item.customerOrder.createdAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
-                                    <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
-                                </td>
-                                <td>
-                                    <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">View</a> |
-                                    <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
-                                    <c:if test="${item.customerOrder.orderStatus == 'COMPLETED'}">
-                                        |
-                                        <c:choose>
-                                            <c:when test="${item.customerOrder.hasInvoice == true}">
-                                                <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="color: #0284c7; font-weight: bold; text-decoration: none;">View Invoice</a>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <a href="${pageContext.request.contextPath}/invoice?orderId=${item.customerOrder.customerOrderId}" style="color: #16a34a; font-weight: bold; text-decoration: none;">Create Invoice</a> 
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:if>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                        <c:if test="${empty orders}">
-                            <tr>
-                                <td colspan="6" style="text-align: center;">No orders found.</td>
-                            </tr>
+    <table border="1" cellpadding="10" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Tax Code</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <% InvoiceService invService = new InvoiceService(); %>
+        <tbody>
+            <c:forEach var="item" items="${orders}">
+                <%
+                    dto.CustomerOrderDTO itemDto = (dto.CustomerOrderDTO) pageContext.getAttribute("item");
+                    if (itemDto != null && itemDto.getCustomerOrder() != null) {
+                        Invoice inv = invService.getInvoiceByOrderId(itemDto.getCustomerOrder().getCustomerOrderId());
+                        pageContext.setAttribute("invOfOrder", inv);
+                    } else {
+                        pageContext.removeAttribute("invOfOrder");
+                    }
+                %>
+                <tr>
+                    <td>${item.customerOrder.customerOrderId}</td>
+                    <td>${item.customerUser.fullName}</td>
+                    <td>${item.customer.taxCode}</td>
+                    <td>${item.customerOrder.orderStatus}</td>
+                    <td>
+                        <fmt:parseDate value="${item.customerOrder.createdAt}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
+                        <fmt:formatDate value="${parsedDateTime}" pattern="dd/MM/yyyy HH:mm" />
+                    </td>
+                    <td>
+                        <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">View</a>
+                        <c:if test="${item.customerOrder.orderStatus != 'COMPLETED'}">
+                            <c:if test="${item.customerOrder.orderStatus != 'SHIPPING'}">
+                               <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>    
+                            </c:if>
                         </c:if>
-                    </tbody>
-                </table>
+                        <c:if test="${item.customerOrder.orderStatus == 'COMPLETED'}">
+                            |
+                            <c:choose>
+                                <c:when test="${empty invOfOrder}">
+                                    <a href="${pageContext.request.contextPath}/invoice?orderId=${item.customerOrder.customerOrderId}" style="color: #16a34a; font-weight: bold; text-decoration: none;">Create Invoice</a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="color: #0284c7; font-weight: bold; text-decoration: none;">View Invoice</a>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:if>
+                    </td>
+                </tr>
+            </c:forEach>
+            <c:if test="${empty orders}">
+                <tr>
+                    <td colspan="6" style="text-align: center;">No orders found.</td>
+                </tr>
+            </c:if>
+        </tbody>
+    </table>
 
                 <div>
                     <c:if test="${totalPages > 1}">
