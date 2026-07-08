@@ -9,4 +9,7 @@
             <page-encoding>UTF-8</page-encoding>
         </jsp-property-group>
     </jsp-config>
+    <session-config>
+        <session-timeout>60</session-timeout>
+    </session-config>
 </web-app>

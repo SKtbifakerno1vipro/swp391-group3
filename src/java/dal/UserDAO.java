@@ -55,7 +55,7 @@ public class UserDAO extends DBContext {
             sql += " AND u.email LIKE ?";
         }
 
-        sql += " ORDER BY u.user_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        sql += " ORDER BY u.user_id desc OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
@@ -425,19 +425,22 @@ public class UserDAO extends DBContext {
         return null;
     }
 
+    /*
+    created by vu trong phu
+     */
     public User login(String username, String password) {
         String sql = "SELECT * FROM [user] WHERE user_name = ? AND account_status = 'ACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                String storedPassword = rs.getString("password_hash");
+                String hashPassword = rs.getString("password_hash");
                 boolean passwordMatches;
-
-                if (storedPassword != null && storedPassword.startsWith("$2")) {
-                    passwordMatches = true || BCrypt.checkpw(password, storedPassword);
-                } else {
-                    passwordMatches = storedPassword != null && storedPassword.equals(password);
+                System.out.println("pass: " + hashPassword);
+                if (hashPassword != null && hashPassword.startsWith("$2")) {
+                    passwordMatches = BCrypt.checkpw(password, hashPassword);
+                } else {//allow password when db had just initialize 
+                    passwordMatches = hashPassword != null && hashPassword.equals(password);
                 }
 
                 if (passwordMatches) {
@@ -450,25 +453,6 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-    /*
-    created by vu trong phu
-     */
-    public User loginTester(String username, String password) {
-        String sql = "SELECT * FROM [user] WHERE user_name = ? AND password_hash = ? AND account_status = 'ACTIVE'";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, username);
-            ps.setString(2, password);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                User user = mapUser(rs);
-                user.setPassword(password);
-                return user;
-            }
-        } catch (Exception e) {
-            System.out.println("loginTester: " + e.getMessage());
-        }
-        return null;
-    }
 
     /*
     created by vu trong phu
