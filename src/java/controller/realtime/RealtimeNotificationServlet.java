@@ -54,9 +54,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
         while (!writer.checkError()) {
             int roleId = user.getRoleId();
 
-
             //  Contract Workflow Notifications
-
             List<ContractHistory> newHistories = contractDAO.getContractHistoriesSinceId(lastContractHistoryId);
             for (ContractHistory h : newHistories) {
                 if (h.getCreatedAt() != null) {
@@ -260,7 +258,6 @@ public class RealtimeNotificationServlet extends HttpServlet {
                 .replace("\t", "\\t");
     }
 
-
 //    private String formatCustomerPaymentJson(Payment p, String contextPath) {
 //        double amt = p.getAmount() != null ? p.getAmount().doubleValue() : 0.0;
 //        String contractNo = p.getContractNumber() != null ? p.getContractNumber() : "";
@@ -307,5 +304,4 @@ public class RealtimeNotificationServlet extends HttpServlet {
 //                contextPath
 //        );
 //    }
-
 }
