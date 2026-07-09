@@ -47,9 +47,14 @@ public class CustomerOrderController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        
 
         String action = request.getParameter("action");
-        if ("delete_order".equals(action)) {
+        if ("delete_order".equals(action) ) {
+            if (currentUser.getRoleId() == 3) {
+                response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                return;
+            }
             String idParam = request.getParameter("id");
             if (idParam != null && !idParam.isBlank()) {
                 try {
@@ -67,6 +72,10 @@ public class CustomerOrderController extends HttpServlet {
         if (idParam != null && !idParam.isBlank()) {
             handleDetailView(request, response, idParam);
         } else {
+            if (currentUser.getRoleId() == 3) {
+                response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                return;
+            }
             handleCreateView(request, response);
         }
     }
@@ -86,8 +95,16 @@ public class CustomerOrderController extends HttpServlet {
         String action = request.getParameter("action");
         
         if ("create".equals(action)) {
+            if (currentUser.getRoleId() == 3) {
+                response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                return;
+            }
             handleCreateAction(request, response, currentUser);
         } else if ("update_status".equals(action)) {
+            if (currentUser.getRoleId() == 3) {
+                response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                return;
+            }
             handleUpdateStatusAction(request, response);
         } else {
             response.sendRedirect(request.getContextPath() + "/customer-order-list");
@@ -107,6 +124,18 @@ public class CustomerOrderController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
                 return;
             }
+
+            Invoice invoice = invoiceService.getInvoiceByOrderId(orderId);
+            if (invoice != null) {
+                isExistInvoice = true;
+                if ("CANCELED".equals(invoice.getInvoiceStatus())) {
+                    isExistInvoice = false;
+                }
+            }
+            if (order.getCustomerOrder() != null) {
+                order.getCustomerOrder().setHasInvoice(isExistInvoice);
+            }
+            request.setAttribute("invOfOrder", invoice);
 
             HttpSession session = request.getSession();
             model.User currentUser = (model.User) session.getAttribute("user");

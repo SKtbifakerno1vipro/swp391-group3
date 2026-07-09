@@ -65,7 +65,7 @@
                     grid-template-columns: 1fr;
                 }
             }
-            
+
             /* Override app-layout.css for raw contract content */
             .legacy-page .raw-content table {
                 background: #fff;
@@ -132,7 +132,6 @@
                             <div style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
                                 <c:if test="${editable}">
                                     <button type="button" onclick="submitForm('save')">Lưu thay đổi</button>
-
                                     <c:if test="${contract != null}">
                                         <!--officier-->
                                         <c:if test="${sessionScope.user.roleId == 5}">
@@ -160,7 +159,7 @@
                             Phím tắt
                         </h3>
                         <p style="color: var(--muted); font-size: 0.85em; margin-bottom: 15px;">Sử dụng các phím tắt trong khi chỉnh sửa:</p>
-                        
+
                         <div class="shortcut-item">
                             <span>In đậm</span>
                             <kbd>Ctrl + B</kbd>

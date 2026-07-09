@@ -155,11 +155,11 @@
                     <section class="page-top"><div><p class="eyebrow">Quản lý Truy cập</p><h1>Sửa Người dùng</h1><p>Cập nhật thông tin tài khoản, vai trò và trạng thái.</p></div><div class="actions"><a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Trở lại danh sách</a></div></section>
                 <form class="panel" action="${pageContext.request.contextPath}/edit-user" method="post">
                     <input type="hidden" name="id" value="${u.userId}">
-                    <div class="panel-head"><h2><c:out value="${u.fullName}"/></h2><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu thay đổi</button></div>
+                    <div class="panel-head"><h2><c:out value="${u.fullName}"/></h2></div>
                     <div class="panel-body">
                         <c:if test="${not empty error}"><div class="alert"><c:out value="${error}"/></div></c:if>
                             <div class="form-grid">
-                                <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" required></div>
+                                <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" readonly=""></div>
                             <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required></div>
                             <div class="field"><label>Email</label><input type="email" name="email" value="${u.email}" required></div>
                             <div class="field"><label>Số điện thoại</label><input type="text" name="phone" value="${u.phone}" required></div>

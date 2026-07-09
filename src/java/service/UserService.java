@@ -1,7 +1,5 @@
 package service;
 
-
-
 import dal.UserDAO;
 import dto.UserRoleDTO;
 import java.util.List;
@@ -18,8 +16,19 @@ public class UserService {
         return userDAO.searchUsers(roleId, status, searchName, searchPhone, searchEmail, pageIndex, pageSize);
     }
 
+    public void notificationForStaff(User u, String password) {
+        String emailSubject = "Thong tin tai khoan Bakery System";
+        String emailContent = "Xin chao " + u.getFullName() + ",\n\n"
+                + "Tai khoan cua ban da duoc tao thanh cong.\n"
+                + "Thong tin dang nhap:\n"
+                + "- Username: " + u.getUserName() + "\n"
+                + "- Password: " + password + "\n\n"
+                + "Vui long dang nhap va doi mat khau ngay.";
+        utils.EmailUtils.sendEmailAsync(u.getEmail(), emailSubject, emailContent);
+    }
+
     public int getTotalUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail) {
-        return userDAO.getTotalUsers( roleId,  status,  searchName,  searchPhone,  searchEmail);
+        return userDAO.getTotalUsers(roleId, status, searchName, searchPhone, searchEmail);
     }
 
     public User getUserById(int id) {
@@ -30,12 +39,15 @@ public class UserService {
         user.setStatus("ACTIVE");
         return userDAO.createUser(user);
     }
+
     public boolean updateUser(User user) {
         return userDAO.updateUser(user);
     }
 
     public String getUsernameById(int userId) {
-        if (userId <= 0) return "N/A";
+        if (userId <= 0) {
+            return "N/A";
+        }
         User u = userDAO.getUserById(userId);
         return (u != null) ? u.getUserName() : "Không tìm thấy";
     }

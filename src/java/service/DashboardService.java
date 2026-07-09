@@ -1,6 +1,8 @@
 package service;
 
 import dal.DashboardDAO;
+import dto.TopProductDTO;
+import dto.StatusStatisticDTO;
 import java.util.List;
 import java.util.Map;
 
@@ -31,11 +33,11 @@ public class DashboardService {
         return dashboardDAO.getRevenueByMonth();
     }
 
-    public Map<String, Integer> getOrderStatusStats() {
+    public List<StatusStatisticDTO> getOrderStatusStats() {
         return dashboardDAO.getOrderStatusStats();
     }
 
-    public List<Map<String, Object>> getTopSellingProducts(int limit) {
+    public List<TopProductDTO> getTopSellingProducts(int limit) {
         return dashboardDAO.getTopSellingProducts(limit);
     }
 

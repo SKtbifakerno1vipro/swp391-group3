@@ -5,7 +5,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Revenue Analytics Report</title>
+    <title>System Statistics Report</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     <style>
         .main { min-width:0; padding:26px 34px 38px; flex-grow: 1; }
@@ -13,6 +13,13 @@
         .eyebrow { margin:0 0 6px; color:var(--primary); font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-size:12px; }
         .dashboard-shell { display:flex; min-height:100vh; }
         h1 { margin:0; font-family:'Literata',Georgia,serif; font-size:clamp(30px,4vw,44px); line-height:1.1; }
+        
+        .charts-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-bottom: 30px; }
+        .charts-row-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .chart-panel { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .chart-panel h3 { margin: 0 0 20px 0; color: #333; font-size: 18px; text-align: center; }
+        .canvas-container { position: relative; height: 300px; width: 100%; }
+        .canvas-container.main-chart { height: 400px; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&display=block" rel="stylesheet">
@@ -28,144 +35,235 @@
             <section class="topbar">
                 <div>
                     <p class="eyebrow">Analytics & Reporting</p>
-                    <h1>Revenue Analytics Report</h1>
-                    <p>Track your business performance and revenue trends.</p>
+                    <h1>System Statistics Report</h1>
+                    <p>Visual overview of Products, Orders, Quotations, and Contracts.</p>
                 </div>
             </section>
             
-            <section class="filter-section panel">
-                <form action="${pageContext.request.contextPath}/revenue-report" method="get" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                    <div style="display: flex; flex-direction: column;">
-                        <label class="eyebrow" style="margin-bottom: 5px;">Report Type</label>
-                        <select name="type" onchange="this.form.submit()" style="padding: 8px; border-radius: 8px; border: 1px solid #ddd;">
-                            <option value="day" ${type == 'day' ? 'selected' : ''}>By Day</option>
-                            <option value="month" ${type == 'month' ? 'selected' : ''}>By Month</option>
-                            <option value="year" ${type == 'year' ? 'selected' : ''}>By Year</option>
-                        </select>
+            <section class="charts-container">
+                <div class="chart-panel">
+                    <h3>Overall Total Summary</h3>
+                    <div class="canvas-container main-chart">
+                        <canvas id="overviewChart"></canvas>
                     </div>
-                    
-                    <div style="display: flex; flex-direction: column;">
-                        <label class="eyebrow" style="margin-bottom: 5px;">From</label>
-                        <input type="date" name="startDate" value="${startDate}" style="padding: 7px; border-radius: 8px; border: 1px solid #ddd;">
+                </div>
+                
+                <div class="chart-panel">
+                    <h3>Top 5 Customers by Orders</h3>
+                    <div class="canvas-container main-chart">
+                        <canvas id="topCustomersChart"></canvas>
                     </div>
-                    
-                    <div style="display: flex; flex-direction: column;">
-                        <label class="eyebrow" style="margin-bottom: 5px;">To</label>
-                        <input type="date" name="endDate" value="${endDate}" style="padding: 7px; border-radius: 8px; border: 1px solid #ddd;">
+                </div>
+
+                <div class="chart-panel">
+                    <h3>Top 5 Selling Products (${topSellingProducts.size()})</h3>
+                    <div class="canvas-container main-chart">
+                        <canvas id="topProductsChart"></canvas>
                     </div>
-                    
-                    <button type="submit" class="btn btn-primary" style="margin-top: 18px; padding: 10px 20px; border-radius: 20px; font-weight: bold; background: #4a7c59; border: none; color: white; cursor: pointer;">
-                        <span class="material-symbols-outlined" style="vertical-align: middle; font-size: 18px; margin-right: 5px;">filter_list</span>Filter
-                    </button>
-                </form>
+                </div>
             </section>
 
-            <c:if test="${not empty revenueData}">
-                <section class="panel" style="padding: 25px; background: white; border-radius: 26px; box-shadow: 0 18px 45px rgba(46,50,48,.08); margin-bottom: 25px;">
-                    <div style="height: 400px; width: 100%;">
-                        <canvas id="revenueChart"></canvas>
+            <section class="charts-row-3">
+                <div class="chart-panel">
+                    <h3>Orders by Status</h3>
+                    <div class="canvas-container">
+                        <canvas id="orderStatusChart"></canvas>
                     </div>
-                </section>
-            </c:if>
-            
-            <section class="panel" style="padding: 20px; background: white; border-radius: 26px; box-shadow: 0 18px 45px rgba(46,50,48,.08);">
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th>Time Period (${type})</th>
-                            <th style="text-align: right;">Revenue</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:set var="totalRevenue" value="0" />
-                        <c:forEach items="${revenueData}" var="entry">
-                            <tr>
-                                <td style="font-weight: 700;">${entry.key}</td>
-                                <td style="text-align: right; font-weight: 700; color: #4a7c59;">
-                                    <fmt:formatNumber value="${entry.value}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
-                                </td>
-                            </tr>
-                            <c:set var="totalRevenue" value="${totalRevenue + entry.value}" />
-                        </c:forEach>
-                    </tbody>
-                    <tfoot>
-                        <tr class="total-row">
-                            <td style="font-size: 18px;">Total Revenue</td>
-                            <td style="text-align: right; font-size: 20px; color: #b1812f;">
-                                <fmt:formatNumber value="${totalRevenue}" type="currency" currencySymbol="VND" maxFractionDigits="0"/>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-                
-                <c:if test="${empty revenueData}">
-                    <div style="text-align: center; padding: 40px; color: #646b66;">
-                        <span class="material-symbols-outlined" style="font-size: 48px; display: block; margin-bottom: 10px;">search_off</span>
-                        <p>No revenue data found for the selected criteria.</p>
+                </div>
+
+                <div class="chart-panel">
+                    <h3>Quotations by Status</h3>
+                    <div class="canvas-container">
+                        <canvas id="quotationStatusChart"></canvas>
                     </div>
-                </c:if>
+                </div>
+
+                <div class="chart-panel">
+                    <h3>Contracts by Status</h3>
+                    <div class="canvas-container">
+                        <canvas id="contractStatusChart"></canvas>
+                    </div>
+                </div>
             </section>
         </main>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('revenueChart');
-            if (!ctx) return;
+            // Colors
+            const barColors = ['rgba(54, 162, 235, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(153, 102, 255, 0.6)'];
+            const barBorders = ['rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)', 'rgba(255, 206, 86, 1)', 'rgba(153, 102, 255, 1)'];
+            
+            const pieColors = [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)'
+            ];
 
-            const labels = [];
-            const dataValues = [];
-
-            <c:forEach items="${revenueData}" var="entry">
-                labels.push('${entry.key}');
-                dataValues.push(${entry.value});
-            </c:forEach>
-
-            new Chart(ctx, {
+            // 1. Overview Bar Chart
+            const ctxOverview = document.getElementById('overviewChart');
+            new Chart(ctxOverview, {
                 type: 'bar',
                 data: {
-                    labels: labels,
+                    labels: ['Products', 'Orders', 'Quotations', 'Contracts'],
                     datasets: [{
-                        label: 'Revenue (VND)',
-                        data: dataValues,
-                        backgroundColor: 'rgba(74, 124, 89, 0.6)',
-                        borderColor: 'rgba(74, 124, 89, 1)',
+                        label: 'Total Count',
+                        data: [${totalProducts}, ${totalOrders}, ${totalQuotations}, ${totalContracts}],
+                        backgroundColor: barColors,
+                        borderColor: barBorders,
                         borderWidth: 1,
-                        borderRadius: 8,
-                        hoverBackgroundColor: 'rgba(74, 124, 89, 0.8)'
+                        borderRadius: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString('vi-VN') + ' ₫';
-                                }
-                            }
-                        }
+                        y: { beginAtZero: true }
                     },
                     plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += context.parsed.y.toLocaleString('vi-VN') + ' ₫';
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
+                        legend: { display: false }
                     }
                 }
             });
+
+            // Helper function to build Pie/Doughnut charts
+            function createPieChart(ctxId, labels, data) {
+                const ctx = document.getElementById(ctxId);
+                if(data.length === 0) {
+                    // if no data, show message instead of blank chart
+                    ctx.parentElement.innerHTML = '<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#999;">No data available</div>';
+                    return;
+                }
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: pieColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+
+            // 2. Order Status Chart
+            const orderLabels = [];
+            const orderData = [];
+            <c:forEach items="${orderStatusCounts}" var="entry">
+                orderLabels.push('${entry.status}');
+                orderData.push(${entry.total});
+            </c:forEach>
+            createPieChart('orderStatusChart', orderLabels, orderData);
+
+            // 3. Quotation Status Chart
+            const quotLabels = [];
+            const quotData = [];
+            <c:forEach items="${quotationStatusCounts}" var="entry">
+                quotLabels.push('${entry.status}');
+                quotData.push(${entry.total});
+            </c:forEach>
+            createPieChart('quotationStatusChart', quotLabels, quotData);
+
+            // 4. Contract Status Chart
+            const contractLabels = [];
+            const contractData = [];
+            <c:forEach items="${contractStatusCounts}" var="entry">
+                contractLabels.push('${entry.status}');
+                contractData.push(${entry.total});
+            </c:forEach>
+            createPieChart('contractStatusChart', contractLabels, contractData);
+
+            // 5. Top Customers Bar Chart
+            const customerLabels = [];
+            const customerData = [];
+            <c:forEach items="${topCustomers}" var="item">
+                customerLabels.push(`<c:out value="${item.companyName}" />`);
+                customerData.push(${item.totalOrders});
+            </c:forEach>
+            
+            const ctxTopCustomers = document.getElementById('topCustomersChart');
+            if(customerData.length === 0) {
+                ctxTopCustomers.parentElement.innerHTML = '<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#999;">No data available</div>';
+            } else {
+                new Chart(ctxTopCustomers, {
+                    type: 'bar',
+                    data: {
+                        labels: customerLabels,
+                        datasets: [{
+                            label: 'Total Orders',
+                            data: customerData,
+                            backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 1,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y', // horizontal bar chart
+                        scales: {
+                            x: { beginAtZero: true }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // 6. Top Selling Products Bar Chart
+            const productLabels = [];
+            const productData = [];
+            <c:forEach items="${topSellingProducts}" var="item">
+                productLabels.push(`<c:out value="${item.productName}" />`);
+                productData.push(${item.totalSold});
+            </c:forEach>
+            
+            console.log("Top Products:", productLabels, productData);
+            
+            const ctxTopProducts = document.getElementById('topProductsChart');
+            if(productData.length === 0) {
+                ctxTopProducts.parentElement.innerHTML = '<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#999;">No data available</div>';
+            } else {
+                new Chart(ctxTopProducts, {
+                    type: 'bar',
+                    data: {
+                        labels: productLabels,
+                        datasets: [{
+                            label: 'Quantity Sold',
+                            data: productData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y', // horizontal bar chart
+                        scales: {
+                            x: { beginAtZero: true }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
         });
     </script>
 </body>

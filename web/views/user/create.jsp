@@ -139,7 +139,7 @@
                 <main class="main legacy-page">
                     <section class="page-top"><div><p class="eyebrow">Quản lý Truy cập</p><h1>Thêm Người dùng</h1><p>Tạo tài khoản nhân viên mới và gán vai trò hệ thống.</p></div><div class="actions"><a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Trở lại danh sách</a></div></section>
                 <form class="panel" action="${pageContext.request.contextPath}/edit-user" method="post">
-                    <div class="panel-head"><h2>Thông tin tài khoản</h2><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu tài khoản</button></div>
+                    <div class="panel-head"><h2>Thông tin tài khoản</h2></div>
                     <div class="panel-body">
                         <c:if test="${not empty error}"><div class="alert"><c:out value="${error}"/></div></c:if>
                             <div class="form-grid">

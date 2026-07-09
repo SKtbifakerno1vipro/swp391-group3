@@ -28,7 +28,7 @@
                     if (userMenu != null && (userMenu.getRoleId() == 1 || userMenu.getRoleId() == 2)) {
                 %>
                 <a href="${pageContext.request.contextPath}/revenue-report"
-                    style="text-decoration: none; color: #28a745; font-weight: bold; margin-right: 15px;">Revenue Analytics Report</a>
+                    style="text-decoration: none; color: #28a745; font-weight: bold; margin-right: 15px;">System Statistics Report</a>
                 <% } %>
                 <a href="${pageContext.request.contextPath}/user/password/change"
                     style="text-decoration: none; color: #0056b3;">Change password</a>
