@@ -438,7 +438,6 @@ public class InvoiceDAO extends DBContext {
                     double discountPercent = rs.getDouble("discount_percent");
                     double taxPercent = rs.getDouble("tax_percent");
 
-                    // Tính toán các giá trị tiền trên từng dòng sản phẩm
                     double lineAmount = Double.parseDouble(String.format("%.2f", quantity * sellingPrice));
                     double lineDiscount = Double.parseDouble(String.format("%.2f", lineAmount * (discountPercent / 100.0)));
                     double lineTax = Double.parseDouble(String.format("%.2f", (lineAmount - lineDiscount) * (taxPercent / 100.0)));
