@@ -2,7 +2,6 @@ package controller.invoice;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Properties;
@@ -67,7 +66,7 @@ public class InvoiceServlet extends HttpServlet {
                     request.setAttribute("invoice", invoice);
                     loadInvoiceCreationData(request, invoice.getCustomerOrderId());
                 } else {
-                    request.setAttribute("error", "Không tìm thấy hóa đơn có ID: " + invoiceId);
+                    request.setAttribute("error", "Không tìm thấy hóa đơn này.");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

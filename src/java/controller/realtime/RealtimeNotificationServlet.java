@@ -236,7 +236,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
                     }
                 }
             }
-
+          
             writer.flush();
             response.flushBuffer();
             try {

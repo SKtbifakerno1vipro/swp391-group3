@@ -5,7 +5,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Invoice List</title>
+        <title>Danh sách hóa đơn</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,7 +75,7 @@
             </jsp:include>
             <main class="main legacy-page">
                 <div>
-                    <h1>Invoices</h1>
+                    <h1>Quản lý hóa đơn</h1>
                     <c:if test="${errorMsg != null}">
                         <div style="color: red; margin-bottom: 10px;">${errorMsg}</div>
                     </c:if>
@@ -84,37 +84,37 @@
                         <form action="${pageContext.request.contextPath}/invoice-list" method="get" style="margin-bottom: 20px;">
                             <table style="border: none; margin-bottom: 15px;">
                                 <tr style="border: none;">
-                                    <td style="border: none; padding: 5px;">Buyer Name:</td>
+                                    <td style="border: none; padding: 5px;">Công ty khách hàng:</td>
                                     <td style="border: none; padding: 5px;"><input type="text" name="searchBuyerName" value="${searchBuyerName}"></td>
 
-                                    <td style="border: none; padding: 5px; padding-left: 20px;">Status:</td>
+                                    <td style="border: none; padding: 5px; padding-left: 20px;">Trạng thái:</td>
                                     <td style="border: none; padding: 5px;">
                                         <select name="status">
-                                            <option value="">All Statuses</option>
-                                            <option value="RELEASED" ${status == 'RELEASED' ? 'selected' : ''}>RELEASED</option>
-                                            <option value="UNRELEASED" ${status == 'UNRELEASED' ? 'selected' : ''}>UNRELEASED</option>
-                                            <option value="CANCELED" ${status == 'CANCELED' ? 'selected' : ''}>CANCELED</option>
+                                            <option value="">Tất cả trạng thái</option>
+                                            <option value="RELEASED" ${status == 'RELEASED' ? 'selected' : ''}>Đã phát hành</option>
+                                            <option value="UNRELEASED" ${status == 'UNRELEASED' ? 'selected' : ''}>Chưa phát hành</option>
+                                            <option value="CANCELED" ${status == 'CANCELED' ? 'selected' : ''}>Đã hủy</option>
                                         </select>
                                     </td>
 
-                                    <td style="border: none; padding: 5px; padding-left: 20px;">Type:</td>
+                                    <td style="border: none; padding: 5px; padding-left: 20px;">Loại hóa đơn:</td>
                                     <td style="border: none; padding: 5px;">
                                         <select name="type">
-                                            <option value="">All Types</option>
-                                            <option value="VAT" ${type == 'VAT' ? 'selected' : ''}>VAT Invoice</option>
-                                            <option value="SALES" ${type == 'SALES' ? 'selected' : ''}>Sales Invoice</option>
+                                            <option value="">Tất cả loại</option>
+                                            <option value="VAT" ${type == 'VAT' ? 'selected' : ''}>Hóa đơn GTGT</option>
+                                            <option value="SALES" ${type == 'SALES' ? 'selected' : ''}>Hóa đơn bán hàng</option>
                                         </select>
                                     </td>
                                 </tr>
                                 <tr style="border: none;">
-                                    <td style="border: none; padding: 5px;">From Issue Date:</td>
+                                    <td style="border: none; padding: 5px;">Từ ngày phát hành:</td>
                                     <td style="border: none; padding: 5px;"><input type="date" name="startDate" value="${startDate}"></td>
 
-                                    <td style="border: none; padding: 5px; padding-left: 20px;">To Issue Date:</td>
+                                    <td style="border: none; padding: 5px; padding-left: 20px;">Đến ngày phát hành:</td>
                                     <td style="border: none; padding: 5px;"><input type="date" name="endDate" value="${endDate}"></td>
 
                                     <td colspan="2" style="border: none; padding: 5px; padding-left: 20px;">
-                                        <input type="submit" value="Search" style="padding: 4px 12px;">
+                                        <input type="submit" value="Tìm kiếm" style="padding: 4px 12px;">
                                     </td>
                                 </tr>
                             </table>
@@ -122,21 +122,21 @@
                         <div>
                             <table border="1">
                                 <tr>
-                                    <th>Invoice Id</th>
-                                    <th>Invoice No</th>
-                                    <th>Company Seller</th>
-                                    <th>Contract Id</th>
-                                    <th>Order Id</th>
-                                    <th>Issue Date</th>
-                                    <th>Invoice Type</th>
-                                    <th>Invoice Symbol</th>
-                                    <th>Total Amount</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Mã hóa đơn</th>
+                                    <th>Số hóa đơn</th>
+                                    <th>Công ty khách hàng</th>
+                                    <th>Mã hợp đồng</th>
+                                    <th>Mã đơn hàng</th>
+                                    <th>Ngày phát hành</th>
+                                    <th>Loại hóa đơn</th>
+                                    <th>Ký hiệu hóa đơn</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
                                 </tr>
                                 <c:if test="${empty invoices}">
                                     <tr>
-                                        <td colspan="11">No invoice found.</td>
+                                        <td colspan="11">Không tìm thấy hóa đơn nào.</td>
                                     </tr>
                                 </c:if>
                                 <c:forEach var="i" items="${invoices}">
@@ -150,22 +150,34 @@
                                             <fmt:parseDate value="${i.issueDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDate" type="both" />
                                             <fmt:formatDate value="${parsedDate}" pattern="dd/MM/yyyy HH:mm" />
                                         </td>
-                                        <td>${i.invoiceType}</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${i.invoiceType == 'VAT'}">VAT</c:when>
+                                                <c:when test="${i.invoiceType == 'SALES'}">SALES</c:when>
+                                                <c:otherwise>${i.invoiceType}</c:otherwise>
+                                            </c:choose>
+                                        </td>
                                         <td>${i.invoiceSymbol}</td>
                                         <td><fmt:formatNumber value="${i.totalAmount}" pattern="#,##0.##"/> VND</td>
                                         <td>
                                             <span class="status-badge ${i.invoiceStatus == 'RELEASED' ? 'status-released' : (i.invoiceStatus == 'UNRELEASED' ? 'status-unreleased' : (i.invoiceStatus == 'WAIT_FOR_RELEASE' ? 'status-waiting' : 'status-canceled'))}">
-                                                ${i.invoiceStatus}
+                                                <c:choose>
+                                                    <c:when test="${i.invoiceStatus == 'RELEASED'}">Đã phát hành</c:when>
+                                                    <c:when test="${i.invoiceStatus == 'UNRELEASED'}">Chưa phát hành</c:when>
+                                                    <c:when test="${i.invoiceStatus == 'WAIT_FOR_RELEASE'}">Chờ phát hành</c:when>
+                                                    <c:when test="${i.invoiceStatus == 'CANCELED'}">Đã hủy</c:when>
+                                                    <c:otherwise>${i.invoiceStatus}</c:otherwise>
+                                                </c:choose>
                                             </span>
                                         </td>
                                          <td style="white-space: nowrap; vertical-align: middle;">
                                              <div style="display: inline-flex; gap: 8px; align-items: center;">
-                                                 <a href="${pageContext.request.contextPath}/invoice?invoiceId=${i.invoiceId}" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">View</a>
+                                                 <a href="${pageContext.request.contextPath}/invoice?invoiceId=${i.invoiceId}" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">Xem</a>
                                                  <c:if test="${i.invoiceStatus != 'CANCELED'}">
                                                      <form action="${pageContext.request.contextPath}/invoice-list" method="post" style="display: inline; margin: 0; padding: 0; background: none; border: none; box-shadow: none;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy hóa đơn này không?');">
                                                          <input type="hidden" name="action" value="cancel">
                                                          <input type="hidden" name="invoiceId" value="${i.invoiceId}">
-                                                         <input type="submit" value="Cancel" style="padding: 4px 10px; font-size: 11px; background-color: var(--danger-soft); color: var(--danger); border: none; border-radius: 6px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-width: 50px; line-height: normal;">
+                                                         <input type="submit" value="Hủy" style="padding: 4px 10px; font-size: 11px; background-color: var(--danger-soft); color: var(--danger); border: none; border-radius: 6px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-width: 50px; line-height: normal;">
                                                      </form>
                                                  </c:if>
                                              </div>
@@ -180,9 +192,9 @@
                             <c:set var="start" value="${page - numLinksTwoSide > 1 ? page - numLinksTwoSide : 1}"></c:set>
                             <c:set var="end" value="${page + numLinksTwoSide > totalPage ? totalPage : page + numLinksTwoSide}"></c:set>
 
-                                <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=1&searchBuyerName=${searchBuyerName}&status=${status}&type=${type}&startDate=${startDate}&endDate=${endDate}">Begin</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=1&searchBuyerName=${searchBuyerName}&status=${status}&type=${type}&startDate=${startDate}&endDate=${endDate}">Đầu</a>
                             <c:if test="${page != 1}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=${page - 1}&searchBuyerName=${searchBuyerName}&status=${status}&type=${type}&startDate=${startDate}&endDate=${endDate}">Previous</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=${page - 1}&searchBuyerName=${searchBuyerName}&status=${status}&type=${type}&startDate=${startDate}&endDate=${endDate}">Trước</a>
                             </c:if>
                             <c:if test="${start > 1}">...</c:if>
                             <c:forEach var="pageNum" begin="${start}" end="${end}">
@@ -190,12 +202,12 @@
                                 </c:forEach>
                                 <c:if test="${end < totalPage}">...</c:if>
                             <c:if test="${page < totalPage}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=${page + 1}&searchBuyerName=${searchBuyerName}&status=${status}&type=${type}&startDate=${startDate}&endDate=${endDate}">Next</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=${page + 1}&searchBuyerName=${searchBuyerName}&status=${status}&type=${type}&startDate=${startDate}&endDate=${endDate}">Sau</a>
                             </c:if>
-                            <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=${totalPage}&searchBuyerName=${searchBuyerName}&status=${status}&type=${type}&startDate=${startDate}&endDate=${endDate}">End</a>
+                            <a class="page-link" href="${pageContext.request.contextPath}/invoice-list?page=${totalPage}&searchBuyerName=${searchBuyerName}&status=${status}&type=${type}&startDate=${startDate}&endDate=${endDate}">Cuối</a>
                         </div>
 
-                        <div><a href="${pageContext.request.contextPath}/dashboard">Back to Dashboard</a></div>
+                        <div><a href="${pageContext.request.contextPath}/dashboard">Quay lại Trang chủ</a></div>
                     </div>
                 </div>
             </main>

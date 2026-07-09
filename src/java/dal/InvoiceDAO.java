@@ -145,47 +145,41 @@ public class InvoiceDAO extends DBContext {
         return false;
     }
 
-    public List<Invoice> getAllInvoices() {
-        List<Invoice> list = new ArrayList<>();
-        String sql = "SELECT * FROM invoice ORDER BY invoice_id DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapResultSetToInvoice(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Invoice> getInvoices(int totalRow, int page, int totalPage, int pageSize) {
-        return getInvoices(null, null, null, null, null, totalRow, page, totalPage, pageSize);
-    }
-
-    public List<Invoice> getInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, int totalRow, int page, int totalPage, int pageSize) {
+    public List<Invoice> getInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, int totalRow, int page, int totalPage, int pageSize, boolean forCustomer, int userId) {
         List<Invoice> list = new ArrayList<>();
         try {
-            String sql = "select * from invoice WHERE 1 = 1";
+            String sql = "select iv.* from invoice iv";
+            if (forCustomer) {
+                sql += " join customer_order co on iv.customer_order_id = co.customer_order_id"
+                     + " join customer c on co.customer_id = c.customer_id";
+            }
+            sql += " WHERE 1 = 1";
+            if (forCustomer && userId > 0) {
+                sql += " and c.user_id = ?";
+            }
             if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
                 searchBuyerName = searchBuyerName.trim();
-                searchBuyerName.replaceAll("//s+", " ");
-                sql += " and buyer_name LIKE ?";
+                searchBuyerName = searchBuyerName.replaceAll("\\s+", " ");
+                sql += " and iv.buyer_name LIKE ?";
             }
             if (status != null && !status.trim().isEmpty()) {
-                sql += " and invoice_status = ?";
+                status = status.trim();
+                status = status.replaceAll("\\s+", " ");
+                sql += " and iv.invoice_status = ?";
             }
             if (type != null && !type.trim().isEmpty()) {
-                sql += " and invoice_type = ?";
+                type = type.trim();
+                type = type.replaceAll("\\s+", " ");
+                sql += " and iv.invoice_type = ?";
             }
             if (startDate != null) {
-                sql += " and issue_date >= ?";
+                sql += " and iv.issue_date >= ?";
             }
             if (endDate != null) {
-                sql += " and issue_date <= ?";
+                sql += " and iv.issue_date <= ?";
             }
             
-            sql += " \n order by invoice_id desc";
+            sql += " \n order by iv.issue_date desc";
 
             if ((page > 0 && page <= totalPage) && totalRow > 0) {
                 sql += """
@@ -195,6 +189,9 @@ public class InvoiceDAO extends DBContext {
             }
             PreparedStatement ps = connection.prepareStatement(sql);
             int index = 1;
+            if (forCustomer) {
+                ps.setInt(index++, userId);
+            }
             if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
                 ps.setString(index++, "%" + searchBuyerName.trim() + "%");
             }
@@ -226,30 +223,38 @@ public class InvoiceDAO extends DBContext {
         return list;
     }
 
-    public int countInvoices() {
-        return countInvoices(null, null, null, null, null);
-    }
-
-    public int countInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate) {
+    
+    public int countInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, boolean forCustomer, int userId) {
         try {
-            String sql = "select COUNT(*) as total from invoice WHERE 1 = 1";
+            String sql = "select COUNT(iv.invoice_id) as total from invoice iv";
+            if (forCustomer) {
+                sql += " inner join customer_order co on iv.customer_order_id = co.customer_order_id"
+                     + " inner join customer c on co.customer_id = c.customer_id";
+            }
+            sql += " WHERE 1 = 1";
+            if (forCustomer) {
+                sql += " and c.user_id = ?";
+            }
             if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
-                sql += " and buyer_name LIKE ?";
+                sql += " and iv.buyer_name LIKE ?";
             }
             if (status != null && !status.trim().isEmpty()) {
-                sql += " and invoice_status = ?";
+                sql += " and iv.invoice_status = ?";
             }
             if (type != null && !type.trim().isEmpty()) {
-                sql += " and invoice_type = ?";
+                sql += " and iv.invoice_type = ?";
             }
             if (startDate != null) {
-                sql += " and issue_date >= ?";
+                sql += " and iv.issue_date >= ?";
             }
             if (endDate != null) {
-                sql += " and issue_date <= ?";
+                sql += " and iv.issue_date <= ?";
             }
             PreparedStatement ps = connection.prepareStatement(sql);
             int index = 1;
+            if (forCustomer) {
+                ps.setInt(index++, userId);
+            }
             if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
                 ps.setString(index++, "%" + searchBuyerName.trim() + "%");
             }

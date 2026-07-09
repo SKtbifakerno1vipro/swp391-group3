@@ -11,19 +11,23 @@ public class InvoiceService {
     private final InvoiceDAO invoiceDAO = new InvoiceDAO();
 
     public List<Invoice> getInvoices(int totalRow, int page, int totalPage, int pageSize) {
-        return invoiceDAO.getInvoices(totalRow, page, totalPage, pageSize);
+        return invoiceDAO.getInvoices(null, null, null, null, null, totalRow, page, totalPage, pageSize, false, 0);
     }
 
     public List<Invoice> getInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, int totalRow, int page, int totalPage, int pageSize) {
-        return invoiceDAO.getInvoices(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, pageSize);
+        return invoiceDAO.getInvoices(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, pageSize, false, 0);
     }
 
-    public int countInvoices() {
-        return invoiceDAO.countInvoices();
+    public List<Invoice> getInvoicesForCustomer(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, int totalRow, int page, int totalPage, int pageSize, int userId) {
+        return invoiceDAO.getInvoices(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, pageSize, true, userId);
     }
-
+            
     public int countInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate) {
-        return invoiceDAO.countInvoices(searchBuyerName, status, type, startDate, endDate);
+        return invoiceDAO.countInvoices(searchBuyerName, status, type, startDate, endDate, false, 0);
+    }
+
+    public int countInvoicesForCustomer(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, int userId) {
+        return invoiceDAO.countInvoices(searchBuyerName, status, type, startDate, endDate, true, userId);
     }
 
     public List<InvoiceItemDTO> getInvoiceItemsByOrderId(int orderId) {

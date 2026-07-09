@@ -139,9 +139,9 @@
                         <div style="margin-top: 5px; font-size: 13px; font-style: italic; color: #475569;">(Bản thể hiện của hóa đơn điện tử)</div>
                     </div>
                     <div class="header-right" style="text-align: right; font-size: 13px; line-height: 1.6;">
-                        <div><strong>Ký hiệu (Symbol):</strong> <span><c:out value="${invoiceSymbol}"/></span></div>
-                        <div><strong>Số (No.):</strong> <span style="color: #dc2626; font-weight: bold; font-size: 15px;"><c:out value="${invoiceNo}"/></span></div>
-                        <div><strong>Ngày (Date):</strong> <span><c:out value="${issueDate}"/></span></div>
+                        <div><strong>Ký hiệu:</strong> <span><c:out value="${invoiceSymbol}"/></span></div>
+                        <div><strong>Số:</strong> <span style="color: #dc2626; font-weight: bold; font-size: 15px;"><c:out value="${invoiceNo}"/></span></div>
+                        <div><strong>Ngày:</strong> <span><c:out value="${issueDate}"/></span></div>
                     </div>
                 </div>
 
