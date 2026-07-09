@@ -21,13 +21,13 @@ public class Invoice {
     private String buyerName;
     private String buyerTaxCode;
     private String buyerAddress;
+    private String buyerPhone;
     
-    private double subTotal;
-    private double taxAmount;
     private double totalAmount;
     
     private Integer createdBy;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String customerNote;
     private String internalNote;
 
@@ -155,21 +155,14 @@ public class Invoice {
         this.buyerAddress = buyerAddress;
     }
 
-    public double getSubTotal() {
-        return subTotal;
+    public String getBuyerPhone() {
+        return buyerPhone;
     }
 
-    public void setSubTotal(double subTotal) {
-        this.subTotal = subTotal;
+    public void setBuyerPhone(String buyerPhone) {
+        this.buyerPhone = buyerPhone;
     }
 
-    public double getTaxAmount() {
-        return taxAmount;
-    }
-
-    public void setTaxAmount(double taxAmount) {
-        this.taxAmount = taxAmount;
-    }
 
     public double getTotalAmount() {
         return totalAmount;
@@ -209,5 +202,13 @@ public class Invoice {
 
     public void setInternalNote(String internalNote) {
         this.internalNote = internalNote;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
