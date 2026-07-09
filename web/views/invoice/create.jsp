@@ -331,9 +331,9 @@
                         Trạng thái: <span class="status-label">
                             <c:choose>
                                 <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'RELEASED'}">Đã phát hành</c:when>
+                                <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'READY'}">Sẵn sàng phát hành</c:when>
                                 <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'UNRELEASED'}">Chưa phát hành</c:when>
                                 <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'CANCELED'}">Đã hủy</c:when>
-                                <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'WAIT_FOR_RELEASE'}">Chờ phát hành</c:when>
                                 <c:otherwise>${not empty invoice ? invoice.invoiceStatus : 'UNRELEASED'}</c:otherwise>
                             </c:choose>
                         </span> 
@@ -383,7 +383,7 @@
                             <div class="buyer-group form-group" style="margin-top: 15px;">
                                 <label>Số điện thoại</label>
                                 <div class="input-wrapper">
-                                    <input type="text" name="buyerPhone" id="buyerPhone" value="${not empty buyerPhone ? buyerPhone : customerUser.phone}" ${isReadOnly ? 'readonly' : ''}>
+                                    <input type="text" name="buyerPhone" id="buyerPhone" value="${not empty invoice.buyerPhone ? invoice.buyerPhone : customerUser.phone}" ${isReadOnly ? 'readonly' : ''}>
                                 </div>
                             </div>
                         </div>
@@ -409,7 +409,7 @@
                             <div class="buyer-group form-group" style="margin-top: 15px;">
                                 <label>Số hóa đơn</label>
                                 <div class="input-wrapper">
-                                    <input type="text" id="invoiceNoDisplay" value="${(not empty invoice && invoice.invoiceStatus != 'UNRELEASED') ? invoice.invoiceNo : 'Chưa cấp (Tự động tạo)'}" readonly style="color: #dc2626; font-weight: bold; background: #f8fafc;">
+                                    <input type="text" id="invoiceNoDisplay" value="${(not empty invoice && (invoice.invoiceStatus != 'UNRELEASED' || invoice.invoiceStatus != 'READY')) ? invoice.invoiceNo : 'Chưa cấp (Tự động tạo)'}" readonly style="color: #dc2626; font-weight: bold; background: #f8fafc;">
                                     <input type="hidden" name="invoiceNo" id="invoiceNo" value="${not empty invoice ? invoice.invoiceNo : '0'}">
                                 </div>
                             </div>
@@ -456,7 +456,7 @@
                                 </tr>
                             </thead>
                             <tbody id="productTableBody">
-                                <c:if var="hasNoItems" test="${empty orderDetails}">
+                                <c:if test="${empty orderDetails}">
                                     <tr id="emptyRowPlaceholder">
                                         <td colspan="9" class="text-center" style="color: var(--muted); padding: 15px;">
                                             Không có dữ liệu mặt hàng.
@@ -501,18 +501,17 @@
                     </div>
 
                     <div class="summary-layout">
-                        <!-- Left notes & words -->
                         <div class="summary-notes">
-                            
+
                             <div class="summary-notes-group">
                                 <label for="invoiceNotes">Ghi chú khách hàng</label>
                                 <textarea id="invoiceNotes" name="invoiceNotes" rows="2" placeholder="Ghi chú in trên hóa đơn cho khách hàng..." ${isReadOnly ? 'readonly' : ''}>${not empty invoice ? invoice.customerNote : ''}</textarea>
                             </div>
-                                <c:if test="${sessionScope.user.roleId != 3}">
-                               <div class="summary-notes-group">
-                                <label for="internalNotes">Ghi chú nội bộ</label>
-                                <textarea id="internalNotes" name="internalNotes" rows="2" placeholder="Ghi chú nội bộ cho nhân viên..." ${isReadOnly ? 'readonly' : ''}>${not empty invoice ? invoice.internalNote : ''}</textarea>
-                            </div> 
+                            <c:if test="${sessionScope.user.roleId != 3}">
+                                <div class="summary-notes-group">
+                                    <label for="internalNotes">Ghi chú nội bộ</label>
+                                    <textarea id="internalNotes" name="internalNotes" rows="2" placeholder="Ghi chú nội bộ cho nhân viên..." ${isReadOnly ? 'readonly' : ''}>${not empty invoice ? invoice.internalNote : ''}</textarea>
+                                </div> 
                             </c:if>
                             <div class="money-in-words" id="moneyInWords">
                                 Số tiền viết bằng chữ: <em>Không đồng</em>
@@ -558,23 +557,35 @@
 
                     <div class="actions-bar">
                         <div class="actions-left">
-                            <button type="submit" formaction="${pageContext.request.contextPath}/preview" formtarget="_blank" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">print</span> Xem trước hóa đơn</button>
+                            <button type="submit" formaction="${pageContext.request.contextPath}/preview" formtarget="_blank" class="btn-action success"><span class="material-symbols-outlined" style="font-size: 16px;">print</span> Xem trước hóa đơn</button>
                         </div>
 
                         <div class="actions-right">
                             <c:choose>
                                 <c:when test="${empty invoice}">
-                                    <button type="button" class="btn-action" onclick="submitDraft()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Lưu nháp</button>
+                                    <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Lưu nháp</button>
                                 </c:when>
                                 <c:otherwise>
                                     <c:if test="${invoice.invoiceStatus == 'UNRELEASED'}">
-                                        <button type="button" class="btn-action success" onclick="submitPublish()"><span class="material-symbols-outlined" style="font-size: 16px;">send</span> Phát hành hóa đơn</button>
-                                        <button type="button" class="btn-action" onclick="submitDraft()"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Cập nhật bản nháp</button>
+                                        <c:if test="${sessionScope.user.roleId == 2}">
+                                            <button type="submit" name="action" value="ready" class="btn-action success"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Lưu Hóa Đơn</button>
+                                        </c:if>
+                                        <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Cập nhật bản nháp</button>
+                                    </c:if>
+                                    <c:if test="${invoice.invoiceStatus == 'READY'}">
+                                        <c:if test="${sessionScope.user.roleId != 3}">
+                                            <button type="submit" name="action" value="notice" class="btn-action success"><span class="material-symbols-outlined" style="font-size: 16px;">mail</span> Thông báo phát hành hóa đơn</button>
+                                        </c:if>
+                                        <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">edit</span> Cập nhật bản nháp</button>
+                                    </c:if>
+                                    <c:if test="${invoice.invoiceStatus == 'RELEASED' && sessionScope.user.roleId != 3}">
+                                        <button type="submit" name="action" value="notice" class="btn-action success"><span class="material-symbols-outlined" style="font-size: 16px;">mail</span> Gửi lại thông báo phát hành</button>
                                     </c:if>
                                 </c:otherwise>
                             </c:choose>
                             <a href="${pageContext.request.contextPath}/invoice-list" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">close</span> Đóng</a>
                         </div>
+                    </div>
                 </form>
             </main>
         </div>
@@ -586,15 +597,6 @@
                 updateMoneyInWords();
             };
 
-            function submitPublish() {
-                document.getElementById('invoiceStatus').value = 'RELEASED';
-                document.getElementById('invoiceForm').submit();
-            }
-
-            function submitDraft() {
-                document.getElementById('invoiceStatus').value = 'UNRELEASED';
-                document.getElementById('invoiceForm').submit();
-            }
 
             function onInvoiceTypeChange() {
                 var type = document.getElementById('invoiceType').value;
@@ -615,7 +617,7 @@
 
             function updateMoneyInWords() {
                 var totalAmountVal = document.getElementById('totalAmount').value || '0';
-                var cleanAmount = totalAmountVal.replace(/[,.]/g, '');
+                var cleanAmount = totalAmountVal.replace(/(,|\.)/g, '');
                 var totalAmount = parseFloat(cleanAmount) || 0;
                 document.getElementById('moneyInWords').innerHTML = "Số tiền viết bằng chữ: <em>" + numberToWords(Math.round(totalAmount)) + "</em>";
             }

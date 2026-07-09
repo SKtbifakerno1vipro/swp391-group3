@@ -147,8 +147,15 @@
                                         <td>${i.customerContractId}</td>
                                         <td>${i.customerOrderId}</td>
                                         <td>
-                                            <fmt:parseDate value="${i.issueDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDate" type="both" />
-                                            <fmt:formatDate value="${parsedDate}" pattern="dd/MM/yyyy HH:mm" />
+                                            <c:choose>
+                                                <c:when test="${not empty i.issueDate}">
+                                                    <fmt:parseDate value="${i.issueDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDate" type="both" />
+                                                    <fmt:formatDate value="${parsedDate}" pattern="dd/MM/yyyy HH:mm" />
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Chưa phát hành
+                                                </c:otherwise>
+                                            </c:choose>
                                         </td>
                                         <td>
                                             <c:choose>
@@ -158,7 +165,8 @@
                                             </c:choose>
                                         </td>
                                         <td>${i.invoiceSymbol}</td>
-                                        <td><fmt:formatNumber value="${i.totalAmount}" pattern="#,##0.##"/> VND</td>
+                                        <td><fmt:formatNumber value="${i.totalAmount}" pattern="#,##0.##"/> VND
+                                        </td>
                                         <td>
                                             <span class="status-badge ${i.invoiceStatus == 'RELEASED' ? 'status-released' : (i.invoiceStatus == 'UNRELEASED' ? 'status-unreleased' : (i.invoiceStatus == 'WAIT_FOR_RELEASE' ? 'status-waiting' : 'status-canceled'))}">
                                                 <c:choose>

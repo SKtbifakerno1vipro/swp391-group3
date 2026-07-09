@@ -5,6 +5,10 @@ import dal.CustomerDAO;
 import dal.ContractDAO;
 import model.Payment;
 import model.ContractHistory;
+import dal.InvoiceDAO;
+import dal.CustomerOrderDAO;
+import dto.CustomerOrderDTO;
+import model.Invoice;
 import model.User;
 import dto.CustomerDTO;
 import jakarta.servlet.ServletException;
@@ -17,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.List;
+import service.InvoiceService;
 
 @WebServlet(name = "RealtimeNotificationServlet", urlPatterns = {"/realtime/notifications"})
 public class RealtimeNotificationServlet extends HttpServlet {
@@ -24,6 +29,9 @@ public class RealtimeNotificationServlet extends HttpServlet {
     private final PaymentDAO paymentDAO = new PaymentDAO();
     private final CustomerDAO customerDAO = new CustomerDAO();
     private final ContractDAO contractDAO = new ContractDAO();
+    private final InvoiceService iService = new InvoiceService();
+    private final CustomerOrderDAO customerOrderDAO = new CustomerOrderDAO();
+    private static final java.util.Map<Integer, String> invoiceStatusCache = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -45,6 +53,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
         long startTime = System.currentTimeMillis() - 5000;
         Timestamp lastCheckedPayment = new Timestamp(startTime);
         Timestamp lastCheckedCustomer = new Timestamp(startTime);
+        Timestamp lastCheckedInvoice = new Timestamp(startTime);
 
         // Quét theo ID thay vì mốc thời gian (Riêng cho Contract theo yêu cầu)
         int lastContractHistoryId = contractDAO.getMaxContractHistoryId();
@@ -234,7 +243,77 @@ public class RealtimeNotificationServlet extends HttpServlet {
                     }
                 }
             }
-          
+
+            //Invoice Notification - Begin
+            List<Invoice> invoiceList = iService.getInvoicesSince(lastCheckedInvoice, (roleId == 3 ? user.getUserId() : null));
+            for (Invoice iv : invoiceList) {
+                boolean shouldNotify = false;
+                String type = "info";
+                String title = "";
+                String msg = "";
+                String link = request.getContextPath() + "/invoice?invoiceId=" + iv.getInvoiceId();
+                String btnText = "";
+
+                String status = iv.getInvoiceStatus();
+
+                // A. Nếu là Nhân viên / Quản lý
+                if (roleId != 3) {
+                    btnText = "Xem chi tiết";
+                    if ("UNRELEASED".equals(status)) {
+                        shouldNotify = true;
+                        title = "Hóa đơn được chỉnh sửa";
+                        msg = "Hóa đơn nháp số " + iv.getInvoiceNo() + " vừa được cập nhật.";
+                    } else if ("READY".equals(status)) {
+                        shouldNotify = true;
+                        type = "success";
+                        title = "Hóa đơn sẵn sàng";
+                        msg = "Hóa đơn cho khách hàng " + iv.getBuyerName() + " đã sẵn sàng gửi.";
+                    } else if ("RELEASED".equals(status)) {
+                        shouldNotify = true;
+                        type = "success";
+                        title = "Đã phát hành hóa đơn";
+                        msg = "Hóa đơn số " + iv.getInvoiceNo() + " đã được phát hành thành công.";
+                    }
+                } else {
+                    btnText = "Xem hóa đơn";
+                    if ("RELEASED".equals(status)) {
+                        shouldNotify = true;
+                        type = "success";
+                        title = "Hóa đơn điện tử mới";
+                        msg = "Quý khách có hóa đơn điện tử số " + iv.getInvoiceNo() + " cần xem.";
+                    }
+                }
+
+                if (shouldNotify) {
+                    writer.write("event: notification\n");
+                    writer.write("data: {\"type\":\"" + type
+                            + "\",\"title\":\"" + escapeJson(title)
+                            + "\",\"message\":\"" + escapeJson(msg)
+                            + "\",\"link\":\"" + escapeJson(link)
+                            + "\",\"btnText\":\"" + escapeJson(btnText) + "\"}\n\n");
+                }
+
+                // Cập nhật lại mốc thời gian quét dựa trên thời gian tạo hoặc thời gian phát hành của hóa đơn vừa duyệt qua
+                if (iv.getCreatedAt() != null) {
+                    Timestamp cTime = Timestamp.valueOf(iv.getCreatedAt());
+                    if (cTime.after(lastCheckedInvoice)) {
+                        lastCheckedInvoice = new Timestamp(cTime.getTime() + 1000);
+                    }
+                }
+                if (iv.getUpdatedAt() != null) {
+                    Timestamp uTime = Timestamp.valueOf(iv.getUpdatedAt());
+                    if (uTime.after(lastCheckedInvoice)) {
+                        lastCheckedInvoice = new Timestamp(uTime.getTime() + 1000);
+                    }
+                }
+                if (iv.getIssueDate() != null) {
+                    Timestamp iTime = Timestamp.valueOf(iv.getIssueDate());
+                    if (iTime.after(lastCheckedInvoice)) {
+                        lastCheckedInvoice = new Timestamp(iTime.getTime() + 1000);
+                    }
+                }
+            }
+
             writer.flush();
             response.flushBuffer();
             try {
