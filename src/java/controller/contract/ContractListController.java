@@ -64,9 +64,6 @@ public class ContractListController extends HttpServlet {
         //defaul page size is 10
         int pageSize = 10;
 
-        List<ContractCustomerDTO> list = contractService.searchContracts(contractNumber, customerName, status, storageType, pageIndex,
-                pageSize, currentUser.getUserId(), currentUser.getRoleId(), fromDate, toDate, taxcode, phone, email);
-
         int totalRecord = contractService.getTotalContracts(contractNumber, customerName, status, storageType, pageIndex,
                 pageSize, currentUser.getUserId(), currentUser.getRoleId(),
                 fromDate, toDate, taxcode, phone, email);
@@ -77,6 +74,9 @@ public class ContractListController extends HttpServlet {
         if (pageIndex > endPage && endPage > 0) {
             pageIndex = endPage;
         }
+
+        List<ContractCustomerDTO> list = contractService.searchContracts(contractNumber, customerName, status, storageType, pageIndex,
+                pageSize, currentUser.getUserId(), currentUser.getRoleId(), fromDate, toDate, taxcode, phone, email);
 
         request.setAttribute("list", list);
         request.setAttribute("endPage", endPage);

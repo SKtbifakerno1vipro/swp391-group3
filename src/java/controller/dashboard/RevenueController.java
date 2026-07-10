@@ -5,15 +5,19 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import service.RevenueService;
+import dal.DashboardDAO;
 import model.User;
+import dto.TopProductDTO;
+import dto.TopCustomerDTO;
+import dto.StatusStatisticDTO;
 import java.io.IOException;
 import java.util.Map;
+import service.RevenueService;
+import java.util.*;
 
 @WebServlet(name = "RevenueController", urlPatterns = {"/revenue-report"})
 public class RevenueController extends HttpServlet {
-    private RevenueService revenueService = new RevenueService();
-
+    private final RevenueService revenueService = new RevenueService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         jakarta.servlet.http.HttpSession session = request.getSession(false);
@@ -24,31 +28,37 @@ public class RevenueController extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         Integer filterUserId = null;
-        // If Sale Staff (roleId 4), only show their own revenue
+        // If Sale Staff (roleId 4), only show their own
         if (user.getRoleId() == 4) {
             filterUserId = user.getUserId();
         }
 
-        String type = request.getParameter("type");
-        if (type == null) type = "month";
+        DashboardDAO dao = new DashboardDAO();
+
+        int totalProducts = dao.getTotalProducts();
+        int totalOrders = dao.getTotalOrders(filterUserId);
+        int totalQuotations = dao.getTotalQuotations(filterUserId);
+        int totalContracts = dao.getTotalContracts(filterUserId);
+
+        List<StatusStatisticDTO> orderStatusCounts = dao.countByStatus("customer_order", "order_status", filterUserId);
+        List<StatusStatisticDTO> quotationStatusCounts = dao.countByStatus("quotation", "quotation_status", filterUserId);
+        List<StatusStatisticDTO> contractStatusCounts = dao.countByStatus("customer_contract", "contract_status", filterUserId);
         
-        String startDate = request.getParameter("startDate");
-        String endDate = request.getParameter("endDate");
+        List<TopCustomerDTO> topCustomers = dao.getTopCustomersByOrderCount(5, filterUserId);
+        
+        List<TopProductDTO> topSellingProducts = dao.getTopSellingProducts(5, filterUserId);
 
-        Map<String, Double> revenueData;
-        if ("day".equals(type)) {
-            revenueData = revenueService.getRevenueByDay(startDate, endDate, filterUserId);
-        } else if ("year".equals(type)) {
-            revenueData = revenueService.getRevenueByYear(startDate, endDate, filterUserId);
-        } else {
-            type = "month";
-            revenueData = revenueService.getRevenueByMonth(startDate, endDate, filterUserId);
-        }
-
-        request.setAttribute("revenueData", revenueData);
-        request.setAttribute("type", type);
-        request.setAttribute("startDate", startDate);
-        request.setAttribute("endDate", endDate);
+        request.setAttribute("totalProducts", totalProducts);
+        request.setAttribute("totalOrders", totalOrders);
+        request.setAttribute("totalQuotations", totalQuotations);
+        request.setAttribute("totalContracts", totalContracts);
+        
+        request.setAttribute("orderStatusCounts", orderStatusCounts);
+        request.setAttribute("quotationStatusCounts", quotationStatusCounts);
+        request.setAttribute("contractStatusCounts", contractStatusCounts);
+        
+        request.setAttribute("topCustomers", topCustomers);
+        request.setAttribute("topSellingProducts", topSellingProducts);
         
         request.getRequestDispatcher("/views/revenue_report.jsp").forward(request, response);
     }

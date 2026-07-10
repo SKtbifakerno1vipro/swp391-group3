@@ -479,7 +479,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
     </head>
 
-    
+
     <body>
         <div class="role-shell">
             <jsp:include page="/views/shared/sidebar.jsp">
@@ -488,30 +488,31 @@
             <main class="main">
                 <section class="page-top">
                     <div><p class="eyebrow">Access Control</p><h1>Role Management</h1><p>Manage system roles and assign permissions for each responsibility group.</p></div>
-                    <div class="actions"><a class="button" href="${pageContext.request.contextPath}/dashboard"><span class="material-symbols-outlined">arrow_back</span>Dashboard</a><a class="button primary" href="${pageContext.request.contextPath}/add-role"><span class="material-symbols-outlined">add</span>Add Role</a></div>
+                    <!--Add role-->
+                    <div class="actions"><a class="button" href="${pageContext.request.contextPath}/dashboard"><span class="material-symbols-outlined">arrow_back</span>Dashboard</a><a class="button primary" href="${pageContext.request.contextPath}/add-role"><span class="material-symbols-outlined">add</span>Add Role</a></div>                    
                 </section>
-                
-              
+
+
                 <section class="summary-grid">
                     <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">admin_panel_settings</span></div><p class="summary-value"><c:out value="${totalRoles}"/></p><p class="summary-label">Total matched roles</p></div>
                     <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">search</span></div><p class="summary-value"><c:out value="${empty searchText ? 'All' : '1'}"/></p><p class="summary-label"><c:out value="${empty searchText ? 'Showing all roles' : 'Search filter active'}"/></p></div>
                     <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">layers</span></div><p class="summary-value"><c:out value="${totalPages}"/></p><p class="summary-label">Total pages</p></div>
                 </section>
-                
+
                 <section class="panel">
                     <div class="toolbar">
                         <!-- 2 chuc nang search va reset -->
                         <form class="search-box" action="${pageContext.request.contextPath}/role-list" method="get"><span class="material-symbols-outlined">search</span><input type="text" name="search" value="${searchText}" placeholder="Search role name..."><button class="button primary" type="submit"><span class="material-symbols-outlined">arrow_forward</span>Search</button></form>
                         <a class="button" href="${pageContext.request.contextPath}/role-list"><span class="material-symbols-outlined">refresh</span>Reset</a>
                     </div>
-                    
+
                     <div class="role-table-wrap">
                         <table>
                             <thead><tr><th>Role ID</th><th>Role Name</th><th>Created At</th><th>Updated At</th><th>Status</th><th>Actions</th></tr></thead>
                             <tbody>
-                                <!--neu rolelist trong thi in ra no roles found-->
+                                <!--neu role list trong thi in ra no roles found-->
                                 <c:if test="${empty roleList}"><tr><td colspan="6"><div class="empty-state">No roles found.</div></td></tr></c:if>
-                                
+                                    <!-- hiển thị role list từ controller -->
                                 <c:forEach var="role" items="${roleList}">
                                     <tr>
                                         <td><span class="role-id">R-<c:out value="${role.roleId}"/></span></td>
@@ -519,6 +520,7 @@
                                         <td class="date-muted"><fmt:formatDate value="${role.createAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                                         <td class="date-muted"><fmt:formatDate value="${role.updateAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                                         <td>
+                                            <!--Nut status -->
                                             <c:choose>
                                                 <c:when test="${role.status == 'Active' || empty role.status}">
                                                     <span class="chip primary">Active</span>
@@ -528,13 +530,15 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
-                                        <td><div class="row-actions"><a class="chip primary" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">visibility</span>View</a><a class="chip" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Permissions</a></div></td>
+                                        <!-- nut actions -->
+                                        <td><div class="row-actions">
+                                                <a class="chip" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Edit</a></div></td>
                                     </tr>
                                 </c:forEach>
                             </tbody>
                         </table>
                     </div>
-                                <!--phan trang-->
+                    <!--phan trang-->
                     <div class="pagination">
                         <c:if test="${currentPage > 1}"><a class="page-link" href="${pageContext.request.contextPath}/role-list?page=${currentPage - 1}&search=${searchText}">&lt;</a></c:if>
                         <c:forEach begin="1" end="${totalPages}" var="i"><c:choose><c:when test="${i == currentPage}"><span class="page-current">${i}</span></c:when><c:otherwise><a class="page-link" href="${pageContext.request.contextPath}/role-list?page=${i}&search=${searchText}">${i}</a></c:otherwise></c:choose></c:forEach>
@@ -542,6 +546,7 @@
                     </div>
                 </section>
             </main>
+
         </div>
     </body>
 </html>

@@ -4,7 +4,6 @@
  */
 package controller.product;
 
-import jakarta.mail.Session;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -17,7 +16,6 @@ import java.util.List;
 import model.Category;
 import model.User;
 import service.ProductService;
-import utils.Validation;
 
 /**
  *
@@ -27,7 +25,7 @@ import utils.Validation;
 public class ProductList extends HttpServlet {
 
     private ProductService pService = new ProductService();
-    private final int PAGE_SIZE = 1;
+    private final int PAGE_SIZE = 10;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>

@@ -28,7 +28,7 @@
                 <span class="sidebar-text">Dashboard</span>
             </a>
             <c:choose>
-                
+
                 <c:when test="${sessionScope.user.roleId == 3}">
                     <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/customer/detail?id_cus=${sessionScope.customerId}" title="My Profile">
@@ -49,6 +49,11 @@
                        href="${pageContext.request.contextPath}/customer-order-list" title="My Orders">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt_long</span></div>
                         <span class="sidebar-text">My Orders</span>
+                    </a>
+                    <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt</span></div>
+                        <span class="sidebar-text">Hóa đơn</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/payment/list" title="My Payments">
@@ -73,9 +78,9 @@
                         <span class="sidebar-text">Orders</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/invoice-list" title="My Invoices">
+                       href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn của tôi">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt</span></div>
-                        <span class="sidebar-text">Invoices</span>
+                        <span class="sidebar-text">Hóa đơn</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/payment/list" title="Payments">
@@ -95,9 +100,9 @@
                         <span class="sidebar-text">Orders</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/product-list" title="Products">
+                       href="${pageContext.request.contextPath}/product-list" title="Sản phẩm">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">inventory_2</span></div>
-                        <span class="sidebar-text">Products</span>
+                        <span class="sidebar-text">Sản phẩm</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/category/list" title="Categories">
@@ -120,9 +125,9 @@
                         <span class="sidebar-text">Payments</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/invoice-list" title="Invoices">
+                       href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt</span></div>
-                        <span class="sidebar-text">Invoices</span>
+                        <span class="sidebar-text">Hóa đơn</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/user-list" title="Users">
@@ -200,107 +205,107 @@
 <c:if test="${not empty sessionScope.user}">
     <!-- Realtime Notification Toast Container -->
     <div id="realtime-toast-container" style="
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 99999;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        width: 650px;
-        pointer-events: none;
-    "></div>
+         position: fixed;
+         top: 20px;
+         left: 50%;
+         transform: translateX(-50%);
+         z-index: 99999;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         gap: 12px;
+         width: 650px;
+         pointer-events: none;
+         "></div>
 
     <style>
-    .toast-box {
-        pointer-events: auto;
-        background: #ffffff;
-        color: #1e293b;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        padding: 16px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        font-family: 'Nunito Sans', sans-serif;
-        border-left: 5px solid var(--primary);
-        animation: toastSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, toastFadeOut 0.5s ease-in 9.5s forwards;
-        opacity: 0;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .toast-box.info {
-        border-left-color: #3b82f6;
-    }
-
-    .toast-box.success {
-        border-left-color: #10b981;
-    }
-
-    @keyframes toastSlideIn {
-        from {
-            transform: translateY(-80px) scale(0.9);
+        .toast-box {
+            pointer-events: auto;
+            background: #ffffff;
+            color: #1e293b;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-family: 'Nunito Sans', sans-serif;
+            border-left: 5px solid var(--primary);
+            animation: toastSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, toastFadeOut 0.5s ease-in 9.5s forwards;
             opacity: 0;
+            width: 100%;
+            box-sizing: border-box;
         }
-        to {
-            transform: translateY(0) scale(1);
-            opacity: 1;
+
+        .toast-box.info {
+            border-left-color: #3b82f6;
         }
-    }
 
-    @keyframes toastFadeOut {
-        from {
-            opacity: 1;
-            transform: translateY(0) scale(1);
+        .toast-box.success {
+            border-left-color: #10b981;
         }
-        to {
-            opacity: 0;
-            transform: translateY(-20px) scale(0.95);
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateY(-80px) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
         }
-    }
 
-    .toast-icon {
-        font-size: 28px;
-        flex-shrink: 0;
-    }
+        @keyframes toastFadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
 
-    .toast-content {
-        flex-grow: 1;
-    }
+        .toast-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
 
-    .toast-title {
-        font-weight: 800;
-        font-size: 16px;
-        margin: 0;
-    }
+        .toast-content {
+            flex-grow: 1;
+        }
 
-    .toast-desc {
-        font-size: 14px;
-        color: #64748b;
-        margin: 2px 0 0 0;
-    }
+        .toast-title {
+            font-weight: 800;
+            font-size: 16px;
+            margin: 0;
+        }
 
-    .toast-btn {
-        font-size: 13px;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: var(--primary);
-        text-decoration: none;
-        margin-left: 8px;
-        text-align: right;
-        line-height: 1.3;
-        flex-shrink: 0;
-    }
+        .toast-desc {
+            font-size: 14px;
+            color: #64748b;
+            margin: 2px 0 0 0;
+        }
+
+        .toast-btn {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--primary);
+            text-decoration: none;
+            margin-left: 8px;
+            text-align: right;
+            line-height: 1.3;
+            flex-shrink: 0;
+        }
 
 
 
 
-    .toast-btn:hover {
-        text-decoration: underline;
-    }
+        .toast-btn:hover {
+            text-decoration: underline;
+        }
     </style>
 
 
@@ -309,33 +314,33 @@
         console.log("[Realtime Notification] Connecting to: ${pageContext.request.contextPath}/realtime/notifications");
         const notifySource = new EventSource("${pageContext.request.contextPath}/realtime/notifications");
 
-        notifySource.onopen = function(event) {
+        notifySource.onopen = function (event) {
             console.log("[Realtime Notification] Connection opened successfully!");
         };
 
-        notifySource.onerror = function(event) {
+        notifySource.onerror = function (event) {
             console.error("[Realtime Notification] Connection error. State: " + notifySource.readyState);
         };
 
-        notifySource.addEventListener('notification', function(event) {
+        notifySource.addEventListener('notification', function (event) {
             console.log("[Realtime Notification] Raw event data received:", event.data);
             try {
                 const notify = JSON.parse(event.data);
                 console.log("[Realtime Notification] Parsed payload:", notify);
                 triggerToast(
-                    notify.type,
-                    notify.title,
-                    notify.message,
-                    notify.link,
-                    notify.btnText
-                );
-            } catch(e) {
+                        notify.type,
+                        notify.title,
+                        notify.message,
+                        notify.link,
+                        notify.btnText
+                        );
+            } catch (e) {
                 console.error("[Realtime Notification] Failed to parse JSON:", e);
             }
         });
 
         function triggerToast(type, title, description, detailUrl, btnText) {
-            console.log("[Realtime Notification] Triggering toast: ", { type, title, description, detailUrl, btnText });
+            console.log("[Realtime Notification] Triggering toast: ", {type, title, description, detailUrl, btnText});
             const container = document.getElementById("realtime-toast-container");
             if (!container) {
                 console.error("[Realtime Notification] Container #realtime-toast-container not found!");
@@ -346,13 +351,13 @@
             const icon = type === 'success' ? 'payments' : 'person_add';
             const color = type === 'success' ? '#10b981' : '#3b82f6';
             const actionText = btnText || 'Xem ngay';
-            
+
             let toastHtml = '<div id="' + id + '" class="toast-box ' + type + '">' +
-                '<span class="material-symbols-outlined toast-icon" style="color: ' + color + ';">' + icon + '</span>' +
-                '<div class="toast-content">' +
+                    '<span class="material-symbols-outlined toast-icon" style="color: ' + color + ';">' + icon + '</span>' +
+                    '<div class="toast-content">' +
                     '<p class="toast-title">' + title + '</p>' +
                     '<p class="toast-desc">' + description + '</p>' +
-                '</div>';
+                    '</div>';
             if (detailUrl) {
                 toastHtml += '<a href="' + detailUrl + '" class="toast-btn">' + actionText + '</a>';
             }

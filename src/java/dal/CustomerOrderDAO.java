@@ -16,7 +16,7 @@ public class CustomerOrderDAO extends DBContext {
 
     public List<CustomerOrderDTO> getAllCustomerOrders() {
         List<CustomerOrderDTO> list = new ArrayList<>();
-        String sql = "SELECT co.*, c.tax_code, u.full_name "
+        String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name "
                 + "FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
@@ -35,7 +35,7 @@ public class CustomerOrderDAO extends DBContext {
     }
 
     public CustomerOrderDTO getCustomerOrderDTOById(int id) {
-        String sql = "SELECT co.*, c.tax_code, u.full_name "
+        String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name "
                 + "FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
@@ -217,6 +217,8 @@ public class CustomerOrderDAO extends DBContext {
         Customer c = new Customer();
         c.setCustomerId(rs.getInt("customer_id"));
         c.setTaxCode(rs.getString("tax_code"));
+        c.setUserId((Integer) rs.getObject("user_id"));
+        c.setAssignedToUserId((Integer) rs.getObject("assigned_to_user_id"));
 
         User u = new User();
         u.setFullName(rs.getString("full_name"));
@@ -230,7 +232,7 @@ public class CustomerOrderDAO extends DBContext {
 
     public List<CustomerOrderDTO> getAllCustomerOrdersByName(String keyword) {
         List<CustomerOrderDTO> list = new ArrayList<>();
-        String sql = "SELECT co.*, c.tax_code, u.full_name "
+        String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name "
                 + "FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
@@ -292,7 +294,7 @@ public class CustomerOrderDAO extends DBContext {
         List<CustomerOrderDTO> list = new ArrayList<>();
         String orderBy = getOrderByClause(sortBy, sortOrder);
         String filter = getRoleFilter(userId, roleName);
-        String sql = "SELECT co.*, c.tax_code, u.full_name FROM customer_order co "
+        String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
                 + "WHERE 1=1 " + filter
@@ -333,7 +335,7 @@ public class CustomerOrderDAO extends DBContext {
         List<CustomerOrderDTO> list = new ArrayList<>();
         String orderBy = getOrderByClause(sortBy, sortOrder);
         String filter = getRoleFilter(userId, roleName);
-        String sql = "SELECT co.*, c.tax_code, u.full_name FROM customer_order co "
+        String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
                 + "WHERE (u.full_name LIKE ? OR c.tax_code LIKE ?) " + filter
@@ -379,7 +381,7 @@ public class CustomerOrderDAO extends DBContext {
         List<CustomerOrderDTO> list = new ArrayList<>();
 
         // Đoi đieu kien WHERE tu loc theo ma đon hang sang loc theo ma khach hang (customer_id)
-        String sql = "SELECT co.*, c.tax_code, u.full_name "
+        String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name "
                 + "FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "

@@ -297,9 +297,9 @@ create TABLE invoice (
     issue_date DATETIME,
     invoice_status VARCHAR(50),
 --UNRELEASED
+--READY
 --RELEASED
 --CANCELED
-
     invoice_type VARCHAR(20) NOT NULL DEFAULT 'SALES',      -- 'VAT' or 'SALES'
     invoice_symbol VARCHAR(20) NOT NULL DEFAULT 'K26TYY',     -- E-invoice code without tax code
     
@@ -316,8 +316,6 @@ create TABLE invoice (
     buyer_phone VARCHAR(20) NULL,
 
     -- Financial summary snapshot
-    sub_total DECIMAL(18,2) DEFAULT 0,
-    tax_amount DECIMAL(18,2) DEFAULT 0,
     total_amount DECIMAL(18,2) DEFAULT 0,
     
 	--Note
@@ -326,6 +324,7 @@ create TABLE invoice (
 
     created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
+	updated_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),
     FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id),
     FOREIGN KEY (created_by) REFERENCES [user](user_id)
@@ -380,20 +379,20 @@ INSERT INTO role (role_name, status) VALUES
 GO
 
 -- 2. TAO TAI KHOAN NHAN VIEN
-INSERT INTO [user] (user_name, password_hash, email, gender, full_name, phone, account_status, role_id) VALUES 
-('admin_01', '123', 'admin@bakery.com', 'M', N'Trần Quản Trị', '0901000001', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'System Admin')),
-('manager_01', '1234', 'manager@bakery.com', 'F', N'Lê Quản Lý', '0901000002', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Manager')),
-('sale_01', '1234', 'sale1@bakery.com', 'M', N'Nguyễn Sale Một', '0901000003', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Sale Staff')),
-('sale_02', '1234', 'sale2@bakery.com', 'F', N'Phạm Sale Hai', '0901000004', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Sale Staff')),
-('officer_01', '1234', 'officer1@bakery.com', 'F', N'Võ Chứng Từ', '0901000005', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Admin Officer')),
-('warehouse_01', '1234', 'warehouse@bakery.com', 'M', N'Đinh Thủ Kho', '0901000006', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Warehouse Staff'));
+INSERT INTO [user] (user_name, password_hash, email, gender, full_name, phone, account_status, role_id, created_by, updated_by) VALUES 
+('admin_01', '123', 'admin@bakery.com', 'M', N'Trần Quản Trị', '0901000001', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'System Admin'), 1, 1),
+('manager_01', '1234', 'manager@bakery.com', 'F', N'Lê Quản Lý', '0901000002', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Manager'), 1, 1),
+('sale_01', '1234', 'sale1@bakery.com', 'M', N'Nguyễn Sale Một', '0901000003', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Sale Staff'), 1, 1),
+('sale_02', '1234', 'sale2@bakery.com', 'F', N'Phạm Sale Hai', '0901000004', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Sale Staff'), 1, 1),
+('officer_01', '1234', 'officer1@bakery.com', 'F', N'Võ Chứng Từ', '0901000005', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Admin Officer'), 1, 1),
+('warehouse_01', '1234', 'warehouse@bakery.com', 'M', N'Đinh Thủ Kho', '0901000006', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Warehouse Staff'), 1, 1);
 GO
 
 -- 3. TAO TAI KHOAN KHACH HANG
-INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, full_name, address, phone, account_status, role_id) VALUES 
-('khachhang_01', '1234', 'khach1@gmail.com', 'M', '1990-01-01', N'Nguyễn Văn Một', N'1 Đại Cồ Việt, Hà Nội', '0981000001', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer')),
-('khachhang_02', '1234', 'khach2@gmail.com', 'F', '1991-02-02', N'Trần Thị Hai', N'2 Lê Thanh Nghị, Hà Nội', '0981000002', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer')),
-('khachhang_03', '1234', 'khach3@gmail.com', 'M', '1992-03-03', N'Phạm Văn Ba', N'3 Giải Phóng, Hà Nội', '0981000003', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer'));
+INSERT INTO [user] (user_name, password_hash, email, gender, date_of_birth, full_name, address, phone, account_status, role_id, created_by, updated_by) VALUES 
+('khachhang_01', '1234', 'khach1@gmail.com', 'M', '1990-01-01', N'Nguyễn Văn Một', N'1 Đại Cồ Việt, Hà Nội', '0981000001', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer'), 1, 1),
+('khachhang_02', '1234', 'khach2@gmail.com', 'F', '1991-02-02', N'Trần Thị Hai', N'2 Lê Thanh Nghị, Hà Nội', '0981000002', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer'), 1, 1),
+('khachhang_03', '1234', 'khach3@gmail.com', 'M', '1992-03-03', N'Phạm Văn Ba', N'3 Giải Phóng, Hà Nội', '0981000003', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Customer'), 1, 1);
 GO
 
 -- 4. HO SO KHACH HANG (CUSTOMER)

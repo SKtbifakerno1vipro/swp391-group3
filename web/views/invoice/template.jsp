@@ -139,9 +139,9 @@
                         <div style="margin-top: 5px; font-size: 13px; font-style: italic; color: #475569;">(Bản thể hiện của hóa đơn điện tử)</div>
                     </div>
                     <div class="header-right" style="text-align: right; font-size: 13px; line-height: 1.6;">
-                        <div><strong>Ký hiệu (Symbol):</strong> <span><c:out value="${invoiceSymbol}"/></span></div>
-                        <div><strong>Số (No.):</strong> <span style="color: #dc2626; font-weight: bold; font-size: 15px;"><c:out value="${invoiceNo}"/></span></div>
-                        <div><strong>Ngày (Date):</strong> <span><c:out value="${issueDate}"/></span></div>
+                        <div><strong>Ký hiệu:</strong> <span><c:out value="${invoiceSymbol}"/></span></div>
+                        <div><strong>Số:</strong> <span style="color: #dc2626; font-weight: bold; font-size: 15px;"><c:out value="${invoiceNo}"/></span></div>
+                        <div><strong>Ngày:</strong> <span><c:out value="${issueDate}"/></span></div>
                     </div>
                 </div>
 
@@ -265,8 +265,24 @@
                     </div>
                     <div style="width: 45%;">
                         <strong>NGƯỜI BÁN HÀNG</strong><br>
-                        <span style="font-size: 11px; color: #64748b;">(Ký, đóng dấu, ghi rõ họ tên)</span>
-                        <div style="height: 60px;"></div>
+                        <span style="font-size: 11px; color: #64748b;">(Ký, ghi rõ họ tên)</span>
+                        <br>
+                        <c:choose>
+                            <c:when test="${invoiceStatus == 'RELEASED'}">
+                                <div style="border: 2px solid #22c55e; padding: 8px 12px; border-radius: 6px; background-color: #f0fdf4; text-align: left; margin-top: 10px; font-family: Arial, sans-serif; display: inline-block; width: 100%; box-sizing: border-box; max-width: 260px;">
+                                    <div style="color: #15803d; font-weight: bold; display: flex; align-items: center; gap: 4px; font-size: 12px; margin-bottom: 4px; text-transform: uppercase;">
+                                        <span style="color: #22c55e; font-weight: bold; font-size: 14px; margin-right: 3px;">✔</span> Signature Valid
+                                    </div>
+                                    <div style="font-size: 11px; color: #334155; line-height: 1.4; text-align: left;">
+                                        Ký bởi: <strong><c:out value="${sellerName}"/></strong><br>
+                                        Ký ngày: <strong><c:out value="${issueDate}"/></strong>
+                                    </div>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div style="height: 60px;"></div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
             </div>
