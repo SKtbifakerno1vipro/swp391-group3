@@ -93,7 +93,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
                         title = "Thanh toán thành công";
                         msg = String.format("Bạn đã thanh toán thành công %,.0f VNĐ cho hợp đồng số %s.", amt, contractNo);
                         btnText = "Chi tiết";
-                    } else { // Admin or Staff
+                    } else if (roleId == 2 || roleId == 4 || roleId == 5) { // Manager (2), Sale (4), or Admin Officer (5)
                         String name = p.getCustomerName() != null ? p.getCustomerName() : "Khách hàng";
                         shouldNotify = true;
                         title = "Thanh toán thành công";
