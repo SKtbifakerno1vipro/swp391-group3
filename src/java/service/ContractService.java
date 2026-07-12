@@ -184,8 +184,8 @@ public class ContractService {
                 + "    </div>"
                 + "</body>"
                 + "</html>";
-//        EmailUtils.sendEmailAsync("omovie111@gmail.com", subject, content);
-        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
+        EmailUtils.sendEmailAsync("omovie111@gmail.com", subject, content);
+//        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
     }
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
