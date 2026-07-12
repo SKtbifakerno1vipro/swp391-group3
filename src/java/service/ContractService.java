@@ -107,9 +107,11 @@ public class ContractService {
         return contractDAO.refreshContractToken(contractId);
     }
 
-    public void noticeCustomerCheckContract(int contractId, String baseUrl) {
+    public void noticeCustomerCheckContract(int contractId) {
         Contract contract = contractDAO.getContractById(contractId);
         CustomerDTO customer = contractDAO.getCustomerDTOByContractId(contractId);
+
+        String baseUrl = "http://localhost:9999/SWP391_GROUP3/";
 
         String secureUrl = baseUrl + "contract-detail?id=" + contractId + "&token=" + contract.getToken();
 
