@@ -297,9 +297,9 @@ create TABLE invoice (
     issue_date DATETIME,
     invoice_status VARCHAR(50),
 --UNRELEASED
+--READY
 --RELEASED
 --CANCELED
-
     invoice_type VARCHAR(20) NOT NULL DEFAULT 'SALES',      -- 'VAT' or 'SALES'
     invoice_symbol VARCHAR(20) NOT NULL DEFAULT 'K26TYY',     -- E-invoice code without tax code
     
@@ -316,8 +316,6 @@ create TABLE invoice (
     buyer_phone VARCHAR(20) NULL,
 
     -- Financial summary snapshot
-    sub_total DECIMAL(18,2) DEFAULT 0,
-    tax_amount DECIMAL(18,2) DEFAULT 0,
     total_amount DECIMAL(18,2) DEFAULT 0,
     
 	--Note
@@ -326,6 +324,7 @@ create TABLE invoice (
 
     created_by INT,
     created_at DATETIME DEFAULT GETDATE(),
+	updated_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),
     FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id),
     FOREIGN KEY (created_by) REFERENCES [user](user_id)

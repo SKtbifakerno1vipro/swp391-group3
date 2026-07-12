@@ -42,15 +42,6 @@ public class InvoiceList extends HttpServlet {
         String startDateRaw = request.getParameter("startDate");
         String endDateRaw = request.getParameter("endDate");
 
-        if (searchBuyerName != null) {
-            searchBuyerName = searchBuyerName.trim();
-        }
-        if (status != null) {
-            status = status.trim();
-        }
-        if (type != null) {
-            type = type.trim();
-        }
 
         LocalDateTime startDate = null;
         LocalDateTime endDate = null;
@@ -83,11 +74,16 @@ public class InvoiceList extends HttpServlet {
             }
         }
 
-        int totalRow = invoiceService.countInvoices(searchBuyerName, status, type, startDate, endDate);
+        boolean forCustomer = (user.getRoleId() == 3);
+        int totalRow = forCustomer 
+                ? invoiceService.countInvoicesForCustomer(searchBuyerName, status, type, startDate, endDate, user.getUserId())
+                : invoiceService.countInvoices(searchBuyerName, status, type, startDate, endDate);
         int totalPage = productService.calculateTotalPage(totalRow, PAGE_SIZE);
         page = productService.nomalizePage(page, totalPage);
 
-        List<Invoice> list = invoiceService.getInvoices(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, PAGE_SIZE);
+        List<Invoice> list = forCustomer 
+                ? invoiceService.getInvoicesForCustomer(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, PAGE_SIZE, user.getUserId())
+                : invoiceService.getInvoices(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, PAGE_SIZE);
         
         request.setAttribute("invoices", list);
         request.setAttribute("errorInvoice", errorInvoice);

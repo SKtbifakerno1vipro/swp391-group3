@@ -2,7 +2,6 @@ package controller.invoice;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Properties;
@@ -16,20 +15,26 @@ import jakarta.servlet.http.HttpSession;
 
 import dal.CustomerOrderDAO;
 import dal.CustomerDAO;
-import dal.ContractDAO;
 import dal.UserDAO;
 import dto.CustomerOrderDTO;
 import dto.CustomerDTO;
 import dto.InvoiceItemDTO;
-import model.Contract;
 import model.Invoice;
 import model.User;
+import service.CustomerOrderService;
+import service.CustomerService;
 import service.InvoiceService;
+import service.RoleService;
+import service.UserService;
 
 @WebServlet(name = "InvoiceServlet", urlPatterns = {"/invoice"})
 public class InvoiceServlet extends HttpServlet {
 
     private final InvoiceService iService = new InvoiceService();
+    private final CustomerService cService = new CustomerService();
+    private final RoleService rService = new RoleService();
+    private final UserService uService = new UserService();
+    private final CustomerOrderService coService = new CustomerOrderService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -42,8 +47,8 @@ public class InvoiceServlet extends HttpServlet {
         }
         String orderIdRaw = request.getParameter("orderId");
         String invoiceIdRaw = request.getParameter("invoiceId");
+        boolean isCustomer = rService.getRoleIdByName("Customer") == user.getRoleId();
 
-        // Load company configuration from properties file
         Properties config = new Properties();
         try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/resources/config.properties")) {
             if (is != null) {
@@ -53,6 +58,7 @@ public class InvoiceServlet extends HttpServlet {
             session.setAttribute("errorInvoice", "Error: Config cannot activatity");
             response.sendRedirect("/invoice-list");
             e.printStackTrace();
+            return;
         }
         request.setAttribute("companyName", config.getProperty("company_name"));
         request.setAttribute("companyTaxCode", config.getProperty("company_tax_code"));
@@ -66,10 +72,17 @@ public class InvoiceServlet extends HttpServlet {
                 int invoiceId = Integer.parseInt(invoiceIdRaw);
                 invoice = iService.getInvoiceById(invoiceId);
                 if (invoice != null) {
-                    request.setAttribute("invoice", invoice);
-                    loadInvoiceCreationData(request, invoice.getCustomerOrderId());
+                    CustomerOrderDTO orderDTO = coService.getCustomerOrderById(invoice.getCustomerOrderId());
+                    if (isCustomer && user.getUserId() != orderDTO.getCustomer().getUserId()) {
+                        session.setAttribute("errorInvoice", "Bạn không được xem hóa đơn của khách hàng khác");
+                        response.sendRedirect(request.getContextPath() + "/invoice-list");
+                        return;
+                    } else {
+                        request.setAttribute("invoice", invoice);
+                        loadInvoiceCreationData(request, invoice.getCustomerOrderId());
+                    }
                 } else {
-                    request.setAttribute("error", "Không tìm thấy hóa đơn có ID: " + invoiceId);
+                    request.setAttribute("error", "Không tìm thấy hóa đơn này.");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -77,8 +90,16 @@ public class InvoiceServlet extends HttpServlet {
             }
         } else if (orderIdRaw != null && !orderIdRaw.trim().isEmpty()) {
             try {
+
                 int orderId = Integer.parseInt(orderIdRaw);
-                loadInvoiceCreationData(request, orderId);
+                CustomerOrderDTO orderDTO = coService.getCustomerOrderById(orderId);
+                if (isCustomer && user.getUserId() != orderDTO.getCustomer().getUserId()) {
+                    session.setAttribute("errorInvoice", "Bạn không được xem hóa đơn của khách hàng khác");
+                    response.sendRedirect(request.getContextPath() + "/invoice-list");
+                    return;
+                } else {
+                    loadInvoiceCreationData(request, orderId);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 request.setAttribute("error", "Lỗi tải thông tin đơn hàng: " + e.getMessage());
@@ -115,7 +136,6 @@ public class InvoiceServlet extends HttpServlet {
         }
         Invoice invoice = null;
         int orderId = 0;
-        String buyerPhone = null;
 
         try {
             String invoiceIdRaw = request.getParameter("invoiceId");
@@ -123,7 +143,7 @@ public class InvoiceServlet extends HttpServlet {
             int contractId = Integer.parseInt(request.getParameter("customerContractId"));
             orderId = Integer.parseInt(request.getParameter("customerOrderId"));
 
-            String invoiceStatus = request.getParameter("invoiceStatus");
+            String action = request.getParameter("action");
             String invoiceType = request.getParameter("invoiceType");
             String invoiceSymbol = request.getParameter("invoiceSymbol");
 
@@ -135,7 +155,7 @@ public class InvoiceServlet extends HttpServlet {
             String buyerName = request.getParameter("buyerName");
             String buyerTaxCode = request.getParameter("buyerTaxCode");
             String buyerAddress = request.getParameter("buyerAddress");
-            buyerPhone = request.getParameter("buyerPhone");
+            String buyerPhone = request.getParameter("buyerPhone");
 
             String subTotalRaw = request.getParameter("subTotal");
             String taxAmountRaw = request.getParameter("taxAmount");
@@ -159,18 +179,26 @@ public class InvoiceServlet extends HttpServlet {
 
             if (invoiceId > 0) {
                 Invoice existingInvoice = iService.getInvoiceById(invoiceId);
-                if ("RELEASED".equals(invoiceStatus)) {
+                if ("notice".equalsIgnoreCase(action)) {
                     invoice.setInvoiceStatus("RELEASED");
                     invoice.setIssueDate(LocalDateTime.now());
                     int year = LocalDateTime.now().getYear();
                     invoice.setInvoiceNo(iService.getNextInvoiceNo(year));
+                } else if ("ready".equalsIgnoreCase(action)) {
+                    invoice.setInvoiceStatus("READY");
+                    invoice.setIssueDate(null);
+                    invoice.setInvoiceNo(existingInvoice != null ? existingInvoice.getInvoiceNo() : ("DFT-" + orderId + "-" + System.currentTimeMillis()));
                 } else {
                     invoice.setInvoiceStatus("UNRELEASED");
                     invoice.setIssueDate(null);
                     invoice.setInvoiceNo(existingInvoice != null ? existingInvoice.getInvoiceNo() : ("DFT-" + orderId + "-" + System.currentTimeMillis()));
                 }
             } else {
-                invoice.setInvoiceStatus("UNRELEASED");
+                if ("ready".equalsIgnoreCase(action)) {
+                    invoice.setInvoiceStatus("READY");
+                } else {
+                    invoice.setInvoiceStatus("UNRELEASED");
+                }
                 invoice.setInvoiceNo("DFT-" + orderId + "-" + System.currentTimeMillis());
                 invoice.setIssueDate(null);
             }
@@ -183,20 +211,18 @@ public class InvoiceServlet extends HttpServlet {
             invoice.setBuyerName(buyerName);
             invoice.setBuyerTaxCode(buyerTaxCode);
             invoice.setBuyerAddress(buyerAddress);
+            invoice.setBuyerPhone(buyerPhone);
 
-            invoice.setSubTotal(subTotal);
-            invoice.setTaxAmount(taxAmount);
             invoice.setTotalAmount(totalAmount);
 
             invoice.setCustomerNote(customerNote);
             invoice.setInternalNote(internalNote);
             invoice.setCreatedBy(createdBy);
 
-            String errorMsg = iService.validateInvoice(invoice, buyerPhone);
+            String errorMsg = iService.validateInvoice(invoice);
             if (errorMsg != null) {
                 request.setAttribute("error", errorMsg);
                 request.setAttribute("invoice", invoice);
-                request.setAttribute("buyerPhone", buyerPhone);
 
                 Integer invoiceCreatorId = invoice.getCreatedBy();
                 if (invoiceCreatorId == null && user != null) {
@@ -224,11 +250,14 @@ public class InvoiceServlet extends HttpServlet {
             }
 
             if (success) {
+                if ("notice".equalsIgnoreCase(action)) {
+                    int targetInvoiceId = invoiceId > 0 ? invoiceId : invoice.getInvoiceId();
+                    iService.emailIssueInvoice(targetInvoiceId, "http://localhost:9999/SWP391_GROUP3/");
+                }
                 response.sendRedirect(request.getContextPath() + "/invoice-list");
             } else {
                 request.setAttribute("error", "Không thể lưu hóa đơn. Đã có lỗi xảy ra trong quá trình lưu trữ.");
                 request.setAttribute("invoice", invoice);
-                request.setAttribute("buyerPhone", buyerPhone);
 
                 Integer invoiceCreatorId = invoice.getCreatedBy();
                 if (invoiceCreatorId == null && user != null) {
@@ -250,7 +279,6 @@ public class InvoiceServlet extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi xử lý dữ liệu: " + e.getMessage());
             request.setAttribute("invoice", invoice);
-            request.setAttribute("buyerPhone", buyerPhone);
 
             Integer invoiceCreatorId = (invoice != null) ? invoice.getCreatedBy() : null;
             if (invoiceCreatorId == null) {
@@ -286,9 +314,6 @@ public class InvoiceServlet extends HttpServlet {
             double totalAmount = Double.parseDouble(String.format("%.2f", subTotal - discountTotal + taxTotal));
             CustomerDAO customerDAO = new CustomerDAO();
             CustomerDTO customerDto = customerDAO.getCustomerDTOById(orderDto.getCustomerOrder().getCustomerId());
-
-            
-
             request.setAttribute("order", orderDto.getCustomerOrder());
             request.setAttribute("orderDetails", orderItems);
             request.setAttribute("subTotal", subTotal);
