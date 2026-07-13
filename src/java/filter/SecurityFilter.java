@@ -158,6 +158,7 @@ public class SecurityFilter implements Filter {
             "/contract-save",
             "/customer-order-list",
             "/customer-order",
+            "/quotation-list",
             //nguyenkien
             "/invoice-list",
             "invoice",

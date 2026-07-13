@@ -124,10 +124,10 @@ public class ContractDetailController extends HttpServlet {
                     request.setAttribute("historyList", historyList);
 
                     // Set status manager or customer can request edit
-                    boolean canRequestEdit = "DRAFT".equals(status)
+                    boolean isInternalProcessing = "DRAFT".equals(status)
                             || "PENDING_REVIEW".equals(status);
                     boolean canCustomerCheck = "CUSTOMER_CHECK".equals(status);
-                    request.setAttribute("canRequestEdit", canRequestEdit);
+                    request.setAttribute("isInternalProcessing", isInternalProcessing);
                     request.setAttribute("canCustomerCheck", canCustomerCheck);
                     request.setAttribute("isApproved", isApproved);
                     
@@ -183,7 +183,7 @@ public class ContractDetailController extends HttpServlet {
             h.setContractId(contractId);
             h.setFromStatus(currentStatus);
             h.setToStatus("PENDING_REVIEW");
-            h.setNote("Customer/Manager request officer edit.");
+            h.setNote("Customer/Manager yêu cầu officer sửa đổi lại hợp đồng.");
             h.setChangedBy(user.getUserId());
             int historyId = contractService.insertHistory(h);
 
@@ -202,30 +202,30 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
             
         } else if ("approve".equals(action)) { //when manager approve that contract
-            // BR: only PENDING_REVIEW status + approved by Manager
+            // only PENDING_REVIEW status  can approve by Manager
             if (!"PENDING_REVIEW".equals(contract.getContractStatus())) {
-                session.setAttribute("errorSig", "Cần được Quản lý hoặc Nhân viên Admin kiểm tra trước");
+                session.setAttribute("errorSig", "Cần được officer kiểm tra và sửa đổi trước.");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
             // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
             contractService.refreshContractToken(contractId); // Gen new token + 30m expire
-            contractService.noticeCustomerCheckContract(contractId, "http://localhost:9999/SWP391_GROUP3/");
+            contractService.noticeCustomerCheckContract(contractId);
 
             // Save history work for manager approve contract
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("CUSTOMER_CHECK");
-            h.setNote("Manager had just approved contract. Waiting for customer check contract");
+            h.setNote("Manager vừa phê duyệt hợp đồng. Đang chờ customer kiểm tra hợp đồng.");
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
             
             response.sendRedirect("contract-detail?id=" + contractId);
             
         } else if ("customer_approve".equals(action)) { // if customer approve contract
-            // BR: only CUSTOMER_CHECK can be approved by Customer
+            // only CUSTOMER_CHECK can be approve by Customer
             if (!"CUSTOMER_CHECK".equals(contract.getContractStatus())) {
                 session.setAttribute("errorSig", "Hợp đồng phải ở trạng thái Chờ khách hàng duyệt trước khi Khách hàng có thể chốt.");
                 response.sendRedirect("contract-detail?id=" + contractId);
@@ -262,19 +262,19 @@ public class ContractDetailController extends HttpServlet {
             h.setContractId(contractId);
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("PENDING_REVIEW");
-            h.setNote("Admin Officer had just edited contract. Manager must check contract");
+            h.setNote("Nhân viên hành chính vừa chỉnh sửa hợp đồng. Quản lý cần kiểm tra hợp đồng.");
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
             
             response.sendRedirect("contract-detail?id=" + contractId);
             
-        } else if ("send_final_contract".equals(action)) {
+        } else if ("send_final_contract".equals(action)) {// send customer final contract for storage their contract
             if (!"SIGNED".equals(contract.getContractStatus())) {
                 session.setAttribute("errorSig", "Hợp đồng chưa được ký hoàn tất.");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
-            String token = contractService.refreshContractToken(contractId);
+            String token = contractService.refreshContractToken(contractId); // refresh token when send to customer
             contractService.noticeSendFinalContractPdf(contractId, token);
             
             response.sendRedirect("contract-detail?id=" + contractId);

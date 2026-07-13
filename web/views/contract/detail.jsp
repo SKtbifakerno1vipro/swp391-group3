@@ -193,8 +193,10 @@
                                 <h3 style="margin-top: 0;">Hành động</h3>
                                 <p><strong>Trạng thái</strong> <span style="color: var(--danger); font-weight: bold;">${contract.contractStatus}</span></p>
                                 <div class="action-btn-group">
+                                    
+                                    <!--Action button-->
                                     <c:choose>
-                                        <c:when test="${canRequestEdit}">
+                                        <c:when test="${isInternalProcessing}">
                                             <!-- Manager (Role 2) -->
                                             <c:if test="${sessionScope.user.roleId == 2}">
                                                 <form method="POST" action="contract-detail">
@@ -269,7 +271,7 @@
                                           && (contract.contractStatus== 'PENDING_REVIEW' ||contract.contractStatus== 'CUSTOMER_CHECK' ) }">
                                   <div class="type-note-section" style="margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 20px;">
                                       <h3 style="margin-top:0;">Ghi chú</h3>
-                                      <form method="POST" action="contract-detail" id="requestEditForm" style="background: none; border: none; box-shadow: none; padding: 0; margin: 0;">
+                                      <form method="POST" action="contract-detail" style="background: none; border: none; box-shadow: none; padding: 0; margin: 0;">
                                           <input type="hidden" name="action" value="request_edit" />
                                           <input type="hidden" name="contractId" value="${contract.contractId}" />
                                           <textarea name="revision_note" class="note-textarea" placeholder="Ví dụ:&#10;Giá: đổi thành 10000&#10;Tên: đổi thành Nguyễn Văn A" required></textarea>

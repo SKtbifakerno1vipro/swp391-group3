@@ -190,7 +190,7 @@ CREATE TABLE customer_contract (
 
 	contract_content nvarchar(max),
     storage_type VARCHAR(10) NOT NULL DEFAULT 'TEXT',
-    token VARCHAR(255) UNIQUE,
+    token VARCHAR(255),
     token_expired_at DATETIME,
 
     created_by INT,
@@ -316,6 +316,8 @@ create TABLE invoice (
     buyer_phone VARCHAR(20) NULL,
 
     -- Financial summary snapshot
+    sub_total DECIMAL(18,2) DEFAULT 0,
+    tax_amount DECIMAL(18,2) DEFAULT 0,
     total_amount DECIMAL(18,2) DEFAULT 0,
     
 	--Note
