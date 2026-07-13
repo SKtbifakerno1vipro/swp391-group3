@@ -353,6 +353,12 @@ public class CustomerOrderController extends HttpServlet {
             return;
         }
         
+        // Block setting status to COMPLETED via general status update (must be done via AcceptanceRecord confirmation)
+        if ("COMPLETED".equals(status)) {
+            response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
+            return;
+        }
+        
         customerOrderService.updateOrderStatus(orderId, status);
         
         HttpSession session = request.getSession();

@@ -104,13 +104,38 @@
         @media print {
             body { margin: 0; }
             .container { max-width: 100%; }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
 <body>
-<div class="no-print" style="text-align: right; margin: 20px;">
-    <button onclick="window.print()" style="padding: 8px 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px;">🖨 In Biên Bản</button>
-    <button onclick="history.back()" style="padding: 8px 16px; cursor: pointer; margin-left: 10px; background: #6c757d; color: white; border: none; border-radius: 4px;">Quay Lại</button>
+<div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin: 20px auto; max-width: 800px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+    <div>
+        <c:choose>
+            <c:when test="${order.customerOrder.orderStatus == 'COMPLETED'}">
+                <span style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: #28a745; color: white; border-radius: 20px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(40,167,69,0.15);">
+                    ✓ Đơn hàng đã giao thành công
+                </span>
+            </c:when>
+            <c:when test="${order.customerOrder.orderStatus == 'SHIPPING' && sessionScope.user.roleId == 3}">
+                <form action="${pageContext.request.contextPath}/AcceptanceRecordController" method="POST" onsubmit="return confirm('Bạn có chắc chắn xác nhận đã nhận bàn giao hàng hóa thành công? Thao tác này sẽ cập nhật trạng thái đơn hàng thành hoàn thành.');" style="margin: 0; display: inline-block;">
+                    <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
+                    <button type="submit" style="padding: 10px 20px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 20px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(40,167,69,0.15); transition: all 0.2s ease;">
+                        ✓ Xác Nhận Giao Hàng Thành Công
+                    </button>
+                </form>
+            </c:when>
+            <c:otherwise>
+                <span style="color: #6c757d; font-style: italic; font-size: 14px;">
+                    Trạng thái đơn hàng: <strong>${order.customerOrder.orderStatus}</strong>
+                </span>
+            </c:otherwise>
+        </c:choose>
+    </div>
+    <div>
+        <button onclick="window.print()" style="padding: 8px 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold;">🖨 In Biên Bản</button>
+        <a href="${pageContext.request.contextPath}/customer-order?id=${order.customerOrder.customerOrderId}" style="padding: 8px 16px; cursor: pointer; margin-left: 10px; background: #6c757d; color: white; border: none; border-radius: 4px; font-weight: bold;" >Quay Lại</a>
+    </div>
 </div>
 <div class="container">
     <div class="header">
@@ -218,12 +243,37 @@
             <td>
                 <div class="signature-title">ĐẠI DIỆN BÊN BÀN GIAO</div>
                 <div class="signature-note">(Ký và ghi rõ họ tên)</div>
-                <div class="signature-space"></div>
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #28a745; border-radius: 4px; padding: 5px 15px; background: #f4faf6; color: #28a745; font-family: 'Courier New', Courier, monospace; transform: rotate(-2deg); font-weight: bold; width: fit-content; margin: 0 auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <span style="font-size: 11pt; letter-spacing: 1px;">ĐÃ XÁC NHẬN ONLINE</span>
+                                <span style="font-size: 8pt; color: #555; font-weight: normal; margin-top: 3px; font-family: sans-serif;">
+                                    Đại diện: <strong>${company_rep_name != null ? company_rep_name : 'Lê Quản Lý'}</strong>
+                                </span>
+                                <span style="font-size: 7pt; color: #777; font-weight: normal; font-family: sans-serif;">
+                                    Ngày: ${day}/${month}/${year}
+                                </span>
+                            </div>
             </td>
             <td>
                 <div class="signature-title">ĐẠI DIỆN BÊN NHẬN BÀN GIAO</div>
                 <div class="signature-note">(Ký và ghi rõ họ tên)</div>
-                <div class="signature-space"></div>
+                <div class="signature-space" style="height: 100px; display: flex; align-items: center; justify-content: center;">
+                    <c:choose>
+                        <c:when test="${order.customerOrder.orderStatus == 'COMPLETED'}">
+                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #28a745; border-radius: 4px; padding: 5px 15px; background: #f4faf6; color: #28a745; font-family: 'Courier New', Courier, monospace; transform: rotate(-2deg); font-weight: bold; width: fit-content; margin: 0 auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <span style="font-size: 11pt; letter-spacing: 1px;">ĐÃ XÁC NHẬN ONLINE</span>
+                                <span style="font-size: 8pt; color: #555; font-weight: normal; margin-top: 3px; font-family: sans-serif;">
+                                    Khách hàng: <strong>${customerFull.user.fullName}</strong>
+                                </span>
+                                <span style="font-size: 7pt; color: #777; font-weight: normal; font-family: sans-serif;">
+                                    Ngày: ${day}/${month}/${year}
+                                </span>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <span style="font-style: italic; font-size: 10pt; color: #999;">(Chờ xác nhận trực tuyến)</span>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </td>
         </tr>
     </table>
