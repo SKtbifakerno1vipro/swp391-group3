@@ -80,7 +80,7 @@ public class ContractDetailController extends HttpServlet {
                     int userId = (user != null) ? user.getUserId() : 0;
                     int roleId = (user != null) ? user.getRoleId() : 0;
 
-                    // Pagination for history
+                    // Pagination for history request
                     int historyPage = 1;
                     int historyPageSize = 5;
                     String historyPageStr = request.getParameter("historyPage");

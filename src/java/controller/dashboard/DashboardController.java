@@ -74,18 +74,18 @@ public class DashboardController extends HttpServlet {
         if (user.getRoleId() == 5) { // ROLE IS ADMIN OFFICER
             String startDate = request.getParameter("startDate");
             String endDate = request.getParameter("endDate");
-            
+
             request.setAttribute("startDate", startDate);
             request.setAttribute("endDate", endDate);
-            
+
             request.setAttribute("awaitingQuotations", dashboardDAO.countQuotationAwaitingContract());
             request.setAttribute("contractsInProgress", dashboardDAO.countContractInProgress());
             request.setAttribute("activeContracts", dashboardDAO.countActiveContracts());
             request.setAttribute("draftContracts", dashboardDAO.countDraftContracts());
-            request.setAttribute("contractStatusCounts", dashboardDAO.countContractStatusForOfficer());
+            request.setAttribute("contractStatusCounts", dashboardDAO.countContractStatusForOfficer()); // circle
             request.setAttribute("contractsNeedingAction", dashboardDAO.getContractNeedingAction(5, startDate, endDate));
-            request.setAttribute("invoiceSummary", dashboardDAO.getInvoiceSummaryForOfficer());
             request.setAttribute("recentInvoices", dashboardDAO.getRecentInvoicesForOfficer(10, startDate, endDate));
+            request.setAttribute("invoiceSummary", dashboardDAO.getInvoiceSummaryForOfficer());
             request.getRequestDispatcher("/views/dashboard/admin-officier-dashboard.jsp").forward(request, response);
             return;
         }
@@ -100,7 +100,7 @@ public class DashboardController extends HttpServlet {
         if (roleName.contains("sale")) {
             saleId = user.getUserId();
         }
-        
+
         request.setAttribute("user", user);
         request.setAttribute("totalCustomers", dashboardService.getTotalCustomers(saleId));
         request.setAttribute("totalProducts", dashboardService.getTotalProducts());
@@ -115,7 +115,7 @@ public class DashboardController extends HttpServlet {
 
         request.setAttribute("recentContracts", dashboardDAO.getRecentContracts(5, saleId));
         request.setAttribute("recentOrders", dashboardDAO.getRecentOrders(5, saleId));
-        request.getRequestDispatcher("/views/dashboard/manager-dashboard.jsp").forward(request, response);       
+        request.getRequestDispatcher("/views/dashboard/manager-dashboard.jsp").forward(request, response);
     }
 
 }
