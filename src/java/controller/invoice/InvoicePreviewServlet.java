@@ -1,7 +1,6 @@
 package controller.invoice;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +11,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dto.InvoiceItemDTO;
+import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "InvoicePreviewServlet", urlPatterns = {"/invoice/preview"})
+@WebServlet(name = "InvoicePreviewServlet", urlPatterns = {"/preview"})
 public class InvoicePreviewServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
         
         try {
             String[] prodIds = request.getParameterValues("productId");
@@ -129,6 +130,7 @@ public class InvoicePreviewServlet extends HttpServlet {
             request.setAttribute("invoiceSymbol", invoiceSymbol);
             request.setAttribute("invoiceNo", invoiceNo);
             request.setAttribute("issueDate", issueDate);
+            request.setAttribute("invoiceStatus", invoiceStatus);
             
             request.setAttribute("sellerName", sellerName);
             request.setAttribute("sellerTaxCode", sellerTaxCode);
@@ -150,7 +152,8 @@ public class InvoicePreviewServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error rendering preview: " + e.getMessage());
+            session.setAttribute("errorInvoice", "Lỗi xem trước hóa đơn");
+            response.sendRedirect("/invoice-list");
         }
     }
 

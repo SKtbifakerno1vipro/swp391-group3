@@ -70,8 +70,11 @@ public class SecurityFilter implements Filter {
             "/contract-save",
             "/customer-order-list",
             "/customer-order",
-            //"/Invoice",
-            "/invoice",
+            //nguyenkien
+            "/invoice-list",
+            "invoice",
+            "/preview",
+            //nguyenkien
             "/revenue-report",
             "/payment",
             "/payment/list",
@@ -97,8 +100,11 @@ public class SecurityFilter implements Filter {
             "/quotation-detail",
             "/contract-list",
             "/contract-detail",
-            //"/Invoice",
-            "/invoice",
+            //nguyenkien
+            "/invoice-list",
+            "invoice",
+            "/preview",
+            //nguyenkien
             "/email/logs",
             "/revenue-report",
             "/Signature",
@@ -115,6 +121,11 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/customer/detail",
             "/customer-order-list",
+            //nguyenkien
+            "/invoice-list",
+            "/invoice",
+            "/preview",
+            //nguyenkien
             "/customer-order",
             "/payment",
             "/payment/list",
@@ -147,7 +158,12 @@ public class SecurityFilter implements Filter {
             "/contract-save",
             "/customer-order-list",
             "/customer-order",
-            //"/Invoice",
+            "/quotation-list",
+            //nguyenkien
+            "/invoice-list",
+            "invoice",
+            "/preview",
+            //nguyenkien
             "/invoice",
             "/payment",
             "/payment/list",
@@ -355,9 +371,12 @@ public class SecurityFilter implements Filter {
                 return "View Order List";
             case "/customer-order":
                 return "View Order Detail";
+            case "/invoice-list":
+                return "View Invoice List";
             case "/invoice":
-            case "/Invoice":
-                return "Issue Invoice";
+                return "View Invoice Detail";
+            case "/preview":
+                return "View Invoice Preview";
             default:
                 return null;
         }

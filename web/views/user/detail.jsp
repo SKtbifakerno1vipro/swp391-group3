@@ -159,7 +159,7 @@
                     <div class="panel-body">
                         <c:if test="${not empty error}"><div class="alert"><c:out value="${error}"/></div></c:if>
                             <div class="form-grid">
-                                <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" required></div>
+                                <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" readonly=""></div>
                             <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required></div>
                             <div class="field"><label>Email</label><input type="email" name="email" value="${u.email}" required></div>
                             <div class="field"><label>Số điện thoại</label><input type="text" name="phone" value="${u.phone}" required></div>

@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Product Detail</title>
+        <title>Chi tiết sản phẩm</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,10 +27,10 @@
             <main class="main legacy-page">
                 <div>
                     <c:if test="${action == 'detail'}">
-                        <h1>Product Detail</h1>
+                        <h1>Chi tiết sản phẩm</h1>
                     </c:if>
                     <c:if test="${action != 'detail'}">
-                        <h1>Product Edit</h1>
+                        <h1>Chỉnh sửa sản phẩm</h1>
                     </c:if>
                     <c:if test="${error != null}" >
                         <p>${error}</p>
@@ -41,51 +41,43 @@
                                 <input type="hidden" name="id" value="${product.productId}">
                                 <input type="hidden" name="action" value="${action}">
                                 <tr>
-                                    <td>Product Name</td>
+                                    <td>Tên sản phẩm</td>
                                     <td><input type="text" name="name" value="${product.productName}" ${action != 'detail' ? ' ' : 'readonly'} required></td>
                                 </tr>
                                 <tr>
-                                    <td>Cost Price</td>
+                                    <td>Giá gốc</td>
                                     <fmt:formatNumber var="fmtCost" value="${product.costPrice}" pattern="#"/>
                                     <td><input type="number"  name="cost" value="${fmtCost}" min="0" ${action != 'detail' ? ' ' : 'readonly'} required></td>
                                 </tr>
                                 <tr>
-                                    <td>Selling Price</td>
+                                    <td>Giá bán</td>
                                     <fmt:formatNumber var="fmtSell" value="${product.sellingPrice}" pattern="#"/>
                                     <td><input type="number" name="sell" value="${fmtSell}" min="0" ${action != 'detail' ? ' ' : 'readonly'} required></td>
                                 </tr>
                                 <tr>
-                                    <td>Description</td>
+                                    <td>Mô tả</td>
                                     <td><textarea name="description" rows="5" cols="20" ${action != 'detail' ? ' ' : 'readonly'} required>${product.description}</textarea></td>
                                 </tr>
                                 <tr>
-                                    <td>Unit</td>
-                                    <td>
-                                        <select name="unit" ${action != 'detail' ? ' ' : 'disabled'}>
-                                            <c:forEach var="u" items="${units}">
-                                                <option value="${u}" ${u == product.unit ? 'selected':''}>${u}</option>
-                                            </c:forEach>
-                                        </select>
-
-                                    </td>
+                                    <td>Đơn vị</td>
+                                    <td><input type="text" name="unit" value="${product.unit}" ${action != 'detail' ? ' ' : 'readonly'} required></td>
                                 </tr>
                                 <tr>
-                                    <td>Product Status</td>
+                                    <td>Trạng thái sản phẩm</td>
                                     <td>
                                         <select name="status" ${action != 'detail' ? ' ' : 'disabled'}>
-                                            <c:forEach var="s" items="${statusList}">
-                                                <option value="${s}" ${s == product.productStatus ? 'selected':''}>${s}</option>
-                                            </c:forEach>
+                                            <option value="ACTIVE" ${product.productStatus == 'ACTIVE' || product.productStatus == 'Active' ? 'selected' : ''}>Hoạt động</option>
+                                            <option value="OUT_OF_STOCK" ${product.productStatus == 'OUT_OF_STOCK' || product.productStatus == 'OUT OF STOCK' || product.productStatus == 'Out of stock' ? 'selected' : ''}>Hết hàng</option>
+                                            <option value="INACTIVE" ${product.productStatus == 'INACTIVE' || product.productStatus == 'Inactive' ? 'selected' : ''}>Không hoạt động</option>
                                         </select>
-
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Quantity</td>
+                                    <td>Số lượng</td>
                                     <td><input type="number" name="quantity" value="${product.quantityAvailable}" min="0" ${action != 'detail' ? ' ' : 'readonly'} required></td>
                                 </tr>
                                 <tr>
-                                    <td>Category</td>
+                                    <td>Danh mục</td>
                                     <td>
                                         <select name="categoryId" ${action != 'detail' ? ' ' : 'disabled'}>
                                             <c:forEach var="c" items="${categories}">
@@ -96,32 +88,32 @@
                                 </tr>
                                 <c:if test="${action == 'detail'}">
                                     <tr>
-                                        <td>Create At</td>
+                                        <td>Ngày tạo</td>
                                         <td><fmt:formatDate value="${product.createdAt}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 
                                     </tr>
                                     <tr>
                                     <input type="hidden" name="update_at" value="${product.updatedAt}">
-                                    <td>Update At</td>
+                                    <td>Ngày cập nhật</td>
                                     <td><fmt:formatDate value="${product.updatedAt}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 
                                     </tr>
                                 </c:if>
                                 <tr>
-                                    <td>Update By</td>
+                                    <td>Người cập nhật</td>
                                     <td><input type="text" name="update_by" value="${product.updatedBy}" readonly></td>
                                 </tr>
                             </table>
 
                             <div>
                                 <c:if test="${action == 'detail'}">
-                                    <a href="pageContext.request.contextPath/edit - product?id ={product.productId}&action=edit"><button type="button">Edit</button></a>
+                                    <a href="pageContext.request.contextPath/edit - product?id ={product.productId}&action=edit"><button type="button">Chỉnh sửa</button></a>
                                 </c:if> 
                                 <c:if test="${action == 'edit'}">
-                                    <input type="submit" value="Save">
+                                    <input type="submit" value="Lưu">
                                 </c:if>
 
-                                <a href="${pageContext.request.contextPath}/product-list">Cancel</a></div>
+                                <a href="${pageContext.request.contextPath}/product-list">Hủy</a></div>
                         </form>
                     </div>
                 </div>

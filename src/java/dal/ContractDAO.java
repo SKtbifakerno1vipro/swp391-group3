@@ -326,7 +326,7 @@ public class ContractDAO extends DBContext {
      * @return
      */
     public boolean validateToken(int contractId, String token) {
-        String sql = "SELECT COUNT(*) FROM customer_contract WHERE customer_contract_id = ? AND token = ? AND (token_expired_at IS NULL OR token_expired_at > GETDATE())";
+        String sql = "SELECT COUNT(*) FROM customer_contract WHERE customer_contract_id = ? AND token = ? AND (token_expired_at > GETDATE())";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
             ps.setString(2, token);
