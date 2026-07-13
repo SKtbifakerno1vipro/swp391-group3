@@ -508,10 +508,11 @@ public class DashboardDAO extends DBContext {
 
     public List<StatusStatisticDTO> countContractStatusForOfficer() {
         List<StatusStatisticDTO> statusCounts = new ArrayList<>();
-        String sql = "SELECT contract_status as c_status, COUNT(*) AS total "
-                + "FROM customer_contract "
-                + "WHERE contract_status IS NOT NULL "
-                + "GROUP BY contract_status";
+        String sql = """
+                     SELECT contract_status as c_status, COUNT(*) AS total 
+                     FROM customer_contract 
+                     WHERE contract_status IS NOT NULL 
+                     GROUP BY contract_status""";
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 statusCounts.add(new StatusStatisticDTO(rs.getString("c_status"), rs.getInt("total")));
