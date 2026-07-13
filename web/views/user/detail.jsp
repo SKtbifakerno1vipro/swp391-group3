@@ -137,6 +137,14 @@
                 color:var(--danger);
                 font-weight:800
             }
+            .alert-success {
+                padding:14px 16px;
+                border-radius:16px;
+                margin-bottom:18px;
+                background:#d4edda;
+                color:#155724;
+                font-weight:800;
+            }
             @media(max-width:760px){
                 .page-top,.panel-head{
                     align-items:flex-start;
@@ -158,6 +166,7 @@
                     <div class="panel-head"><h2><c:out value="${u.fullName}"/></h2></div>
                     <div class="panel-body">
                         <c:if test="${not empty error}"><div class="alert"><c:out value="${error}"/></div></c:if>
+                        <c:if test="${not empty successMsg}"><div class="alert-success"><c:out value="${successMsg}"/></div></c:if>
                             <div class="form-grid">
                                 <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" readonly=""></div>
                             <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required></div>
@@ -172,7 +181,11 @@
                             <div class="field"><label>Người cập nhật</label><span class="readonly-value"><c:set var="updator" value="${userService.getUserById(u.updatedBy)}" /><c:out value="${updator != null ? updator.userName : (u.updatedBy == 0 ? 'N/A' : u.updatedBy)}"/></span></div>
                             <div class="field"><label>Ngày cập nhật</label><span class="readonly-value"><c:out value="${u.updateTimeString}"/></span></div>
                         </div>
-                        <div class="actions" style="margin-top:24px"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu thay đổi</button><a class="button danger" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">close</span>Hủy</a></div>
+                        <div class="actions" style="margin-top:24px">
+                            <button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu thay đổi</button>
+                            <button class="button danger" type="submit" name="action" value="resetPassword" onclick="return confirm('Bạn có chắc muốn khôi phục mật khẩu về 123456 không?');"><span class="material-symbols-outlined">lock_reset</span>Khôi phục Mật khẩu</button>
+                            <a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">close</span>Hủy</a>
+                        </div>
                     </div>
                 </form>
             </main>

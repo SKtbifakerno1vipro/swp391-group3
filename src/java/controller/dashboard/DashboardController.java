@@ -72,14 +72,20 @@ public class DashboardController extends HttpServlet {
             return;
         }
         if (user.getRoleId() == 5) { // ROLE IS ADMIN OFFICER
+            String startDate = request.getParameter("startDate");
+            String endDate = request.getParameter("endDate");
+            
+            request.setAttribute("startDate", startDate);
+            request.setAttribute("endDate", endDate);
+            
             request.setAttribute("awaitingQuotations", dashboardDAO.countQuotationAwaitingContract());
             request.setAttribute("contractsInProgress", dashboardDAO.countContractInProgress());
             request.setAttribute("activeContracts", dashboardDAO.countActiveContracts());
             request.setAttribute("draftContracts", dashboardDAO.countDraftContracts());
             request.setAttribute("contractStatusCounts", dashboardDAO.countContractStatusForOfficer());
-            request.setAttribute("contractsNeedingAction", dashboardDAO.getContractNeedingAction(5));
+            request.setAttribute("contractsNeedingAction", dashboardDAO.getContractNeedingAction(5, startDate, endDate));
             request.setAttribute("invoiceSummary", dashboardDAO.getInvoiceSummaryForOfficer());
-            request.setAttribute("recentInvoices", dashboardDAO.getRecentInvoicesForOfficer(10));
+            request.setAttribute("recentInvoices", dashboardDAO.getRecentInvoicesForOfficer(10, startDate, endDate));
             request.getRequestDispatcher("/views/dashboard/admin-officier-dashboard.jsp").forward(request, response);
             return;
         }

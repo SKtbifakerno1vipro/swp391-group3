@@ -472,6 +472,50 @@ public class DashboardDAO extends DBContext {
      * @param limit
      * @return
      */
+    public List<ContractCustomerDTO> getContractNeedingAction(int limit, String startDate, String endDate) {
+        List<ContractCustomerDTO> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+                    select top (?)
+                    c.customer_contract_id, c.contract_number, c.contract_status,
+                    c.updated_at, cust.company_name
+                    from customer_contract c join customer cust
+                    on c.customer_id= cust.customer_id
+                    where c.contract_status in ('PENDING_REVIEW','DRAFT') """);
+        
+        if (startDate != null && !startDate.isEmpty()) {
+            sql.append(" AND c.updated_at >= ? ");
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            sql.append(" AND c.updated_at <= ? ");
+        }
+        sql.append(" order by c.updated_at desc");
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            ps.setInt(paramIndex++, limit);
+            if (startDate != null && !startDate.isEmpty()) ps.setString(paramIndex++, startDate + " 00:00:00");
+            if (endDate != null && !endDate.isEmpty()) ps.setString(paramIndex++, endDate + " 23:59:59");
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ContractCustomerDTO dto = new ContractCustomerDTO();
+                    dto.setContractId(rs.getInt("customer_contract_id"));
+                    dto.setContractNumber(rs.getString("contract_number"));
+                    dto.setContractStatus(rs.getString("contract_status"));
+                    dto.setCustomerName(rs.getString("company_name"));
+
+                    if (rs.getTimestamp("updated_at") != null) {
+                        dto.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                    }
+                    list.add(dto);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getContractNeedingAction with dates: " + e.getMessage());
+        }
+        return list;
+    }
+
     public List<ContractCustomerDTO> getContractNeedingAction(int limit) {
         List<ContractCustomerDTO> list = new ArrayList<>();
         String sql = """
@@ -682,6 +726,50 @@ public class DashboardDAO extends DBContext {
             System.out.println("getInvoiceSummaryForOfficer error: " + e.getMessage());
         }
         return summary;
+    }
+
+    public List<Map<String, Object>> getRecentInvoicesForOfficer(int limit, String startDate, String endDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT TOP (?) i.invoice_no, i.issue_date, i.total_amount, i.invoice_status, "
+                + "c.contract_number, cu.company_name, o.customer_order_id, p.payment_status "
+                + "FROM invoice i "
+                + " JOIN customer_contract c ON i.customer_contract_id = c.customer_contract_id "
+                + " JOIN customer cu ON c.customer_id = cu.customer_id "
+                + " JOIN customer_order o ON i.customer_order_id = o.customer_order_id "
+                + " JOIN payment p ON i.invoice_id = p.invoice_id WHERE 1=1 ");
+        
+        if (startDate != null && !startDate.isEmpty()) {
+            sql.append(" AND i.issue_date >= ? ");
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            sql.append(" AND i.issue_date <= ? ");
+        }
+        sql.append(" ORDER BY i.issue_date DESC, i.invoice_id DESC");
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            ps.setInt(paramIndex++, limit);
+            if (startDate != null && !startDate.isEmpty()) ps.setString(paramIndex++, startDate);
+            if (endDate != null && !endDate.isEmpty()) ps.setString(paramIndex++, endDate);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> inv = new HashMap<>();
+                    inv.put("invoiceNo", rs.getString("invoice_no"));
+                    inv.put("issueDate", rs.getDate("issue_date"));
+                    inv.put("totalAmount", rs.getBigDecimal("total_amount"));
+                    inv.put("invoiceStatus", rs.getString("invoice_status"));
+                    inv.put("contractNumber", rs.getString("contract_number"));
+                    inv.put("companyName", rs.getString("company_name"));
+                    inv.put("orderId", rs.getInt("customer_order_id"));
+                    inv.put("paymentStatus", rs.getString("payment_status"));
+                    list.add(inv);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getRecentInvoicesForOfficer with dates error: " + e.getMessage());
+        }
+        return list;
     }
 
     public List<Map<String, Object>> getRecentInvoicesForOfficer(int limit) {
