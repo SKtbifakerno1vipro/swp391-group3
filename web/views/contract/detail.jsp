@@ -50,15 +50,20 @@
             }
 
             .history-section {
-                max-height: 500px;
-                overflow-y: auto;
                 padding-right: 5px;
             }
 
-            .history-section::-webkit-scrollbar {
+            .history-list {
+                max-height: 400px;
+                overflow-y: auto;
+                padding-right: 5px;
+                margin-bottom: 15px;
+            }
+
+            .history-list::-webkit-scrollbar {
                 width: 6px;
             }
-            .history-section::-webkit-scrollbar-thumb {
+            .history-list::-webkit-scrollbar-thumb {
                 background: rgba(0,0,0,0.1);
                 border-radius: 3px;
             }
@@ -286,21 +291,35 @@
                                 <h3 style="margin-top:0;">Lịch sử yêu cầu chỉnh sửa</h3>
                                 <c:choose>
                                     <c:when test="${not empty historyList}">
-                                        <c:forEach var="h" items="${historyList}">
-                                            <div class="history-item">
-                                                <p style="margin: 0 0 3px 0; color: var(--muted); font-size: 0.85em;">${h.getCreateTimeString()}</p>
-                                                <p style="margin: 0 0 3px 0; font-size: 0.9em;"><strong>Trạng thái:</strong> ${h.toStatus}</p>
-                                                <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>Bởi:</strong> ${h.changedByName}</p>
-                                                <c:if test="${sessionScope.user.roleId == 5}">
-                                                    <p style="margin: 0 0 5px 0; color: var(--danger); font-size: 0.9em;"><strong>Ghi chú:</strong> ${h.note}</p>
-                                                </c:if>
-                                                <c:if test="${not empty h.revisionItems}">
-                                                    <c:forEach var="item" items="${h.revisionItems}">
-                                                        <div class="note-block">${item.revisionDetail}</div>
-                                                    </c:forEach>
-                                                </c:if>
+                                        <div class="history-list">
+                                            <c:forEach var="h" items="${historyList}">
+                                                <div class="history-item">
+                                                    <p style="margin: 0 0 3px 0; color: var(--muted); font-size: 0.85em;">${h.getCreateTimeString()}</p>
+                                                    <p style="margin: 0 0 3px 0; font-size: 0.9em;"><strong>Trạng thái:</strong> ${h.toStatus}</p>
+                                                    <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>Bởi:</strong> ${h.changedByName}</p>
+                                                    <c:if test="${sessionScope.user.roleId == 5}">
+                                                        <p style="margin: 0 0 5px 0; color: var(--danger); font-size: 0.9em;"><strong>Ghi chú:</strong> ${h.note}</p>
+                                                    </c:if>
+                                                    <c:if test="${not empty h.revisionItems}">
+                                                        <c:forEach var="item" items="${h.revisionItems}">
+                                                            <div class="note-block">${item.revisionDetail}</div>
+                                                        </c:forEach>
+                                                    </c:if>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                        <c:if test="${historyEndPage > 1}">
+                                            <div style="display: flex; gap: 5px; margin-top: 15px; justify-content: center;">
+                                                <c:forEach begin="1" end="${historyEndPage}" var="i">
+                                                    <a href="contract-detail?id=${contract.contractId}&historyPage=${i}" 
+                                                       style="padding: 4px 10px; border-radius: 4px; border: 1px solid var(--line); text-decoration: none; 
+                                                              background: ${i == historyPage ? 'var(--primary)' : '#fff'};
+                                                              color: ${i == historyPage ? '#fff' : 'var(--text)'};">
+                                                        ${i}
+                                                    </a>
+                                                </c:forEach>
                                             </div>
-                                        </c:forEach>
+                                        </c:if>
                                     </c:when>
                                     <c:otherwise>
                                         <p style="color: var(--muted); font-style: italic; font-size: 0.9em;">Chưa có lịch sử nào</p>

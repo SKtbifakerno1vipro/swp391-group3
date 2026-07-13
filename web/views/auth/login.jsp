@@ -381,6 +381,7 @@
                                         <span class="material-symbols-outlined">lock</span>
                                         <input type="password" id="password" name="password" required
                                             placeholder="Nhập mật khẩu" autocomplete="current-password">
+                                        <span class="material-symbols-outlined" id="togglePasswordIcon" onclick="togglePassword()" style="cursor: pointer; color: var(--muted); user-select: none;">visibility_off</span>
                                     </div>
                                 </div>
 
@@ -402,6 +403,18 @@
                     </section>
                 </section>
             </main>
+            <script>
+                function togglePassword() {
+                    var pwdInput = document.getElementById("password");
+                    var icon = document.getElementById("togglePasswordIcon");
+                    if (pwdInput.type === "password") {
+                        pwdInput.type = "text";
+                        icon.innerText = "visibility";
+                    } else {
+                        pwdInput.type = "password";
+                        icon.innerText = "visibility_off";
+                    }
+                }
+            </script>
         </body>
-
         </html>

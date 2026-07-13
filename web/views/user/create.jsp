@@ -147,6 +147,8 @@
                             <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required></div>
                             <div class="field"><label>Email</label><input type="email" name="email" value="${u.email}" required></div>
                             <div class="field"><label>Số điện thoại</label><input type="text" name="phone" value="${u.phone}" required></div>
+                            <div class="field"><label>Địa chỉ</label><input type="text" name="address" value="${u.address}"></div>
+                            <div class="field"><label>Ngày sinh</label><input type="date" name="dateBirth" value="${u.dateBirth}"></div>
                             <div class="field"><label>Giới tính</label><select name="gender"><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Nam</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Nữ</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Khác</option></select></div>
                             <div class="field"><label>Vai trò</label><select name="roleId" required><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
                             </div>

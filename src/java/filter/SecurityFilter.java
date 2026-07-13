@@ -67,7 +67,6 @@ public class SecurityFilter implements Filter {
             "/quotation-detail",
             "/contract-list",
             "/contract-detail",
-            "/contract-save",
             "/customer-order-list",
             "/customer-order",
             //nguyenkien
@@ -141,10 +140,7 @@ public class SecurityFilter implements Filter {
             "/quotation-list",
             "/quotation-create",
             "/quotation-detail",
-            "/contract-list",
-            "/contract-detail",
             "/customer-order-list",
-            "/customer-order",
             "/customer-order",
             "/product-list",
             "/category/list",
@@ -153,6 +149,8 @@ public class SecurityFilter implements Filter {
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
             "/dashboard",
+            "/edit-user",
+            "/user-detail",
             "/contract-list",
             "/contract-detail",
             "/contract-save",
@@ -185,84 +183,83 @@ public class SecurityFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        chain.doFilter(request, response);
-//        HttpServletRequest req = (HttpServletRequest) request;
-//        HttpServletResponse res = (HttpServletResponse) response;
-//
-//        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-//        res.setHeader("Pragma", "no-cache");
-//        res.setDateHeader("Expires", 0);
-//
-//        String path = req.getServletPath();
-//
-//        if (isStaticResource(path)) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        HttpSession session = req.getSession(false);
-//        User user = (session != null) ? (User) session.getAttribute("user") : null;
-//
-//        if ("/contract-detail".equals(path)) {
-//            String token = req.getParameter("token");
-//            String idStr = req.getParameter("id");
-//            if (token != null && idStr != null) {
-//                try {
-//                    int contractId = Integer.parseInt(idStr);
-//                    dal.ContractDAO cDAO = new dal.ContractDAO();
-//                    if (cDAO.validateToken(contractId, token)) {
-//                        chain.doFilter(request, response);
-//                        return;
-//                    }
-//                } catch (Exception e) {
-//                    res.sendRedirect(req.getContextPath() + "/login");
-//                }
-//            }
-//        }
-//
-//        if (user == null) {
-//            res.sendRedirect(req.getContextPath() + "/login");
-//            return;
-//        }
-//
-//        // Check if user has been banned/deactivated (INACTIVE status)
-//        User dbUser = userDAO.getUserById(user.getUserId());
-//        if (dbUser == null || "INACTIVE".equalsIgnoreCase(dbUser.getStatus())) {
-//            if (session != null) {
-//                session.invalidate();
-//            }
-//            res.sendRedirect(req.getContextPath() + "/login");
-//            return;
-//        }
-//
-//        if (LOGGED_IN_URLS.contains(path)) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (path.startsWith("/views/")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (hasPermission(user.getRoleId(), path, req)) {
-//            chain.doFilter(request, response);
-//            return;
-//        } else {
-//            System.out.println("Access Denied: Role "
-//                    + user.getRoleId()
-//                    + " tried to access "
-//                    + path);
-//
-//            res.sendRedirect(req.getContextPath()
-//                    + "/dashboard?error=denied");
-//            return;
-//        }
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setDateHeader("Expires", 0);
+
+        String path = req.getServletPath();
+
+        if (isStaticResource(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if ("/contract-detail".equals(path)) {
+            String token = req.getParameter("token");
+            String idStr = req.getParameter("id");
+            if (token != null && idStr != null) {
+                try {
+                    int contractId = Integer.parseInt(idStr);
+                    dal.ContractDAO cDAO = new dal.ContractDAO();
+                    if (cDAO.validateToken(contractId, token)) {
+                        chain.doFilter(request, response);
+                        return;
+                    }
+                } catch (Exception e) {
+                    res.sendRedirect(req.getContextPath() + "/login");
+                }
+            }
+        }
+
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        // Check if user has been banned/deactivated (INACTIVE status)
+        User dbUser = userDAO.getUserById(user.getUserId());
+        if (dbUser == null || "INACTIVE".equalsIgnoreCase(dbUser.getStatus())) {
+            if (session != null) {
+                session.invalidate();
+            }
+            res.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        if (LOGGED_IN_URLS.contains(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (path.startsWith("/views/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (hasPermission(user.getRoleId(), path, req)) {
+            chain.doFilter(request, response);
+            return;
+        } else {
+            System.out.println("Access Denied: Role "
+                    + user.getRoleId()
+                    + " tried to access "
+                    + path);
+
+            res.sendRedirect(req.getContextPath()
+                    + "/dashboard?error=denied");
+            return;
+        }
     }
 
     private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
