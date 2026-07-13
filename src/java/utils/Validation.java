@@ -136,7 +136,51 @@ public class Validation {
                 return "Price exceeds the permitted limit";
             }
         } catch (NumberFormatException e) {
-            return "Price must be integer";
+            return "Price must be a valid number";
+        }
+        return null;
+    }
+
+    public static String validateProductName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return "Tên sản phẩm không được để trống!";
+        }
+        String trimmed = name.trim();
+        if (trimmed.length() > 255) {
+            return "Tên sản phẩm tối đa chỉ được 255 kí tự!";
+        }
+        return null;
+    }
+
+    public static String validateProductUnit(String unit) {
+        if (unit == null || unit.trim().isEmpty()) {
+            return "Đơn vị tính không được để trống!";
+        }
+        String trimmed = unit.trim();
+        if (trimmed.length() > 50) {
+            return "Đơn vị tính tối đa chỉ được 50 kí tự!";
+        }
+        return null;
+    }
+
+    public static String validateCostAndSellingPrice(String costPriceStr, String sellingPriceStr) {
+        String validateCost = validatePrice(costPriceStr);
+        if (validateCost != null) {
+            return "Giá gốc: " + validateCost;
+        }
+        String validateSelling = validatePrice(sellingPriceStr);
+        if (validateSelling != null) {
+            return "Giá bán: " + validateSelling;
+        }
+
+        try {
+            double cost = Double.parseDouble(costPriceStr.trim());
+            double selling = Double.parseDouble(sellingPriceStr.trim());
+            if (selling < cost) {
+                return "Giá bán phải lớn hơn hoặc bằng giá gốc sản phẩm!";
+            }
+        } catch (NumberFormatException e) {
+            return "Định dạng giá gốc hoặc giá bán không hợp lệ!";
         }
         return null;
     }

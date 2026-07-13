@@ -104,6 +104,11 @@
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">inventory_2</span></div>
                         <span class="sidebar-text">Sản phẩm</span>
                     </a>
+                    <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/product-review" title="Đánh giá & Phản hồi">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span></div>
+                        <span class="sidebar-text">Đánh giá</span>
+                    </a>
                     <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/category/list" title="Categories">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">category</span></div>
