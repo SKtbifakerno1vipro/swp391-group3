@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -167,26 +168,31 @@
                     <div class="panel-body">
                         <c:if test="${not empty error}"><div class="alert"><c:out value="${error}"/></div></c:if>
                         <c:if test="${not empty successMsg}"><div class="alert-success"><c:out value="${successMsg}"/></div></c:if>
+                            <c:set var="canEdit" value="${sessionScope.user.roleId == 1 || sessionScope.user.userId == u.userId}" />
                             <div class="form-grid">
                                 <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" readonly=""></div>
-                            <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}></div>
-                            <div class="field"><label>Email</label><input type="email" name="email" value="${u.email}" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}></div>
-                            <div class="field"><label>Số điện thoại</label><input type="text" name="phone" value="${u.phone}" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}></div>
-                            <div class="field"><label>Địa chỉ</label><input type="text" name="address" value="${u.address}" ${sessionScope.user.roleId != 1 ? 'disabled' : ''}></div>
-                            <div class="field"><label>Giới tính</label><select name="gender" ${sessionScope.user.roleId != 1 ? 'disabled' : ''}><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Nam</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Nữ</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Khác</option></select></div>
-                            <div class="field"><label>Vai trò</label><select name="roleId" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
-                            <div class="field"><label>Trạng thái</label><select name="status" ${sessionScope.user.roleId != 1 ? 'disabled' : ''}><option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option><option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>Khóa</option></select></div>
+                            <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required ${not canEdit ? 'disabled' : ''}></div>
+                            <div class="field"><label>Email</label><input type="email" name="email" value="${u.email}" required ${not canEdit ? 'disabled' : ''}></div>
+                            <div class="field"><label>Số điện thoại</label><input type="text" name="phone" value="${u.phone}" required ${not canEdit ? 'disabled' : ''}></div>
+                            <fmt:formatDate value="${u.dateBirth}" pattern="yyyy-MM-dd" var="dobStr" />
+                            <div class="field"><label>Ngày sinh</label><input type="date" name="dateBirth" value="${dobStr}" ${not canEdit ? 'disabled' : ''}></div>
+                            <div class="field"><label>Địa chỉ</label><input type="text" name="address" value="${u.address}" ${not canEdit ? 'disabled' : ''}></div>
+                            <div class="field"><label>Giới tính</label><select name="gender" ${not canEdit ? 'disabled' : ''}><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Nam</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Nữ</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Khác</option></select></div>
+                            <div class="field"><label>Vai trò</label><select name="roleId" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select><c:if test="${sessionScope.user.roleId != 1}"><input type="hidden" name="roleId" value="${u.roleId}"></c:if></div>
+                            <div class="field"><label>Trạng thái</label><select name="status" ${sessionScope.user.roleId != 1 ? 'disabled' : ''}><option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option><option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>Khóa</option></select><c:if test="${sessionScope.user.roleId != 1}"><input type="hidden" name="status" value="${u.status}"></c:if></div>
                             <div class="field"><label>Người tạo</label><span class="readonly-value"><c:set var="creator" value="${userService.getUserById(u.createdBy)}" /><c:out value="${creator != null ? creator.userName : (u.createdBy == 0 ? 'N/A' : u.createdBy)}"/></span></div>
                             <div class="field"><label>Ngày tạo</label><span class="readonly-value"><c:out value="${u.createTimeString}"/></span></div>
                             <div class="field"><label>Người cập nhật</label><span class="readonly-value"><c:set var="updator" value="${userService.getUserById(u.updatedBy)}" /><c:out value="${updator != null ? updator.userName : (u.updatedBy == 0 ? 'N/A' : u.updatedBy)}"/></span></div>
                             <div class="field"><label>Ngày cập nhật</label><span class="readonly-value"><c:out value="${u.updateTimeString}"/></span></div>
                         </div>
                         <div class="actions" style="margin-top:24px">
-                            <c:if test="${sessionScope.user.roleId == 1}">
+                            <c:if test="${canEdit}">
                                 <button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu thay đổi</button>
-                                <button class="button danger" type="submit" name="action" value="resetPassword" onclick="return confirm('Bạn có chắc muốn khôi phục mật khẩu về 123456 không?');"><span class="material-symbols-outlined">lock_reset</span>Khôi phục Mật khẩu</button>
-                                <a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">close</span>Hủy</a>
                             </c:if>
+                            <c:if test="${sessionScope.user.roleId == 1}">
+                                <button class="button danger" type="submit" name="action" value="resetPassword" onclick="return confirm('Bạn có chắc muốn khôi phục mật khẩu về 123456 không?');"><span class="material-symbols-outlined">lock_reset</span>Khôi phục Mật khẩu</button>
+                            </c:if>
+                            <a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Quay lại</a>
                         </div>
                     </div>
                 </form>
