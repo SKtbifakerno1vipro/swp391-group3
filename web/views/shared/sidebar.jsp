@@ -114,11 +114,13 @@
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">request_quote</span></div>
                         <span class="sidebar-text">Quotations</span>
                     </a>
-                    <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/contract-list" title="Contracts">
-                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div>
-                        <span class="sidebar-text">Contracts</span>
-                    </a>
+                    <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
+                        <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
+                           href="${pageContext.request.contextPath}/contract-list" title="Contracts">
+                            <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div>
+                            <span class="sidebar-text">Contracts</span>
+                        </a>
+                    </c:if>
                     <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/payment/list" title="Payments">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">payments</span></div>
@@ -129,11 +131,13 @@
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt</span></div>
                         <span class="sidebar-text">Hóa đơn</span>
                     </a>
-                    <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/user-list" title="Users">
-                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">manage_accounts</span></div>
-                        <span class="sidebar-text">Users</span>
-                    </a>
+                    <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
+                        <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"
+                           href="${pageContext.request.contextPath}/user-list" title="Users">
+                            <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">manage_accounts</span></div>
+                            <span class="sidebar-text">Users</span>
+                        </a>
+                    </c:if>
                     <a class="nav-link ${param.activeMenu == 'roles' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/role-list" title="Roles">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">admin_panel_settings</span></div>
