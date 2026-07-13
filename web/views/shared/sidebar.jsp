@@ -62,6 +62,11 @@
                     </a>
                 </c:when>
                 <c:when test="${sessionScope.user.roleId == 5}">
+                    <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/edit-user?id=${sessionScope.user.userId}" title="My Profile">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">account_circle</span></div>
+                        <span class="sidebar-text">My Profile</span>
+                    </a>
                     <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/quotation-list" title="Quotations">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">request_quote</span></div>

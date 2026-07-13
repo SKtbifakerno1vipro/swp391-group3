@@ -124,14 +124,16 @@
                             </c:if>
 
                             <label style="font-weight:bold; display:block; margin-top: 15px;">Nội dung Hợp đồng:</label>
-                            <div id="contract-body" class="raw-content" contenteditable="${editable ? 'true' : 'false'}"
-                                 style="background: ${editable ? 'white' : '#f9f9f9'};">
+                            <div id="contract-body" class="raw-content" contenteditable="${editable && sessionScope.user.roleId == 5 ? 'true' : 'false'}"
+                                 style="background: ${editable && sessionScope.user.roleId == 5 ? 'white' : '#f9f9f9'};">
                                 ${not empty contract.contractContent ? contract.contractContent : templateContent}
                             </div>
 
                             <div style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
                                 <c:if test="${editable}">
-                                    <button type="button" onclick="submitForm('save')">Lưu thay đổi</button>
+                                    <c:if test="${sessionScope.user.roleId == 5}">
+                                        <button type="button" onclick="submitForm('save')">Lưu thay đổi</button>
+                                    </c:if>
                                     <c:if test="${contract != null}">
                                         <!--officier-->
                                         <c:if test="${sessionScope.user.roleId == 5}">

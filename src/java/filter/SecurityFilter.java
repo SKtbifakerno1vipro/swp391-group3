@@ -149,6 +149,8 @@ public class SecurityFilter implements Filter {
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
             "/dashboard",
+            "/edit-user",
+            "/user-detail",
             "/contract-list",
             "/contract-detail",
             "/contract-save",

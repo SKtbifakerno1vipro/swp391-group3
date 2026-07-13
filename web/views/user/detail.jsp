@@ -169,22 +169,24 @@
                         <c:if test="${not empty successMsg}"><div class="alert-success"><c:out value="${successMsg}"/></div></c:if>
                             <div class="form-grid">
                                 <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" readonly=""></div>
-                            <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required></div>
-                            <div class="field"><label>Email</label><input type="email" name="email" value="${u.email}" required></div>
-                            <div class="field"><label>Số điện thoại</label><input type="text" name="phone" value="${u.phone}" required></div>
-                            <div class="field"><label>Địa chỉ</label><input type="text" name="address" value="${u.address}"></div>
-                            <div class="field"><label>Giới tính</label><select name="gender"><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Nam</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Nữ</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Khác</option></select></div>
-                            <div class="field"><label>Vai trò</label><select name="roleId" required><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
-                            <div class="field"><label>Trạng thái</label><select name="status"><option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option><option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>Khóa</option></select></div>
+                            <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}></div>
+                            <div class="field"><label>Email</label><input type="email" name="email" value="${u.email}" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}></div>
+                            <div class="field"><label>Số điện thoại</label><input type="text" name="phone" value="${u.phone}" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}></div>
+                            <div class="field"><label>Địa chỉ</label><input type="text" name="address" value="${u.address}" ${sessionScope.user.roleId != 1 ? 'disabled' : ''}></div>
+                            <div class="field"><label>Giới tính</label><select name="gender" ${sessionScope.user.roleId != 1 ? 'disabled' : ''}><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Nam</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Nữ</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Khác</option></select></div>
+                            <div class="field"><label>Vai trò</label><select name="roleId" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
+                            <div class="field"><label>Trạng thái</label><select name="status" ${sessionScope.user.roleId != 1 ? 'disabled' : ''}><option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option><option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>Khóa</option></select></div>
                             <div class="field"><label>Người tạo</label><span class="readonly-value"><c:set var="creator" value="${userService.getUserById(u.createdBy)}" /><c:out value="${creator != null ? creator.userName : (u.createdBy == 0 ? 'N/A' : u.createdBy)}"/></span></div>
                             <div class="field"><label>Ngày tạo</label><span class="readonly-value"><c:out value="${u.createTimeString}"/></span></div>
                             <div class="field"><label>Người cập nhật</label><span class="readonly-value"><c:set var="updator" value="${userService.getUserById(u.updatedBy)}" /><c:out value="${updator != null ? updator.userName : (u.updatedBy == 0 ? 'N/A' : u.updatedBy)}"/></span></div>
                             <div class="field"><label>Ngày cập nhật</label><span class="readonly-value"><c:out value="${u.updateTimeString}"/></span></div>
                         </div>
                         <div class="actions" style="margin-top:24px">
-                            <button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu thay đổi</button>
-                            <button class="button danger" type="submit" name="action" value="resetPassword" onclick="return confirm('Bạn có chắc muốn khôi phục mật khẩu về 123456 không?');"><span class="material-symbols-outlined">lock_reset</span>Khôi phục Mật khẩu</button>
-                            <a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">close</span>Hủy</a>
+                            <c:if test="${sessionScope.user.roleId == 1}">
+                                <button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu thay đổi</button>
+                                <button class="button danger" type="submit" name="action" value="resetPassword" onclick="return confirm('Bạn có chắc muốn khôi phục mật khẩu về 123456 không?');"><span class="material-symbols-outlined">lock_reset</span>Khôi phục Mật khẩu</button>
+                                <a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">close</span>Hủy</a>
+                            </c:if>
                         </div>
                     </div>
                 </form>
