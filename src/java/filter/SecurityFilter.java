@@ -38,7 +38,8 @@ public class SecurityFilter implements Filter {
             "/auth/forgot",
             "/user/password/change",
             "/payment/ipn",
-            "/payment/return"
+            "/payment/return",
+            "/export-pdf"
     );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
@@ -94,7 +95,8 @@ public class SecurityFilter implements Filter {
             "/revenue-report",
             "/Signature",
             "/SignatureAcceptance",
-            "/realtime/notifications"
+            "/realtime/notifications",
+            "/export-pdf"
     );
 
     private static final List<String> MANAGER_URLS = List.of(
@@ -122,7 +124,8 @@ public class SecurityFilter implements Filter {
             "/revenue-report",
             "/Signature",
             "/SignatureAcceptance",
-            "/realtime/notifications"
+            "/realtime/notifications",
+            "/export-pdf"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
@@ -147,7 +150,8 @@ public class SecurityFilter implements Filter {
             "/payment",
             "/realtime/notifications",
             "/Signature",
-            "/SignatureAcceptance"
+            "/SignatureAcceptance",
+            "/export-pdf"
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(
@@ -175,7 +179,8 @@ public class SecurityFilter implements Filter {
             "/payment/list",
             "/payment",
             "/payment/detail",
-            "/realtime/notifications"
+            "/realtime/notifications",
+            "/export-pdf"
     );
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
@@ -204,7 +209,8 @@ public class SecurityFilter implements Filter {
             "/payment/detail",
             "/Signature",
             "/SignatureAcceptance",
-            "/realtime/notifications"
+            "/realtime/notifications",
+            "/export-pdf"
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
@@ -220,7 +226,8 @@ public class SecurityFilter implements Filter {
             "/create-product",
             "/edit-product",
             "/product-delete",
-            "/realtime/notifications"
+            "/realtime/notifications",
+            "/export-pdf"
     );
 
     @Override
