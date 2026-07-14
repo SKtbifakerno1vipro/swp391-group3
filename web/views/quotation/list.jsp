@@ -108,7 +108,7 @@
                                 <td>
                                     <c:choose>
                                         <c:when test="${quotation.hasContract && quotation.contractId != null}">
-                                            <a href="contract-detail?id=${quotation.contractId}">View Detail</a>
+                                             <a href="quotation-detail?id=${quotation.quotationId}">View Detail</a>
                                         </c:when>
                                         <c:otherwise>
                                             <a href="quotation-detail?id=${quotation.quotationId}">View Detail</a>

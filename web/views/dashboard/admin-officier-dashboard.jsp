@@ -274,8 +274,9 @@
             function getSemanticColor(status) {
                 if (['SIGNED', 'APPROVED', 'COMPLETED'].includes(status)) return '#4a7c59'; 
                 if (['DRAFT'].includes(status)) return '#646b66'; 
-                if (['PENDING_REVIEW', 'CUSTOMER_CHECK', 'AWAITING_QUOTATION'].includes(status)) return '#b1812f'; 
+                if (['PENDING_REVIEW', 'AWAITING_QUOTATION'].includes(status)) return '#b1812f'; 
                 if (['CANCELLED', 'REJECTED'].includes(status)) return '#b83230'; 
+                if (['CUSTOMER_CHECK'].includes(status)) return '#FFDEA0'; 
                 return '#e4e0d8'; 
             }
 

@@ -79,7 +79,8 @@ public class SecurityFilter implements Filter {
             "/payment",
             "/payment/list",
             "/payment/detail",
-            "/admin/audit-logs"
+            "/admin/audit-logs",
+            "/realtime/notifications"
     );
 
     private static final List<String> MANAGER_URLS = List.of(
@@ -111,7 +112,8 @@ public class SecurityFilter implements Filter {
             "/SignatureAcceptance",
             "/payment",
             "/payment/list",
-            "/payment/detail"
+            "/payment/detail",
+            "/realtime/notifications"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
@@ -132,7 +134,8 @@ public class SecurityFilter implements Filter {
             "/payment/list",
             "/payment/detail",
             "/Signature",
-            "/SignatureAcceptance"
+            "/SignatureAcceptance",
+            "/realtime/notifications"
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(
@@ -148,7 +151,8 @@ public class SecurityFilter implements Filter {
             "/customer-order",
             "/product-list",
             "/category/list",
-            "/revenue-report"
+            "/revenue-report",
+            "/realtime/notifications"
     );
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
@@ -169,7 +173,8 @@ public class SecurityFilter implements Filter {
             "/invoice",
             "/payment",
             "/payment/list",
-            "/payment/detail"
+            "/payment/detail",
+            "/realtime/notifications"
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
@@ -181,7 +186,8 @@ public class SecurityFilter implements Filter {
             "/category/list",
             "/category/create",
             "/category/edit",
-            "/category/delete"
+            "/category/delete",
+            "/realtime/notifications"
     );
 
     @Override
