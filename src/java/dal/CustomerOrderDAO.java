@@ -131,6 +131,17 @@ public class CustomerOrderDAO extends DBContext {
                     }
                     psDetail.executeBatch();
                 }
+
+                // 3. Deduct stock from products
+                String deductStockSql = "UPDATE product SET quantity_available = quantity_available - ? WHERE product_id = ?";
+                try (PreparedStatement psStock = connection.prepareStatement(deductStockSql)) {
+                    for (model.CustomerOrderDetail detail : details) {
+                        psStock.setInt(1, detail.getQuantity());
+                        psStock.setInt(2, detail.getProductId());
+                        psStock.addBatch();
+                    }
+                    psStock.executeBatch();
+                }
             }
 
             connection.commit();
@@ -153,15 +164,88 @@ public class CustomerOrderDAO extends DBContext {
         }
     }
     public boolean updateOrderStatus(int orderId, String status) {
-        String sql = "UPDATE customer_order SET order_status = ? WHERE customer_order_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, status);
-            ps.setInt(2, orderId);
-            return ps.executeUpdate() > 0;
+        String checkStatusSql = "SELECT order_status FROM customer_order WHERE customer_order_id = ?";
+        String updateStatusSql = "UPDATE customer_order SET order_status = ? WHERE customer_order_id = ?";
+        
+        boolean originalAutoCommit = true;
+        try {
+            originalAutoCommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
+            
+            String currentStatus = null;
+            try (PreparedStatement psCheck = connection.prepareStatement(checkStatusSql)) {
+                psCheck.setInt(1, orderId);
+                try (ResultSet rs = psCheck.executeQuery()) {
+                    if (rs.next()) {
+                        currentStatus = rs.getString("order_status");
+                    }
+                }
+            }
+            
+            if (currentStatus == null) {
+                connection.rollback();
+                return false;
+            }
+            
+            // If transitioning to CANCELLED and it wasn't CANCELLED before
+            if ("CANCELLED".equalsIgnoreCase(status) && !"CANCELLED".equalsIgnoreCase(currentStatus)) {
+                // Get items
+                String getItemsSql = "SELECT qd.product_id, cod.quantity "
+                        + "FROM customer_order_detail cod "
+                        + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
+                        + "WHERE cod.customer_order_id = ?";
+                List<int[]> items = new ArrayList<>();
+                try (PreparedStatement psGetItems = connection.prepareStatement(getItemsSql)) {
+                    psGetItems.setInt(1, orderId);
+                    try (ResultSet rsItems = psGetItems.executeQuery()) {
+                        while (rsItems.next()) {
+                            int productId = rsItems.getInt("product_id");
+                            int quantity = rsItems.getInt("quantity");
+                            items.add(new int[]{productId, quantity});
+                        }
+                    }
+                }
+                
+                // Add back quantity_available to products
+                String restoreStockSql = "UPDATE product SET quantity_available = quantity_available + ? WHERE product_id = ?";
+                try (PreparedStatement psRestore = connection.prepareStatement(restoreStockSql)) {
+                    for (int[] item : items) {
+                        psRestore.setInt(1, item[1]); // quantity
+                        psRestore.setInt(2, item[0]); // product_id
+                        psRestore.addBatch();
+                    }
+                    psRestore.executeBatch();
+                }
+            }
+            
+            // Update order status
+            try (PreparedStatement psUpdate = connection.prepareStatement(updateStatusSql)) {
+                psUpdate.setString(1, status);
+                psUpdate.setInt(2, orderId);
+                int affected = psUpdate.executeUpdate();
+                if (affected > 0) {
+                    connection.commit();
+                    return true;
+                } else {
+                    connection.rollback();
+                    return false;
+                }
+            }
         } catch (Exception e) {
+            try {
+                connection.rollback();
+            } catch (Exception rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
             e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(originalAutoCommit);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        return false;
     }
 
     public boolean deleteCustomerOrder(int orderId) {
