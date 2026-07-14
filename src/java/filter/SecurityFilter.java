@@ -43,7 +43,8 @@ public class SecurityFilter implements Filter {
 
     private static final List<String> LOGGED_IN_URLS = List.of(
             "/dashboard",
-            "/user/password/change"
+            "/user/password/change",
+            "/realtime/notifications"
     );
 
     private static final List<String> SYSTEM_ADMIN_URLS = List.of(
@@ -108,6 +109,7 @@ public class SecurityFilter implements Filter {
             "/email/logs",
             "/revenue-report",
             "/Signature",
+            "/SignatureAcceptance",
             "/payment",
             "/payment/list",
             "/payment/detail"
@@ -129,7 +131,9 @@ public class SecurityFilter implements Filter {
             "/customer-order",
             "/payment",
             "/payment/list",
-            "/payment/detail"
+            "/payment/detail",
+            "/Signature",
+            "/SignatureAcceptance"
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(
