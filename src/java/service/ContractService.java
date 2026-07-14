@@ -107,9 +107,11 @@ public class ContractService {
         return contractDAO.refreshContractToken(contractId);
     }
 
-    public void noticeCustomerCheckContract(int contractId, String baseUrl) {
+    public void noticeCustomerCheckContract(int contractId) {
         Contract contract = contractDAO.getContractById(contractId);
         CustomerDTO customer = contractDAO.getCustomerDTOByContractId(contractId);
+
+        String baseUrl = "http://localhost:9999/SWP391_GROUP3/";
 
         String secureUrl = baseUrl + "contract-detail?id=" + contractId + "&token=" + contract.getToken();
 
@@ -146,8 +148,8 @@ public class ContractService {
                 + "    </div>"
                 + "</body>"
                 + "</html>";
-//        EmailUtils.sendEmailAsync(customer.getEmail(), subject, content);
-        EmailUtils.sendEmailAsync("omovie111@gmail.com", subject, content);
+//        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
+        EmailUtils.sendEmailAsync("kiennguyenba2005@gmail.com", subject, content);
     }
 
     public void noticeSendFinalContractPdf(int contractId, String token) {
@@ -185,7 +187,7 @@ public class ContractService {
                 + "</body>"
                 + "</html>";
         EmailUtils.sendEmailAsync("omovie111@gmail.com", subject, content);
-//        EmailUtils.sendEmailAsync(customer.getEmail(), subject, content);
+//        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
     }
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
@@ -209,6 +211,14 @@ public class ContractService {
 
     public int insert(Contract c) {
         return contractDAO.insert(c);
+    }
+
+    public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId, int pageIndex, int pageSize) {
+        return contractDAO.getHistoriesByContractId(contractId, userId, roleId, pageIndex, pageSize);
+    }
+
+    public int getTotalHistoriesByContractId(int contractId, int userId, int roleId) {
+        return contractDAO.getTotalHistoriesByContractId(contractId, userId, roleId);
     }
 
     public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId) {

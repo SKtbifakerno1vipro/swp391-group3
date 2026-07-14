@@ -90,5 +90,56 @@ public class AcceptanceRecordController extends HttpServlet {
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/customer-order-list");
         }
-    } 
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        String orderIdParam = request.getParameter("orderId");
+        if (orderIdParam == null || orderIdParam.trim().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/customer-order-list");
+            return;
+        }
+
+        try {
+            int orderId = Integer.parseInt(orderIdParam);
+            CustomerOrderDTO order = customerOrderService.getCustomerOrderById(orderId);
+            if (order == null) {
+                response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                return;
+            }
+
+            // Only Customer (roleId == 3) associated with this order should confirm it.
+            if (currentUser.getRoleId() == 3) {
+                if (order.getCustomer() == null || order.getCustomer().getUserId() == null || order.getCustomer().getUserId().intValue() != currentUser.getUserId()) {
+                    response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                    return;
+                }
+            } else {
+                session.setAttribute("error", "Chỉ khách hàng mới có quyền xác nhận nhận hàng.");
+                response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
+                return;
+            }
+
+            boolean updated = customerOrderService.updateOrderStatus(orderId, "COMPLETED");
+            if (updated) {
+                service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "Order", "Khách hàng " + currentUser.getFullName() + " xác nhận nhận hàng thành công đơn hàng ID: " + orderId);
+                session.setAttribute("successMessage", "Xác nhận giao hàng thành công.");
+            } else {
+                session.setAttribute("errorMessage", "Không thể cập nhật trạng thái đơn hàng.");
+            }
+
+            response.sendRedirect(request.getContextPath() + "/AcceptanceRecordController?orderId=" + orderId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/customer-order-list");
+        }
+    }
 }

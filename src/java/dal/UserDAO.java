@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import model.User;
-import java.sql.Statement;
+import java.sql.*;
 import java.sql.Connection;
 
 public class UserDAO extends DBContext {
@@ -21,6 +21,10 @@ public class UserDAO extends DBContext {
         u.setPhone(rs.getString("phone"));
         u.setStatus(rs.getString("account_status"));
         u.setRoleId(rs.getInt("role_id"));
+        u.setAddress(rs.getString("address"));
+        if (rs.getDate("date_of_birth") != null) {
+            u.setDateBirth(rs.getDate("date_of_birth"));
+        }
         if (rs.getTimestamp("created_at") != null) {
             u.setCreateAt(rs.getTimestamp("created_at").toLocalDateTime());
         }
@@ -38,7 +42,7 @@ public class UserDAO extends DBContext {
     public List<UserRoleDTO> searchUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail, int pageIndex, int pageSize) {
         List<UserRoleDTO> list = new ArrayList<>();
         // Tim dong nay trong UserDAO.java
-        String sql = "SELECT u.*, r.role_name FROM [user] u LEFT JOIN dbo.role r ON u.role_id = r.role_id WHERE 1=1";
+        String sql = "SELECT u.*, r.role_name FROM [user] u  JOIN dbo.role r ON u.role_id = r.role_id WHERE 1=1";
         if (roleId > 0) {
             sql += " AND u.role_id = ?";
         }
@@ -55,7 +59,7 @@ public class UserDAO extends DBContext {
             sql += " AND u.email LIKE ?";
         }
 
-        sql += " ORDER BY u.user_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        sql += " ORDER BY u.user_id desc OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
@@ -353,8 +357,8 @@ public class UserDAO extends DBContext {
 
     public boolean createUser(User u) {
         String sql = "INSERT INTO [user] (user_name, password_hash, email, full_name, gender, phone, "
-                + "account_status, role_id, created_by, updated_by, created_at, updated_at) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+                + "account_status, role_id, created_by, updated_by, address, date_of_birth, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, u.getUserName());
@@ -368,6 +372,12 @@ public class UserDAO extends DBContext {
             ps.setInt(8, u.getRoleId());
             ps.setInt(9, u.getCreatedBy());
             ps.setInt(10, u.getUpdatedBy());
+            ps.setString(11, u.getAddress());
+            if (u.getDateBirth() != null) {
+                ps.setDate(12, new Date(u.getDateBirth().getTime()));
+            } else {
+                ps.setNull(12, Types.DATE);
+            }
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("createUser" + e.getMessage());
@@ -389,7 +399,8 @@ public class UserDAO extends DBContext {
         try {
 
             String sql = "UPDATE [user] SET full_name = ?, phone = ?, account_status = ?, "
-                    + "gender = ?, role_id = ?, updated_by = ?, updated_at = GETDATE() "
+                    + "gender = ?, role_id = ?, updated_by = ?, updated_at = GETDATE(), "
+                    + "email = ?, address = ?, date_of_birth = ? "
                     + "WHERE user_id = ?";
 
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -399,7 +410,14 @@ public class UserDAO extends DBContext {
             stm.setString(4, user.getGender());
             stm.setInt(5, user.getRoleId());
             stm.setInt(6, user.getUpdatedBy());
-            stm.setInt(7, user.getUserId());
+            stm.setString(7, user.getEmail());
+            stm.setString(8, user.getAddress());
+            if (user.getDateBirth() != null) {
+                stm.setDate(9, new Date(user.getDateBirth().getTime()));
+            } else {
+                stm.setNull(9, Types.DATE);
+            }
+            stm.setInt(10, user.getUserId());
 
             return stm.executeUpdate() > 0;
         } catch (Exception e) {
@@ -425,19 +443,22 @@ public class UserDAO extends DBContext {
         return null;
     }
 
+    /*
+    created by vu trong phu
+     */
     public User login(String username, String password) {
         String sql = "SELECT * FROM [user] WHERE user_name = ? AND account_status = 'ACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                String storedPassword = rs.getString("password_hash");
+                String hashPassword = rs.getString("password_hash");
                 boolean passwordMatches;
-
-                if (storedPassword != null && storedPassword.startsWith("$2")) {
-                    passwordMatches = true || BCrypt.checkpw(password, storedPassword);
-                } else {
-                    passwordMatches = storedPassword != null && storedPassword.equals(password);
+                System.out.println("pass: " + hashPassword);
+                if (hashPassword != null && hashPassword.startsWith("$2")) {
+                    passwordMatches = BCrypt.checkpw(password, hashPassword);
+                } else {//allow password when db had just initialize 
+                    passwordMatches = hashPassword != null && hashPassword.equals(password);
                 }
 
                 if (passwordMatches) {
@@ -450,25 +471,6 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-    /*
-    created by vu trong phu
-     */
-    public User loginTester(String username, String password) {
-        String sql = "SELECT * FROM [user] WHERE user_name = ? AND password_hash = ? AND account_status = 'ACTIVE'";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, username);
-            ps.setString(2, password);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                User user = mapUser(rs);
-                user.setPassword(password);
-                return user;
-            }
-        } catch (Exception e) {
-            System.out.println("loginTester: " + e.getMessage());
-        }
-        return null;
-    }
 
     /*
     created by vu trong phu

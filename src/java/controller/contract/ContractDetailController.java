@@ -19,23 +19,23 @@ import service.UserService;
 
 @WebServlet("/contract-detail")
 public class ContractDetailController extends HttpServlet {
-
+    
     private ContractService contractService = new ContractService();
     private SignatureService sService = new SignatureService();
     private UserService uService = new UserService();
     private RoleService rService = new RoleService();
-
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-
+        
         String token = request.getParameter("token");
         String contractIdRaw = request.getParameter("id");
-
+        
         boolean isGuest = false;
-
+        
         if (user == null) {
             // if user is guest and click to the link url send from email
             if (token != null && contractIdRaw != null) {
@@ -57,19 +57,19 @@ public class ContractDetailController extends HttpServlet {
             }
         }
         request.setAttribute("isGuest", isGuest);
-
+        
         if ((String) session.getAttribute("errorSig") != null) {
             request.setAttribute("errorSig", (String) session.getAttribute("errorSig"));
             session.removeAttribute("errorSig");
         }
-
+        
         String idStr = request.getParameter("id");
         String quotationIdStr = request.getParameter("quotationId"); //quotation take from quotatuion detail
         boolean existSignature = false;
-
+        
         if ((idStr != null && !idStr.isEmpty()) || (quotationIdStr != null && !quotationIdStr.isEmpty())) {
             try {
-
+                
                 Contract contract = quotationIdStr != null
                         ? contractService.getContractByQuotationId(Integer.parseInt(quotationIdStr))
                         : contractService.getContractById(Integer.parseInt(idStr));
@@ -79,7 +79,27 @@ public class ContractDetailController extends HttpServlet {
                     int contractId = contract.getContractId();
                     int userId = (user != null) ? user.getUserId() : 0;
                     int roleId = (user != null) ? user.getRoleId() : 0;
-                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(contractId, userId, roleId);
+
+                    // Pagination for history request
+                    int historyPage = 1;
+                    int historyPageSize = 5;
+                    String historyPageStr = request.getParameter("historyPage");
+                    if (historyPageStr != null && !historyPageStr.trim().isEmpty()) {
+                        try {
+                            historyPage = Integer.parseInt(historyPageStr);
+                        } catch (Exception e) {}
+                    }
+
+                    int totalHistories = contractService.getTotalHistoriesByContractId(contractId, userId, roleId);
+                    int historyEndPage = totalHistories / historyPageSize;
+                    if (totalHistories % historyPageSize != 0) {
+                        historyEndPage++;
+                    }
+                    if (historyPage > historyEndPage && historyEndPage > 0) {
+                        historyPage = historyEndPage;
+                    }
+
+                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(contractId, userId, roleId, historyPage, historyPageSize);
 
                     //nguyenkien - begin
                     String finalHtml = (contract.getContractContent() != null) ? contract.getContractContent() : "Not have any contract";
@@ -104,11 +124,11 @@ public class ContractDetailController extends HttpServlet {
                             }
                             boolean isCustomerSigner = rService.getRoleIdByName("Customer")
                                     == uService.getUserById(sig.getSignerUserId()).getRoleId();
-
+                            
                             String imgTag = "<div style=\"height: 100px;\">"
                                     + "<img src='" + uploadsUrl + sig.getFileName() + "' style='width: auto; height:80px; max-width: 100%; object-fit: contain;'/>"
                                     + "</div>";
-
+                            
                             if (isCustomerSigner) {
                                 finalHtml = finalHtml.replace("<div style=\"height: 100px;\" id=\"buyer\"></div>", imgTag);
                             } else {
@@ -116,21 +136,23 @@ public class ContractDetailController extends HttpServlet {
                             }
                         }
                     }
-
+                    
                     contract.setContractContent(finalHtml);
                     //nguyen kien - end
 
                     request.setAttribute("contract", contract);
                     request.setAttribute("historyList", historyList);
+                    request.setAttribute("historyPage", historyPage);
+                    request.setAttribute("historyEndPage", historyEndPage);
 
                     // Set status manager or customer can request edit
-                    boolean canRequestEdit = "DRAFT".equals(status)
+                    boolean isInternalProcessing = "DRAFT".equals(status)
                             || "PENDING_REVIEW".equals(status);
                     boolean canCustomerCheck = "CUSTOMER_CHECK".equals(status);
-                    request.setAttribute("canRequestEdit", canRequestEdit);
+                    request.setAttribute("isInternalProcessing", isInternalProcessing);
                     request.setAttribute("canCustomerCheck", canCustomerCheck);
                     request.setAttribute("isApproved", isApproved);
-
+                    
                     request.getRequestDispatcher("views/contract/detail.jsp")
                             .forward(request, response);
                 } else {
@@ -143,10 +165,10 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-list");
         }
     }
-
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
@@ -155,9 +177,9 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-
+        
         String action = request.getParameter("action");
-
+        
         int contractId = Integer.parseInt(request.getParameter("contractId"));
 
         // take contract with the id
@@ -175,7 +197,7 @@ public class ContractDetailController extends HttpServlet {
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
-
+            
             String note = request.getParameter("revision_note");
 
             // save work history  for customer or manager request edit
@@ -183,6 +205,7 @@ public class ContractDetailController extends HttpServlet {
             h.setContractId(contractId);
             h.setFromStatus(currentStatus);
             h.setToStatus("PENDING_REVIEW");
+            h.setNote("Customer/Manager yêu cầu officer sửa đổi lại hợp đồng.");
             h.setChangedBy(user.getUserId());
             int historyId = contractService.insertHistory(h);
 
@@ -194,38 +217,37 @@ public class ContractDetailController extends HttpServlet {
                 item.setRevisionType("");
                 item.setRevisionDetail(note);
                 contractService.insertRevisionItem(item);
-
             }
 
             // update status of contract
             contractService.updateStatus(contractId, "PENDING_REVIEW");
             response.sendRedirect("contract-detail?id=" + contractId);
-
+            
         } else if ("approve".equals(action)) { //when manager approve that contract
-            // BR: only PENDING_REVIEW status + approved by Manager
+            // only PENDING_REVIEW status  can approve by Manager
             if (!"PENDING_REVIEW".equals(contract.getContractStatus())) {
-                session.setAttribute("errorSig", "Cần được Quản lý hoặc Nhân viên Admin kiểm tra trước");
+                session.setAttribute("errorSig", "Cần được officer kiểm tra và sửa đổi trước.");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
             // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
             contractService.refreshContractToken(contractId); // Gen new token + 30m expire
-            contractService.noticeCustomerCheckContract(contractId, "http://localhost:9999/SWP391_GROUP3/");
+            contractService.noticeCustomerCheckContract(contractId);
 
             // Save history work for manager approve contract
             ContractHistory h = new ContractHistory();
             h.setContractId(contractId);
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("CUSTOMER_CHECK");
-            h.setNote("Manager had just approved contract. Waiting for customer check contract");
+            h.setNote("Manager vừa phê duyệt hợp đồng. Đang chờ customer kiểm tra hợp đồng.");
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
-
+            
             response.sendRedirect("contract-detail?id=" + contractId);
-
+            
         } else if ("customer_approve".equals(action)) { // if customer approve contract
-            // BR: only CUSTOMER_CHECK can be approved by Customer
+            // only CUSTOMER_CHECK can be approve by Customer
             if (!"CUSTOMER_CHECK".equals(contract.getContractStatus())) {
                 session.setAttribute("errorSig", "Hợp đồng phải ở trạng thái Chờ khách hàng duyệt trước khi Khách hàng có thể chốt.");
                 response.sendRedirect("contract-detail?id=" + contractId);
@@ -242,9 +264,9 @@ public class ContractDetailController extends HttpServlet {
             h.setNote("Customer approved the contract.");
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
-
+            
             response.sendRedirect("contract-detail?id=" + contractId);
-
+            
         } else if ("send_to_manager".equals(action)) { //if officier send to manager
             // BR: only DRAFT or PENDING_REVIEW can be sent to Manager
             String curStatus = contract.getContractStatus();
@@ -254,7 +276,7 @@ public class ContractDetailController extends HttpServlet {
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
-
+            
             contractService.updateStatus(contractId, "PENDING_REVIEW");
 
             // save work history for officer want manager check contract
@@ -262,23 +284,23 @@ public class ContractDetailController extends HttpServlet {
             h.setContractId(contractId);
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("PENDING_REVIEW");
-            h.setNote("Admin Officer had just edited contract. Manager must check contract");
+            h.setNote("Nhân viên hành chính vừa chỉnh sửa hợp đồng. Quản lý cần kiểm tra hợp đồng.");
             h.setChangedBy(user.getUserId());
             contractService.insertHistory(h);
-
+            
             response.sendRedirect("contract-detail?id=" + contractId);
-
-        } else if ("send_final_contract".equals(action)) {
+            
+        } else if ("send_final_contract".equals(action)) {// send customer final contract for storage their contract
             if (!"SIGNED".equals(contract.getContractStatus())) {
                 session.setAttribute("errorSig", "Hợp đồng chưa được ký hoàn tất.");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
-            String token = contractService.refreshContractToken(contractId);
+            String token = contractService.refreshContractToken(contractId); // refresh token when send to customer
             contractService.noticeSendFinalContractPdf(contractId, token);
             
             response.sendRedirect("contract-detail?id=" + contractId);
-
+            
         } else {
             // Action not defined
             response.sendRedirect("contract-detail?id=" + contractId);

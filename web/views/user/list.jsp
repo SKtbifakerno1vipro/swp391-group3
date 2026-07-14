@@ -254,10 +254,12 @@
                     <div>
                         <p class="eyebrow">Quản lý Truy cập</p>
                         <h1>Quản lý Người dùng</h1>
-                        <p>Quản lý tài khoản, vai trò, thông tin liên lạc và trạng thái của nhân viên.</p>
+                        <p>Quản lý tài khoản, vai trò, thông tin liên lạc và trạng thái của người dùng.</p>
                     </div>
                     <div class="actions">
-                        <a class="button primary" href="${pageContext.request.contextPath}/edit-user"><span class="material-symbols-outlined">person_add</span>Thêm Người dùng</a>
+                        <c:if test="${sessionScope.user.roleId == 1}">
+                            <a class="button primary" href="${pageContext.request.contextPath}/edit-user"><span class="material-symbols-outlined">person_add</span>Thêm Người dùng</a>
+                        </c:if>
                     </div>
                 </section>
 
@@ -289,7 +291,18 @@
                                         <td style="color:var(--text-light, #6b7280);"><c:out value="${u.phone}"/></td>
                                         <td style="font-weight:700;"><c:out value="${u.roleName}"/></td>
                                         <td><span class="status-pill ${u.status == 'ACTIVE' ? 'status-active' : 'status-inactive'}"><c:out value="${u.status == 'ACTIVE' ? 'Hoạt động' : 'Khóa'}"/></span></td>
-                                        <td><div class="row-actions"><a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">edit</span>Sửa</a><form action="${pageContext.request.contextPath}/user-list" method="post" style="display:inline;"><input type="hidden" name="userId" value="${u.userId}"><input type="hidden" name="status" value="${u.status}"><button class="chip ${u.status == 'ACTIVE' ? 'danger' : 'primary'}" type="submit"><span class="material-symbols-outlined">${u.status == 'ACTIVE' ? 'lock' : 'lock_open'}</span>${u.status == 'ACTIVE' ? 'Khóa' : 'Mở Khóa'}</button></form></div></td>
+                                        <td><div class="row-actions">
+                                            <c:choose>
+                                                <c:when test="${sessionScope.user.roleId == 1}">
+                                                    <a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">edit</span>Sửa</a>
+                                                    <a class="chip ${u.status == 'ACTIVE' ? 'danger' : 'primary'}" href="javascript:void(0);" onclick="document.getElementById('form_status_${u.userId}').submit();"><span class="material-symbols-outlined">${u.status == 'ACTIVE' ? 'lock' : 'lock_open'}</span>${u.status == 'ACTIVE' ? 'Khóa' : 'Mở Khóa'}</a>
+                                                    <form id="form_status_${u.userId}" action="${pageContext.request.contextPath}/user-list" method="post" style="display:none;"><input type="hidden" name="userId" value="${u.userId}"><input type="hidden" name="status" value="${u.status}"></form>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">visibility</span>Xem</a>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div></td>
                                     </tr>
                                 </c:forEach>
                             </tbody>

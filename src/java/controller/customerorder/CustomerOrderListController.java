@@ -26,13 +26,18 @@ public class CustomerOrderListController extends HttpServlet {
         String pageRaw = request.getParameter("page");
         String sortBy = request.getParameter("sortBy");
         String sortOrder = request.getParameter("sortOrder");
-
+        String pagesize = request.getParameter("pagesize");
         // Defaults
         if (sortBy == null || sortBy.isEmpty()) sortBy = "orderId";
         if (sortOrder == null || sortOrder.isEmpty()) sortOrder = "desc";
 
         int pageIndex = (pageRaw != null && !pageRaw.isEmpty()) ? Integer.parseInt(pageRaw) : 1;
-        int pageSize = 10;
+        int pageSize;
+        if(pagesize == null || pagesize.isEmpty()){
+            pageSize = 10;
+        }else{
+            pageSize = Integer.parseInt(pagesize);
+        }
         List<CustomerOrderDTO> listOrder;
         int totalRecords;
         
@@ -78,6 +83,7 @@ public class CustomerOrderListController extends HttpServlet {
         request.setAttribute("action", action);
         request.setAttribute("sortBy", sortBy);
         request.setAttribute("sortOrder", sortOrder);
+        request.setAttribute("pagesize", pageSize);
 
         request.getRequestDispatcher("/views/customer-order/list.jsp").forward(request, response);
     }

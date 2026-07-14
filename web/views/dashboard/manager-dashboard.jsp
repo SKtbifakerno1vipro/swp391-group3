@@ -561,7 +561,7 @@
                         <div class="panel-title"><h2>Order Status</h2><span class="badge"><c:out value="${totalOrders}"/> total</span></div>
                         <div class="status-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
                             <c:forEach var="entry" items="${orderStatusCounts}">
-                                <div class="status-item"><span><c:out value="${entry.key}"/></span><strong><c:out value="${entry.value}"/></strong></div>
+                                <div class="status-item"><span><c:out value="${entry.status}"/></span><strong><c:out value="${entry.total}"/></strong></div>
                                     </c:forEach>
                                     <c:if test="${empty orderStatusCounts}">
                                 <div class="empty-state">No order data yet.</div>

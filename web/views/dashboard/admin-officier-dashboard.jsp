@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Dashboard - Po Bread Sales</title>
+        <title>Bảng điều khiển - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -89,40 +89,49 @@
             <div class="main">
                 <div class="topbar">
                     <div>
-                        <p class="eyebrow">Overview</p>
-                        <h1>Admin Officer Dashboard</h1>
+                        <p class="eyebrow">Tổng quan</p>
+                        <h1>Bảng điều khiển Admin Officer</h1>
                         <p>Quản lý hợp đồng và tình trạng phê duyệt</p>
+                    </div>
+                    <div>
+                        <form action="${pageContext.request.contextPath}/dashboard" method="GET" style="display:flex; gap:10px; align-items:center;">
+                            <label style="font-size:12px; font-weight:bold;">Từ ngày:</label>
+                            <input type="date" name="startDate" value="${startDate}" style="padding:8px; border-radius:6px; border:1px solid var(--line);">
+                            <label style="font-size:12px; font-weight:bold;">Đến ngày:</label>
+                            <input type="date" name="endDate" value="${endDate}" style="padding:8px; border-radius:6px; border:1px solid var(--line);">
+                            <button type="submit" style="padding:8px 16px; background:var(--primary); color:white; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">Lọc dữ liệu</button>
+                            <a href="${pageContext.request.contextPath}/dashboard" style="padding:8px 16px; background:var(--surface-strong); color:var(--text); font-weight:bold; border-radius:6px; text-decoration:none;">Xóa lọc</a>
+                        </form>
                     </div>
                 </div>
 
-                <!-- KPI ROW (6 Cards) -->
                 <div class="kpi-row">
                     <!-- Contract KPIs -->
                     <div class="kpi-card">
-                        <h3>Awaiting Quotations</h3>
+                        <h3>Báo giá chờ Hợp đồng</h3>
                         <p style="color:${awaitingQuotations > 0 ? 'var(--danger)' : 'var(--muted)'};">${awaitingQuotations}</p>
                     </div>
                     <div class="kpi-card">
-                        <h3>Contracts In Progress</h3>
+                        <h3>Hợp đồng đang xử lý</h3>
                         <p style="color:${contractsInProgress > 0 ? 'var(--tertiary)' : 'var(--muted)'};">${contractsInProgress}</p>
                     </div>
                     <div class="kpi-card">
-                        <h3>Active Contracts</h3>
+                        <h3>Hợp đồng hiệu lực</h3>
                         <p style="color:${activeContracts > 0 ? 'var(--primary)' : 'var(--muted)'};">${activeContracts}</p>
                     </div>
                     <!-- Invoice KPIs -->
                     <div class="kpi-card">
-                        <h3>Total Invoices</h3>
+                        <h3>Tổng số Hóa đơn</h3>
                         <p style="color:var(--primary);">${invoiceSummary.totalInvoices != null ? invoiceSummary.totalInvoices : 0}</p>
                     </div>
                     <div class="kpi-card">
-                        <h3>Total Paid Amount</h3>
+                        <h3>Tổng tiền Đã thu</h3>
                         <p style="color:${invoiceSummary.paidAmount > 0 ? '#4caf50' : 'var(--muted)'};">
                             <fmt:formatNumber value="${invoiceSummary.paidAmount}" type="number" maxFractionDigits="0"/>đ
                         </p>
                     </div>
                     <div class="kpi-card">
-                        <h3>Total Unpaid Amount</h3>
+                        <h3>Tổng tiền Chưa thu</h3>
                         <p style="color:${invoiceSummary.unpaidAmount > 0 ? 'var(--danger)' : 'var(--muted)'};">
                             <fmt:formatNumber value="${invoiceSummary.unpaidAmount}" type="number" maxFractionDigits="0"/>đ
                         </p>
@@ -133,7 +142,7 @@
                 <div class="content-grid">
                     <!-- Column 1: Biểu đồ -->
                     <div class="content-card">
-                        <h3>Contract Status</h3>
+                        <h3>Trạng thái Hợp đồng</h3>
                         <div style="position:relative; width:100%; flex:1; display:flex; justify-content:center; align-items:center; min-height:0;">
                             <canvas id="statusChart"></canvas>
                         </div>
@@ -141,15 +150,15 @@
 
                     <!-- Column 2: Nhắc việc -->
                     <div class="content-card">
-                        <h3>Contracts Needing Action</h3>
+                        <h3>Hợp đồng Cần Xử Lý</h3>
                         <div class="table-wrapper">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Company</th>
-                                        <th>Status</th>
-                                        <th style="text-align:right;">Action</th>
+                                        <th>Mã HĐ</th>
+                                        <th>Khách hàng</th>
+                                        <th>Trạng thái</th>
+                                        <th style="text-align:right;">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -165,14 +174,28 @@
                                         <tr>
                                             <td style="font-weight:bold;">${c.contractNumber}</td>
                                             <td>${c.customerName}</td>
-                                            <td><span class="badge" style="background:${bg}; color:${col};">${c.contractStatus}</span></td>
+                                            <td>
+                                                <span class="badge" style="background:${bg}; color:${col};">
+                                                    <c:choose>
+                                                        <c:when test="${c.contractStatus == 'SIGNED'}">Đã ký</c:when>
+                                                        <c:when test="${c.contractStatus == 'APPROVED'}">Đã duyệt</c:when>
+                                                        <c:when test="${c.contractStatus == 'COMPLETED'}">Đã hoàn thành</c:when>
+                                                        <c:when test="${c.contractStatus == 'DRAFT'}">Bản nháp</c:when>
+                                                        <c:when test="${c.contractStatus == 'PENDING_REVIEW'}">Chờ duyệt</c:when>
+                                                        <c:when test="${c.contractStatus == 'CUSTOMER_CHECK'}">Chờ khách duyệt</c:when>
+                                                        <c:when test="${c.contractStatus == 'CANCELLED'}">Đã hủy</c:when>
+                                                        <c:when test="${c.contractStatus == 'REJECTED'}">Bị từ chối</c:when>
+                                                        <c:otherwise>${c.contractStatus}</c:otherwise>
+                                                    </c:choose>
+                                                </span>
+                                            </td>
                                             <td style="text-align:right;">
-                                                <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}" style="color:var(--primary); font-weight:bold;">Review</a>
+                                                <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}" style="color:var(--primary); font-weight:bold;">Xem</a>
                                             </td>
                                         </tr>
                                     </c:forEach>
                                     <c:if test="${empty contractsNeedingAction}">
-                                        <tr><td colspan="4" style="text-align:center; color:var(--muted); padding:20px;">No pending actions. Great job!</td></tr>
+                                        <tr><td colspan="4" style="text-align:center; color:var(--muted); padding:20px;">Không có công việc nào cần xử lý. Rất tốt!</td></tr>
                                     </c:if>
                                 </tbody>
                             </table>
@@ -181,17 +204,17 @@
             
                     <!-- Column 3: Hóa đơn gần đây -->
                     <div class="content-card">
-                        <h3>Recent Invoices</h3>
+                        <h3>Hóa đơn Gần Đây</h3>
                         <div class="table-wrapper">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Invoice No</th>
-                                        <th>Contract</th>
-                                        <th>Customer</th>
-                                        <th>Amount</th>
-                                        <th style="width:1%; white-space:nowrap;">Status</th>
-                                        <th style="width:1%; white-space:nowrap;">Payment</th>
+                                        <th>Số Hóa đơn</th>
+                                        <th>Mã HĐ</th>
+                                        <th>Khách hàng</th>
+                                        <th>Số tiền</th>
+                                        <th style="width:1%; white-space:nowrap;">Trạng thái</th>
+                                        <th style="width:1%; white-space:nowrap;">Thanh toán</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -210,18 +233,33 @@
                                             <td style="color:var(--primary); font-weight:bold;">
                                                 <fmt:formatNumber value="${i.totalAmount}" type="number" maxFractionDigits="0"/>đ
                                             </td>
-                                            <td style="white-space:nowrap;"><span class="badge" style="background:${ibg}; color:${icol};">${i.invoiceStatus}</span></td>
+                                            <td style="white-space:nowrap;">
+                                                <span class="badge" style="background:${ibg}; color:${icol};">
+                                                    <c:choose>
+                                                        <c:when test="${i.invoiceStatus == 'PAID'}">Đã thanh toán</c:when>
+                                                        <c:when test="${i.invoiceStatus == 'PENDING'}">Chờ xử lý</c:when>
+                                                        <c:when test="${i.invoiceStatus == 'UNRELEASED'}">Chưa phát hành</c:when>
+                                                        <c:when test="${i.invoiceStatus == 'CANCELLED'}">Đã hủy</c:when>
+                                                        <c:when test="${i.invoiceStatus == 'OVERDUE'}">Quá hạn</c:when>
+                                                        <c:otherwise>${i.invoiceStatus}</c:otherwise>
+                                                    </c:choose>
+                                                </span>
+                                            </td>
                                             <td style="white-space:nowrap;">
                                                 <span class="badge" style="
                                                     background:${i.paymentStatus == 'PAID' ? '#dcefe1' : (i.paymentStatus == 'UNPAID' ? '#fbeaea' : '#f0ece4')}; 
                                                     color:${i.paymentStatus == 'PAID' ? '#4a7c59' : (i.paymentStatus == 'UNPAID' ? '#b83230' : '#646b66')};">
-                                                    ${i.paymentStatus != null ? i.paymentStatus : 'UNPAID'}
+                                                    <c:choose>
+                                                        <c:when test="${i.paymentStatus == 'PAID'}">Đã thanh toán</c:when>
+                                                        <c:when test="${i.paymentStatus == 'UNPAID'}">Chưa thanh toán</c:when>
+                                                        <c:otherwise>Chưa thanh toán</c:otherwise>
+                                                    </c:choose>
                                                 </span>
                                             </td>
                                         </tr>
                                     </c:forEach>
                                     <c:if test="${empty recentInvoices}">
-                                        <tr><td colspan="6" style="text-align:center; color:var(--muted); padding:20px;">No invoices found.</td></tr>
+                                        <tr><td colspan="6" style="text-align:center; color:var(--muted); padding:20px;">Không tìm thấy hóa đơn nào.</td></tr>
                                     </c:if>
                                 </tbody>
                             </table>
@@ -245,16 +283,16 @@
             const bgColors = [];
             let totalCount = 0;
             <c:forEach items="${contractStatusCounts}" var="entry">
-                data.push(${entry.value});
-                bgColors.push(getSemanticColor('${entry.key}'));
-                totalCount += ${entry.value};
+                data.push(${entry.total});
+                bgColors.push(getSemanticColor('${entry.status}'));
+                totalCount += ${entry.total};
             </c:forEach>
             const labels = [];
             <c:forEach items="${contractStatusCounts}" var="entry">
                 {
-                    let val = ${entry.value};
+                    let val = ${entry.total};
                     let pct = totalCount > 0 ? Math.round((val / totalCount) * 100) : 0;
-                    labels.push('${entry.key} (' + val + ' - ' + pct + '%)');
+                    labels.push('${entry.status} (' + val + ' - ' + pct + '%)');
                 }
             </c:forEach>
 

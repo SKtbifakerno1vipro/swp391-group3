@@ -11,7 +11,6 @@ public class Product {
     private String description;
     private String unit;
     private String productStatus;
-    private int reorderLevel;
     private int quantityAvailable;
     private Integer updatedBy;
     private Timestamp createdAt;
@@ -77,13 +76,7 @@ public class Product {
         this.productStatus = productStatus;
     }
 
-    public int getReorderLevel() {
-        return reorderLevel;
-    }
 
-    public void setReorderLevel(int reorderLevel) {
-        this.reorderLevel = reorderLevel;
-    }
 
     public int getQuantityAvailable() {
         return quantityAvailable;

@@ -10,7 +10,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Create Product</title>
+        <title>Thêm sản phẩm</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,54 +25,46 @@
             </jsp:include>
             <main class="main legacy-page">
         <div>
-            <h1>Create Product</h1>
+            <h1>Thêm sản phẩm</h1>
             <div>
                 <form action="edit-product" method="post">
                     <table>
                         <tr>
-                            <td>Product Name</td>
+                            <td>Tên sản phẩm</td>
                             <td><input type="text" name="name" value="${name}" required></td>
                         </tr>
                         <tr>
-                            <td>Cost Price</td>
+                            <td>Giá gốc</td>
                             <td><input type="number" name="cost" value="${cost}" required min="0"></td>
                         </tr>
                         <tr>
-                            <td>Selling Price</td>
+                            <td>Giá bán</td>
                             <td><input type="number" name="sell" value="${sell}" required min="0"></td>
                         </tr>
                         <tr>
-                            <td>Description</td>
+                            <td>Mô tả</td>
                             <td><textarea name="description" rows="5" cols="20" required>${description}</textarea></td>
                         </tr>
                         <tr>
-                            <td>Unit</td>
-                            <td>
-                                <select name="unit">
-                                    <c:forEach var="u" items="${units}">
-                                        <option value="${u}" ${u == unit ? 'selected':''}>${u}</option>
-                                    </c:forEach>
-                                </select>
-
-                            </td>
+                            <td>Đơn vị</td>
+                            <td><input type="text" name="unit" value="${unit}" required></td>
                         </tr>
                         <tr>
-                            <td>Product Status</td>
+                            <td>Trạng thái sản phẩm</td>
                             <td>
                                 <select name="status">
-                                    <c:forEach var="s" items="${statusList}">
-                                        <option value="${s}" ${s == status ? 'selected':''}>${s}</option>
-                                    </c:forEach>
+                                    <option value="ACTIVE" ${status == 'ACTIVE' || status == 'Active' || empty status ? 'selected' : ''}>Hoạt động</option>
+                                    <option value="OUT_OF_STOCK" ${status == 'OUT_OF_STOCK' || status == 'OUT OF STOCK' || status == 'Out of stock' ? 'selected' : ''}>Hết hàng</option>
+                                    <option value="INACTIVE" ${status == 'INACTIVE' || status == 'Inactive' ? 'selected' : ''}>Không hoạt động</option>
                                 </select>
-
                             </td>
                         </tr>
                         <tr>
-                            <td>Quantity</td>
+                            <td>Số lượng</td>
                             <td><input type="number" name="quantity" value="${quantity}" required min="0"></td>
                         </tr>
                         <tr>
-                            <td>Category</td>
+                            <td>Danh mục</td>
                             <td>
                                 <select name="categoryId">
                                     <c:forEach var="c" items="${categories}">
@@ -83,8 +75,8 @@
                         </tr>
                         <tr>
                         <input type="hidden" name="action" value="${action}">
-                            <td colspan="2"><input type="submit"  value="Create">
-                                <a href="${pageContext.request.contextPath}/product-list">Cancel</a></td>
+                            <td colspan="2"><input type="submit"  value="Thêm mới">
+                                <a href="${pageContext.request.contextPath}/product-list">Hủy</a></td>
                         </tr>
 
                     </table>

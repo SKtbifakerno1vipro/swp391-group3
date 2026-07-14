@@ -6,8 +6,98 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Contract Detail - Dashboard</title>
         <style>
+<<<<<<< HEAD
             body {
                 font-family: Arial, sans-serif;
+=======
+            .layout-container {
+                display: grid;
+                grid-template-columns: 1fr 380px;
+                gap: 20px;
+                align-items: start;
+            }
+
+            .content-panel, .right-panel {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 22px;
+                box-shadow: var(--shadow);
+                padding: 20px;
+            }
+
+            .action-section {
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .note-textarea {
+                width: 100%;
+                min-height: 120px;
+                padding: 10px;
+                border: 1px solid var(--line);
+                border-radius: 12px;
+                font-family: inherit;
+                font-size: 14px;
+                resize: vertical;
+                box-sizing: border-box;
+                margin-bottom: 10px;
+            }
+
+            .note-textarea:focus {
+                outline: none;
+                border-color: var(--primary);
+            }
+
+            .history-section {
+                padding-right: 5px;
+            }
+
+            .history-list {
+                max-height: 400px;
+                overflow-y: auto;
+                padding-right: 5px;
+                margin-bottom: 15px;
+            }
+
+            .history-list::-webkit-scrollbar {
+                width: 6px;
+            }
+            .history-list::-webkit-scrollbar-thumb {
+                background: rgba(0,0,0,0.1);
+                border-radius: 3px;
+            }
+
+            .note-block {
+                border-left: 3px solid var(--primary);
+                padding: 8px 12px;
+                margin-bottom: 5px;
+                background: var(--surface-soft);
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 0.9em;
+                border-radius: 0 8px 8px 0;
+            }
+
+            .history-item {
+                border-bottom: 1px solid var(--line);
+                padding-bottom: 15px;
+                margin-bottom: 15px;
+            }
+            .history-item:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            .action-btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+            }
+            .action-btn-group form {
+>>>>>>> a5d933bcdd2d38a00633fea144fd64b641bd5450
                 margin: 0;
                 padding: 0;
                 background-color: #f4f7f6;
@@ -122,6 +212,7 @@
                             </form>
                         </c:if>
 
+<<<<<<< HEAD
                         <!-- Admin Officer (Role 5) -->
                         <c:if test="${sessionScope.user.roleId == 5}">
                             <a href="contract-save?id=${contract.contractId}" class="btn btn-blue">Chỉnh sửa HTML</a>
@@ -130,6 +221,164 @@
                                 <input type="hidden" name="contractId" value="${contract.contractId}"/>
                                 <button type="submit" class="btn btn-gray">Gửi lại cho Manager</button>
                             </form>
+=======
+                        <h3 style="margin-top: 0;">Nội dung Hợp đồng</h3>
+                        <div style="background: var(--bg); padding: 15px; border: 1px solid var(--line); margin-bottom: 15px; border-radius: 12px;">
+                            <p style="margin: 0 0 5px 0;"><strong>Khách hàng</strong> ${contract.customerName}</p>
+                            <p style="margin: 0;"><strong>Loại lưu trữ</strong> ${contract.storageType}</p>
+                        </div>
+
+                        <div class="raw-content" style="border: 1px solid var(--line); padding: 20px; background: #fff; min-height: 500px; overflow-x: auto; border-radius: 12px;">
+                            ${contract.contractContent}
+                        </div>
+                    </div>
+
+                    <!-- COL 2: ACTION + HISTORY (Right) -->
+
+                    <div class="right-panel">
+
+                        <!-- ACTION BLOCK -->
+                        <div class="action-section">
+
+                            <c:if test="${isGuest}">
+                                <p style="color: var(--muted); font-size: 0.9em; line-height: 1.4; margin-top: 10px;">Bạn cần đăng nhập để có nhiều quyền hạn hơn!</p>
+                                <div class="action-btn-group">
+                                    <a href="login?redirect=contract-detail?id=${contract.contractId}" class="btn-full"><button type="button" style="width: 100%;">Đăng nhập</button></a>
+                                </div>
+                            </c:if>
+                            <c:if test="${!isGuest}">
+                                <h3 style="margin-top: 0;">Hành động</h3>
+                                <p><strong>Trạng thái</strong> <span style="color: var(--danger); font-weight: bold;">${contract.contractStatus}</span></p>
+                                <div class="action-btn-group">
+                                    
+                                    <!--Action button-->
+                                    <c:choose>
+                                        <c:when test="${isInternalProcessing}">
+                                            <!-- Manager (Role 2) -->
+                                            <c:if test="${sessionScope.user.roleId == 2}">
+                                                <form method="POST" action="contract-detail">
+                                                    <input type="hidden" name="action" value="approve" />
+                                                    <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                                    <button type="submit" class="btn-full" style="background: var(--primary);">Duyệt</button>
+                                                </form>
+                                            </c:if>
+
+                                            <!-- Admin Officer (Role 5) -->
+                                            <c:if test="${sessionScope.user.roleId == 5}">
+                                                <a href="contract-save?id=${contract.contractId}" class="btn-full" style="text-decoration:none;">
+                                                    <button type="button" style="width: 100%;">Sửa Hợp đồng</button>
+                                                </a>
+                                                <form method="POST" action="contract-detail">
+                                                    <input type="hidden" name="action" value="send_to_manager" />
+                                                    <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                                    <button type="submit" class="btn-full btn-secondary">Gửi Quản lý duyệt</button>
+                                                </form>
+                                            </c:if>
+                                        </c:when>
+
+                                        <c:when test="${canCustomerCheck}">
+                                            <!-- Khach hang (Role 3) -->
+                                            <c:if test="${sessionScope.user.roleId == 3}">
+                                                <form method="POST" action="contract-detail">
+                                                    <input type="hidden" name="action" value="customer_approve" />
+                                                    <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                                    <button type="submit" class="btn-full" style="background: var(--primary);">Duyệt</button>
+                                                </form>
+                                            </c:if>
+                                        </c:when>
+
+                                        <c:when test="${isApproved}">
+                                            <p style="color: var(--primary); text-align: center; font-weight: bold; margin: 10px 0;">Hợp đồng đã chốt</p>
+                                            <c:if test="${sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                                                <c:if test="${not signed}">
+                                                    <form action="Signature" method="get">
+                                                        <input type="hidden" name="contractId" value="${contract.contractId}">
+                                                        <input type="hidden" name="signerId" value="${sessionScope.user.userId}">
+                                                        <button type="submit" class="btn-full">Ký Hợp đồng</button>
+                                                    </form>
+                                                </c:if>
+                                            </c:if>
+                                        </c:when>
+
+                                        <c:when test="${contract.contractStatus == 'SIGNED'}">
+                                            <p style="color: var(--primary); text-align: center; font-weight: bold; margin: 10px 0;">Hợp đồng đã ký hoàn tất</p>
+                                            <c:if test="${sessionScope.user.roleId == 2}">
+                                                <form method="POST" action="contract-detail" style="margin-bottom: 10px;">
+                                                    <input type="hidden" name="action" value="send_final_contract" />
+                                                    <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                                    <button type="submit" class="btn-full" style="background: var(--primary);">Gửi hợp đồng hoàn thiện</button>
+                                                </form>
+                                            </c:if>
+                                        </c:when>
+                                    </c:choose>
+
+                                    <a href="export-pdf?id=${contract.contractId}" class="btn-full" style="text-decoration:none;">
+                                        <button type="button" class="btn-secondary" style="width: 100%;">Xuất PDF</button>
+                                    </a>
+                                    <div style="text-align: center; margin-top: 5px;">
+                                        <a href="contract-list" style="color: var(--primary); font-size: 0.9em; font-weight: 600;">Quay lại danh sách</a>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <!-- TYPE NOTE BLOCK -->
+                            <c:if test="${(( sessionScope.user.roleId == 2) || ( sessionScope.user.roleId == 3))
+                                          && (contract.contractStatus== 'PENDING_REVIEW' ||contract.contractStatus== 'CUSTOMER_CHECK' ) }">
+                                  <div class="type-note-section" style="margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 20px;">
+                                      <h3 style="margin-top:0;">Ghi chú</h3>
+                                      <form method="POST" action="contract-detail" style="background: none; border: none; box-shadow: none; padding: 0; margin: 0;">
+                                          <input type="hidden" name="action" value="request_edit" />
+                                          <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                          <textarea name="revision_note" class="note-textarea" placeholder="Ví dụ:&#10;Giá: đổi thành 10000&#10;Tên: đổi thành Nguyễn Văn A" required></textarea>
+                                          <button type="submit" class="btn-tertiary" style="width: 100%;">Gửi ghi chú</button>
+                                      </form>
+                                  </div>
+                            </c:if>
+
+                            <!-- HISTORY BLOCK -->
+
+                            <div class="history-section">
+                                <h3 style="margin-top:0;">Lịch sử yêu cầu chỉnh sửa</h3>
+                                <c:choose>
+                                    <c:when test="${not empty historyList}">
+                                        <div class="history-list">
+                                            <c:forEach var="h" items="${historyList}">
+                                                <div class="history-item">
+                                                    <p style="margin: 0 0 3px 0; color: var(--muted); font-size: 0.85em;">${h.getCreateTimeString()}</p>
+                                                    <p style="margin: 0 0 3px 0; font-size: 0.9em;"><strong>Trạng thái:</strong> ${h.toStatus}</p>
+                                                    <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>Bởi:</strong> ${h.changedByName}</p>
+                                                    <c:if test="${sessionScope.user.roleId == 5}">
+                                                        <p style="margin: 0 0 5px 0; color: var(--danger); font-size: 0.9em;"><strong>Ghi chú:</strong> ${h.note}</p>
+                                                    </c:if>
+                                                    <c:if test="${not empty h.revisionItems}">
+                                                        <c:forEach var="item" items="${h.revisionItems}">
+                                                            <div class="note-block">${item.revisionDetail}</div>
+                                                        </c:forEach>
+                                                    </c:if>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                        <c:if test="${historyEndPage > 1}">
+                                            <div style="display: flex; gap: 5px; margin-top: 15px; justify-content: center;">
+                                                <c:forEach begin="1" end="${historyEndPage}" var="i">
+                                                    <a href="contract-detail?id=${contract.contractId}&historyPage=${i}" 
+                                                       style="padding: 4px 10px; border-radius: 4px; border: 1px solid var(--line); text-decoration: none; 
+                                                              background: ${i == historyPage ? 'var(--primary)' : '#fff'};
+                                                              color: ${i == historyPage ? '#fff' : 'var(--text)'};">
+                                                        ${i}
+                                                    </a>
+                                                </c:forEach>
+                                            </div>
+                                        </c:if>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <p style="color: var(--muted); font-style: italic; font-size: 0.9em;">Chưa có lịch sử nào</p>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+>>>>>>> a5d933bcdd2d38a00633fea144fd64b641bd5450
                         </c:if>
                     </c:when>
 

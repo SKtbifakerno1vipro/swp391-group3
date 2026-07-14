@@ -67,11 +67,13 @@ public class SecurityFilter implements Filter {
             "/quotation-detail",
             "/contract-list",
             "/contract-detail",
-            "/contract-save",
             "/customer-order-list",
             "/customer-order",
-            //"/Invoice",
-            "/invoice",
+            //nguyenkien
+            "/invoice-list",
+            "invoice",
+            "/preview",
+            //nguyenkien
             "/revenue-report",
             "/payment",
             "/payment/list",
@@ -97,8 +99,11 @@ public class SecurityFilter implements Filter {
             "/quotation-detail",
             "/contract-list",
             "/contract-detail",
-            //"/Invoice",
-            "/invoice",
+            //nguyenkien
+            "/invoice-list",
+            "invoice",
+            "/preview",
+            //nguyenkien
             "/email/logs",
             "/revenue-report",
             "/Signature",
@@ -115,6 +120,12 @@ public class SecurityFilter implements Filter {
             "/contract-detail",
             "/customer/detail",
             "/customer-order-list",
+            //nguyenkien
+            "/invoice-list",
+            "/invoice",
+            "/preview",
+            //nguyenkien
+            "/customer-order",
             "/payment",
             "/payment/list",
             "/payment/detail"
@@ -129,10 +140,7 @@ public class SecurityFilter implements Filter {
             "/quotation-list",
             "/quotation-create",
             "/quotation-detail",
-            "/contract-list",
-            "/contract-detail",
             "/customer-order-list",
-            "/customer-order",
             "/customer-order",
             "/product-list",
             "/category/list",
@@ -141,12 +149,19 @@ public class SecurityFilter implements Filter {
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
             "/dashboard",
+            "/edit-user",
+            "/user-detail",
             "/contract-list",
             "/contract-detail",
             "/contract-save",
             "/customer-order-list",
             "/customer-order",
-            //"/Invoice",
+            "/quotation-list",
+            //nguyenkien
+            "/invoice-list",
+            "invoice",
+            "/preview",
+            //nguyenkien
             "/invoice",
             "/payment",
             "/payment/list",
@@ -168,7 +183,6 @@ public class SecurityFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
@@ -252,6 +266,26 @@ public class SecurityFilter implements Filter {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
         System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
 
+        // Check if the path is explicitly allowed by the hardcoded fallback lists first
+        if (roleId == ROLE_SYSTEM_ADMIN && SYSTEM_ADMIN_URLS.contains(cleanPath)) {
+            return true;
+        }
+        if (roleId == ROLE_MANAGER && MANAGER_URLS.contains(cleanPath)) {
+            return true;
+        }
+        if (roleId == ROLE_CUSTOMER && CUSTOMER_URLS.contains(cleanPath)) {
+            return true;
+        }
+        if (roleId == ROLE_SALE_STAFF && SALE_STAFF_URLS.contains(cleanPath)) {
+            return true;
+        }
+        if (roleId == ROLE_ADMIN_OFFICER && ADMIN_OFFICER_URLS.contains(cleanPath)) {
+            return true;
+        }
+        if (roleId == ROLE_WAREHOUSE_STAFF && WAREHOUSE_STAFF_URLS.contains(cleanPath)) {
+            return true;
+        }
+
         String requiredPermission = getRequiredPermission(cleanPath, req);
         if (requiredPermission != null) {
             Role role = roleDAO.getRoleDetail(roleId);
@@ -265,26 +299,6 @@ public class SecurityFilter implements Filter {
                 System.out.println("Role " + roleId + " DOES NOT HAVE database permission: " + requiredPermission);
                 return false;
             }
-        }
-
-        // Fallback for URLs not mapped to a specific permission in the database
-        if (roleId == ROLE_SYSTEM_ADMIN) {
-            return SYSTEM_ADMIN_URLS.contains(cleanPath);
-        }
-        if (roleId == ROLE_MANAGER) {
-            return MANAGER_URLS.contains(cleanPath);
-        }
-        if (roleId == ROLE_CUSTOMER) {
-            return CUSTOMER_URLS.contains(cleanPath);
-        }
-        if (roleId == ROLE_SALE_STAFF) {
-            return SALE_STAFF_URLS.contains(cleanPath);
-        }
-        if (roleId == ROLE_ADMIN_OFFICER) {
-            return ADMIN_OFFICER_URLS.contains(cleanPath);
-        }
-        if (roleId == ROLE_WAREHOUSE_STAFF) {
-            return WAREHOUSE_STAFF_URLS.contains(cleanPath);
         }
 
         return false;
@@ -366,9 +380,12 @@ public class SecurityFilter implements Filter {
                 return "View Order List";
             case "/customer-order":
                 return "View Order Detail";
+            case "/invoice-list":
+                return "View Invoice List";
             case "/invoice":
-            case "/Invoice":
-                return "Issue Invoice";
+                return "View Invoice Detail";
+            case "/preview":
+                return "View Invoice Preview";
             default:
                 return null;
         }

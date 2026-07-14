@@ -27,7 +27,7 @@ public class UserListController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-
+        
         String roleIdString = request.getParameter("roleId");
         String status = request.getParameter("status");
         String searchEmail = request.getParameter("searchEmail") != null ? request.getParameter("searchEmail").trim().replaceAll("\\s+", "") : null;
