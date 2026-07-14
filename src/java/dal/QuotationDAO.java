@@ -14,7 +14,7 @@ import model.QuotationDetail;
 
 public class QuotationDAO extends DBContext {
 
-    public List<Quotation> getAllQuotations() {
+    public List<Quotation> getAllQuotations(Integer saleId) {
         List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
                 + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
@@ -25,9 +25,16 @@ public class QuotationDAO extends DBContext {
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
                 + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
                 + "LEFT JOIN customer_contract ON quotation.quotation_id = customer_contract.quotation_id "
-                + "ORDER BY quotation.quotation_id ASC";
+                + "WHERE 1=1 ";
+        if (saleId != null) {
+            sql += " AND customer.assigned_to_user_id = ? ";
+        }
+        sql += " ORDER BY quotation.quotation_id ASC";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
+            if (saleId != null) {
+                ps.setInt(1, saleId);
+            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Quotation quotation = new Quotation();
@@ -129,7 +136,7 @@ public class QuotationDAO extends DBContext {
                     quotation.setQuotationDate(rs.getTimestamp("quotation_date").toLocalDateTime());
                 }
                 quotation.setQuotationStatus(rs.getString("quotation_status"));
-                quotation.setCreatedBy(rs.getInt("created_by"));
+                quotation.setCreatedBy(rs.getInt("created_by"));      
                 if (rs.getTimestamp("created_at") != null) {
                     quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 }
@@ -459,7 +466,7 @@ public class QuotationDAO extends DBContext {
     }
 
     public void updateStatus(int quotationId, String status) {
-        String sql = "UPDATE quotation SET quotation_status = ? WHERE quotation_id = ?";
+        String sql = "UPDATE quotation SET quotation_status = ?, created_at = GETDATE() WHERE quotation_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, quotationId);
@@ -560,7 +567,8 @@ public class QuotationDAO extends DBContext {
                 + "    ) "
                 + "    FROM quotation_detail qd "
                 + "    WHERE qd.quotation_id = q.quotation_id"
-                + "), 0.00) "
+                + "), 0.00), "
+                + "q.created_at = GETDATE() "
                 + "FROM quotation q "
                 + "WHERE q.quotation_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

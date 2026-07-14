@@ -507,8 +507,8 @@ INSERT INTO customer_order (customer_id, customer_contract_id, order_status, cre
 );
 DECLARE @O1 INT = SCOPE_IDENTITY();
 INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (@O1, @QD1, 100, 15000, 22000);
-INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, sub_total, tax_amount, total_amount, created_by) 
-VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2090000.00, 209000.00, 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, total_amount, created_by) 
+VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
 INSERT INTO payment (customer_contract_id, invoice_id, amount, payment_type, payment_status, paid_at, created_by) VALUES (@C1, SCOPE_IDENTITY(), 2299000.00, 'BANK_TRANSFER', 'COMPLETED', SYSDATETIME(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 GO
 
@@ -552,11 +552,7 @@ INSERT INTO contract_revision_item (history_id, contract_id, revision_type, revi
 (@H2, @C2, N'Thanh toán', N'Muốn thanh toán 100% sau khi nhận hàng thay vì đặt cọc');
 GO
 
--- 9. KHO (GIAO DICH NHAP KHO BAN ĐAU)
-INSERT INTO stock_transaction (product_id, transaction_type, quantity_in, quantity_out, transaction_date) VALUES 
-((SELECT product_id FROM product WHERE product_name = N'Bột Mì Meizan'), 'INITIAL_STOCK', 500, 0, GETDATE()),
-((SELECT product_id FROM product WHERE product_name = N'Đường Biên Hòa'), 'INITIAL_STOCK', 1000, 0, GETDATE());
-GO
+
 
 
 -- ==========================================================
