@@ -50,143 +50,174 @@ public class SecurityFilter implements Filter {
     private static final List<String> SYSTEM_ADMIN_URLS = List.of(
             "/dashboard",
             "/admin-dashboard",
-            "/user-list",
-            "/user-detail",
-            "/create-user",
-            "/edit-user",
-            "/role-list",
-            "/role-detail",
+            "/role-list", "/role-detail",
             "/add-role",
             "/edit-role-permissions",
+            "/user-list",
+            "/create-user",
+            "/edit-user",
+            "/edit-user",
+            "/user-detail",
+            "/customer/list",
+            "/customer-list",
+            "/customer/create",
+            "/customer/detail",
+            "/customer-detail",
+            "/customer/edit",
+            "/customer-order-list",
+            "/customer-order",
+            "/create-order",
+            "/category/list",
+            "/category/create",
+            "/category/edit",
+            "/category/delete",
             "/product-list",
             "/create-product",
             "/edit-product",
             "/product-delete",
-            "/email/logs",
             "/quotation-list",
             "/quotation-create",
             "/quotation-detail",
             "/contract-list",
+            "/contract-save",
+            "/contract-create",
             "/contract-detail",
-            "/customer-order-list",
-            "/customer-order",
-            //nguyenkien
             "/invoice-list",
-            "invoice",
+            "/invoice",
             "/preview",
-            //nguyenkien
-            "/revenue-report",
-            "/payment",
+            "/invoice/create",
             "/payment/list",
+            "/payment",
             "/payment/detail",
+            "/email/logs",
             "/admin/audit-logs",
+            "/revenue-report",
+            "/Signature",
+            "/SignatureAcceptance",
             "/realtime/notifications"
     );
 
     private static final List<String> MANAGER_URLS = List.of(
             "/dashboard",
-            "/user-list",
-            "/user-detail",
             "/role-list",
             "/role-detail",
+            "/user-list",
+            "/edit-user",
             "/customer/list",
-            "/customer/detail",
-            "/customer/create",
-            "/customer/edit",
+            "/customer-list",
             "/customer-order-list",
             "/customer-order",
+            "/create-order",
             "/product-list",
-            "/category/list",
-            "/quotation-list",
-            "/quotation-detail",
+            "/edit-product",
+            "/product-delete",
             "/contract-list",
             "/contract-detail",
-            //nguyenkien
             "/invoice-list",
-            "invoice",
+            "/invoice",
             "/preview",
-            //nguyenkien
-            "/email/logs",
+            "/payment/list",
+            "/payment",
+            "/payment/detail",
             "/revenue-report",
             "/Signature",
             "/SignatureAcceptance",
-            "/payment",
-            "/payment/list",
-            "/payment/detail",
             "/realtime/notifications"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
             "/dashboard",
+            "/customer/detail",
+            "/customer-detail",
+            "/customer/edit",
+            "/customer-order-list",
+            "/customer-order",
+            "/category/list",
+            "/category/create",
+            "/category/edit",
+            "/category/delete",
+            "/product-list",
             "/quotation-list",
             "/quotation-detail",
             "/contract-list",
             "/contract-detail",
-            "/customer/detail",
-            "/customer-order-list",
-            //nguyenkien
             "/invoice-list",
-            "/invoice",
             "/preview",
-            //nguyenkien
-            "/customer-order",
-            "/payment",
             "/payment/list",
-            "/payment/detail",
-            "/Signature",
-            "/SignatureAcceptance",
+            "/payment",
             "/realtime/notifications"
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(
             "/dashboard",
+            "/edit-user",
             "/customer/list",
-            "/customer/detail",
+            "/customer-list",
             "/customer/create",
+            "/customer/detail",
+            "/customer-detail",
             "/customer/edit",
+            "/customer-order-list",
+            "/customer-order",
+            "/create-order",
+            "/category/list",
+            "/category/create",
+            "/category/edit",
+            "/category/delete",
+            "/product-list",
+            "/edit-product",
+            "/product-delete",
             "/quotation-list",
             "/quotation-create",
             "/quotation-detail",
-            "/customer-order-list",
-            "/customer-order",
-            "/product-list",
-            "/category/list",
-            "/revenue-report",
+            "/payment/list",
+            "/payment",
+            "/payment/detail",
             "/realtime/notifications"
     );
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
             "/dashboard",
             "/edit-user",
-            "/user-detail",
-            "/contract-list",
-            "/contract-detail",
-            "/contract-save",
+            "/customer/list",
+            "/customer-list",
+            "/customer/detail",
+            "/customer-detail",
+            "/customer/edit",
             "/customer-order-list",
             "/customer-order",
+            "/create-order",
             "/quotation-list",
-            //nguyenkien
+            "/quotation-detail",
+            "/contract-list",
+            "/contract-save",
+            "/contract-create",
+            "/contract-detail",
             "/invoice-list",
-            "invoice",
-            "/preview",
-            //nguyenkien
             "/invoice",
-            "/payment",
+            "/preview",
+            "/invoice/create",
             "/payment/list",
+            "/payment",
             "/payment/detail",
+            "/Signature",
+            "/SignatureAcceptance",
             "/realtime/notifications"
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
             "/dashboard",
-            "/product-list",
-            "/create-product",
-            "/edit-product",
-            "/product-delete",
+            "/edit-user",
+            "/customer-order-list",
+            "/customer-order",
             "/category/list",
             "/category/create",
             "/category/edit",
             "/category/delete",
+            "/product-list",
+            "/create-product",
+            "/edit-product",
+            "/product-delete",
             "/realtime/notifications"
     );
 
@@ -200,6 +231,16 @@ public class SecurityFilter implements Filter {
         res.setHeader("Pragma", "no-cache");
         res.setDateHeader("Expires", 0);
 
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if (user != null) {
+            if (user.getRoleId() == 1) {
+                chain.doFilter(request, response);
+                return;
+            }
+        }
+
         String path = req.getServletPath();
 
         if (isStaticResource(path)) {
@@ -211,9 +252,6 @@ public class SecurityFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
-
-        HttpSession session = req.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
 
         if ("/contract-detail".equals(path)) {
             String token = req.getParameter("token");
@@ -257,6 +295,12 @@ public class SecurityFilter implements Filter {
             return;
         }
 
+        String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
+        if (getRequiredPermission(cleanPath, req) == null) {
+            res.sendError(HttpServletResponse.SC_NOT_FOUND, "Not Found");
+            return;
+        }
+
         if (hasPermission(user.getRoleId(), path, req)) {
             chain.doFilter(request, response);
             return;
@@ -266,8 +310,7 @@ public class SecurityFilter implements Filter {
                     + " tried to access "
                     + path);
 
-            res.sendRedirect(req.getContextPath()
-                    + "/dashboard?error=denied");
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
             return;
         }
     }
@@ -318,84 +361,98 @@ public class SecurityFilter implements Filter {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
         switch (cleanPath) {
             case "/dashboard":
-                return "View Dashboard";
-            case "/revenue-report":
-                return "View Dashboard";
+                return "Dashboard";
+            case "/role-list":
+            case "/role-detail":
+                return "Role List";
+            case "/add-role":
+            case "/edit-role-permissions":
+                return "Edit Role Permission";
             case "/user-list":
-                return "View User List";
+                return "User List";
+            case "/create-user":
+                return "User Create";
+            case "/user-detail":
+                return "User List";
             case "/edit-user":
                 String idParam = req.getParameter("id");
                 if (idParam == null || idParam.trim().isEmpty()) {
-                    return "Create User";
+                    return "User Create";
                 } else {
+                    jakarta.servlet.http.HttpSession session = req.getSession(false);
+                    model.User user = session != null ? (model.User) session.getAttribute("user") : null;
+                    if (user != null && String.valueOf(user.getUserId()).equals(idParam)) {
+                        return "Profile";
+                    }
                     if ("POST".equalsIgnoreCase(req.getMethod())) {
-                        return "Edit User";
+                        return "User Edit";
                     } else {
-                        return "View User Detail";
+                        return "User List";
                     }
                 }
-            case "/user-detail":
-                return "View User Detail";
-            case "/create-user":
-                return "Create User";
-            case "/role-list":
-                return "View Role List";
-            case "/role-detail":
-                return "View Role Detail";
-            case "/add-role":
-                return "Add Role";
-            case "/edit-role-permissions":
-                return "Edit Role Permissions";
-            case "/category/list":
-                return "View Category List";
-            case "/category/create":
-                return "Create Category";
-            case "/category/edit":
-                return "Edit Category";
-            case "/category/delete":
-                return "Delete Category";
-            case "/product-list":
-                return "View Product List";
-            case "/create-product":
-                return "Create Product";
-            case "/edit-product":
-                return "Edit Product";
-            case "/product-delete":
-                return "Delete Product";
             case "/customer/list":
             case "/customer-list":
-                return "View Customer List";
+                return "Customer List";
+            case "/customer/create":
+                return "Customer Create";
             case "/customer/detail":
             case "/customer-detail":
-                return "View Customer Detail";
-            case "/customer/create":
-                return "Create Customer";
             case "/customer/edit":
-                return "Edit Customer";
+                return "Customer Detail";
+            case "/customer-order-list":
+                return "Order List";
+            case "/create-order":
+                return "Order Create";
+            case "/customer-order":
+                return "Order Detail";
+            case "/category/list":
+                return "Category List";
+            case "/category/create":
+            case "/category/edit":
+            case "/category/delete":
+                return "Category edit";
+            case "/product-list":
+                return "Product List";
+            case "/create-product":
+                return "Product Create";
+            case "/edit-product":
+            case "/product-delete":
+                return "Product Detail";
             case "/quotation-list":
-                return "View Quotation List";
+                return "Quotation List";
             case "/quotation-create":
                 return "Create Quotation";
             case "/quotation-detail":
-                return "View Quotation Detail";
+                return "Quotation Detail";
             case "/contract-list":
-                return "View Contract List";
-            case "/contract-detail":
-                return "View Contract List";
+                return "Contract List";
+            case "/contract-create":
             case "/contract-save":
-                return "Save Contract";
-            case "/export-pdf":
-                return "View Contract List";
-            case "/customer-order-list":
-                return "View Order List";
-            case "/customer-order":
-                return "View Order Detail";
+                return "Contract Create";
+            case "/contract-detail":
+                return "Contract Detail(Edit)";
             case "/invoice-list":
-                return "View Invoice List";
+                return "Invoice List";
+            case "/invoice/create":
+                return "Invoice Create";
             case "/invoice":
-                return "View Invoice Detail";
+                return "Invoice Detail";
             case "/preview":
-                return "View Invoice Preview";
+                return "Preview Invoice";
+            case "/payment/list":
+            case "/payment":
+                return "Payment List";
+            case "/payment/detail":
+                return "Payment Detail";
+            case "/email/logs":
+                return "Email Logs";
+            case "/admin/audit-logs":
+                return "System Audit Logs";
+            case "/revenue-report":
+                return "Revenue Report";
+            case "/Signature":
+            case "/SignatureAcceptance":
+                return "Acceptance Record";
             default:
                 return null;
         }

@@ -12,4 +12,16 @@
     <session-config>
         <session-timeout>60</session-timeout>
     </session-config>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/views/error-page/403.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/views/error-page/404.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>405</error-code>
+        <location>/views/error-page/405.jsp</location>
+    </error-page>
 </web-app>

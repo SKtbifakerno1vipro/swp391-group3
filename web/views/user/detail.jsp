@@ -161,7 +161,13 @@
         <div class="dashboard-shell">
             <jsp:include page="/views/shared/sidebar.jsp"><jsp:param name="activeMenu" value="users"/></jsp:include>
                 <main class="main legacy-page">
-                    <section class="page-top"><div><p class="eyebrow">Quản lý Truy cập</p><h1>Cập Nhật Profile</h1><p>Cập nhật thông tin tài khoản, vai trò và trạng thái.</p></div><div class="actions"><a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Trở lại danh sách</a></div></section>
+                    <section class="page-top"><div><p class="eyebrow">Quản lý Truy cập</p><h1>Cập Nhật Profile</h1><p>Cập nhật thông tin tài khoản, vai trò và trạng thái.</p></div>
+                    <div class="actions">
+                        <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
+                            <a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Trở lại danh sách</a>
+                        </c:if>
+                    </div>
+                </section>
                 <form class="panel" action="${pageContext.request.contextPath}/edit-user" method="post">
                     <input type="hidden" name="id" value="${u.userId}">
                     <div class="panel-head"><h2><c:out value="${u.fullName}"/></h2></div>
@@ -192,7 +198,6 @@
                             <c:if test="${sessionScope.user.roleId == 1}">
                                 <button class="button danger" type="submit" name="action" value="resetPassword" onclick="return confirm('Bạn có chắc muốn khôi phục mật khẩu về 123456 không?');"><span class="material-symbols-outlined">lock_reset</span>Khôi phục Mật khẩu</button>
                             </c:if>
-                            <a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Quay lại</a>
                         </div>
                     </div>
                 </form>

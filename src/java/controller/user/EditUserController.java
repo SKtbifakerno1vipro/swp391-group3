@@ -37,6 +37,9 @@ public class EditUserController extends HttpServlet {
             try {
                 User u = userService.getUserById(Integer.parseInt(idStr));
                 if (u != null) {
+                    if ("1".equals(request.getParameter("success"))) {
+                        request.setAttribute("successMsg", "Cập nhật thông tin thành công!");
+                    }
                     request.setAttribute("u", u);
                     request.setAttribute("mode", "edit");
                     request.setAttribute("userService", userService);
@@ -177,11 +180,12 @@ public class EditUserController extends HttpServlet {
         if (success) {
             if (isEdit) {
                 service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", "Cập nhật thông tin tài khoản: " + u.getUserName() + " (ID: " + u.getUserId() + ", Tên: " + u.getFullName() + ")");
+                response.sendRedirect(request.getContextPath() + "/edit-user?id=" + u.getUserId() + "&success=1");
             } else {
                 service.AuditLogService.log(currentUser.getUserId(), "CREATE", "User", "Tạo tài khoản mới: " + u.getUserName() + " (Email: " + u.getEmail() + ", Tên: " + u.getFullName() + ")");
                 userService.notificationForStaff(u, password);
+                response.sendRedirect(request.getContextPath() + "/user-list");
             }
-            response.sendRedirect(request.getContextPath() + "/user-list");
         } else {
             request.setAttribute("error", "Database error!");
             request.setAttribute("u", u);
