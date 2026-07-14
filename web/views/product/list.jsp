@@ -98,12 +98,18 @@
                                 <tr>
                                     <th>Mã sản phẩm</th>
                                     <th>Tên sản phẩm</th>
-                                    <th>Giá gốc</th>
+                                        <c:if test="${sessionScope.user.roleId != 3}">
+                                        <th>Giá gốc</th>
+                                        </c:if>
                                     <th>Giá bán</th>
                                     <th>Đơn vị</th>
-                                    <th>Số lượng</th>
+                                        <c:if test="${sessionScope.user.roleId != 3}">
+                                        <th>Số lượng</th>
+                                        </c:if>
                                     <th>Tên danh mục</th>
-                                    <th>Trạng thái</th>
+                                        <c:if test="${sessionScope.user.roleId != 3}">
+                                        <th>Trạng thái</th>
+                                        </c:if>
                                     <th>Hành động</th>
                                 </tr>
                                 <c:if test="${empty products}">
@@ -115,11 +121,16 @@
                                     <tr>
                                         <td>${p.productId}</td>
                                         <td>${p.productName}</td>
+                                        <c:if test="${sessionScope.user.roleId != 3}">
                                         <td><fmt:formatNumber value="${p.costPrice}" pattern="#,##0.##"/></td>
+                                        </c:if>
                                         <td><fmt:formatNumber value="${p.sellingPrice}" pattern="#,##0.##"/></td>
                                         <td>${p.unit}</td>
+                                        <c:if test="${sessionScope.user.roleId != 3}">
                                         <td><fmt:formatNumber value="${p.quantityAvailable}" pattern="#,##0"/></td>
+                                        </c:if>
                                         <td>${p.categoryName}</td>
+                                        <c:if test="${sessionScope.user.roleId != 3}">
                                         <td>
                                             <c:choose>
                                                 <c:when test="${p.productStatus == 'ACTIVE' || p.productStatus == 'Active'}">Hoạt động</c:when>
@@ -128,9 +139,19 @@
                                                 <c:otherwise>${p.productStatus}</c:otherwise>
                                             </c:choose>
                                         </td>
+                                        </c:if>
                                         <td style="white-space: nowrap; vertical-align: middle;">
                                             <div style="display: inline-flex; gap: 8px; align-items: center;">
-                                                <a href="${pageContext.request.contextPath}/edit-product?id=${p.productId}&action=edit" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">Sửa</a>
+
+                                                <c:choose>
+                                                    <c:when test="${sessionScope.user.roleId == 3}">
+                                                        <a href="${pageContext.request.contextPath}/edit-product?id=${p.productId}&action=detail" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">Chi tiết</a>
+                                                    </c:when>
+                                                    <c:when test="${sessionScope.user.roleId != 3}">
+                                                        <a href="${pageContext.request.contextPath}/edit-product?id=${p.productId}&action=edit" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">SỬa</a>
+                                                    </c:when>
+                                                </c:choose>
+
                                                 <form action="product-list" method="post" style="display: inline; margin: 0; padding: 0; background: none; border: none; box-shadow: none;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
                                                     <input type="submit" value="Xóa" style="padding: 4px 10px; font-size: 11px; background-color: var(--danger-soft); color: var(--danger); border: none; border-radius: 6px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-width: 50px; line-height: normal;">
                                                     <input type="hidden" name="id" value="${p.productId}">

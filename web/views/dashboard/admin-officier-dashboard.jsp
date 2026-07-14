@@ -93,9 +93,18 @@
                         <h1>Bảng điều khiển Admin Officer</h1>
                         <p>Quản lý hợp đồng và tình trạng phê duyệt</p>
                     </div>
+                    <div>
+                        <form action="${pageContext.request.contextPath}/dashboard" method="GET" style="display:flex; gap:10px; align-items:center;">
+                            <label style="font-size:12px; font-weight:bold;">Từ ngày:</label>
+                            <input type="date" name="startDate" value="${startDate}" style="padding:8px; border-radius:6px; border:1px solid var(--line);">
+                            <label style="font-size:12px; font-weight:bold;">Đến ngày:</label>
+                            <input type="date" name="endDate" value="${endDate}" style="padding:8px; border-radius:6px; border:1px solid var(--line);">
+                            <button type="submit" style="padding:8px 16px; background:var(--primary); color:white; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">Lọc dữ liệu</button>
+                            <a href="${pageContext.request.contextPath}/dashboard" style="padding:8px 16px; background:var(--surface-strong); color:var(--text); font-weight:bold; border-radius:6px; text-decoration:none;">Xóa lọc</a>
+                        </form>
+                    </div>
                 </div>
 
-                <!-- KPI ROW (6 Cards) -->
                 <div class="kpi-row">
                     <!-- Contract KPIs -->
                     <div class="kpi-card">

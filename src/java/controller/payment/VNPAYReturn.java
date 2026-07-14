@@ -25,6 +25,7 @@ import model.User;
 import model.Contract;
 import service.PaymentService;
 import dal.ContractDAO;
+import utils.PaymentConfig;
 
 @WebServlet(name = "VNPAYReturn", urlPatterns = {"/payment/return"})
 public class VNPAYReturn extends HttpServlet {
@@ -77,7 +78,13 @@ public class VNPAYReturn extends HttpServlet {
 
         int paymentId = -1;
         try {
-            paymentId = Integer.parseInt(vnp_TxnRef);
+            if (vnp_TxnRef != null) {
+                if (vnp_TxnRef.contains("_")) {
+                    paymentId = Integer.parseInt(vnp_TxnRef.split("_")[0]);
+                } else {
+                    paymentId = Integer.parseInt(vnp_TxnRef);
+                }
+            }
         } catch (NumberFormatException ignored) {}
 
         if (paymentId > 0) {

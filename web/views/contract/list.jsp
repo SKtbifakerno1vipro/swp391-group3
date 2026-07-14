@@ -19,7 +19,6 @@
             </jsp:include>
             <main class="main legacy-page">
                 <h2>Quản lý Hợp đồng</h2>
-
                 <form action="contract-list" method="GET">
                     <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Mã hợp đồng">
                     <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng">

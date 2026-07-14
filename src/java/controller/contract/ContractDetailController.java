@@ -79,7 +79,27 @@ public class ContractDetailController extends HttpServlet {
                     int contractId = contract.getContractId();
                     int userId = (user != null) ? user.getUserId() : 0;
                     int roleId = (user != null) ? user.getRoleId() : 0;
-                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(contractId, userId, roleId);
+
+                    // Pagination for history request
+                    int historyPage = 1;
+                    int historyPageSize = 5;
+                    String historyPageStr = request.getParameter("historyPage");
+                    if (historyPageStr != null && !historyPageStr.trim().isEmpty()) {
+                        try {
+                            historyPage = Integer.parseInt(historyPageStr);
+                        } catch (Exception e) {}
+                    }
+
+                    int totalHistories = contractService.getTotalHistoriesByContractId(contractId, userId, roleId);
+                    int historyEndPage = totalHistories / historyPageSize;
+                    if (totalHistories % historyPageSize != 0) {
+                        historyEndPage++;
+                    }
+                    if (historyPage > historyEndPage && historyEndPage > 0) {
+                        historyPage = historyEndPage;
+                    }
+
+                    List<ContractHistory> historyList = contractService.getHistoriesByContractId(contractId, userId, roleId, historyPage, historyPageSize);
 
                     //nguyenkien - begin
                     String finalHtml = (contract.getContractContent() != null) ? contract.getContractContent() : "Not have any contract";
@@ -122,6 +142,8 @@ public class ContractDetailController extends HttpServlet {
 
                     request.setAttribute("contract", contract);
                     request.setAttribute("historyList", historyList);
+                    request.setAttribute("historyPage", historyPage);
+                    request.setAttribute("historyEndPage", historyEndPage);
 
                     // Set status manager or customer can request edit
                     boolean isInternalProcessing = "DRAFT".equals(status)

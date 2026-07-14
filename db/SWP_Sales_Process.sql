@@ -316,8 +316,6 @@ create TABLE invoice (
     buyer_phone VARCHAR(20) NULL,
 
     -- Financial summary snapshot
-    sub_total DECIMAL(18,2) DEFAULT 0,
-    tax_amount DECIMAL(18,2) DEFAULT 0,
     total_amount DECIMAL(18,2) DEFAULT 0,
     
 	--Note
@@ -355,19 +353,22 @@ ON payment(invoice_id)
 WHERE invoice_id IS NOT NULL;
 GO
 
--- 19. Stock Transaction
-CREATE TABLE stock_transaction (
-    transaction_id INT IDENTITY(1,1) PRIMARY KEY,
-    product_id INT NOT NULL,
-    transaction_date DATETIME DEFAULT GETDATE(),
-    transaction_type VARCHAR(50),
-    quantity_in INT DEFAULT 0 CHECK (quantity_in >= 0),
-    quantity_out INT DEFAULT 0 CHECK (quantity_out >= 0),
-    customer_order_id INT,
-    FOREIGN KEY (product_id) REFERENCES product(product_id),
-    FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id)
+-- 19. Product Review
+CREATE TABLE product_review (
+    review_id INT IDENTITY(1,1) PRIMARY KEY,
+    product_id INT NOT NULL,                  -- FK liên kết bảng product
+    user_id INT NOT NULL,                     -- FK liên kết bảng user (người đánh giá)
+    rating INT CHECK (rating BETWEEN 1 AND 5),-- Số sao đánh giá từ 1 đến 5
+    comment NVARCHAR(1000) NULL,              -- Nội dung đánh giá
+    created_at DATETIME DEFAULT GETDATE(),    -- Thời gian đánh giá
+    reply_content NVARCHAR(1000) NULL,        -- Nội dung phản hồi của nhân viên
+    replied_by INT NULL,                      -- FK liên kết bảng user (nhân viên phản hồi)
+    replied_at DATETIME NULL,                 -- Thời gian phản hồi
+    status VARCHAR(20) DEFAULT 'ACTIVE'       -- Trạng thái: ACTIVE, HIDDEN, INACTIVE
+	FOREIGN KEY (product_id) REFERENCES product(product_id),
+    FOREIGN KEY (user_id) REFERENCES [user](user_id),
+    FOREIGN KEY (replied_by) REFERENCES [user](user_id)
 );
-GO
 
 
 -- 1. TAO ROLE
