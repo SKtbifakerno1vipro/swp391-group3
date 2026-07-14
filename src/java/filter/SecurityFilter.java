@@ -145,7 +145,9 @@ public class SecurityFilter implements Filter {
             "/preview",
             "/payment/list",
             "/payment",
-            "/realtime/notifications"
+            "/realtime/notifications",
+            "/Signature",
+            "/SignatureAcceptance"
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(
