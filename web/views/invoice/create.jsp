@@ -2,7 +2,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
-    String defaultSymbol = "1C" + String.format("%02d", LocalDate.now().getYear() % 100) + "TYY";
+    String defaultSymbol = "1K" + String.format("%02d", LocalDate.now().getYear() % 100) + "TYY";
     pageContext.setAttribute("defaultSymbol", defaultSymbol);
 %>
 <!DOCTYPE html>
@@ -371,11 +371,11 @@
                             <div class="buyer-group form-group" style="margin-top: 15px;">
                                 <label>Mã số thuế</label>
                                 <div class="input-wrapper">
-                                    <input type="text" name="buyerTaxCode" id="buyerTaxCode" value="${not empty invoice ? invoice.buyerTaxCode : customer.taxCode}" ${isReadOnly ? 'readonly' : ''}>
+                                    <input type="text" name="buyerTaxCode" id="buyerTaxCode" value="${not empty invoice ? invoice.buyerTaxCode : customer.taxCode}" readonly}>
                                 </div>
                             </div>
                             <div class="buyer-group form-group" style="margin-top: 15px;">
-                                <label>Tên người mua</label>
+                                <label>Tên Công Ty</label>
                                 <div class="input-wrapper">
                                     <input type="text" name="buyerName" id="buyerName" value="${not empty invoice ? invoice.buyerName : customer.companyName}" ${isReadOnly ? 'readonly' : ''}>
                                 </div>
