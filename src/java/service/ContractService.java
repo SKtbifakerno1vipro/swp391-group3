@@ -140,7 +140,7 @@ public class ContractService {
                 + "            </a>"
                 + "        </div>"
                 + "        <div style=\"background-color: #fcf8e3; border: 1px solid #fbeed5; border-radius: 12px; padding: 15px; margin-bottom: 24px; color: #c09853;\">"
-                + "            <p style=\"margin: 0; font-size: 14px;\"><strong>Lưu ý:</strong> Hợp đồng đang ở trạng thái <strong>CUSTOMER_CHECK</strong>. Quý khách vui lòng kiểm tra kỹ các thông tin cá nhân, danh sách sản phẩm, và điều khoản thanh toán.</p>"
+                + "            <p style=\"margin: 0; font-size: 14px;\"><strong>Lưu ý: Quý khách vui lòng kiểm tra kỹ các thông tin cá nhân, danh sách sản phẩm, và điều khoản thanh toán.</p>"
                 + "        </div>"
                 + "        <div style=\"border-top: 1px solid #eaeaea; padding-top: 20px; color: #888888; font-size: 12px; text-align: center;\">"
                 + "            <p style=\"margin: 0;\">Đây là email tự động từ hệ thống quản lý hợp đồng Pơ Bread. Vui lòng không phản hồi trực tiếp email này.</p>"

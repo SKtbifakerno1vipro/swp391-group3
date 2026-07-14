@@ -201,6 +201,7 @@
                             <option value="PENDING" ${status eq 'PENDING' ? 'selected' : ''}>Chờ thanh toán</option>
                             <option value="COMPLETED" ${status eq 'COMPLETED' ? 'selected' : ''}>Đã hoàn tất</option>
                             <option value="FAILED" ${status eq 'FAILED' ? 'selected' : ''}>Thất bại</option>
+                            <option value="CANCELLED" ${status eq 'CANCELLED' ? 'selected' : ''}>Đã hủy</option>
                         </select>
                     </div>
 
@@ -285,11 +286,17 @@
                                 <td>${p.paymentType}</td>
                                 <td>
                                     <c:choose>
+                                        <c:when test="${p.paymentStatus == 'PENDING'}">
+                                            <span class="badge badge-warning">Chờ thanh toán</span>
+                                        </c:when>
                                         <c:when test="${p.paymentStatus == 'COMPLETED'}">
                                             <span class="badge badge-success">Đã thanh toán</span>
                                         </c:when>
                                         <c:when test="${p.paymentStatus == 'FAILED'}">
                                             <span class="badge badge-danger">Thất bại</span>
+                                        </c:when>
+                                        <c:when test="${p.paymentStatus == 'CANCELLED'}">
+                                            <span class="badge badge-danger">Đã hủy</span>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="badge badge-warning">${p.paymentStatus}</span>

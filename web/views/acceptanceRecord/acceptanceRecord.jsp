@@ -112,6 +112,11 @@
 <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin: 20px auto; max-width: 800px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
     <div>
         <c:choose>
+            <c:when test="${order.customerOrder.orderStatus == 'CANCELLED'}">
+                <span style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: #FF4500; color: white; border-radius: 20px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(40,167,69,0.15);">
+                    ✖ Đơn hàng đã hủy
+                </span>
+            </c:when>
             <c:when test="${order.customerOrder.orderStatus == 'COMPLETED'}">
                 <span style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: #28a745; color: white; border-radius: 20px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(40,167,69,0.15);">
                     ✓ Đơn hàng đã giao thành công
@@ -125,6 +130,7 @@
                     </button>
                 </form>
             </c:when>
+            
             <c:otherwise>
                 <span style="color: #6c757d; font-style: italic; font-size: 14px;">
                     Trạng thái đơn hàng: <strong>${order.customerOrder.orderStatus}</strong>
@@ -262,6 +268,17 @@
                             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #28a745; border-radius: 4px; padding: 5px 15px; background: #f4faf6; color: #28a745; font-family: 'Courier New', Courier, monospace; transform: rotate(-2deg); font-weight: bold; width: fit-content; margin: 0 auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <span style="font-size: 11pt; letter-spacing: 1px;">ĐÃ XÁC NHẬN ONLINE</span>
                                 <span style="font-size: 8pt; color: #555; font-weight: normal; margin-top: 3px; font-family: sans-serif;">
+                                    Khách hàng: <strong>${customerFull.user.fullName}</strong>
+                                </span>
+                                <span style="font-size: 7pt; color: #777; font-weight: normal; font-family: sans-serif;">
+                                    Ngày: ${day}/${month}/${year}
+                                </span>
+                            </div>
+                        </c:when>
+                        <c:when test="${order.customerOrder.orderStatus == 'CANCELLED'}">
+                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #FF4500; border-radius: 4px; padding: 5px 15px; background: #f4faf6; color: #FF4500; font-family: 'Courier New', Courier, monospace; transform: rotate(-2deg); font-weight: bold; width: fit-content; margin: 0 auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <span style="font-size: 11pt; letter-spacing: 1px;">ĐÃ HỦY NHẬN HÀNG</span>
+                                <span style="font-size: 8pt; color: #777; font-weight: normal; margin-top: 3px; font-family: sans-serif;">
                                     Khách hàng: <strong>${customerFull.user.fullName}</strong>
                                 </span>
                                 <span style="font-size: 7pt; color: #777; font-weight: normal; font-family: sans-serif;">

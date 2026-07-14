@@ -191,11 +191,17 @@
                             <span class="label">Trạng thái</span>
                             <span class="value">
                                 <c:choose>
+                                    <c:when test="${payment.paymentStatus == 'PENDING'}">
+                                        <span class="badge badge-warning">CHỜ THANH TOÁN</span>
+                                    </c:when>
                                     <c:when test="${payment.paymentStatus == 'COMPLETED'}">
                                         <span class="badge badge-success">ĐÃ HOÀN TẤT</span>
                                     </c:when>
                                     <c:when test="${payment.paymentStatus == 'FAILED'}">
                                         <span class="badge badge-danger">THẤT BẠI</span>
+                                    </c:when>
+                                    <c:when test="${payment.paymentStatus == 'CANCELLED'}">
+                                        <span class="badge badge-danger">ĐÃ HỦY</span>
                                     </c:when>
                                     <c:otherwise>
                                         <span class="badge badge-warning">${payment.paymentStatus}</span>
@@ -206,13 +212,20 @@
                     </div>
 
                     <div class="receipt-footer">
-                        <c:if test="${payment.paymentStatus == 'PENDING' && sessionScope.user.roleId == 3}">
+                        <c:if test="${(payment.paymentStatus == 'PENDING' || payment.paymentStatus == 'FAILED' || payment.paymentStatus == 'CANCELLED') && sessionScope.user.roleId == 3}">
                             <form action="${pageContext.request.contextPath}/payment" method="POST" style="margin-top: 15px;">
                                 <input type="hidden" name="orderId" value="${payment.paymentId}">
                                 <input type="hidden" name="amount" value="${payment.amount.longValue()}">
                                 <button type="submit" class="btn-pay" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #10b981; color: #ffffff; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); width: 100%; box-sizing: border-box;">
                                     <span class="material-symbols-outlined">payment</span>
-                                    Thanh toán qua VNPay
+                                    <c:choose>
+                                        <c:when test="${payment.paymentStatus == 'PENDING'}">
+                                            Thanh toán qua VNPay
+                                        </c:when>
+                                        <c:otherwise>
+                                            Thanh toán lại qua VNPay
+                                        </c:otherwise>
+                                    </c:choose>
                                 </button>
                             </form>
                         </c:if>
