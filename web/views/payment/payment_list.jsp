@@ -192,7 +192,9 @@
                     <div class="search-row">
                         <span class="search-label">Tìm kiếm thanh toán:</span>
                         
-                        <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng..." class="input-small" />
+                        <c:if test="${sessionScope.user.roleId != 3}">
+                            <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng..." class="input-small" />
+                        </c:if>
                         
                         <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Số hợp đồng..." class="input-small" />
                         

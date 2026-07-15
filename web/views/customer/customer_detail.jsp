@@ -573,9 +573,9 @@
                             </div>
 
                             <div class="btn-group">
-                                <c:if test="${sessionScope.user.roleId != 3}">
-                                    <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customer.customerId}"
-                                        class="btn-edit">Chỉnh sửa hồ sơ</a>
+                                <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customer.customerId}"
+                                    class="btn-edit">Chỉnh sửa hồ sơ</a>
+                                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 4}">
                                     <c:if test="${cusDTO.user.status == 'ACTIVE'}">
                                         <a href="${pageContext.request.contextPath}/customer/detail?action=deactivate&id_cus=${cusDTO.customer.customerId}"
                                             class="btn-remove"
@@ -586,6 +586,8 @@
                                             class="btn-activate"
                                             onclick="return confirm('Bạn có chắc chắn muốn kích hoạt khách hàng này không?');">Kích hoạt</a>
                                     </c:if>
+                                </c:if>
+                                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 4 || sessionScope.user.roleId == 5}">
                                     <a href="${pageContext.request.contextPath}/customer/list" class="btn-back">Quay lại danh sách</a>
                                 </c:if>
                             </div>

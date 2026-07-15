@@ -177,7 +177,7 @@
         <body>
             <div class="dashboard-shell">
                 <jsp:include page="/views/shared/sidebar.jsp">
-                    <jsp:param name="activeMenu" value="customers" />
+                    <jsp:param name="activeMenu" value="${sessionScope.user.roleId == 3 ? 'profile' : 'customers'}" />
                 </jsp:include>
                 <main class="main legacy-page">
                     <div class="container">
@@ -237,7 +237,7 @@
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input type="email" id="email" name="email" class="form-control"
-                                        value="${isEdit ? cusDTO.user.email : ''}" ${isEdit ? 'readonly' : '' } required>
+                                        value="${isEdit ? cusDTO.user.email : ''}" ${isEdit && sessionScope.user.roleId != 3 ? 'readonly' : '' } required>
                                 </div>
 
                                 <%-- Full Name --%>
@@ -255,41 +255,55 @@
                                         </div>
 
                                         <%-- Status --%>
-                                            <div class="form-group">
-                                                <label for="status">Trạng thái</label>
-                                                <select id="status" name="status" class="form-control">
-                                                    <option value="ACTIVE" ${isEdit && cusDTO.user.status=='ACTIVE'
-                                                        ? 'selected' : '' }>Hoạt động</option>
-                                                    <option value="INACTIVE" ${isEdit && cusDTO.user.status=='INACTIVE'
-                                                        ? 'selected' : '' }>Ngừng hoạt động</option>
-                                                </select>
-                                            </div>
+                                            <c:choose>
+                                                <c:when test="${sessionScope.user.roleId == 3}">
+                                                    <input type="hidden" name="status" value="${cusDTO.user.status}">
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="form-group">
+                                                        <label for="status">Trạng thái</label>
+                                                        <select id="status" name="status" class="form-control">
+                                                            <option value="ACTIVE" ${isEdit && cusDTO.user.status=='ACTIVE'
+                                                                ? 'selected' : '' }>Hoạt động</option>
+                                                            <option value="INACTIVE" ${isEdit && cusDTO.user.status=='INACTIVE'
+                                                                ? 'selected' : '' }>Ngừng hoạt động</option>
+                                                        </select>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
 
-                                            <div class="form-group">
-                                                <label>Vai trò</label>
-                                                <c:choose>
-                                                    <c:when test="${isEdit}">
-                                                        <c:forEach var="role" items="${roles}">
-                                                            <c:if test="${role.roleId == cusDTO.user.roleId}">
-                                                                <input type="text" class="form-control"
-                                                                    value="${role.roleName}" readonly>
-                                                                <input type="hidden" name="roleId"
-                                                                    value="${role.roleId}">
-                                                            </c:if>
-                                                        </c:forEach>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <input type="hidden" name="roleId" value="${customerRoleId}">
-                                                        <span class="role-badge">Khách hàng</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </div>
+                                            <c:choose>
+                                                <c:when test="${sessionScope.user.roleId == 3}">
+                                                    <input type="hidden" name="roleId" value="${cusDTO.user.roleId}">
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="form-group">
+                                                        <label>Vai trò</label>
+                                                        <c:choose>
+                                                            <c:when test="${isEdit}">
+                                                                <c:forEach var="role" items="${roles}">
+                                                                    <c:if test="${role.roleId == cusDTO.user.roleId}">
+                                                                        <input type="text" class="form-control"
+                                                                            value="${role.roleName}" readonly>
+                                                                        <input type="hidden" name="roleId"
+                                                                            value="${role.roleId}">
+                                                                    </c:if>
+                                                                </c:forEach>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <input type="hidden" name="roleId" value="${customerRoleId}">
+                                                                <span class="role-badge">Khách hàng</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
 
                                             <%-- Tax Code --%>
                                                 <div class="form-group">
                                                     <label for="taxCode">Mã số thuế</label>
                                                     <input type="text" id="taxCode" name="taxCode" class="form-control"
-                                                        value="${isEdit ? cusDTO.customer.taxCode : ''}" required>
+                                                        value="${isEdit ? cusDTO.customer.taxCode : ''}" ${sessionScope.user.roleId == 3 ? 'readonly' : ''} required>
                                                 </div>
  
                                                 <%-- Company Name --%>
@@ -301,43 +315,57 @@
                                                     </div>
 
                                                     <%-- Customer Type--%>
-                                                        <div class="form-group">
-                                                            <label for="customerType">Loại khách hàng</label>
-                                                            <select id="customerType" name="customerType"
-                                                                class="form-control" ${isEdit ? 'required' : '' }>
-                                                                <option value="">-- Chọn phân loại --</option>
-                                                                <c:forEach var="type" items="${listTypeCus}">
-                                                                    <option value="${type}" ${isEdit &&
-                                                                        cusDTO.customer.customerType==type ? 'selected' : '' }>
-                                                                        ${type}</option>
-                                                                </c:forEach>
-                                                            </select>
-                                                        </div>
+                                                        <c:choose>
+                                                            <c:when test="${sessionScope.user.roleId == 3}">
+                                                                <input type="hidden" name="customerType" value="${cusDTO.customer.customerType}">
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <div class="form-group">
+                                                                    <label for="customerType">Loại khách hàng</label>
+                                                                    <select id="customerType" name="customerType"
+                                                                        class="form-control" ${isEdit ? 'required' : '' }>
+                                                                        <option value="">-- Chọn phân loại --</option>
+                                                                        <c:forEach var="type" items="${listTypeCus}">
+                                                                            <option value="${type}" ${isEdit &&
+                                                                                cusDTO.customer.customerType==type ? 'selected' : '' }>
+                                                                                ${type}</option>
+                                                                        </c:forEach>
+                                                                    </select>
+                                                                </div>
+                                                            </c:otherwise>
+                                                        </c:choose>
 
                                                         <%-- Assigned To--%>
-                                                            <div class="form-group">
-                                                                <label for="assignedToUserId">Giao cho (ID người dùng đã đăng nhập: ${sessionScope.user.userId})</label>
-                                                                <select id="assignedToUserId" name="assignedToUserId"
-                                                                    class="form-control">
-                                                                    <option value="">-- Không giao cho ai --</option>
-                                                                    <c:forEach var="u" items="${users}">
-                                                                        <option value="${u.userId}" ${(isEdit &&
-                                                                            cusDTO.customer.assignedToUserId==u.userId) ||
-                                                                            (!isEdit &&
-                                                                            sessionScope.user.userId==u.userId)
-                                                                            ? 'selected' : '' }>
-                                                                            ${u.fullName} (${u.userName}) - ID:
-                                                                            ${u.userId}
-                                                                        </option>
-                                                                    </c:forEach>
-                                                                </select>
-                                                            </div>
+                                                            <c:choose>
+                                                                <c:when test="${sessionScope.user.roleId == 3}">
+                                                                    <input type="hidden" name="assignedToUserId" value="${cusDTO.customer.assignedToUserId}">
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <div class="form-group">
+                                                                        <label for="assignedToUserId">Giao cho (ID người dùng đã đăng nhập: ${sessionScope.user.userId})</label>
+                                                                        <select id="assignedToUserId" name="assignedToUserId"
+                                                                            class="form-control">
+                                                                            <option value="">-- Không giao cho ai --</option>
+                                                                            <c:forEach var="u" items="${users}">
+                                                                                <option value="${u.userId}" ${(isEdit &&
+                                                                                    cusDTO.customer.assignedToUserId==u.userId) ||
+                                                                                    (!isEdit &&
+                                                                                    sessionScope.user.userId==u.userId)
+                                                                                    ? 'selected' : '' }>
+                                                                                    ${u.fullName} (${u.userName}) - ID:
+                                                                                    ${u.userId}
+                                                                                </option>
+                                                                            </c:forEach>
+                                                                        </select>
+                                                                    </div>
+                                                                </c:otherwise>
+                                                            </c:choose>
  
                                                             <%-- --%>
                                                                 <div class="btn-group">
                                                                     <button type="submit" class="btn-submit">${isEdit ?
                                                                         'Lưu thay đổi' : 'Tạo mới'}</button>
-                                                                    <a href="${pageContext.request.contextPath}/customer/list"
+                                                                    <a href="${pageContext.request.contextPath}/${sessionScope.user.roleId == 3 ? 'customer/detail' : 'customer/list'}"
                                                                         class="btn-cancel">Hủy</a>
                                                                 </div>
                         </form>

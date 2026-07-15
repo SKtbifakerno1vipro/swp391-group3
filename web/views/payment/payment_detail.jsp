@@ -195,7 +195,7 @@
                                         <span class="badge badge-warning">CHỜ THANH TOÁN</span>
                                     </c:when>
                                     <c:when test="${payment.paymentStatus == 'COMPLETED'}">
-                                        <span class="badge badge-success">ĐÃ HOÀN TẤT</span>
+                                        <span class="badge badge-success">ĐÃ THANH TOÁN</span>
                                     </c:when>
                                     <c:when test="${payment.paymentStatus == 'FAILED'}">
                                         <span class="badge badge-danger">THẤT BẠI</span>
