@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpSession;
 import utils.PasswordUtils;
+import java.sql.Date;
 
 @WebServlet(name = "EditUserController", urlPatterns = {"/edit-user"})
 public class EditUserController extends HttpServlet {
@@ -67,6 +68,25 @@ public class EditUserController extends HttpServlet {
         String idStr = request.getParameter("id");
         boolean isEdit = (idStr != null && !idStr.isEmpty());
         
+        String action = request.getParameter("action");
+        if ("resetPassword".equals(action) && isEdit) {
+            try {
+                userService.changePassword(Integer.parseInt(idStr), null, "123456");
+                service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", "Reset password for User ID: " + idStr);
+                request.setAttribute("successMsg", "Đã khôi phục mật khẩu về mặc định: 123456");
+                
+                User resetUser = userService.getUserById(Integer.parseInt(idStr));
+                request.setAttribute("u", resetUser);
+                request.setAttribute("mode", "edit");
+                request.setAttribute("userService", userService);
+                request.setAttribute("roles", roleService.getAllRolesForCreateUser());
+                request.getRequestDispatcher("/views/user/detail.jsp").forward(request, response);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
         User u = new User();
         if (isEdit) {
             u.setUserId(Integer.parseInt(idStr));
@@ -89,6 +109,13 @@ public class EditUserController extends HttpServlet {
         
         String rawAddress = request.getParameter("address");
         u.setAddress(rawAddress != null ? rawAddress.trim() : "");
+        
+        String rawDob = request.getParameter("dateBirth");
+        if (rawDob != null && !rawDob.trim().isEmpty()) {
+            try {
+                u.setDateBirth(Date.valueOf(rawDob.trim()));
+            } catch (Exception e) {}
+        }
         
         try {
             u.setRoleId(Integer.parseInt(request.getParameter("roleId")));

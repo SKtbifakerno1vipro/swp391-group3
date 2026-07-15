@@ -23,6 +23,7 @@ import model.Payment;
 import model.Contract;
 import service.PaymentService;
 import dal.ContractDAO;
+import utils.PaymentConfig;
 
 @WebServlet(name = "VNPAYIPN", urlPatterns = {"/payment/ipn"})
 public class VNPAYIPN extends HttpServlet {
@@ -71,7 +72,13 @@ public class VNPAYIPN extends HttpServlet {
 
                 int paymentId = -1;
                 try {
-                    paymentId = Integer.parseInt(vnp_TxnRef);
+                    if (vnp_TxnRef != null) {
+                        if (vnp_TxnRef.contains("_")) {
+                            paymentId = Integer.parseInt(vnp_TxnRef.split("_")[0]);
+                        } else {
+                            paymentId = Integer.parseInt(vnp_TxnRef);
+                        }
+                    }
                 } catch (NumberFormatException ignored) {}
 
                 // 1. Check checkOrderId (Order/Contract/Payment exists in database)

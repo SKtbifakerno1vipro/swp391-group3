@@ -213,6 +213,14 @@ public class ContractService {
         return contractDAO.insert(c);
     }
 
+    public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId, int pageIndex, int pageSize) {
+        return contractDAO.getHistoriesByContractId(contractId, userId, roleId, pageIndex, pageSize);
+    }
+
+    public int getTotalHistoriesByContractId(int contractId, int userId, int roleId) {
+        return contractDAO.getTotalHistoriesByContractId(contractId, userId, roleId);
+    }
+
     public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId) {
         return contractDAO.getHistoriesByContractId(contractId, userId, roleId);
     }

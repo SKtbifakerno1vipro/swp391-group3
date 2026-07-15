@@ -17,6 +17,11 @@ import model.Category;
 import model.Product;
 import model.User;
 import service.ProductService;
+import service.ProductReviewService;
+import model.ProductReview;
+import dto.CustomerDTO;
+import service.CustomerService;
+import service.UserService;
 import utils.Validation;
 
 /**
@@ -27,7 +32,10 @@ import utils.Validation;
 public class EditProduct extends HttpServlet {
 
     private final ProductService pService = new ProductService();
-
+    private final ProductReviewService reviewService = new ProductReviewService();
+    private final CustomerService customerService = new CustomerService();
+    private final UserService userService = new UserService();
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -67,8 +75,9 @@ public class EditProduct extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login");
             return;
         }
 
@@ -98,12 +107,29 @@ public class EditProduct extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/product-list");
                     return;
                 }
+
+                List<ProductReview> reviews = reviewService.getReviewsByProductId(id);
+                double avgRating = reviewService.getAverageRating(id);
+
+                boolean canReview = false;
+                if (user.getRoleId() == 3) {
+
+                    CustomerDTO customerDTO = customerService.getCustomerDTOByUserId(user.getUserId());
+                    if (customerDTO != null && customerDTO.getCustomer() != null) {
+                        canReview = reviewService.hasPurchasedProduct(customerDTO.getCustomer().getCustomerId(), id);
+                    }
+                }
+
+                request.setAttribute("reviews", reviews);
+                request.setAttribute("avgRating", avgRating);
+                request.setAttribute("canReview", canReview);
+
                 request.setAttribute("product", p);
                 request.setAttribute("units", units);
                 request.setAttribute("categories", categories);
                 request.setAttribute("statusList", statusList);
                 request.setAttribute("update_at", p.getUpdatedAt());
-                request.setAttribute("update_by", p.getUpdatedBy());
+                request.setAttribute("update_by", userService.getUserById(p.getUpdatedBy()).getFullName());
                 request.setAttribute("action", action);
                 request.getRequestDispatcher("/views/product/detail.jsp").forward(request,
                         response);
@@ -138,6 +164,17 @@ public class EditProduct extends HttpServlet {
         String action = request.getParameter("action");
         String productId = request.getParameter("id");
 
+        int id = 0;
+        if ("edit".equals(action)) {
+            try {
+                id = Integer.parseInt(productId);
+            } catch (NumberFormatException e) {
+                session.setAttribute("errorProduct", "ID sản phẩm không hợp lệ!");
+                response.sendRedirect(request.getContextPath() + "/product-list");
+                return;
+            }
+        }
+
         String name = request.getParameter("name");
         String costRaw = request.getParameter("cost");
         String sellRaw = request.getParameter("sell");
@@ -149,24 +186,33 @@ public class EditProduct extends HttpServlet {
 
         String error = null;
         if (error == null) {
-            error = Validation.validateCompanyName(name);
+            error = Validation.validateProductName(name);
         }
         if (error == null) {
-            error = Validation.validatePrice(costRaw);
+            error = Validation.validateProductUnit(unit);
         }
         if (error == null) {
-            error = Validation.validatePrice(sellRaw);
+            error = Validation.validateCostAndSellingPrice(costRaw, sellRaw);
         }
         if (error == null) {
             error = Validation.validateQuantity(qRaw);
         }
 
-        // Lấy lại danh sách Category & Unit dự phòng trường hợp xảy ra lỗi cần load lại trang
+        // Kiểm tra trùng tên sản phẩm trong CSDL
+        if (error == null) {
+            Integer idObj = null;
+            if ("edit".equals(action)) {
+                idObj = id;
+            }
+            if (pService.isProductNameExists(name, idObj)) {
+                error = "Tên sản phẩm này đã tồn tại trong hệ thống!";
+            }
+        }
+
         List<Category> categories = pService.getAllCategory();
         List<String> units = pService.getProductUnit();
         List<String> statusList = pService.getProductStatus();
 
-        // BƯỚC 3: Nếu DỮ LIỆU NHẬP BỊ LỖI -> Trả về form cũ kèm thông báo lỗi
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("categories", categories);
@@ -186,27 +232,21 @@ public class EditProduct extends HttpServlet {
                 request.getRequestDispatcher("/views/product/create.jsp").forward(request, response);
             } else if ("edit".equals(action)) {
                 Product errorProduct = new Product();
-                errorProduct.setProductId(Integer.parseInt(productId));
+                errorProduct.setProductId(id);
                 errorProduct.setProductName(name);
                 errorProduct.setDescription(des);
                 errorProduct.setUnit(unit);
                 errorProduct.setProductStatus(status);
-                try {
-                    errorProduct.setCostPrice(Double.parseDouble(costRaw));
-                } catch (Exception e) {
-                }
-                try {
-                    errorProduct.setSellingPrice(Double.parseDouble(sellRaw));
-                } catch (Exception e) {
-                }
-                try {
-                    errorProduct.setQuantityAvailable(Integer.parseInt(qRaw));
-                } catch (Exception e) {
-                }
-                try {
-                    errorProduct.setCategoryId(Integer.parseInt(cRaw));
-                } catch (Exception e) {
-                }
+
+                try { errorProduct.setCostPrice(Double.parseDouble(costRaw)); } catch (Exception e) { errorProduct.setCostPrice(0.0); }
+                try { errorProduct.setSellingPrice(Double.parseDouble(sellRaw)); } catch (Exception e) { errorProduct.setSellingPrice(0.0); }
+                try { errorProduct.setQuantityAvailable(Integer.parseInt(qRaw)); } catch (Exception e) { errorProduct.setQuantityAvailable(0); }
+                try { errorProduct.setCategoryId(Integer.parseInt(cRaw)); } catch (Exception e) { errorProduct.setCategoryId(0); }
+
+                request.setAttribute("cost", costRaw);
+                request.setAttribute("sell", sellRaw);
+                request.setAttribute("quantity", qRaw);
+                request.setAttribute("categoryId", cRaw);
 
                 request.setAttribute("action", "edit");
                 request.setAttribute("product", errorProduct);
@@ -215,38 +255,42 @@ public class EditProduct extends HttpServlet {
             return;
         }
 
-        Product product = new Product();
-        product.setProductName(name);
-        product.setCostPrice(Double.parseDouble(costRaw));
-        product.setSellingPrice(Double.parseDouble(sellRaw));
-        product.setQuantityAvailable(Integer.parseInt(qRaw));
-        product.setCategoryId(Integer.parseInt(cRaw));
-        product.setDescription(des);
-        product.setUnit(unit);
-        product.setProductStatus(status);
-        product.setUpdatedBy(u.getUserId());
+        try {
+            Product product = new Product();
+            product.setProductName(name);
+            product.setCostPrice(Double.parseDouble(costRaw));
+            product.setSellingPrice(Double.parseDouble(sellRaw));
+            product.setQuantityAvailable(Integer.parseInt(qRaw));
+            product.setCategoryId(Integer.parseInt(cRaw));
+            product.setDescription(des);
+            product.setUnit(unit);
+            product.setProductStatus(status);
+            product.setUpdatedBy(u.getUserId());
 
-        if ("create".equals(action)) {
-            boolean isCreated = pService.createProduct(product);
-            if (isCreated) {
-                service.AuditLogService.log(u.getUserId(), "CREATE", "Product", "Tạo sản phẩm: " + name);
-                response.sendRedirect(request.getContextPath() + "/product-list");
-            } else {
-                session.setAttribute("errorProduct", "Tạo sản phẩm thất bại.");
-                response.sendRedirect(request.getContextPath() + "/product-list");
-            }
-        } else if ("edit".equals(action)) {
-            int id = Integer.parseInt(productId);
-            product.setProductId(id);
+            if ("create".equals(action)) {
+                boolean isCreated = pService.createProduct(product);
+                if (isCreated) {
+                    service.AuditLogService.log(u.getUserId(), "CREATE", "Product", "Tạo sản phẩm: " + name);
+                    response.sendRedirect(request.getContextPath() + "/product-list");
+                } else {
+                    session.setAttribute("errorProduct", "Tạo sản phẩm thất bại.");
+                    response.sendRedirect(request.getContextPath() + "/product-list");
+                }
+            } else if ("edit".equals(action)) {
+                product.setProductId(id);
 
-            boolean isUpdated = pService.updateProduct(product);
-            if (isUpdated) {
-                service.AuditLogService.log(u.getUserId(), "UPDATE", "Product", "Chỉnh sửa sản phẩm ID: " + id);
-                response.sendRedirect(request.getContextPath() + "/edit-product?id=" + id + "&action=detail");
-            } else {
-                session.setAttribute("errorProduct", "Cập nhật sản phẩm thất bại.");
-                response.sendRedirect(request.getContextPath() + "/product-list");
+                boolean isUpdated = pService.updateProduct(product);
+                if (isUpdated) {
+                    service.AuditLogService.log(u.getUserId(), "UPDATE", "Product", "Chỉnh sửa sản phẩm ID: " + id);
+                    response.sendRedirect(request.getContextPath() + "/edit-product?id=" + id + "&action=detail");
+                } else {
+                    session.setAttribute("errorProduct", "Cập nhật sản phẩm thất bại.");
+                    response.sendRedirect(request.getContextPath() + "/product-list");
+                }
             }
+        } catch (NumberFormatException e) {
+            session.setAttribute("errorProduct", "Lỗi định dạng số liệu sản phẩm!");
+            response.sendRedirect(request.getContextPath() + "/product-list");
         }
     }
 

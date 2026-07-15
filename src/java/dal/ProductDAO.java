@@ -201,7 +201,6 @@ public class ProductDAO extends DBContext {
         p.setDescription(rs.getString("description"));
         p.setUnit(rs.getString("unit"));
         p.setProductStatus(rs.getString("product_status"));
-        p.setReorderLevel(rs.getInt("reorder_level"));
         p.setQuantityAvailable(rs.getInt("quantity_available"));
 
         int updatedBy = rs.getInt("updated_by");
@@ -328,5 +327,42 @@ public class ProductDAO extends DBContext {
             System.out.println("getAllCategory: " + e.getMessage());
         }
         return null;
+    }
+
+    public boolean isProductNameExists(String productName, Integer excludeProductId) {
+        String sql = "SELECT COUNT(*) FROM product WHERE LOWER(product_name) = LOWER(?)";
+        if (excludeProductId != null && excludeProductId > 0) {
+            sql += " AND product_id != ?";
+        }
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, productName.trim());
+            if (excludeProductId != null && excludeProductId > 0) {
+                ps.setInt(2, excludeProductId);
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            System.err.println("Error in isProductNameExists: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean isProductUsed(int productId) {
+        // Kiểm tra xem sản phẩm đã có trong chi tiết Báo giá nào chưa để tránh xóa nhầm
+        String sql = "SELECT COUNT(*) FROM quotation_detail WHERE product_id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, productId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            System.err.println("Error in isProductUsed: " + e.getMessage());
+        }
+        return false;
     }
 }

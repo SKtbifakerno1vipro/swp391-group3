@@ -68,4 +68,12 @@ public class ProductService {
         }
         return page;
     }
+
+    public boolean isProductNameExists(String productName, Integer excludeProductId) {
+        return productDAO.isProductNameExists(productName, excludeProductId);
+    }
+
+    public boolean isProductUsed(int productId) {
+        return productDAO.isProductUsed(productId);
+    }
 }

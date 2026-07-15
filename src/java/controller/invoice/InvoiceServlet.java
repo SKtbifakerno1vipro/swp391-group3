@@ -225,7 +225,7 @@ public class InvoiceServlet extends HttpServlet {
                 request.setAttribute("invoice", invoice);
 
                 Integer invoiceCreatorId = invoice.getCreatedBy();
-                if (invoiceCreatorId == null && user != null) {
+                if (invoiceCreatorId == null) {
                     invoiceCreatorId = user.getUserId();
                 }
                 if (invoiceCreatorId != null) {
@@ -241,7 +241,6 @@ public class InvoiceServlet extends HttpServlet {
                 return;
             }
 
-            // Save to Database
             boolean success;
             if (invoiceId > 0) {
                 success = iService.updateInvoice(invoice);

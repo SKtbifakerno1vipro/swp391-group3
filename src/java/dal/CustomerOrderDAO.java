@@ -55,7 +55,7 @@ public class CustomerOrderDAO extends DBContext {
     }
 
     public List<CustomerOrderDTO> getDetailsByOrderId(int orderId) {
-        List<dto.CustomerOrderDTO> details = new ArrayList<>();
+        List<CustomerOrderDTO> details = new ArrayList<>();
         String sql = "SELECT cod.*, qd.product_name, qd.unit, qd.product_id, qd.tax_percent, qd.discount_percent "
                 + "FROM customer_order_detail cod "
                 + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
@@ -123,7 +123,7 @@ public class CustomerOrderDAO extends DBContext {
 
                 // 2. Insert Details
                 try (PreparedStatement psDetail = connection.prepareStatement(insertDetailSql)) {
-                    for (model.CustomerOrderDetail detail : details) {
+                    for (CustomerOrderDetail detail : details) {
                         psDetail.setInt(1, orderId);
                         psDetail.setInt(2, detail.getQuotationDetailId());
                         psDetail.setInt(3, detail.getQuantity());
@@ -137,7 +137,7 @@ public class CustomerOrderDAO extends DBContext {
                 // 3. Deduct stock from products
                 String deductStockSql = "UPDATE product SET quantity_available = quantity_available - ? WHERE product_id = ?";
                 try (PreparedStatement psStock = connection.prepareStatement(deductStockSql)) {
-                    for (model.CustomerOrderDetail detail : details) {
+                    for (CustomerOrderDetail detail : details) {
                         psStock.setInt(1, detail.getQuantity());
                         psStock.setInt(2, detail.getProductId());
                         psStock.addBatch();

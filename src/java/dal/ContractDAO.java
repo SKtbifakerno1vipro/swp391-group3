@@ -102,7 +102,7 @@ public class ContractDAO extends DBContext {
             sql += " AND u.email LIKE ? ";
         }
 
-        sql += " ORDER BY c.created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        sql += " ORDER BY c.customer_contract_id desc OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
@@ -458,6 +458,73 @@ public class ContractDAO extends DBContext {
 
     //////////////////////////////detail contract
     // Lấy lịch sử và danh sách item liên quan
+    // Lấy lịch sử và danh sách item liên quan (Có phân trang)
+    public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId, int pageIndex, int pageSize) {
+        List<ContractHistory> list = new ArrayList<>();
+        String sql = "SELECT h.*, u.user_name "
+                + "FROM contract_edit_history h "
+                + " JOIN [user] u "
+                + "ON h.changed_by = u.user_id "
+                + " JOIN customer_contract c ON h.contract_id = c.customer_contract_id "
+                + " JOIN customer cust ON c.customer_id = cust.customer_id "
+                + "WHERE h.contract_id = ? ";
+        if (userId != 0 && userId > 0 && roleId == 3) {
+            sql += " AND cust.user_id = ? AND u.role_id = 3 ";
+        }
+        sql += "ORDER BY h.created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int index = 1;
+            ps.setInt(index++, contractId);
+            if (userId != 0 && userId > 0 && roleId == 3) {
+                ps.setInt(index++, userId);
+            }
+            ps.setInt(index++, (pageIndex - 1) * pageSize);
+            ps.setInt(index++, pageSize);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ContractHistory h = new ContractHistory();
+                h.setHistoryId(rs.getInt("history_id"));
+                h.setFromStatus(rs.getString("from_status"));
+                h.setToStatus(rs.getString("to_status"));
+                h.setNote(rs.getString("note"));
+                h.setChangedByName(rs.getString("user_name"));
+                h.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                h.setRevisionItems(getRevisionItemsByHistoryId(h.getHistoryId()));
+                list.add(h);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int getTotalHistoriesByContractId(int contractId, int userId, int roleId) {
+        String sql = "SELECT COUNT(*) "
+                + "FROM contract_edit_history h "
+                + " JOIN [user] u "
+                + "ON h.changed_by = u.user_id "
+                + " JOIN customer_contract c ON h.contract_id = c.customer_contract_id "
+                + " JOIN customer cust ON c.customer_id = cust.customer_id "
+                + "WHERE h.contract_id = ? ";
+        if (userId != 0 && userId > 0 && roleId == 3) {
+            sql += " AND cust.user_id = ? AND u.role_id = 3 ";
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            int index = 1;
+            ps.setInt(index++, contractId);
+            if (userId != 0 && userId > 0 && roleId == 3) {
+                ps.setInt(index++, userId);
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public List<ContractHistory> getHistoriesByContractId(int contractId, int userId, int roleId) {
         List<ContractHistory> list = new ArrayList<>();
         String sql = "SELECT h.*, u.user_name "

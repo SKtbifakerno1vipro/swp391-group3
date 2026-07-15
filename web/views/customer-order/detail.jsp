@@ -65,6 +65,7 @@
                             <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
                             <input type="hidden" name="action" value="update_status">
                             <ul>
+<<<<<<< HEAD
                                 <li><strong>Mã đơn hàng:</strong> ${order.customerOrder.customerOrderId}</li>
                                 <li><strong>Tên khách hàng:</strong> ${order.customerUser.fullName}</li>
                                 <li><strong>Mã số thuế:</strong> ${order.customer.taxCode}</li>
@@ -76,6 +77,19 @@
                                          <option value="COMPLETED" ${order.customerOrder.orderStatus != 'COMPLETED' ? 'hidden' : 'selected'}>ĐÃ HOÀN THÀNH</option>
                                      </select>
                                         <button type="submit" ${order.customerOrder.orderStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'CANCELLED' ? 'hidden' : ''}>Cập nhật trạng thái</button>
+=======
+                                <li><strong>Order ID:</strong> ${order.customerOrder.customerOrderId}</li>
+                                <li><strong>Customer Name:</strong> ${order.customerUser.fullName}</li>
+                                <li><strong>Tax Code:</strong> ${order.customer.taxCode}</li>
+                                <li><strong>Status:</strong>
+                                    <select name="status" ${order.customerOrder.orderStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'CANCELLED' ? 'disabled' : ''} >
+                                        <option value="PENDING" ${order.customerOrder.orderStatus == 'PENDING' ? 'selected' : 'hidden'}>PENDING</option>
+                                         <option value="SHIPPING" ${order.customerOrder.orderStatus == 'SHIPPING' ? 'selected' : ''}>SHIPPING</option>
+                                         <option value="CANCELLED" ${order.customerOrder.orderStatus == 'CANCELLED' ? 'selected' : ''}>CANCELLED</option>
+                                         <option value="COMPLETED" ${order.customerOrder.orderStatus == 'COMPLETED' ? 'selected' : ''}>COMPLETED</option>
+                                     </select>
+                                        <button type="submit" ${order.customerOrder.orderStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'CANCELLED' ? 'hidden' : ''}>Update Status</button>
+>>>>>>> 56a0ace80a9ac499cdedcb1b8a0ec78c796fcd91
                                 </li>
                                 <c:if test="${order.customerOrder.orderStatus == 'COMPLETED'}">
                                     <li style="margin-top: 15px;"><strong>Hành động:</strong>
@@ -100,7 +114,11 @@
                             </ul>
                         </form>
                                     <c:if test="${order.customerOrder.orderStatus == 'SHIPPING' || order.customerOrder.orderStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'CANCELLED'}">
+<<<<<<< HEAD
                             <a href="${pageContext.request.contextPath}/AcceptanceRecordController?orderId=${order.customerOrder.customerOrderId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #0284c7; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);">Biên bản nghiệm thu</a>
+=======
+                            <a href="${pageContext.request.contextPath}/AcceptanceRecordController?orderId=${order.customerOrder.customerOrderId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #0284c7; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);">Acceptance Record</a>
+>>>>>>> 56a0ace80a9ac499cdedcb1b8a0ec78c796fcd91
                         </c:if>
 
                     </c:otherwise>

@@ -18,6 +18,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import utils.PaymentConfig;
+import service.PaymentService;
+import model.Payment;
 
 @WebServlet(name = "VNPAYPayment", urlPatterns = {"/payment"})
 public class VNPAYPayment extends HttpServlet {
@@ -47,6 +50,20 @@ public class VNPAYPayment extends HttpServlet {
         }
         if (vnp_TxnRef == null || vnp_TxnRef.isEmpty()) {
             vnp_TxnRef = String.valueOf(System.currentTimeMillis());
+        }
+
+        int paymentId = -1;
+        try {
+            paymentId = Integer.parseInt(vnp_TxnRef);
+        } catch (NumberFormatException ignored) {}
+
+        if (paymentId > 0) {
+            PaymentService paymentService = new PaymentService();
+            Payment p = paymentService.getPaymentById(paymentId);
+            if (p != null && ("FAILED".equals(p.getPaymentStatus()) || "CANCELLED".equals(p.getPaymentStatus()))) {
+                paymentService.updatePaymentStatus(paymentId, "PENDING");
+            }
+            vnp_TxnRef = paymentId + "_" + System.currentTimeMillis();
         }
 
         long amountValue = Long.parseLong(req.getParameter("amount"));
