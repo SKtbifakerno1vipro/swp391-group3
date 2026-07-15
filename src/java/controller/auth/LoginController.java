@@ -10,6 +10,7 @@ import java.io.IOException;
 import model.User;
 
 import jakarta.servlet.annotation.WebServlet;
+import service.AuditLogService;
 
 @WebServlet(name = "LoginController", urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
@@ -79,7 +80,7 @@ public class LoginController extends HttpServlet {
             // Login Success: Reset attempts and set user session
             session.setAttribute("failedAttempts", 0);
             session.setAttribute("user", authenticatedUser);
-
+            AuditLogService.log(user.getUserId(), "LOGIN", "Auth", authenticatedUser.getUserName() + " vừa đăng nhập  vào hệ thống");
             response.sendRedirect(request.getContextPath() + "/dashboard");
         } else {
             // Login Failed: Increment attempts
