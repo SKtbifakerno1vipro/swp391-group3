@@ -46,9 +46,9 @@
                         <span class="sidebar-text">Contracts</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/customer-order-list" title="My Orders">
+                       href="${pageContext.request.contextPath}/customer-order-list" title="Đơn hàng của tôi">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt_long</span></div>
-                        <span class="sidebar-text">My Orders</span>
+                        <span class="sidebar-text">Đơn hàng của tôi</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn">
@@ -73,9 +73,9 @@
                         <span class="sidebar-text">Contracts</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/customer-order-list" title="Orders">
+                       href="${pageContext.request.contextPath}/customer-order-list" title="Đơn hàng">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">shopping_cart</span></div>
-                        <span class="sidebar-text">Orders</span>
+                        <span class="sidebar-text">Đơn hàng</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn của tôi">
@@ -95,9 +95,9 @@
                         <span class="sidebar-text">Customers</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/customer-order-list" title="Orders">
+                       href="${pageContext.request.contextPath}/customer-order-list" title="Đơn hàng">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt_long</span></div>
-                        <span class="sidebar-text">Orders</span>
+                        <span class="sidebar-text">Đơn hàng</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/product-list" title="Sản phẩm">

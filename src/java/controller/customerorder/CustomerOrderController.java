@@ -228,7 +228,7 @@ public class CustomerOrderController extends HttpServlet {
                     List<Contract> contracts = contractDao.getSignedContractsByCustomerId(customerId);
                     request.setAttribute("contracts", contracts);
                 } else {
-                    request.setAttribute("error", "Customer not found.");
+                    request.setAttribute("error", "Không tìm thấy khách hàng.");
                     List<CustomerDTO> customers = customerService.getAllCustomerDTOs();
                     request.setAttribute("customers", customers);
                 }
@@ -272,7 +272,7 @@ public class CustomerOrderController extends HttpServlet {
         String[] qdIds = request.getParameterValues("quotationDetailIds");
 
         if (customerIdStr == null || customerIdStr.isBlank() || contractIdStr == null || contractIdStr.isBlank()) {
-            request.setAttribute("error", "Customer and Contract are required.");
+            request.setAttribute("error", "Khách hàng và Hợp đồng là bắt buộc.");
             handleCreateView(request, response);
             return;
         }
@@ -282,7 +282,7 @@ public class CustomerOrderController extends HttpServlet {
             int contractId = Integer.parseInt(contractIdStr);
 
             if (qdIds == null || qdIds.length == 0) {
-                request.setAttribute("error", "Please select at least one product.");
+                request.setAttribute("error", "Vui lòng chọn ít nhất một sản phẩm.");
                 handleCreateView(request, response);
                 return;
             }
@@ -324,7 +324,7 @@ public class CustomerOrderController extends HttpServlet {
             }
 
             if (details.isEmpty()) {
-                request.setAttribute("error", "No valid products or quantities selected.");
+                request.setAttribute("error", "Không có sản phẩm hoặc số lượng hợp lệ nào được chọn.");
                 handleCreateView(request, response);
                 return;
             }
@@ -333,11 +333,11 @@ public class CustomerOrderController extends HttpServlet {
                 service.AuditLogService.log(currentUser.getUserId(), "CREATE", "Order", "Tạo đơn hàng mới cho khách hàng ID: " + customerId + " (Số mặt hàng: " + details.size() + ")");
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
             } else {
-                request.setAttribute("error", "Failed to create order. " + dal.CustomerOrderDAO.lastError);
+                request.setAttribute("error", "Tạo đơn hàng thất bại. " + dal.CustomerOrderDAO.lastError);
                 handleCreateView(request, response);
             }
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "Invalid data format.");
+            request.setAttribute("error", "Định dạng dữ liệu không hợp lệ.");
             handleCreateView(request, response);
         }
     }
