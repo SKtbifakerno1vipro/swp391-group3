@@ -105,6 +105,7 @@
                                     <th>Đơn vị</th>
                                         <c:if test="${sessionScope.user.roleId != 3}">
                                         <th>Số lượng</th>
+                                        <th>Số lượng đặt trước</th>
                                         </c:if>
                                     <th>Tên danh mục</th>
                                         <c:if test="${sessionScope.user.roleId != 3}">
@@ -128,6 +129,7 @@
                                         <td>${p.unit}</td>
                                         <c:if test="${sessionScope.user.roleId != 3}">
                                             <td><fmt:formatNumber value="${p.quantityAvailable}" pattern="#,##0"/></td>
+                                            <td><fmt:formatNumber value="${p.quantityReserve}" pattern="#,##0"/></td>
                                         </c:if>
                                         <td>${p.categoryName}</td>
                                         <c:if test="${sessionScope.user.roleId != 3}">

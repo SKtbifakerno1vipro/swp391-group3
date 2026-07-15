@@ -366,4 +366,16 @@ public class ProductDAO extends DBContext {
         }
         return false;
     }
+
+    public boolean updateQuantityReserve(int productId, int quantityReserve) {
+        String sql = "UPDATE product SET quantity_reserve = ? WHERE product_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, quantityReserve);
+            ps.setInt(2, productId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("updateQuantityReserve: " + e.getMessage());
+        }
+        return false;
+    }
 }

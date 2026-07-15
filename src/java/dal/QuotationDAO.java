@@ -266,6 +266,7 @@ public class QuotationDAO extends DBContext {
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
+                
                 updateQuotationTotalPrice(detail.getQuotationId());
             }
             return affectedRows > 0;

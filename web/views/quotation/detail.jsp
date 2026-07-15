@@ -33,7 +33,7 @@
                 <c:if test="${message == 'accepted'}"><p style="color: green; font-weight: bold;">Đã duyệt báo giá thành công.</p></c:if>
                 <c:if test="${message == 'stockError'}">
                     <p style="color: red; font-weight: bold;">
-                        Không đủ hàng tồn kho cho sản phẩm. (Trong kho chỉ còn ${param.stock != null ? param.stock : 0} sản phẩm, nhưng yêu cầu ${param.required != null ? param.required : 0} sản phẩm).
+                        Không đủ hàng cho sản phẩm.
                     </p>
                 </c:if>
 
