@@ -177,40 +177,42 @@
         </nav>
     </div>
 
-    <!-- Section 3: User Profile -->
-    <c:if test="${not empty sessionScope.user}">
-        <div class="sidebar-section profile-section">
-            <div class="user-card">
-                <div class="sidebar-icon-wrap">
-                    <div class="avatar"><span class="material-symbols-outlined">person</span></div>
-                </div>
-                <div class="sidebar-text">
-                    <strong><c:out value="${sessionScope.user.fullName}" /></strong><br>
-                    <small>@<c:out value="${sessionScope.user.userName}" /><br>
-                        <c:choose>
-                            <c:when test="${sessionScope.user.roleId == 1}">Admin</c:when>
-                            <c:when test="${sessionScope.user.roleId == 2}">Manager</c:when>
-                            <c:when test="${sessionScope.user.roleId == 3}">Customer</c:when>
-                            <c:when test="${sessionScope.user.roleId == 4}">Sale</c:when>
-                            <c:when test="${sessionScope.user.roleId == 5}">Admin Officer</c:when>
-                            <c:otherwise>Role <c:out value="${sessionScope.user.roleId}" /></c:otherwise>
-                        </c:choose>
-                    </small>
+    <div class="sidebar-footer" style="display: flex; flex-direction: column; gap: 8px;">
+        <!-- Section 3: User Profile -->
+        <c:if test="${not empty sessionScope.user}">
+            <div class="sidebar-section profile-section">
+                <div class="user-card">
+                    <div class="sidebar-icon-wrap">
+                        <div class="avatar"><span class="material-symbols-outlined">person</span></div>
+                    </div>
+                    <div class="sidebar-text">
+                        <strong><c:out value="${sessionScope.user.fullName}" /></strong><br>
+                        <small>@<c:out value="${sessionScope.user.userName}" /><br>
+                            <c:choose>
+                                <c:when test="${sessionScope.user.roleId == 1}">Admin</c:when>
+                                <c:when test="${sessionScope.user.roleId == 2}">Manager</c:when>
+                                <c:when test="${sessionScope.user.roleId == 3}">Customer</c:when>
+                                <c:when test="${sessionScope.user.roleId == 4}">Sale</c:when>
+                                <c:when test="${sessionScope.user.roleId == 5}">Admin Officer</c:when>
+                                <c:otherwise>Role <c:out value="${sessionScope.user.roleId}" /></c:otherwise>
+                            </c:choose>
+                        </small>
+                    </div>
                 </div>
             </div>
-        </div>
-    </c:if>
+        </c:if>
 
-    <!-- Section 4: Actions -->
-    <div class="sidebar-section actions-section">
-        <a class="nav-link" href="${pageContext.request.contextPath}/user/password/change" title="Change password">
-            <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">lock_reset</span></div>
-            <span class="sidebar-text">Change password</span>
-        </a>
-        <a class="nav-link" href="${pageContext.request.contextPath}/logout" title="Logout">
-            <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">logout</span></div>
-            <span class="sidebar-text">Logout</span>
-        </a>
+        <!-- Section 4: Actions -->
+        <div class="sidebar-section actions-section">
+            <a class="nav-link" href="${pageContext.request.contextPath}/user/password/change" title="Change password">
+                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">lock_reset</span></div>
+                <span class="sidebar-text">Change password</span>
+            </a>
+            <a class="nav-link" href="${pageContext.request.contextPath}/logout" title="Logout">
+                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">logout</span></div>
+                <span class="sidebar-text">Logout</span>
+            </a>
+        </div>
     </div>
 </aside>
 
