@@ -73,7 +73,7 @@
                                         <option value="PENDING" ${order.customerOrder.orderStatus == 'PENDING' ? 'selected' : 'hidden'}>Chờ xử lý</option>
                                          <option value="SHIPPING" ${order.customerOrder.orderStatus == 'SHIPPING' ? 'selected' : ''}>Đang giao hàng</option>
                                          <option value="CANCELLED" ${order.customerOrder.orderStatus == 'CANCELLED' ? 'selected' : ''}>Đã hủy</option>
-                                         <option value="COMPLETED" ${order.customerOrder.orderStatus == 'COMPLETED' ? 'selected' : ''}>Đã hoàn thành</option>
+                                         <option value="COMPLETED" ${order.customerOrder.orderStatus != 'COMPLETED' ? 'hidden' : 'selected'}>ĐÃ HOÀN THÀNH</option>
                                      </select>
                                         <button type="submit" ${order.customerOrder.orderStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'CANCELLED' ? 'hidden' : ''}>Cập nhật trạng thái</button>
                                 </li>
