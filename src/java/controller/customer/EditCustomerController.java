@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpSession;
 import model.*;
 import dto.*;
 import service.*;
@@ -34,7 +35,7 @@ public class EditCustomerController extends HttpServlet {
             int customerId = Integer.parseInt(customerIdStr);
             
             // Security check: Customer can only edit their own profile
-            jakarta.servlet.http.HttpSession session = request.getSession(false);
+            HttpSession session = request.getSession(false);
             User user = (session != null) ? (User) session.getAttribute("user") : null;
             if (user != null && user.getRoleId() == 3) {
                 CustomerDTO currentCustomer = customerService.getCustomerDTOByUserId(user.getUserId());
@@ -84,7 +85,7 @@ public class EditCustomerController extends HttpServlet {
             int userId = Integer.parseInt(userIdStr);
 
             // Security check: Customer can only update their own profile
-            jakarta.servlet.http.HttpSession session = request.getSession(false);
+            HttpSession session = request.getSession(false);
             User user = (session != null) ? (User) session.getAttribute("user") : null;
             if (user != null && user.getRoleId() == 3) {
                 CustomerDTO currentCustomer = customerService.getCustomerDTOByUserId(user.getUserId());

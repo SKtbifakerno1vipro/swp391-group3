@@ -29,7 +29,19 @@ public class CustomerOrderService {
     }
 
     public boolean createOrder(model.CustomerOrder order, List<model.CustomerOrderDetail> details) {
-        return customerOrderDAO.createOrder(order, details);
+        boolean success = customerOrderDAO.createOrder(order, details);
+        // Xhieu - tu dong tao payment
+        if (success) {
+            try {
+                int contractId = order.getCustomerContractId();
+                PaymentService paymentService = new PaymentService();
+                paymentService.createPendingPaymentForContractIfNotExists(contractId);
+            } catch (Exception e) {
+                System.err.println("Failed to automatically create pending payment for contract: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return success;
     }
 
 

@@ -215,7 +215,7 @@ public class SignatureServlet extends HttpServlet {
                 ctrService.insertHistory(h);
 
                 // Automatically create a PENDING payment record if it doesn't exist yet
-                paymentService.createPendingPaymentForContractIfNotExists(contractId);
+                // paymentService.createPendingPaymentForContractIfNotExists(contractId);
             }
             response.sendRedirect("contract-detail?id=" + contractId);
 
