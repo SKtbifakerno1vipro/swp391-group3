@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpSession;
 import model.*;
 import dto.*;
 import service.*;
@@ -32,6 +33,18 @@ public class EditCustomerController extends HttpServlet {
 
         try {
             int customerId = Integer.parseInt(customerIdStr);
+            
+            // Security check: Customer can only edit their own profile
+            HttpSession session = request.getSession(false);
+            User user = (session != null) ? (User) session.getAttribute("user") : null;
+            if (user != null && user.getRoleId() == 3) {
+                CustomerDTO currentCustomer = customerService.getCustomerDTOByUserId(user.getUserId());
+                if (currentCustomer == null || currentCustomer.getCustomer().getCustomerId() != customerId) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
+                    return;
+                }
+            }
+
             CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(customerId);
             request.setAttribute("users", customerService.getAllSalesExecutiveUsers());
             request.setAttribute("roles", roleService.getAllRoles());
@@ -70,6 +83,17 @@ public class EditCustomerController extends HttpServlet {
         try {
             int customerId = Integer.parseInt(customerIdStr);
             int userId = Integer.parseInt(userIdStr);
+
+            // Security check: Customer can only update their own profile
+            HttpSession session = request.getSession(false);
+            User user = (session != null) ? (User) session.getAttribute("user") : null;
+            if (user != null && user.getRoleId() == 3) {
+                CustomerDTO currentCustomer = customerService.getCustomerDTOByUserId(user.getUserId());
+                if (currentCustomer == null || currentCustomer.getCustomer().getCustomerId() != customerId || currentCustomer.getUser().getUserId() != userId) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
+                    return;
+                }
+            }
 
             String userName = request.getParameter("username");
             String email = request.getParameter("email");
