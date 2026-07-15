@@ -22,11 +22,16 @@
     <!-- Section 2: Navigation Menu -->
     <div class="sidebar-section nav-section">
         <nav class="nav-group" aria-label="Main navigation">
-            <a class="nav-link ${param.activeMenu == 'dashboard' ? 'active' : ''}"
-               href="${pageContext.request.contextPath}/dashboard" title="Dashboard">
-                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">dashboard</span></div>
-                <span class="sidebar-text">Dashboard</span>
-            </a>
+           
+                <c:if test="${sessionScope.user.roleId != 6}">
+                    <a class="nav-link ${param.activeMenu == 'dashboard' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/dashboard" title="Dashboard">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">dashboard</span></div>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                </c:if>
+            
+
             <c:choose>
 
                 <c:when test="${sessionScope.user.roleId == 3}">
@@ -39,6 +44,11 @@
                        href="${pageContext.request.contextPath}/quotation-list" title="Quotations">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">request_quote</span></div>
                         <span class="sidebar-text">Quotations</span>
+                    </a>
+                    <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/product-list" title="Sản phẩm">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">inventory_2</span></div>
+                        <span class="sidebar-text">Sản phẩm</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/contract-list" title="Contracts">
@@ -72,6 +82,11 @@
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">request_quote</span></div>
                         <span class="sidebar-text">Quotations</span>
                     </a>
+                    <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/product-review" title="Đánh giá & Phản hồi">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span></div>
+                        <span class="sidebar-text">Đánh giá</span>
+                    </a>
                     <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/contract-list" title="Contracts">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div>
@@ -93,7 +108,40 @@
                         <span class="sidebar-text">Payments</span>
                     </a>
                 </c:when>
+                <c:when test="${sessionScope.user.roleId == 6}">
+                    <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/edit-user?id=${sessionScope.user.userId}" title="My Profile">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">account_circle</span></div>
+                        <span class="sidebar-text">My Profile</span>
+                    </a>
+                    <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/product-list" title="Sản phẩm">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">inventory_2</span></div>
+                        <span class="sidebar-text">Sản phẩm</span>
+                    </a>
+                    <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/product-review" title="Đánh giá & Phản hồi">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span></div>
+                        <span class="sidebar-text">Đánh giá</span>
+                    </a>
+                    <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customer-order-list" title="Orders">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">shopping_cart</span></div>
+                        <span class="sidebar-text">Orders</span>
+                    </a>
+                    <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/category/list" title="Categories">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">category</span></div>
+                        <span class="sidebar-text">Categories</span>
+                    </a>
+                        
+                </c:when>
                 <c:otherwise>
+                    <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customer/detail?id_cus=${sessionScope.customerId}" title="My Profile">
+                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">account_circle</span></div>
+                        <span class="sidebar-text">My Profile</span>
+                    </a>
                     <a class="nav-link ${param.activeMenu == 'customers' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/customer/list" title="Customers">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">groups</span></div>

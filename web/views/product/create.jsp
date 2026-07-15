@@ -28,6 +28,11 @@
             <h1>Thêm sản phẩm</h1>
             <div>
                 <form action="edit-product" method="post">
+                    <c:if test="${error != null}">
+                        <div style="color: var(--danger); background: var(--danger-soft); border: 1px solid var(--line); padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; font-weight: 700;">
+                            ${error}
+                        </div>
+                    </c:if>
                     <table>
                         <tr>
                             <td>Tên sản phẩm</td>
@@ -80,7 +85,7 @@
                         </tr>
 
                     </table>
-                    <div>${error}</div>
+                    
                 </form>
             </div>
         </div>

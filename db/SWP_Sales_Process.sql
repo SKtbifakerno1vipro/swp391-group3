@@ -102,6 +102,7 @@ CREATE TABLE product (
     product_status VARCHAR(20),
     reorder_level INT CHECK (reorder_level >= 0),
     quantity_available INT DEFAULT 0 CHECK (quantity_available >= 0),
+	quantity_reserve INT DEFAULT 0 CHECK (quantity_reserve >= 0), --them cai nay cho hop logic
     updated_by INT,
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
@@ -451,7 +452,8 @@ INSERT INTO permission (permission_name) VALUES
 (N'Email Logs'),
 (N'System Audit Logs'),
 (N'Revenue Report'),
-(N'Acceptance Record');
+(N'Acceptance Record'),
+(N'Product Review');
 GO
 
 -- 7. QUY TRINH HOP DONG 01: KHACH HANG 01 (LAM TRON BO TOI THANH TOAN)
@@ -755,7 +757,8 @@ SELECT 2, permission_id FROM permission WHERE permission_name IN (
     N'Dashboard', N'Role List', N'User List', N'Profile', N'Customer List', N'Order List', 
     N'Order Create', N'Order Detail', N'Product List', N'Product Detail', 
     N'Contract List', N'Contract Detail(Edit)', N'Invoice List', N'Invoice Detail', 
-    N'Preview Invoice', N'Payment List', N'Payment Detail', N'Revenue Report', N'Acceptance Record'
+    N'Preview Invoice', N'Payment List', N'Payment Detail', N'Revenue Report', N'Acceptance Record',
+    N'Product Review'
 );
 
 -- 3. Customer (role_id = 3)
@@ -763,7 +766,7 @@ INSERT INTO role_permission (role_id, permission_id)
 SELECT 3, permission_id FROM permission WHERE permission_name IN (
     N'Dashboard', N'Customer Detail', N'Order List', N'Order Detail', N'Category List', N'Category edit',
     N'Product List', N'Quotation List', N'Quotation Detail', N'Contract List', N'Contract Detail(Edit)',
-    N'Invoice List', N'Preview Invoice', N'Payment List'
+    N'Invoice List', N'Preview Invoice', N'Payment List', N'Product Review'
 );
 
 -- 4. Sale Staff (role_id = 4)
@@ -772,7 +775,7 @@ SELECT 4, permission_id FROM permission WHERE permission_name IN (
     N'Dashboard', N'Profile', N'Customer List', N'Customer Create', N'Customer Detail',
     N'Order List', N'Order Create', N'Order Detail', N'Category List', N'Category edit',
     N'Product List', N'Product Detail', N'Quotation List', N'Create Quotation', N'Quotation Detail',
-    N'Payment List', N'Payment Detail'
+    N'Payment List', N'Payment Detail', N'Product Review'
 );
 
 -- 5. Admin Officer (role_id = 5)
@@ -781,14 +784,14 @@ SELECT 5, permission_id FROM permission WHERE permission_name IN (
     N'Dashboard', N'Profile', N'Customer List', N'Customer Detail', N'Order List', N'Order Create',
     N'Order Detail', N'Quotation List', N'Quotation Detail', N'Contract List', N'Contract Create',
     N'Contract Detail(Edit)', N'Invoice List', N'Invoice Create', N'Invoice Detail', N'Preview Invoice',
-    N'Payment List', N'Payment Detail', N'Acceptance Record'
+    N'Payment List', N'Payment Detail', N'Acceptance Record', N'Product Review'
 );
 
 -- 6. Warehouse Staff (role_id = 6)
 INSERT INTO role_permission (role_id, permission_id)
 SELECT 6, permission_id FROM permission WHERE permission_name IN (
     N'Dashboard', N'Profile', N'Order List', N'Order Detail', N'Category List', N'Category edit',
-    N'Product List', N'Product Create', N'Product Detail'
+    N'Product List', N'Product Create', N'Product Detail', N'Product Review'
 );
 GO
 

@@ -112,7 +112,7 @@ public class SecurityFilter implements Filter {
             "/create-order",
             "/product-list",
             "/edit-product",
-            "/product-delete",
+            "/product-review",
             "/contract-list",
             "/contract-detail",
             "/invoice-list",
@@ -149,6 +149,7 @@ public class SecurityFilter implements Filter {
             "/payment/list",
             "/payment",
             "/realtime/notifications",
+            "/product-review",
             "/Signature",
             "/SignatureAcceptance",
             "/export-pdf"
@@ -172,7 +173,7 @@ public class SecurityFilter implements Filter {
             "/category/delete",
             "/product-list",
             "/edit-product",
-            "/product-delete",
+            "/product-review",
             "/quotation-list",
             "/quotation-create",
             "/quotation-detail",
@@ -207,6 +208,7 @@ public class SecurityFilter implements Filter {
             "/payment/list",
             "/payment",
             "/payment/detail",
+            "/product-review",
             "/Signature",
             "/SignatureAcceptance",
             "/realtime/notifications",
@@ -214,7 +216,6 @@ public class SecurityFilter implements Filter {
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
-            "/dashboard",
             "/edit-user",
             "/customer-order-list",
             "/customer-order",
@@ -226,16 +227,15 @@ public class SecurityFilter implements Filter {
             "/create-product",
             "/edit-product",
             "/product-delete",
+            "/product-review",
             "/realtime/notifications",
             "/export-pdf"
     );
 
-    //
-    
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
+        
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
@@ -430,6 +430,8 @@ public class SecurityFilter implements Filter {
             case "/edit-product":
             case "/product-delete":
                 return "Product Detail";
+            case "/product-review":
+                return "Product Review";
             case "/quotation-list":
                 return "Quotation List";
             case "/quotation-create":

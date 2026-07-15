@@ -202,6 +202,7 @@ public class ProductDAO extends DBContext {
         p.setUnit(rs.getString("unit"));
         p.setProductStatus(rs.getString("product_status"));
         p.setQuantityAvailable(rs.getInt("quantity_available"));
+        p.setQuantityReserve(rs.getInt("quantity_reserve"));
 
         int updatedBy = rs.getInt("updated_by");
         if (!rs.wasNull()) {
