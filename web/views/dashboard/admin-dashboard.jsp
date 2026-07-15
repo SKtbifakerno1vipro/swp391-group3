@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Admin Dashboard - Po Bread Sales</title>
+        <title>Trang quản trị - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -26,9 +26,9 @@
                 <!-- Top Header Section -->
                 <section class="topbar">
                     <div>
-                        <p class="eyebrow">System Administration</p>
-                        <h1>System Admin Dashboard</h1>
-                        <p>Overview of system performance, role breakdowns, contract statuses, and system audit logs.</p>
+                        <p class="eyebrow">Quản trị hệ thống</p>
+                        <h1>Bảng điều khiển Admin</h1>
+                        <p>Tổng quan về hiệu suất hệ thống, thống kê vai trò, trạng thái hợp đồng và lịch sử hoạt động hệ thống.</p>
                     </div>
                 </section>
 
@@ -38,37 +38,37 @@
                     <a class="metric-card info" href="${pageContext.request.contextPath}/user-list">
                         <div class="metric-icon"><span class="material-symbols-outlined">manage_accounts</span></div>
                         <p class="metric-value"><c:out value="${summary.totalUsers}"/></p>
-                        <p class="metric-label">Total Users</p>
+                        <p class="metric-label">Tổng số người dùng</p>
                     </a>
                     <!-- Total Customers -->
                     <a class="metric-card" href="${pageContext.request.contextPath}/customer/list">
                         <div class="metric-icon"><span class="material-symbols-outlined">groups</span></div>
                         <p class="metric-value"><c:out value="${summary.totalCustomers}"/></p>
-                        <p class="metric-label">Total Customers</p>
+                        <p class="metric-label">Tổng số khách hàng</p>
                     </a>
                     <!-- Total Products -->
                     <a class="metric-card secondary" href="${pageContext.request.contextPath}/product-list">
                         <div class="metric-icon"><span class="material-symbols-outlined">inventory_2</span></div>
                         <p class="metric-value"><c:out value="${summary.totalProducts}"/></p>
-                        <p class="metric-label">Total Products</p>
+                        <p class="metric-label">Tổng số sản phẩm</p>
                     </a>
                     <!-- Total Contracts -->
                     <a class="metric-card tertiary" href="${pageContext.request.contextPath}/contract-list">
                         <div class="metric-icon"><span class="material-symbols-outlined">contract</span></div>
                         <p class="metric-value"><c:out value="${summary.totalContracts}"/></p>
-                        <p class="metric-label">Total Contracts</p>
+                        <p class="metric-label">Tổng số hợp đồng</p>
                     </a>
                     <!-- Total Orders -->
                     <a class="metric-card danger" href="${pageContext.request.contextPath}/customer-order-list">
                         <div class="metric-icon"><span class="material-symbols-outlined">receipt_long</span></div>
                         <p class="metric-value"><c:out value="${summary.totalOrders}"/></p>
-                        <p class="metric-label">Total Orders</p>
+                        <p class="metric-label">Tổng số đơn hàng</p>
                     </a>
                     <!-- Total Invoices -->
                     <a class="metric-card pink" href="${pageContext.request.contextPath}/invoice-list">
                         <div class="metric-icon"><span class="material-symbols-outlined">receipt</span></div>
                         <p class="metric-value"><c:out value="${summary.totalInvoices}"/></p>
-                        <p class="metric-label">Total Invoices</p>
+                        <p class="metric-label">Tổng số hóa đơn</p>
                     </a>
                 </section>
 
@@ -76,21 +76,21 @@
                 <section class="charts-grid" aria-label="Dashboard charts">
                     <!-- Users by Role Pie Chart -->
                     <div class="panel status-panel">
-                        <div class="panel-title"><h2>Users by Role</h2></div>
+                        <div class="panel-title"><h2>Người dùng theo vai trò</h2></div>
                         <div class="chart-container">
                             <canvas id="usersRoleChart"></canvas>
                         </div>
                     </div>
                     <!-- Contracts by Status Bar Chart -->
                     <div class="panel status-panel">
-                        <div class="panel-title"><h2>Contracts by Status</h2></div>
+                        <div class="panel-title"><h2>Hợp đồng theo trạng thái</h2></div>
                         <div class="chart-container">
                             <canvas id="contractsStatusChart"></canvas>
                         </div>
                     </div>
                     <!-- Orders by Status Doughnut Chart -->
                     <div class="panel status-panel">
-                        <div class="panel-title"><h2>Orders by Status</h2></div>
+                        <div class="panel-title"><h2>Đơn hàng theo trạng thái</h2></div>
                         <div class="chart-container">
                             <canvas id="ordersStatusChart"></canvas>
                         </div>
@@ -101,15 +101,15 @@
                 <section class="content-grid">
                     <!-- Section 3: Recent Activity Log Table -->
                     <div class="panel table-panel">
-                        <div class="panel-title"><h2>Recent System Activities</h2></div>
+                        <div class="panel-title"><h2>Hoạt động hệ thống gần đây</h2></div>
                         <table>
                             <thead>
                                 <tr>
-                                    <th style="width: 20%;">Time</th>
-                                    <th style="width: 20%;">User</th>
-                                    <th style="width: 15%;">Action</th>
-                                    <th style="width: 20%;">Affected Object</th>
-                                    <th style="width: 25%;">Description</th>
+                                    <th style="width: 20%;">Thời gian</th>
+                                    <th style="width: 20%;">Người dùng</th>
+                                    <th style="width: 15%;">Hành động</th>
+                                    <th style="width: 20%;">Đối tượng tác động</th>
+                                    <th style="width: 25%;">Mô tả</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -145,7 +145,7 @@
                                 </c:forEach>
                                 <c:if test="${empty recentActivities}">
                                     <tr>
-                                        <td colspan="5" style="text-align: center; color: var(--muted);">No recent activities found.</td>
+                                        <td colspan="5" style="text-align: center; color: var(--muted);">Không tìm thấy hoạt động gần đây nào.</td>
                                     </tr>
                                 </c:if>
                             </tbody>
@@ -154,22 +154,22 @@
 
                     <!-- Section 4: Quick System Info Panel -->
                     <div class="panel status-panel">
-                        <div class="panel-title"><h2>Quick System Info</h2></div>
+                        <div class="panel-title"><h2>Thông tin nhanh hệ thống</h2></div>
                         <div class="status-list">
                             <div class="status-item">
-                                <span>Server Time</span>
+                                <span>Thời gian máy chủ</span>
                                 <strong><c:out value="${serverTime}"/></strong>
                             </div>
                             <div class="status-item">
-                                <span>Current Admin</span>
+                                <span>Admin hiện tại</span>
                                 <strong><c:out value="${adminName}"/></strong>
                             </div>
                             <div class="status-item">
-                                <span>Database Name</span>
+                                <span>Tên cơ sở dữ liệu</span>
                                 <strong><c:out value="${dbName}"/></strong>
                             </div>
                             <div class="status-item">
-                                <span>App Version</span>
+                                <span>Phiên bản ứng dụng</span>
                                 <strong><c:out value="${appVersion}"/></strong>
                             </div>
                         </div>
@@ -249,7 +249,7 @@
                 data: {
                     labels: contractsStatusLabels,
                     datasets: [{
-                        label: 'Contracts Count',
+                        label: 'Số lượng hợp đồng',
                         data: contractsStatusData,
                         backgroundColor: '#7a6148', // secondary brown
                         borderRadius: 8,

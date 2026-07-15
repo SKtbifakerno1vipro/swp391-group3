@@ -45,7 +45,21 @@ public class QuotationListController extends HttpServlet {
         }
         
         QuotationService quotationService = new QuotationService();
-        List<Quotation> quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate, saleId);
+        List<Quotation> quotationList;
+
+        // Kiem tra xem nguoi dung co dang thuc hien tim kiem hoac loc du lieu hay khong
+        boolean isSearching = (searchText != null && !searchText.isBlank())
+                || (status != null && !status.isBlank())
+                || (fromDate != null && !fromDate.isBlank())
+                || (toDate != null && !toDate.isBlank());
+
+        if (isSearching) {
+            // Truong hop co filter/search: goi searchQuotations
+            quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate, saleId);
+        } else {
+            // Truong hop binh thuong: lay toan bo danh sach (kem theo phân quyen saleId neu co)
+            quotationList = quotationService.getAllQuotations(saleId);
+        }
 
         // Pagination
         int page = 1;
@@ -66,10 +80,10 @@ public class QuotationListController extends HttpServlet {
             totalPages = 1;
         }
         if (page < 1) {
+            page = 1;
         }
         if (page > totalPages) {
             page = totalPages;
-            page = 1;
         }
 
         int fromIndex = Math.min((page - 1) * pageSize, totalQuotations);

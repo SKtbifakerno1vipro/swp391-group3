@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Role Detail - ${role.roleName}</title>
+        <title>Chi tiết vai trò - ${role.roleName}</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -436,25 +436,25 @@
             <jsp:include page="/views/shared/sidebar.jsp">
                 <jsp:param name="activeMenu" value="roles"/>
             </jsp:include>
-            <main class="main">
+             <main class="main">
                 <section class="page-top">
-                    <div><p class="eyebrow">Access Control</p><h1>Role Detail</h1><p>Review role profile and manage its permission set.</p></div>
-                    <div class="actions"><a class="button" href="${pageContext.request.contextPath}/role-list"><span class="material-symbols-outlined">arrow_back</span>Back to roles</a>
-                        <a class="button primary" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Edit permissions</a></div>
+                    <div><p class="eyebrow">Kiểm soát truy cập</p><h1>Chi tiết vai trò</h1><p>Xem thông tin vai trò và quản lý danh sách quyền hạn tương ứng.</p></div>
+                    <div class="actions"><a class="button" href="${pageContext.request.contextPath}/role-list"><span class="material-symbols-outlined">arrow_back</span>Quay lại danh sách</a>
+                        <a class="button primary" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Chỉnh sửa quyền</a></div>
                 </section>
                 <section class="panel">
                     <div class="panel-head"><h2><c:out value="${role.roleName}"/></h2><span class="button"><span class="material-symbols-outlined">shield_person</span>R-${role.roleId}</span></div>
                     <div class="panel-body">
                         <div class="info-grid">
-                            <div class="info-card"><p class="info-label">Role ID</p><p class="info-value">R-<c:out value="${role.roleId}"/></p></div>
-                            <div class="info-card"><p class="info-label">Role Name</p><p class="info-value"><c:out value="${role.roleName}"/></p></div>
-                            <div class="info-card"><p class="info-label">Created At</p><p class="info-value"><fmt:formatDate value="${role.createAt}" pattern="dd/MM/yyyy HH:mm"/></p></div>
-                            <div class="info-card"><p class="info-label">Updated At</p><p class="info-value"><fmt:formatDate value="${role.updateAt}" pattern="dd/MM/yyyy HH:mm"/></p></div>
-                            <div class="info-card"><p class="info-label">Status</p><p class="info-value" style="color: ${role.status == 'Active' || empty role.status ? 'var(--primary)' : 'var(--danger)'};"><c:out value="${empty role.status ? 'Active' : role.status}"/></p></div>
+                            <div class="info-card"><p class="info-label">Mã vai trò</p><p class="info-value">R-<c:out value="${role.roleId}"/></p></div>
+                            <div class="info-card"><p class="info-label">Tên vai trò</p><p class="info-value"><c:out value="${role.roleName}"/></p></div>
+                            <div class="info-card"><p class="info-label">Ngày tạo</p><p class="info-value"><fmt:formatDate value="${role.createAt}" pattern="dd/MM/yyyy HH:mm"/></p></div>
+                            <div class="info-card"><p class="info-label">Ngày cập nhật</p><p class="info-value"><fmt:formatDate value="${role.updateAt}" pattern="dd/MM/yyyy HH:mm"/></p></div>
+                            <div class="info-card"><p class="info-label">Trạng thái</p><p class="info-value" style="color: ${role.status == 'Active' || empty role.status ? 'var(--primary)' : 'var(--danger)'};"><c:out value="${empty role.status || role.status == 'Active' ? 'Hoạt động' : 'Không hoạt động'}"/></p></div>
                         </div>
-                        <div class="panel-head" style="border:1px solid var(--line); border-radius:20px; margin-bottom:16px;"><h2>Permissions</h2><span class="button"><span class="material-symbols-outlined">key</span><c:out value="${empty role.permissions ? 0 : role.permissions.size()}"/> enabled</span></div>
+                        <div class="panel-head" style="border:1px solid var(--line); border-radius:20px; margin-bottom:16px;"><h2>Quyền hạn</h2><span class="button"><span class="material-symbols-outlined">key</span>Đã kích hoạt <c:out value="${empty role.permissions ? 0 : role.permissions.size()}"/></span></div>
                         <c:choose>
-                            <c:when test="${empty role.permissions}"><div class="empty-state">No permissions assigned to this role yet.</div></c:when>
+                            <c:when test="${empty role.permissions}"><div class="empty-state">Chưa có quyền hạn nào được gán cho vai trò này.</div></c:when>
                             <c:otherwise><div class="permission-grid"><c:forEach var="p" items="${role.permissions}"><div class="permission-card"><span class="material-symbols-outlined">verified_user</span><c:out value="${p.permissionName}"/></div></c:forEach></div></c:otherwise>
                         </c:choose>
                     </div>

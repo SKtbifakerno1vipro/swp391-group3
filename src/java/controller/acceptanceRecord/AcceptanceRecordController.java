@@ -31,6 +31,7 @@ public class AcceptanceRecordController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        boolean isCustomer = currentUser.getRoleId() == 3;
         String orderIdParam = request.getParameter("orderId");
         if (orderIdParam == null || orderIdParam.trim().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/customer-order-list");
@@ -79,12 +80,15 @@ public class AcceptanceRecordController extends HttpServlet {
             CustomerDAO customerDAO = new CustomerDAO();
             CustomerDTO customerFull = customerDAO.getCustomerDTOById(order.getCustomer().getCustomerId());
             request.setAttribute("customerFull", customerFull);
-
+            if (isCustomer && currentUser.getUserId() != customerFull.getUser().getUserId()) {
+                response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                return;
+            }
             java.time.LocalDate now = java.time.LocalDate.now();
             request.setAttribute("day", String.format("%02d", now.getDayOfMonth()));
             request.setAttribute("month", String.format("%02d", now.getMonthValue()));
             request.setAttribute("year", now.getYear());
-
+            
             request.getRequestDispatcher("/views/acceptanceRecord/acceptanceRecord.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();

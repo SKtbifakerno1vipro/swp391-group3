@@ -6,7 +6,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Create Quotation</title>
+        <title>Tạo báo giá</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
             </jsp:include>
             <main class="main legacy-page">
 
-                <h1>Create Quotation</h1>
+                <h1>Tạo báo giá</h1>
 
                 <%-- Neu Controller gui loi sang thi hien thi loi o day. --%>
                 <c:if test="${not empty error}">
@@ -33,9 +33,9 @@
 
                     <%-- Dropdown chon khach hang. Du lieu customers duoc gui tu doGet(). --%>
                     <div>
-                        <label>Customer:</label>
+                        <label>Khách hàng:</label>
                         <select name="customerId" required>
-                            <option value="">-- Select Customer --</option>
+                            <option value="">-- Chọn khách hàng --</option>
                             <c:forEach items="${customers}" var="customer">
                                 <option value="${customer.customer.customerId}">
                                     ${customer.customer.companyName}
@@ -47,16 +47,16 @@
                     <br>
 
                     <%-- Khu vuc search san pham va add vao quotation. --%>
-                    <h3>Search Product</h3>
+                    <h3>Tìm kiếm sản phẩm</h3>
                     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; position: relative;">
-                        <input type="text" id="productSearch" placeholder="Search product name..." autocomplete="off" onkeyup="showCreateProductSuggestions()" style="min-width: 300px;">
+                        <input type="text" id="productSearch" placeholder="Tìm kiếm tên sản phẩm..." autocomplete="off" onkeyup="showCreateProductSuggestions()" style="min-width: 300px;">
                         <input type="hidden" id="selectedProductId">
                         <input type="hidden" id="selectedProductName">
                         <input type="hidden" id="selectedProductPrice">
                         <input type="hidden" id="selectedProductCostPrice">
                         <input type="hidden" id="selectedProductUnit">
 
-                        <button type="button" onclick="addSelectedProduct()">Add</button>
+                        <button type="button" onclick="addSelectedProduct()">Thêm</button>
                         <span id="selectedProductText" style="font-weight: bold; color: green;"></span>
 
                         <%-- Hop goi y san pham sau khi search. --%>
@@ -66,32 +66,32 @@
                     <br>
 
                     <%-- Bang nay chua cac san pham da duoc add vao quotation. --%>
-                    <h3>Selected Products</h3>
+                    <h3>Sản phẩm đã chọn</h3>
                     <div style="background-color: #f9f9f9; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; max-width: 600px;">
-                        <strong>Apply Discount & Tax to ALL products:</strong>
+                        <strong>Áp dụng Chiết khấu & Thuế cho TẤT CẢ sản phẩm:</strong>
                         <br><br>
-                        <label>Discount %:</label>
+                        <label>Chiết khấu %:</label>
                         <input type="number" id="bulkDiscount" min="0" max="100" step="0.01" value="0">
 
-                        <label style="margin-left: 15px;">Tax %:</label>
+                        <label style="margin-left: 15px;">Thuế %:</label>
                         <input type="number" id="bulkTax" min="0" max="100" step="0.01" value="0">
 
-                        <button type="button" onclick="applyBulkDiscountAndTax()" style="margin-left: 15px; padding: 5px 10px; background-color: #008CBA; color: white; border: none; cursor: pointer;">Apply All</button>
+                        <button type="button" onclick="applyBulkDiscountAndTax()" style="margin-left: 15px; padding: 5px 10px; background-color: #008CBA; color: white; border: none; cursor: pointer;">Áp dụng tất cả</button>
                     </div>
 
                     <div style="overflow-x: auto; width: 100%; margin: 18px 0; border: 1px solid rgba(221, 213, 201, 0.85); border-radius: 8px;">
                         <table border="1" cellpadding="7" cellspacing="0" id="productTable" style="width: 100%; min-width: 900px; margin: 0;">
                             <thead>
                                 <tr>
-                                    <th>Product</th>
-                                    <th>Unit</th>
-                                    <th>Cost Price</th>
-                                    <th>Selling Price</th>
-                                    <th>Quantity</th>
-                                    <th>Discount %</th>
-                                    <th>Tax %</th>
-                                    <th>Line Total</th>
-                                    <th>Action</th>
+                                    <th>Sản phẩm</th>
+                                    <th>Đơn vị</th>
+                                    <th>Giá vốn</th>
+                                    <th>Giá bán</th>
+                                    <th>Số lượng</th>
+                                    <th>Chiết khấu %</th>
+                                    <th>Thuế %</th>
+                                    <th>Thành tiền</th>
+                                    <th>Hành động</th>
                                 </tr>
                             </thead>
                             <tbody id="productRows">
@@ -99,7 +99,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="7" style="text-align: right;">Grand Total:</th>
+                                    <th colspan="7" style="text-align: right;">Tổng cộng:</th>
                                     <th id="grandTotal">0</th>
                                     <th></th>
                                 </tr>
@@ -109,8 +109,8 @@
 
                     <br>
 
-                    <button type="submit">Create Quotation</button>
-                    <a href="${pageContext.request.contextPath}/quotation-list">Back to List</a>
+                    <button type="submit">Tạo báo giá</button>
+                    <a href="${pageContext.request.contextPath}/quotation-list">Quay lại danh sách</a>
                 </form>
 
                 <script>
@@ -150,7 +150,7 @@
                         });
 
                         if (matchedProducts.length === 0) {
-                            box.innerHTML = '<div style="padding: 8px; color: red;">No product found</div>';
+                            box.innerHTML = '<div style="padding: 8px; color: red;">Không tìm thấy sản phẩm nào</div>';
                             box.style.display = 'block';
                             return;
                         }
@@ -182,7 +182,8 @@
                         document.getElementById('selectedProductCostPrice').value = productCostPrice;
                         document.getElementById('selectedProductUnit').value = productUnit;
                         document.getElementById('productSearch').value = productName;
-                        document.getElementById('selectedProductText').textContent = 'Selected: ' + productName;
+                        document.getElementById('addProductId') ? document.getElementById('addProductId').value = productId : null; // compatibility
+                        document.getElementById('selectedProductText').textContent = 'Đã chọn: ' + productName;
                         document.getElementById('createProductSuggestions').style.display = 'none';
                     }
 
@@ -195,7 +196,7 @@
                         const unit = document.getElementById('selectedProductUnit').value;
 
                         if (!productId) {
-                            alert('Please select a product from suggestions first.');
+                            alert('Vui lòng chọn một sản phẩm từ danh sách gợi ý trước.');
                             return;
                         }
 
@@ -236,7 +237,7 @@
                                 + '<td><input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required oninput="calculateTotals()" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"></td>'
                                 + '<td><input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required oninput="calculateTotals()" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;"></td>'
                                 + '<td class="lineTotal" style="font-weight: bold; min-width: 100px;">0</td>'
-                                + '<td><button type="button" onclick="removeProductRow(this)" style="padding: 4px 8px; background-color: #ff4d4d; color: white; border: none; border-radius: 4px; cursor: pointer;">Remove</button></td>';
+                                + '<td><button type="button" onclick="removeProductRow(this)" style="padding: 4px 8px; background-color: #ff4d4d; color: white; border: none; border-radius: 4px; cursor: pointer;">Xóa</button></td>';
 
                         tbody.appendChild(row);
 
@@ -285,7 +286,7 @@
                     function validateBeforeSubmit() {
                         const rows = document.querySelectorAll('#productRows tr');
                         if (rows.length === 0) {
-                            alert('Please add at least one product.');
+                            alert('Vui lòng thêm ít nhất một sản phẩm.');
                             return false;
                         }
                         return true;
@@ -298,7 +299,7 @@
                         const rows = document.querySelectorAll('#productRows tr');
 
                         if (rows.length === 0) {
-                            alert("Please add at least one product first.");
+                            alert("Vui lòng thêm ít nhất một sản phẩm trước.");
                             return;
                         }
 

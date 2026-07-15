@@ -5,7 +5,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Create Customer Order</title>
+        <title>Tạo Đơn hàng Khách hàng</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -20,14 +20,14 @@
             <main class="main legacy-page">
         <c:choose>
             <c:when test="${not empty customer}">
-                <h2>Create Order for ${customer.user.fullName}</h2>
+                <h2>Tạo đơn hàng cho ${customer.user.fullName}</h2>
             </c:when>
             <c:otherwise>
-                <h2>Create New Customer Order</h2>
+                <h2>Tạo mới đơn hàng khách hàng</h2>
             </c:otherwise>
         </c:choose>
         <hr>
-        <a href="${pageContext.request.contextPath}/customer-order-list">Back to Orders</a>
+        <a href="${pageContext.request.contextPath}/customer-order-list">Quay lại danh sách đơn hàng</a>
         <hr>
 
         <c:if test="${not empty error}">
@@ -41,11 +41,11 @@
                 <c:when test="${not empty customer}">
                     <input type="hidden" name="customerId" value="${customer.customer.customerId}" />
                     <p>
-                        <strong>Customer:</strong> ${customer.user.fullName} (${customer.user.userName})
+                        <strong>Khách hàng:</strong> ${customer.user.fullName} (${customer.user.userName})
                     </p>
                 </c:when>
                 <c:otherwise>
-                    <p style="color: red;">No customer selected.</p>
+                    <p style="color: red;">Chưa chọn khách hàng.</p>
                 </c:otherwise>
             </c:choose>
 
@@ -56,24 +56,24 @@
                     <c:when test="${not empty selectedContract}">
                         <input type="hidden" name="customerContractId" value="${selectedContract.contractId}" />
                         <p>
-                            <strong>Signed Contract:</strong> ${selectedContract.contractNumber}
+                            <strong>Hợp đồng đã ký:</strong> ${selectedContract.contractNumber}
                         </p>
                     </c:when>
                     <c:otherwise>
-                        <p style="color: red;"><strong>Signed Contract:</strong> No signed contract selected or available!</p>
+                        <p style="color: red;"><strong>Hợp đồng đã ký:</strong> Chưa có hợp đồng nào được chọn hoặc hợp đồng không khả dụng!</p>
                     </c:otherwise>
                 </c:choose>
             </div>
 
             <c:if test="${not empty quotationDetails}">
-                <h3>Select Products</h3>
+                <h3>Danh sách sản phẩm</h3>
                 <table border="1" cellpadding="10" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>Product Name</th>
-                            <th>Price</th>
-                            <th>Unit</th>
-                            <th>Quantity</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Đơn giá</th>
+                            <th>Đơn vị</th>
+                            <th>Số lượng</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,7 +95,7 @@
                 </table>
             </c:if>
             <br>
-            <button type="submit">Create Order</button>
+            <button type="submit">Tạo đơn hàng</button>
         </form>
 
             </main>

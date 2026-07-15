@@ -67,23 +67,31 @@ a { color: inherit; text-decoration: none; }
     display: flex;
     flex-direction: column;
     gap: 28px;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
-.sidebar::-webkit-scrollbar {
+.sidebar .nav-section {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+.sidebar .nav-section::-webkit-scrollbar {
     width: 6px;
 }
 
-.sidebar::-webkit-scrollbar-track {
+.sidebar .nav-section::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.sidebar::-webkit-scrollbar-thumb {
+.sidebar .nav-section::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.08);
     border-radius: 3px;
 }
 
-.sidebar::-webkit-scrollbar-thumb:hover {
+.sidebar .nav-section::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.16);
 }
 
@@ -608,28 +616,19 @@ a { color: inherit; text-decoration: none; }
 @media (min-width: 1081px) {
     .dashboard-shell,
     .role-shell {
-        grid-template-columns: auto minmax(0, 1fr) !important;
+        grid-template-columns: 260px minmax(0, 1fr) !important;
         min-height: 100vh;
     }
 
     .sidebar {
-        width: 80px;
-        min-width: 80px;
-        max-width: 80px;
+        width: 260px;
+        min-width: 260px;
+        max-width: 260px;
         padding: 24px 0 !important;
-        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                    min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
         gap: 20px;
-    }
-
-    .sidebar:hover {
-        width: 260px;
-        min-width: 260px;
-        max-width: 260px;
     }
 
     /* Reusable layout section class */
@@ -699,36 +698,10 @@ a { color: inherit; text-decoration: none; }
 
     /* Sidebar text transitions */
     .sidebar .sidebar-text {
-        opacity: 0;
-        visibility: hidden;
-        white-space: nowrap;
-        transition: opacity 0.15s ease, visibility 0.15s ease;
-        display: inline-block;
-    }
-
-    .sidebar:hover .sidebar-text {
         opacity: 1;
         visibility: visible;
-        transition: opacity 0.25s ease 0.1s, visibility 0.25s ease 0.1s;
-    }
-
-    /* Collapsed state adjustments for spacing and padding */
-    .sidebar:not(:hover) .brand {
-        padding: 10px 8px;
-        gap: 0;
-    }
-
-    .sidebar:not(:hover) .nav-link {
-        padding: 10px 8px !important;
-        gap: 0;
-    }
-
-    .sidebar:not(:hover) .user-card {
-        padding: 10px 8px !important;
-        gap: 0;
-        background: transparent !important;
-        border-color: transparent !important;
-        box-shadow: none !important;
+        white-space: nowrap;
+        display: inline-block;
     }
 }
 
