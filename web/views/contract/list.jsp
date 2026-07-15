@@ -19,6 +19,11 @@
             </jsp:include>
             <main class="main legacy-page">
                 <h2>Quản lý Hợp đồng</h2>
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5}">
+                    <div style="margin-bottom: 15px;">
+                        <a href="${pageContext.request.contextPath}/contract-save" class="button primary" style="padding: 8px 16px; background-color: var(--primary); color: white; text-decoration: none; border-radius: 4px; display: inline-block;">Thêm Hợp đồng</a>
+                    </div>
+                </c:if>
                 <form action="contract-list" method="GET">
                     <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Mã hợp đồng">
                     <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng">
@@ -87,7 +92,7 @@
                                 <td>${c.formattedCreatedAtDate}</td>
                                 <td>${c.email}</td>
                                 <td>
-                                    <c:if test="${sessionScope.user.roleId==5}">
+                                    <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5}">
                                         <c:if test="${c.contractStatus != 'SIGNED' && c.contractStatus !='APPROVED'}">
                                             <a href="${pageContext.request.contextPath}/contract-save?id=${c.contractId}">Sửa</a> |      
                                         </c:if>                    
@@ -99,7 +104,9 @@
                                                 <a href="${pageContext.request.contextPath}/customer-order?id=${c.orderId}">| Xem Đơn hàng</a>
                                             </c:when>
                                             <c:otherwise>
-                                                <a href="${pageContext.request.contextPath}//customer-order?contractId=${c.contractId}">| Tạo Đơn hàng</a>
+                                                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 4 || sessionScope.user.roleId == 5}">
+                                                    <a href="${pageContext.request.contextPath}/customer-order?contractId=${c.contractId}">| Tạo Đơn hàng</a>
+                                                </c:if>
                                             </c:otherwise>
                                         </c:choose>
                                     </c:if>
