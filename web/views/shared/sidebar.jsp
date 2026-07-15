@@ -14,7 +14,7 @@
             </div>
             <div class="sidebar-text">
                 <h1 class="brand-title">Po Bread</h1>
-                <p class="brand-subtitle">Sales Process Portal</p>
+                <p class="brand-subtitle">Cổng quản lý quy trình bán hàng</p>
             </div>
         </div>
     </div>
@@ -23,32 +23,32 @@
     <div class="sidebar-section nav-section">
         <nav class="nav-group" aria-label="Main navigation">
             <a class="nav-link ${param.activeMenu == 'dashboard' ? 'active' : ''}"
-               href="${pageContext.request.contextPath}/dashboard" title="Dashboard">
+               href="${pageContext.request.contextPath}/dashboard" title="Bảng điều khiển">
                 <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">dashboard</span></div>
-                <span class="sidebar-text">Dashboard</span>
+                <span class="sidebar-text">Bảng điều khiển</span>
             </a>
             <c:choose>
 
                 <c:when test="${sessionScope.user.roleId == 3}">
                     <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/customer/detail?id_cus=${sessionScope.customerId}" title="My Profile">
+                       href="${pageContext.request.contextPath}/customer/detail?id_cus=${sessionScope.customerId}" title="Hồ sơ của tôi">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">account_circle</span></div>
-                        <span class="sidebar-text">My Profile</span>
+                        <span class="sidebar-text">Hồ sơ của tôi</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/quotation-list" title="Quotations">
+                       href="${pageContext.request.contextPath}/quotation-list" title="Báo giá">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">request_quote</span></div>
-                        <span class="sidebar-text">Quotations</span>
+                        <span class="sidebar-text">Báo giá</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/contract-list" title="Contracts">
+                       href="${pageContext.request.contextPath}/contract-list" title="Hợp đồng">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div>
-                        <span class="sidebar-text">Contracts</span>
+                        <span class="sidebar-text">Hợp đồng</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/customer-order-list" title="My Orders">
+                       href="${pageContext.request.contextPath}/customer-order-list" title="Đơn hàng của tôi">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt_long</span></div>
-                        <span class="sidebar-text">My Orders</span>
+                        <span class="sidebar-text">Đơn hàng của tôi</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn">
@@ -56,53 +56,53 @@
                         <span class="sidebar-text">Hóa đơn</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/payment/list" title="My Payments">
+                       href="${pageContext.request.contextPath}/payment/list" title="Thanh toán của tôi">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">payments</span></div>
-                        <span class="sidebar-text">My Payments</span>
+                        <span class="sidebar-text">Thanh toán của tôi</span>
                     </a>
                 </c:when>
                 <c:when test="${sessionScope.user.roleId == 5}">
                     <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/edit-user?id=${sessionScope.user.userId}" title="My Profile">
+                       href="${pageContext.request.contextPath}/edit-user?id=${sessionScope.user.userId}" title="Hồ sơ của tôi">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">account_circle</span></div>
-                        <span class="sidebar-text">My Profile</span>
+                        <span class="sidebar-text">Hồ sơ của tôi</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/quotation-list" title="Quotations">
+                       href="${pageContext.request.contextPath}/quotation-list" title="Báo giá">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">request_quote</span></div>
-                        <span class="sidebar-text">Quotations</span>
+                        <span class="sidebar-text">Báo giá</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/contract-list" title="Contracts">
+                       href="${pageContext.request.contextPath}/contract-list" title="Hợp đồng">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div>
-                        <span class="sidebar-text">Contracts</span>
+                        <span class="sidebar-text">Hợp đồng</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/customer-order-list" title="Orders">
+                       href="${pageContext.request.contextPath}/customer-order-list" title="Đơn hàng">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">shopping_cart</span></div>
-                        <span class="sidebar-text">Orders</span>
+                        <span class="sidebar-text">Đơn hàng</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn của tôi">
+                       href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt</span></div>
                         <span class="sidebar-text">Hóa đơn</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/payment/list" title="Payments">
+                       href="${pageContext.request.contextPath}/payment/list" title="Thanh toán">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">payments</span></div>
-                        <span class="sidebar-text">Payments</span>
+                        <span class="sidebar-text">Thanh toán</span>
                     </a>
                 </c:when>
                 <c:otherwise>
                     <a class="nav-link ${param.activeMenu == 'customers' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/customer/list" title="Customers">
+                       href="${pageContext.request.contextPath}/customer/list" title="Khách hàng">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">groups</span></div>
-                        <span class="sidebar-text">Customers</span>
+                        <span class="sidebar-text">Khách hàng</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/customer-order-list" title="Orders">
+                       href="${pageContext.request.contextPath}/customer-order-list" title="Đơn hàng">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt_long</span></div>
-                        <span class="sidebar-text">Orders</span>
+                        <span class="sidebar-text">Đơn hàng</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/product-list" title="Sản phẩm">
@@ -115,26 +115,26 @@
                         <span class="sidebar-text">Đánh giá</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/category/list" title="Categories">
+                       href="${pageContext.request.contextPath}/category/list" title="Danh mục">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">category</span></div>
-                        <span class="sidebar-text">Categories</span>
+                        <span class="sidebar-text">Danh mục</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/quotation-list" title="Quotations">
+                       href="${pageContext.request.contextPath}/quotation-list" title="Báo giá">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">request_quote</span></div>
-                        <span class="sidebar-text">Quotations</span>
+                        <span class="sidebar-text">Báo giá</span>
                     </a>
                     <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
                         <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}"
-                           href="${pageContext.request.contextPath}/contract-list" title="Contracts">
+                           href="${pageContext.request.contextPath}/contract-list" title="Hợp đồng">
                             <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div>
-                            <span class="sidebar-text">Contracts</span>
+                            <span class="sidebar-text">Hợp đồng</span>
                         </a>
                     </c:if>
                     <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/payment/list" title="Payments">
+                       href="${pageContext.request.contextPath}/payment/list" title="Thanh toán">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">payments</span></div>
-                        <span class="sidebar-text">Payments</span>
+                        <span class="sidebar-text">Thanh toán</span>
                     </a>
                     <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn">
@@ -143,33 +143,33 @@
                     </a>
                     <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
                         <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"
-                           href="${pageContext.request.contextPath}/user-list" title="Users">
+                           href="${pageContext.request.contextPath}/user-list" title="Người dùng">
                             <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">manage_accounts</span></div>
-                            <span class="sidebar-text">Users</span>
+                            <span class="sidebar-text">Người dùng</span>
                         </a>
                     </c:if>
                     <a class="nav-link ${param.activeMenu == 'roles' ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/role-list" title="Roles">
+                       href="${pageContext.request.contextPath}/role-list" title="Vai trò">
                         <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">admin_panel_settings</span></div>
-                        <span class="sidebar-text">Roles</span>
+                        <span class="sidebar-text">Vai trò</span>
                     </a>
                     <c:if test="${sessionScope.user.roleId == 2 || sessionScope.user.roleId == 4}">
                         <a class="nav-link ${param.activeMenu == 'revenue' ? 'active' : ''}"
-                           href="${pageContext.request.contextPath}/revenue-report" title="Revenue Report">
+                           href="${pageContext.request.contextPath}/revenue-report" title="Báo cáo doanh thu">
                             <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">analytics</span></div>
-                            <span class="sidebar-text">Revenue Report</span>
+                            <span class="sidebar-text">Báo cáo doanh thu</span>
                         </a>
                     </c:if>
                     <c:if test="${sessionScope.user.roleId == 1}">
                         <a class="nav-link ${param.activeMenu == 'emailLogs' ? 'active' : ''}"
-                           href="${pageContext.request.contextPath}/email/logs" title="Email Logs">
+                           href="${pageContext.request.contextPath}/email/logs" title="Nhật ký Email">
                             <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">mail</span></div>
-                            <span class="sidebar-text">Email Logs</span>
+                            <span class="sidebar-text">Nhật ký Email</span>
                         </a>
                         <a class="nav-link ${param.activeMenu == 'auditLogs' ? 'active' : ''}"
-                           href="${pageContext.request.contextPath}/admin/audit-logs" title="System Audit Logs">
+                           href="${pageContext.request.contextPath}/admin/audit-logs" title="Nhật ký hệ thống">
                             <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">history</span></div>
-                            <span class="sidebar-text">System Audit Logs</span>
+                            <span class="sidebar-text">Nhật ký hệ thống</span>
                         </a>
                     </c:if>
                 </c:otherwise>
@@ -203,13 +203,13 @@
 
     <!-- Section 4: Actions -->
     <div class="sidebar-section actions-section">
-        <a class="nav-link" href="${pageContext.request.contextPath}/user/password/change" title="Change password">
+        <a class="nav-link" href="${pageContext.request.contextPath}/user/password/change" title="Đổi mật khẩu">
             <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">lock_reset</span></div>
-            <span class="sidebar-text">Change password</span>
+            <span class="sidebar-text">Đổi mật khẩu</span>
         </a>
-        <a class="nav-link" href="${pageContext.request.contextPath}/logout" title="Logout">
+        <a class="nav-link" href="${pageContext.request.contextPath}/logout" title="Đăng xuất">
             <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">logout</span></div>
-            <span class="sidebar-text">Logout</span>
+            <span class="sidebar-text">Đăng xuất</span>
         </a>
     </div>
 </aside>

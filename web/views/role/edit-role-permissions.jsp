@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Edit Role Permissions - Po Bread Sales</title>
+        <title>Chỉnh sửa quyền vai trò - Po Bread Sales</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -436,24 +436,24 @@
             <jsp:include page="/views/shared/sidebar.jsp">
                 <jsp:param name="activeMenu" value="roles"/>
             </jsp:include>
-            <main class="main">
+             <main class="main">
                 <section class="page-top">
-                    <div><p class="eyebrow">Access Control</p><h1>Edit Permissions</h1><p>Update the permission set for <strong><c:out value="${role.roleName}"/></strong>.</p></div>
-                    <div class="actions"><a class="button" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">arrow_back</span>Role detail</a></div>
+                    <div><p class="eyebrow">Kiểm soát truy cập</p><h1>Chỉnh sửa quyền</h1><p>Cập nhật danh sách quyền cho vai trò <strong><c:out value="${role.roleName}"/></strong>.</p></div>
+                    <div class="actions"><a class="button" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">arrow_back</span>Chi tiết vai trò</a></div>
                 </section>
                 <!-- request về edit role -->
                 <form class="panel" action="${pageContext.request.contextPath}/edit-role-permissions" method="post">
                     <input type="hidden" name="roleId" value="${role.roleId}">
-                    <div class="panel-head"><h2><c:out value="${role.roleName}"/> Permissions</h2><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Save permissions</button></div>
+                    <div class="panel-head"><h2>Quyền của <c:out value="${role.roleName}"/></h2><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu quyền hạn</button></div>
                     <div class="panel-body">
                         <div class="info-grid">
-                            <div class="info-card"><p class="info-label">Role ID</p><p class="info-value">R-<c:out value="${role.roleId}"/></p></div>
-                            <div class="info-card"><p class="info-label">Role Name</p><p class="info-value"><c:out value="${role.roleName}"/></p></div>
-                            <div class="info-card"><p class="info-label">Available Permissions</p><p class="info-value"><c:out value="${empty permissionList ? 0 : permissionList.size()}"/></p></div>
-                            <div class="info-card"><p class="info-label">Selected</p><p class="info-value"><c:out value="${empty selectedPermissionIds ? 0 : selectedPermissionIds.size()}"/></p></div>
+                            <div class="info-card"><p class="info-label">Mã vai trò</p><p class="info-value">R-<c:out value="${role.roleId}"/></p></div>
+                            <div class="info-card"><p class="info-label">Tên vai trò</p><p class="info-value"><c:out value="${role.roleName}"/></p></div>
+                            <div class="info-card"><p class="info-label">Quyền hạn khả dụng</p><p class="info-value"><c:out value="${empty permissionList ? 0 : permissionList.size()}"/></p></div>
+                            <div class="info-card"><p class="info-label">Đã chọn</p><p class="info-value"><c:out value="${empty selectedPermissionIds ? 0 : selectedPermissionIds.size()}"/></p></div>
                         </div>
                         <c:choose>
-                            <c:when test="${empty permissionList}"><div class="empty-state">No permissions available.</div></c:when>
+                            <c:when test="${empty permissionList}"><div class="empty-state">Không có quyền hạn nào khả dụng.</div></c:when>
                             <c:otherwise>
                                 <div class="permission-grid">
                                     <c:forEach var="permission" items="${permissionList}">
@@ -462,7 +462,7 @@
                                 </div>
                             </c:otherwise>
                         </c:choose>
-                        <div class="actions" style="margin-top:24px; justify-content:flex-start;"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Save permissions</button><a class="button danger" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">close</span>Cancel</a></div>
+                        <div class="actions" style="margin-top:24px; justify-content:flex-start;"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu quyền hạn</button><a class="button danger" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">close</span>Hủy bỏ</a></div>
                     </div>
                 </form>
             </main>

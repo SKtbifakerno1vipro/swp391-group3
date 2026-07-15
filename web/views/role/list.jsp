@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Role Management - Po Bread Sales</title>
+        <title>Quản lý vai trò - Po Bread Sales</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -487,31 +487,31 @@
             </jsp:include>
             <main class="main">
                 <section class="page-top">
-                    <div><p class="eyebrow">Access Control</p><h1>Role Management</h1><p>Manage system roles and assign permissions for each responsibility group.</p></div>
+                    <div><p class="eyebrow">Kiểm soát truy cập</p><h1>Quản lý vai trò</h1><p>Quản lý vai trò hệ thống và phân quyền cho từng nhóm trách nhiệm.</p></div>
                     <!--Add role-->
-                    <div class="actions"><a class="button" href="${pageContext.request.contextPath}/dashboard"><span class="material-symbols-outlined">arrow_back</span>Dashboard</a><a class="button primary" href="${pageContext.request.contextPath}/add-role"><span class="material-symbols-outlined">add</span>Add Role</a></div>                    
+                    <div class="actions"><a class="button" href="${pageContext.request.contextPath}/dashboard"><span class="material-symbols-outlined">arrow_back</span>Trang chủ</a><a class="button primary" href="${pageContext.request.contextPath}/add-role"><span class="material-symbols-outlined">add</span>Thêm vai trò</a></div>                    
                 </section>
 
 
                 <section class="summary-grid">
-                    <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">admin_panel_settings</span></div><p class="summary-value"><c:out value="${totalRoles}"/></p><p class="summary-label">Total matched roles</p></div>
-                    <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">search</span></div><p class="summary-value"><c:out value="${empty searchText ? 'All' : '1'}"/></p><p class="summary-label"><c:out value="${empty searchText ? 'Showing all roles' : 'Search filter active'}"/></p></div>
-                    <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">layers</span></div><p class="summary-value"><c:out value="${totalPages}"/></p><p class="summary-label">Total pages</p></div>
+                    <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">admin_panel_settings</span></div><p class="summary-value"><c:out value="${totalRoles}"/></p><p class="summary-label">Tổng số vai trò</p></div>
+                    <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">search</span></div><p class="summary-value"><c:out value="${empty searchText ? 'Tất cả' : '1'}"/></p><p class="summary-label"><c:out value="${empty searchText ? 'Đang hiển thị tất cả' : 'Bộ lọc tìm kiếm đang kích hoạt'}"/></p></div>
+                    <div class="summary-card"><div class="summary-icon"><span class="material-symbols-outlined">layers</span></div><p class="summary-value"><c:out value="${totalPages}"/></p><p class="summary-label">Tổng số trang</p></div>
                 </section>
 
                 <section class="panel">
                     <div class="toolbar">
                         <!-- 2 chuc nang search va reset -->
-                        <form class="search-box" action="${pageContext.request.contextPath}/role-list" method="get"><span class="material-symbols-outlined">search</span><input type="text" name="search" value="${searchText}" placeholder="Search role name..."><button class="button primary" type="submit"><span class="material-symbols-outlined">arrow_forward</span>Search</button></form>
-                        <a class="button" href="${pageContext.request.contextPath}/role-list"><span class="material-symbols-outlined">refresh</span>Reset</a>
+                        <form class="search-box" action="${pageContext.request.contextPath}/role-list" method="get"><span class="material-symbols-outlined">search</span><input type="text" name="search" value="${searchText}" placeholder="Tìm kiếm tên vai trò..."><button class="button primary" type="submit"><span class="material-symbols-outlined">arrow_forward</span>Tìm kiếm</button></form>
+                        <a class="button" href="${pageContext.request.contextPath}/role-list"><span class="material-symbols-outlined">refresh</span>Đặt lại</a>
                     </div>
 
                     <div class="role-table-wrap">
                         <table>
-                            <thead><tr><th>Role ID</th><th>Role Name</th><th>Created At</th><th>Updated At</th><th>Status</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>Mã vai trò</th><th>Tên vai trò</th><th>Ngày tạo</th><th>Ngày cập nhật</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
                             <tbody>
                                 <!--neu role list trong thi in ra no roles found-->
-                                <c:if test="${empty roleList}"><tr><td colspan="6"><div class="empty-state">No roles found.</div></td></tr></c:if>
+                                <c:if test="${empty roleList}"><tr><td colspan="6"><div class="empty-state">Không tìm thấy vai trò nào.</div></td></tr></c:if>
                                     <!-- hiển thị role list từ controller -->
                                 <c:forEach var="role" items="${roleList}">
                                     <tr>
@@ -523,16 +523,16 @@
                                             <!--Nut status -->
                                             <c:choose>
                                                 <c:when test="${role.status == 'Active' || empty role.status}">
-                                                    <span class="chip primary">Active</span>
+                                                    <span class="chip primary">Hoạt động</span>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <span class="chip">Inactive</span>
+                                                    <span class="chip">Không hoạt động</span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
                                         <!-- nut actions -->
                                         <td><div class="row-actions">
-                                                <a class="chip" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Edit</a></div></td>
+                                                <a class="chip" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Chỉnh sửa</a></div></td>
                                     </tr>
                                 </c:forEach>
                             </tbody>

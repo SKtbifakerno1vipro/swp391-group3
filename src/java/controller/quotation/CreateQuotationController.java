@@ -52,7 +52,7 @@ public class CreateQuotationController extends HttpServlet {
 
             QuotationService quotationService = new QuotationService();
             if (quotationService.hasDraftQuotation(customerId)) {
-                request.setAttribute("error", "This customer already has a quotation in DRAFT status.");
+                request.setAttribute("error", "Khách hàng này đã có một báo giá ở trạng thái Nháp (DRAFT).");
                 doGet(request, response);
                 return;
             }
@@ -68,7 +68,7 @@ public class CreateQuotationController extends HttpServlet {
             String[] taxPercents = request.getParameterValues("taxPercent");
 
             if (productIds == null || productIds.length == 0) {
-                request.setAttribute("error", "Please add at least one product.");
+                request.setAttribute("error", "Vui lòng thêm ít nhất một sản phẩm.");
                 doGet(request, response);
                 return;
             }
@@ -127,7 +127,7 @@ public class CreateQuotationController extends HttpServlet {
             }
 
             if (details.isEmpty()) {
-                request.setAttribute("error", "Please add at least one valid product.");
+                request.setAttribute("error", "Vui lòng thêm ít nhất một sản phẩm hợp lệ.");
                 doGet(request, response);
                 return;
             }
@@ -141,13 +141,13 @@ public class CreateQuotationController extends HttpServlet {
                 response.sendRedirect("quotation-list");
             } else {
                 // That bai thi quay lai form va bao loi
-                request.setAttribute("error", "Create quotation failed.");
+                request.setAttribute("error", "Tạo báo giá thất bại.");
                 doGet(request, response);
             }
 
         } catch (Exception e) {
             // Neu parse du lieu loi hoac thieu du lieu
-            request.setAttribute("error", "Invalid input data.");
+            request.setAttribute("error", "Dữ liệu nhập vào không hợp lệ.");
             doGet(request, response);
         }
     }
