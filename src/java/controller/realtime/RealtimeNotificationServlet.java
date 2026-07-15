@@ -55,6 +55,8 @@ public class RealtimeNotificationServlet extends HttpServlet {
         Timestamp lastCheckedCustomer = new Timestamp(startTime);
         Timestamp lastCheckedInvoice = new Timestamp(startTime);
 
+        int lastContractHistoryId = contractDAO.getMaxContractHistoryId();
+
         System.out.println("[Realtime Servlet] Client connected: " + user.getUserName() + " (Role: " + user.getRoleId() + ")");
 
         while (!writer.checkError()) {
@@ -165,8 +167,6 @@ public class RealtimeNotificationServlet extends HttpServlet {
                     }
                 }
             }
-
-            int lastContractHistoryId = contractDAO.getMaxContractHistoryId();
 
             // 3. Contract Workflow Notifications
             List<ContractHistory> newHistories = contractDAO.getContractHistoriesSinceId(lastContractHistoryId);

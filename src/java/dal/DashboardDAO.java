@@ -687,20 +687,23 @@ public class DashboardDAO extends DBContext {
         }
         return list;
     }
-        /**
-     * created by vtpp 
+
+    /**
+     * created by vtpp
+     *
      * @return the number of total invoice, total invoice paid and unpaid
      */
     public InvoiceSummaryDTO getInvoiceSummaryForOfficer() {
         InvoiceSummaryDTO summary = new InvoiceSummaryDTO();
         String sql = """
-                     SELECT 
-                     COUNT(i.invoice_id) as total_invoices, 
-                     SUM(CASE WHEN p.payment_status = 'PAID' THEN i.total_amount ELSE 0 END) as paid_amount, 
-                     SUM(CASE WHEN p.payment_status = 'UNPAID' OR p.payment_status = 'PENDING' OR p.payment_status IS NULL THEN i.total_amount ELSE 0 END) as unpaid_amount 
-                     FROM invoice i 
-                     JOIN payment p ON i.invoice_id = p.invoice_id 
-                     WHERE i.invoice_status != 'UNRELEASED'""";
+                   SELECT 
+                       COUNT(DISTINCT i.invoice_id) as total_invoices, 
+                       SUM(CASE WHEN p.payment_status = 'COMPLETED' THEN i.total_amount ELSE 0 END) as paid_amount, 
+                       SUM(CASE WHEN p.payment_status !='COMPLETED' THEN i.total_amount ELSE 0 END) as unpaid_amount 
+                   FROM invoice i 
+                   JOIN payment p ON i.invoice_id = p.invoice_id 
+                   WHERE i.invoice_status != 'UNRELEASED'
+                     '""";
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 summary.setTotalInvoices(rs.getInt("total_invoices"));
@@ -712,8 +715,10 @@ public class DashboardDAO extends DBContext {
         }
         return summary;
     }
-        /**
-     * created by vtpp 
+
+    /**
+     * created by vtpp
+     *
      * @return the list recent invoice
      */
     public List<RecentInvoiceDTO> getRecentInvoicesForOfficer(int limit, String startDate, String endDate) {
