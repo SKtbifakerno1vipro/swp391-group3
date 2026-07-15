@@ -12,6 +12,7 @@ public class Product {
     private String unit;
     private String productStatus;
     private int quantityAvailable;
+    private int quantityReserve;
     private Integer updatedBy;
     private Timestamp createdAt;
     private Timestamp updatedAt;
@@ -84,6 +85,14 @@ public class Product {
 
     public void setQuantityAvailable(int quantityAvailable) {
         this.quantityAvailable = quantityAvailable;
+    }
+
+    public int getQuantityReserve() {
+        return quantityReserve;
+    }
+
+    public void setQuantityReserve(int quantityReserve) {
+        this.quantityReserve = quantityReserve;
     }
 
     public Integer getUpdatedBy() {

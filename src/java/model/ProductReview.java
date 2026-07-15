@@ -14,10 +14,9 @@ public class ProductReview {
     private Timestamp repliedAt;
     private String status;
 
-    // Các thuộc tính phụ vụ hiển thị (Transient properties)
-    private String companyName;      // Tên công ty khách hàng đánh giá
-    private String repliedByName;    // Tên nhân viên phản hồi
-    private String productName;      // Tên sản phẩm được đánh giá
+    private String companyName;      
+    private String repliedByName;    
+    private String productName;      
 
     public ProductReview() {
     }
@@ -35,7 +34,6 @@ public class ProductReview {
         this.status = status;
     }
 
-    // Getters và Setters
     public int getReviewId() {
         return reviewId;
     }

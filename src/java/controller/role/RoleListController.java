@@ -23,17 +23,16 @@ public class RoleListController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         // chuc nang cua searchtext
         String searchText = request.getParameter("search");
-       
-            if (searchText != null) {
-                searchText = searchText.trim().replaceAll("\\s+", " ");
-            }
+
+        if (searchText != null) {
+            searchText = searchText.trim().replaceAll("\\s+", " ");
+        }
 
         List<Role> roles;
         // neu searchtext khong null va ko rong thi thuc hien chuc nang cua search role
         if (searchText != null && !searchText.isBlank()) {
             roles = roleService.searchRoles(searchText);
-        }
-        //neu khong thi van hien thi getAllRoles 
+        } //neu khong thi van hien thi getAllRoles 
         else {
             roles = roleService.getAllRoles();
         }

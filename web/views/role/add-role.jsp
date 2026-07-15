@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Add Role - Po Bread Sales</title>
+        <title>Thêm vai trò - Po Bread Sales</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -438,20 +438,20 @@
             </jsp:include>
             <main class="main">
                 <section class="page-top">
-                    <div><p class="eyebrow">Access Control</p><h1>Add New Role</h1><p>Create a responsibility group and assign permissions in one step.</p></div>
-                    <div class="actions"><a class="button" href="${pageContext.request.contextPath}/role-list"><span class="material-symbols-outlined">arrow_back</span>Back to roles</a></div>
+                    <div><p class="eyebrow">Kiểm soát truy cập</p><h1>Thêm vai trò mới</h1><p>Tạo nhóm trách nhiệm và gán quyền hạn trong một bước.</p></div>
+                    <div class="actions"><a class="button" href="${pageContext.request.contextPath}/role-list"><span class="material-symbols-outlined">arrow_back</span>Quay lại danh sách</a></div>
                 </section>
                 <form class="panel" action="${pageContext.request.contextPath}/add-role" method="POST">
-                    <div class="panel-head"><h2>Role Information</h2><button class="button primary" type="submit"><span class="material-symbols-outlined">add</span>Create role</button></div>
+                    <div class="panel-head"><h2>Thông tin vai trò</h2><button class="button primary" type="submit"><span class="material-symbols-outlined">add</span>Tạo vai trò</button></div>
                     <div class="panel-body">
                         <c:if test="${not empty error}"><div class="alert"><c:out value="${error}"/></div></c:if>
                             <div class="form-grid">
-                                <div class="field"><label for="roleName">Role Name</label><input type="text" id="roleName" name="roleName" value="${roleName}" required placeholder="Example: Manager, Staff..."></div>
-                            <div class="info-card"><p class="info-label">Guideline</p><p class="info-value">Use a short and clear name for each business responsibility.</p></div>
+                                <div class="field"><label for="roleName">Tên vai trò</label><input type="text" id="roleName" name="roleName" value="${roleName}" required placeholder="Ví dụ: Quản lý, Nhân viên..."></div>
+                            <div class="info-card"><p class="info-label">Hướng dẫn</p><p class="info-value">Sử dụng tên ngắn gọn và rõ ràng cho từng trách nhiệm công việc.</p></div>
                         </div>
-                        <div class="panel-head" style="border:1px solid var(--line); border-radius:20px; margin-bottom:16px;"><h2>Assign Permissions</h2><span class="button"><span class="material-symbols-outlined">key</span>Select permissions</span></div>
+                        <div class="panel-head" style="border:1px solid var(--line); border-radius:20px; margin-bottom:16px;"><h2>Gán quyền hạn</h2><span class="button"><span class="material-symbols-outlined">key</span>Chọn các quyền</span></div>
                         <c:choose>
-                            <c:when test="${empty permissionList}"><div class="empty-state">No permissions available.</div></c:when>
+                            <c:when test="${empty permissionList}"><div class="empty-state">Không có quyền hạn nào khả dụng.</div></c:when>
                             <c:otherwise>
                                 <div class="permission-grid">
                                     <c:forEach var="permission" items="${permissionList}">
@@ -460,7 +460,7 @@
                                 </div>
                             </c:otherwise>
                         </c:choose>
-                        <div class="actions" style="margin-top:24px; justify-content:flex-start;"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Create role</button><a class="button danger" href="${pageContext.request.contextPath}/role-list"><span class="material-symbols-outlined">close</span>Cancel</a></div>
+                        <div class="actions" style="margin-top:24px; justify-content:flex-start;"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Tạo vai trò</button><a class="button danger" href="${pageContext.request.contextPath}/role-list"><span class="material-symbols-outlined">close</span>Hủy bỏ</a></div>
                     </div>
                 </form>
             </main>

@@ -222,6 +222,7 @@ public class InvoiceServlet extends HttpServlet {
             String errorMsg = iService.validateInvoice(invoice);
             if (errorMsg != null) {
                 request.setAttribute("error", errorMsg);
+                invoice.setInvoiceStatus("UNRELEASED");
                 request.setAttribute("invoice", invoice);
 
                 Integer invoiceCreatorId = invoice.getCreatedBy();

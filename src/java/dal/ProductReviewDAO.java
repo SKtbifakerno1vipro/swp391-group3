@@ -48,7 +48,6 @@ public class ProductReviewDAO extends DBContext {
 
     public List<ProductReview> getReviewsByProductId(int productId) {
         List<ProductReview> list = new ArrayList<>();
-        // Lấy thông tin review, JOIN lấy Tên công ty khách hàng, JOIN lấy Tên nhân viên phản hồi (nếu có)
         String sql = "SELECT pr.*, c.company_name, u_staff.full_name AS staff_name "
                    + "FROM product_review pr "
                    + "JOIN [user] u_cust ON pr.user_id = u_cust.user_id "
@@ -170,6 +169,42 @@ public class ProductReviewDAO extends DBContext {
         }
     }
 
+    public List<ProductReview> getReviewsSince(java.sql.Timestamp since, Integer customerUserId) {
+        List<ProductReview> list = new ArrayList<>();
+        String sql = "SELECT pr.*, c.company_name, u_staff.full_name AS staff_name, p.product_name "
+                   + "FROM product_review pr "
+                   + "JOIN product p ON pr.product_id = p.product_id "
+                   + "JOIN [user] u_cust ON pr.user_id = u_cust.user_id "
+                   + "JOIN customer c ON u_cust.user_id = c.user_id "
+                   + "LEFT JOIN [user] u_staff ON pr.replied_by = u_staff.user_id "
+                   + "WHERE (pr.created_at > ? OR pr.replied_at > ?) ";
+        if (customerUserId != null) {
+            sql += "AND pr.user_id = ? ";
+        }
+        sql += "ORDER BY pr.created_at ASC, pr.replied_at ASC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, since);
+            ps.setTimestamp(2, since);
+            if (customerUserId != null) {
+                ps.setInt(3, customerUserId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ProductReview pr = mapResultSetToReview(rs);
+                    pr.setCompanyName(rs.getString("company_name"));
+                    pr.setRepliedByName(rs.getString("staff_name"));
+                    pr.setProductName(rs.getString("product_name"));
+                    list.add(pr);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error in getReviewsSince: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     private ProductReview mapResultSetToReview(ResultSet rs) throws Exception {
         ProductReview pr = new ProductReview();
         pr.setReviewId(rs.getInt("review_id"));
@@ -191,4 +226,34 @@ public class ProductReviewDAO extends DBContext {
         pr.setStatus(rs.getString("status"));
         return pr;
     }
+    
+        public List<ProductReview> getReviewsSince(java.sql.Timestamp since) {
+        List<ProductReview> list = new ArrayList<>();
+        String sql = "SELECT pr.*, c.company_name, u_staff.full_name AS staff_name, p.product_name "
+                   + "FROM product_review pr "
+                   + "JOIN product p ON pr.product_id = p.product_id "
+                   + "JOIN [user] u_cust ON pr.user_id = u_cust.user_id "
+                   + "JOIN customer c ON u_cust.user_id = c.user_id "
+                   + "LEFT JOIN [user] u_staff ON pr.replied_by = u_staff.user_id "
+                   + "WHERE pr.created_at > ? OR pr.replied_at > ? "
+                   + "ORDER BY pr.created_at DESC, pr.replied_at DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, since);
+            ps.setTimestamp(2, since);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ProductReview pr = mapResultSetToReview(rs);
+                    pr.setCompanyName(rs.getString("company_name"));
+                    pr.setRepliedByName(rs.getString("staff_name"));
+                    pr.setProductName(rs.getString("product_name"));
+                    list.add(pr);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error in getReviewsSince: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }

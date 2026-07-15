@@ -211,8 +211,8 @@
                                                 </form>
                                             </c:if>
 
-                                            <!-- Admin Officer (Role 5) -->
-                                            <c:if test="${sessionScope.user.roleId == 5}">
+                                            <!-- Admin Officer (Role 5) or System Admin (Role 1) -->
+                                            <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5}">
                                                 <a href="contract-save?id=${contract.contractId}" class="btn-full" style="text-decoration:none;">
                                                     <button type="button" style="width: 100%;">Sửa Hợp đồng</button>
                                                 </a>
@@ -297,7 +297,7 @@
                                                     <p style="margin: 0 0 3px 0; color: var(--muted); font-size: 0.85em;">${h.getCreateTimeString()}</p>
                                                     <p style="margin: 0 0 3px 0; font-size: 0.9em;"><strong>Trạng thái:</strong> ${h.toStatus}</p>
                                                     <p style="margin: 0 0 5px 0; font-size: 0.9em;"><strong>Bởi:</strong> ${h.changedByName}</p>
-                                                    <c:if test="${sessionScope.user.roleId == 5}">
+                                                    <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5}">
                                                         <p style="margin: 0 0 5px 0; color: var(--danger); font-size: 0.9em;"><strong>Ghi chú:</strong> ${h.note}</p>
                                                     </c:if>
                                                     <c:if test="${not empty h.revisionItems}">

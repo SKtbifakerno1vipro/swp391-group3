@@ -5,7 +5,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Quotation Detail</title>
+        <title>Chi tiết báo giá</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,47 +20,55 @@
             </jsp:include>
             <main class="main legacy-page">
 
-                <h1>Quotation Detail</h1>
+                <h1>Chi tiết báo giá</h1>
 
                 <%-- Hien thi thong bao sau khi thao tac. --%>
-                <c:if test="${message == 'saveSuccess'}"><p style="color: green; font-weight: bold;">Save successfully.</p></c:if>
-                <c:if test="${message == 'saveFailed'}"><p style="color: red; font-weight: bold;">Save failed. Please try again.</p></c:if>
-                <c:if test="${message == 'addSuccess'}"><p style="color: green; font-weight: bold;">Product added successfully.</p></c:if>
-                <c:if test="${message == 'addFailed'}"><p style="color: red; font-weight: bold;">Add product failed.</p></c:if>
-                <c:if test="${message == 'deleteSuccess'}"><p style="color: green; font-weight: bold;">Product deleted successfully.</p></c:if>
-                <c:if test="${message == 'deleteFailed'}"><p style="color: red; font-weight: bold;">Delete product failed.</p></c:if>
-                <c:if test="${message == 'invalidInput'}"><p style="color: red; font-weight: bold;">Invalid input data.</p></c:if>
-                <c:if test="${message == 'accepted'}"><p style="color: green; font-weight: bold;">Quotation accepted.</p></c:if>
+                <c:if test="${message == 'saveSuccess'}"><p style="color: green; font-weight: bold;">Lưu thành công.</p></c:if>
+                <c:if test="${message == 'saveFailed'}"><p style="color: red; font-weight: bold;">Lưu thất bại. Vui lòng thử lại.</p></c:if>
+                <c:if test="${message == 'addSuccess'}"><p style="color: green; font-weight: bold;">Thêm sản phẩm thành công.</p></c:if>
+                <c:if test="${message == 'addFailed'}"><p style="color: red; font-weight: bold;">Thêm sản phẩm thất bại.</p></c:if>
+                <c:if test="${message == 'deleteSuccess'}"><p style="color: green; font-weight: bold;">Xóa sản phẩm thành công.</p></c:if>
+                <c:if test="${message == 'deleteFailed'}"><p style="color: red; font-weight: bold;">Xóa sản phẩm thất bại.</p></c:if>
+                <c:if test="${message == 'invalidInput'}"><p style="color: red; font-weight: bold;">Dữ liệu đầu vào không hợp lệ.</p></c:if>
+                <c:if test="${message == 'accepted'}"><p style="color: green; font-weight: bold;">Đã duyệt báo giá thành công.</p></c:if>
                 <c:if test="${message == 'stockError'}">
                     <p style="color: red; font-weight: bold;">
-                        Không đủ hàng tồn kho cho sản phẩm. (Trong kho chỉ còn ${param.stock != null ? param.stock : 0} sản phẩm, nhưng yêu cầu ${param.required != null ? param.required : 0} sản phẩm).
+                        Không đủ hàng cho sản phẩm.
                     </p>
                 </c:if>
 
                 <%-- Khoi nay hien thi thong tin chung cua quotation. --%>
-                <h2>General Information</h2>
+                <h2>Thông tin chung</h2>
 
                 <table border="1" cellpadding="7" cellspacing="0">
-                    <tr><th>Quotation ID</th><td>${quotation.quotationId}</td></tr>
-                    <tr><th>Customer</th><td>${quotation.customerName}</td></tr>
-                    <tr><th>Quotation Date</th><td>${quotation.quotationDate}</td></tr>
-                    <tr><th>Status</th><td>${quotation.quotationStatus}</td></tr>
-                    <tr><th>Total Price</th><td><strong><fmt:formatNumber value="${quotation.totalPrice != null ? quotation.totalPrice : 0}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></strong></td></tr>
-                    <tr><th>Created By</th><td>${quotation.createdByName}</td></tr>
-                    <tr><th>Created At</th><td>${quotation.createdAt}</td></tr>
+                    <tr><th>Mã báo giá</th><td>${quotation.quotationId}</td></tr>
+                    <tr><th>Khách hàng</th><td>${quotation.customerName}</td></tr>
+                    <tr><th>Ngày báo giá</th><td>${quotation.quotationDate}</td></tr>
+                    <tr><th>Trạng thái</th><td>
+                        <c:choose>
+                             <c:when test="${quotation.quotationStatus == 'DRAFT'}">Nháp</c:when>
+                             <c:when test="${quotation.quotationStatus == 'PENDING'}">Chờ duyệt</c:when>
+                             <c:when test="${quotation.quotationStatus == 'ACCEPTED'}">Đã duyệt</c:when>
+                             <c:when test="${quotation.quotationStatus == 'REJECTED'}">Đã từ chối</c:when>
+                             <c:otherwise>${quotation.quotationStatus}</c:otherwise>
+                         </c:choose>
+                    </td></tr>
+                    <tr><th>Tổng giá</th><td><strong><fmt:formatNumber value="${quotation.totalPrice != null ? quotation.totalPrice : 0}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></strong></td></tr>
+                    <tr><th>Người tạo</th><td>${quotation.createdByName}</td></tr>
+                    <tr><th>Ngày tạo</th><td>${quotation.createdAt}</td></tr>
                 </table>
 
                 <br>
 
                 <%-- Form them san pham moi vao quotation hien tai bang searchbar. --%>
                 <c:if test="${sessionScope.user.roleId != 3}">
-                    <h2>Add Product</h2>
+                    <h2>Thêm sản phẩm</h2>
                     <form action="${pageContext.request.contextPath}/quotation-detail" method="post">
                         <input type="hidden" name="quotationId" value="${quotation.quotationId}">
                         <input type="hidden" name="productId" id="addProductId">
 
-                        <label>Search Product:</label>
-                        <input type="text" id="addProductSearch" placeholder="Type product name..." autocomplete="off" onkeyup="showProductSuggestions()">
+                        <label>Tìm kiếm sản phẩm:</label>
+                        <input type="text" id="addProductSearch" placeholder="Nhập tên sản phẩm..." autocomplete="off" onkeyup="showProductSuggestions()">
 
                         <%-- Hop goi y san pham sau khi search. --%>
                         <div id="productSuggestions" style="border: 1px solid #ccc; max-width: 420px; display: none; background: white; position: absolute; z-index: 10;"></div>
@@ -71,38 +79,38 @@
 
                         <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                             <div>
-                                <label>Unit:</label>
+                                <label>Đơn vị:</label>
                                 <input type="text" id="addUnit" readonly style="width: 75px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
                             </div>
                             <div>
-                                <label>Selling Price:</label>
+                                <label>Giá bán:</label>
                                 <input type="number" id="addSellingPrice" readonly style="width: 110px; background-color: #f1f1f1; border: 1px solid #ccc; padding: 4px;">
                             </div>
                             <div>
-                                <label>Quantity:</label>
+                                <label>Số lượng:</label>
                                 <input type="number" name="quantity" min="1" value="1" required style="width: 70px; padding: 4px;">
                             </div>
                         </div>
                         <br>
-                        <button type="submit" name="action" value="addProduct" onclick="return validateAddProductForm()">Add Product</button>
+                        <button type="submit" name="action" value="addProduct" onclick="return validateAddProductForm()">Thêm sản phẩm</button>
                     </form>
                     <br>
                 </c:if>
 
                 <%-- Khoi nay hien thi va cho sua danh sach san pham trong quotation. --%>
-                                <c:if test="${sessionScope.user.roleId != 3}">
+                <c:if test="${sessionScope.user.roleId != 3}">
                     <div style="margin-bottom: 15px;">
                         <form action="${pageContext.request.contextPath}/quotation-detail" method="post" style="display:inline;">
                             <input type="hidden" name="action" value="applyAll">
                             <input type="hidden" name="quotationId" value="${quotation.quotationId}">
 
-                            <label><strong>Discount %:</strong></label>
+                            <label><strong>Chiết khấu %:</strong></label>
                             <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="0" required>
 
-                            <label style="margin-left: 10px;"><strong>Tax %:</strong></label>
+                            <label style="margin-left: 10px;"><strong>Thuế %:</strong></label>
                             <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="0" required>
 
-                            <button type="submit" style="margin-left: 10px;">Apply to All Products</button>
+                            <button type="submit" style="margin-left: 10px;">Áp dụng cho tất cả sản phẩm</button>
                         </form>
                     </div>
                 </c:if>
@@ -110,24 +118,24 @@
                 <table border="1" cellpadding="7" cellspacing="0" style="width: 100%;">
                     <thead>
                         <tr>
-                            <th>Product</th>
-                            <th>Unit</th>
+                            <th>Sản phẩm</th>
+                            <th>Đơn vị</th>
                                 <c:if test="${sessionScope.user.roleId != 3}">
-                                <th>Cost Price</th>
+                                <th>Giá vốn</th>
                                 </c:if>
-                            <th>Selling Price</th>
-                            <th>Quantity</th>
-                            <th>Discount %</th>
-                            <th>Tax %</th>
-                            <th>Amount</th>
+                            <th>Giá bán</th>
+                            <th>Số lượng</th>
+                            <th>Chiết khấu %</th>
+                            <th>Thuế %</th>
+                            <th>Thành tiền</th>
                                 <c:if test="${sessionScope.user.roleId != 3}">
-                                <th>Action</th>
+                                <th>Hành động</th>
                                 </c:if>
                         </tr>
                     </thead>
                     <tbody>
                         <c:if test="${empty details}">
-                            <tr><td colspan="${sessionScope.user.roleId != 3 ? 9 : 7}" style="text-align: center;">No product details found.</td></tr>
+                            <tr><td colspan="${sessionScope.user.roleId != 3 ? 9 : 7}" style="text-align: center;">Không tìm thấy chi tiết sản phẩm nào.</td></tr>
                         </c:if>
 
                         <c:forEach items="${details}" var="detail">
@@ -183,16 +191,16 @@
                                     <td>
                                         <input type="hidden" name="quotationId" value="${quotation.quotationId}">
                                         <input type="hidden" name="quotationDetailId" value="${detail.quotationDetailId}">
-                                        <button type="submit" name="action" value="updateDetail">Save</button>
-                                        <button type="submit" name="action" value="deleteProduct" onclick="return confirm('Delete this product from quotation?')">Delete</button>
+                                        <button type="submit" name="action" value="updateDetail">Lưu</button>
+                                        <button type="submit" name="action" value="deleteProduct" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi báo giá?')">Xóa</button>
                                     </td>
                                 </c:if>
                             </form>
                             </tr>
                         </c:forEach>
-                        <!-- Grand Total Row -->
+                                   <!-- Grand Total Row -->
                         <tr style="background-color: #f9f9f9;">
-                            <td colspan="${sessionScope.user.roleId != 3 ? 7 : 6}" style="text-align: right; font-weight: bold;">Grand Total:</td>
+                            <td colspan="${sessionScope.user.roleId != 3 ? 7 : 6}" style="text-align: right; font-weight: bold;">Tổng cộng:</td>
                             <td style="font-weight: bold; color: #2e7d32;">
                                 <fmt:formatNumber value="${quotation.totalPrice != null ? quotation.totalPrice : 0}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
                             </td>
@@ -206,21 +214,21 @@
                 <br>
 
                 <%-- Khoi nay hien thi lich su negotiation cua quotation. --%>
-                <h2>Negotiation History</h2>
+                <h2>Lịch sử thương lượng</h2>
 
                 <table border="1" cellpadding="7" cellspacing="0" style="width: 100%;">
                     <thead>
-                        <tr><th>Time</th><th>User Name</th><th>History</th></tr>
+                        <tr><th>Thời gian</th><th>Tên người dùng</th><th>Lịch sử</th></tr>
                     </thead>
                     <tbody>
                         <c:if test="${empty histories}">
-                            <tr><td colspan="3" style="text-align: center;">No history found.</td></tr>
+                            <tr><td colspan="3" style="text-align: center;">Không tìm thấy lịch sử nào.</td></tr>
                         </c:if>
 
                         <c:forEach items="${histories}" var="history">
                             <tr>
                                 <td>${history.createdAt}</td>
-                                <td><c:out value="${history.createdByName != null ? history.createdByName : 'System'}"/></td>
+                                <td><c:out value="${history.createdByName != null ? history.createdByName : 'Hệ thống'}"/></td>
                                 <td>${history.editHistory}</td>
                             </tr>
                         </c:forEach>
@@ -233,19 +241,19 @@
                         <form action="quotation-detail" method="POST" style="display:inline;">
                             <input type="hidden" name="quotationId" value="${quotation.quotationId}">
                             <input type="hidden" name="action" value="accept">
-                            <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">Accept Quotation</button>
+                            <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">Duyệt báo giá</button>
                         </form>
                     </c:if>
 
                     <c:if test="${sessionScope.user.roleId == 4 && quotation.quotationStatus == 'ACCEPTED'}">
                         <a href="contract-generate?quotationId=${quotation.quotationId}">
-                            <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; cursor: pointer;">Generate Draft Contract</button>
+                            <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; cursor: pointer;">Tạo dự thảo hợp đồng</button>
                         </a>
                     </c:if>
                 </div>
 
                 <br>
-                <a href="${pageContext.request.contextPath}/quotation-list">Back to List</a>
+                <a href="${pageContext.request.contextPath}/quotation-list">Quay lại danh sách</a>
 
                 <script>
                     // Luu danh sach product tu server sang JavaScript de search goi y.
@@ -285,7 +293,7 @@
                         });
 
                         if (matchedProducts.length === 0) {
-                            box.innerHTML = '<div style="padding: 8px; color: red;">No product found</div>';
+                            box.innerHTML = '<div style="padding: 8px; color: red;">Không tìm thấy sản phẩm</div>';
                             box.style.display = 'block';
                             return;
                         }
@@ -306,7 +314,7 @@
                     function selectProduct(productId, productName, productPrice, productCost, productUnit) {
                         document.getElementById('addProductId').value = productId;
                         document.getElementById('addProductSearch').value = productName;
-                        document.getElementById('selectedProductName').textContent = 'Selected: ' + productName;
+                        document.getElementById('selectedProductName').textContent = 'Đã chọn: ' + productName;
                         document.getElementById('addSellingPrice').value = productPrice;
                         const addCostPriceElem = document.getElementById('addCostPrice');
                         if (addCostPriceElem)
@@ -318,7 +326,7 @@
                     // Khong cho add neu user chua chon san pham tu goi y.
                     function validateAddProductForm() {
                         if (document.getElementById('addProductId').value === '') {
-                            alert('Please select a product from suggestions.');
+                            alert('Vui lòng chọn một sản phẩm từ danh sách gợi ý.');
                             return false;
                         }
                         return true;

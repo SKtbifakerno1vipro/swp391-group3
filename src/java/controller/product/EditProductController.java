@@ -28,8 +28,8 @@ import utils.Validation;
  *
  * @author ADMIN
  */
-@WebServlet(name = "EditProduct", urlPatterns = {"/edit-product"})
-public class EditProduct extends HttpServlet {
+@WebServlet(name = "EditProductController", urlPatterns = {"/edit-product"})
+public class EditProductController extends HttpServlet {
 
     private final ProductService pService = new ProductService();
     private final ProductReviewService reviewService = new ProductReviewService();
@@ -198,7 +198,6 @@ public class EditProduct extends HttpServlet {
             error = Validation.validateQuantity(qRaw);
         }
 
-        // Kiểm tra trùng tên sản phẩm trong CSDL
         if (error == null) {
             Integer idObj = null;
             if ("edit".equals(action)) {

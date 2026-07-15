@@ -20,12 +20,12 @@ public class QuotationService {
         this.productService = new ProductService();
     }
 
-    public List<Quotation> getAllQuotations() {
-        return quotationDAO.getAllQuotations();
+    public List<Quotation> getAllQuotations(Integer saleId) {
+        return quotationDAO.getAllQuotations(saleId);
     }
 
-
-    public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate, Integer saleId) {
+    public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate,
+            Integer saleId) {
         return quotationDAO.searchQuotations(search, status, fromDate, toDate, saleId);
 
     }
@@ -95,6 +95,7 @@ public class QuotationService {
 
         return updated;
     }
+
     /*
      * Tao quotation moi voi nhieu san pham.
      * Buoc 1: tao quotation de lay quotationId.
@@ -119,16 +120,19 @@ public class QuotationService {
         }
 
         if (allDetailsCreated) {
-            quotationDAO.addQuotationHistory(quotationId, quotation.getCreatedBy(), "Tao quotation moi voi " + details.size() + " san pham");
+            quotationDAO.addQuotationHistory(quotationId, quotation.getCreatedBy(),
+                    "Tao quotation moi voi " + details.size() + " san pham");
         }
 
         return allDetailsCreated;
     }
+
     /*
      * Them 1 san pham moi vao quotation dang co va ghi lich su.
      */
     public boolean addProductToQuotation(QuotationDetail detail, Integer userId) {
-        QuotationDetail oldDetail = quotationDAO.getQuotationDetailByProduct(detail.getQuotationId(), detail.getProductId());
+        QuotationDetail oldDetail = quotationDAO.getQuotationDetailByProduct(detail.getQuotationId(),
+                detail.getProductId());
 
         if (oldDetail != null) {
             int oldQuantity = oldDetail.getQuantity();
@@ -143,7 +147,8 @@ public class QuotationService {
 
             if (updated) {
                 quotationDAO.addQuotationHistory(detail.getQuotationId(), userId,
-                        "Cap nhat san pham " + detail.getProductName() + " da co: quantity tu " + oldQuantity + " thanh " + newQuantity);
+                        "Cap nhat san pham " + detail.getProductName() + " da co: quantity tu " + oldQuantity
+                                + " thanh " + newQuantity);
             }
 
             return updated;
@@ -152,7 +157,8 @@ public class QuotationService {
         boolean added = quotationDAO.addQuotationDetail(detail);
 
         if (added) {
-            quotationDAO.addQuotationHistory(detail.getQuotationId(), userId, "Them san pham " + detail.getProductName() + " vao quotation");
+            quotationDAO.addQuotationHistory(detail.getQuotationId(), userId,
+                    "Them san pham " + detail.getProductName() + " vao quotation");
         }
 
         return added;
@@ -161,7 +167,8 @@ public class QuotationService {
     /*
      * Xoa 1 san pham khoi quotation dang co va ghi lich su.
      */
-    public boolean deleteProductFromQuotation(int quotationId, int quotationDetailId, String productName, Integer userId) {
+    public boolean deleteProductFromQuotation(int quotationId, int quotationDetailId, String productName,
+            Integer userId) {
         boolean deleted = quotationDAO.deleteQuotationDetail(quotationDetailId);
 
         if (deleted) {
@@ -174,10 +181,12 @@ public class QuotationService {
     /*
      * Cap nhat discount va tax cho toan bo quotation_detail hien co.
      */
-    public boolean applyDiscountAndTaxToAll(int quotationId, java.math.BigDecimal discount, java.math.BigDecimal tax, Integer userId) {
+    public boolean applyDiscountAndTaxToAll(int quotationId, java.math.BigDecimal discount, java.math.BigDecimal tax,
+            Integer userId) {
         boolean updated = quotationDAO.updateDiscountAndTaxForAll(quotationId, discount, tax);
         if (updated) {
-            quotationDAO.addQuotationHistory(quotationId, userId, "Ap dung discount " + discount + "% va tax " + tax + "% cho toan bo san pham");
+            quotationDAO.addQuotationHistory(quotationId, userId,
+                    "Ap dung discount " + discount + "% va tax " + tax + "% cho toan bo san pham");
         }
         return updated;
     }

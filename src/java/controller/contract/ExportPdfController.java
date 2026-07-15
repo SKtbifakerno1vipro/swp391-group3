@@ -17,7 +17,7 @@ import model.Signature;
 import java.util.List;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
-
+import  java.net.URLEncoder;
 @WebServlet(name = "ExportPdfController", urlPatterns = {"/export-pdf"})
 public class ExportPdfController extends HttpServlet {
 
@@ -118,7 +118,7 @@ public class ExportPdfController extends HttpServlet {
 
         // 5. Trả PDF về trình duyệt
         String safeFileName = contract.getContractNumber().replaceAll("[\\\\/:*?\"<>|]", "-");
-        String encodedFileName = java.net.URLEncoder.encode("Contract_" + safeFileName + ".pdf", "UTF-8").replaceAll("\\+", "%20");
+        String encodedFileName = URLEncoder.encode("Contract_" + safeFileName + ".pdf", "UTF-8").replaceAll("\\+", "%20");
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName);
         response.setContentLength(baos.size());

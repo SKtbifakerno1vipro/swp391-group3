@@ -9,6 +9,8 @@ import model.Customer;
 import model.User;
 import dto.CustomerOrderDTO;
 import java.sql.Timestamp;
+import model.CustomerOrderDetail;
+import model.Product;
 
 public class CustomerOrderDAO extends DBContext {
 
@@ -53,7 +55,7 @@ public class CustomerOrderDAO extends DBContext {
     }
 
     public List<CustomerOrderDTO> getDetailsByOrderId(int orderId) {
-        List<dto.CustomerOrderDTO> details = new ArrayList<>();
+        List<CustomerOrderDTO> details = new ArrayList<>();
         String sql = "SELECT cod.*, qd.product_name, qd.unit, qd.product_id, qd.tax_percent, qd.discount_percent "
                 + "FROM customer_order_detail cod "
                 + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
@@ -62,7 +64,7 @@ public class CustomerOrderDAO extends DBContext {
             ps.setInt(1, orderId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                model.CustomerOrderDetail cod = new model.CustomerOrderDetail();
+                CustomerOrderDetail cod = new CustomerOrderDetail();
                 cod.setCustomerOrderDetailId(rs.getInt("customer_order_detail_id"));
                 cod.setCustomerOrderId(rs.getInt("customer_order_id"));
                 cod.setQuotationDetailId(rs.getInt("quotation_detail_id"));
@@ -72,13 +74,13 @@ public class CustomerOrderDAO extends DBContext {
                 cod.setTaxPercent(rs.getDouble("tax_percent"));
                 cod.setDiscountPercent(rs.getDouble("discount_percent"));
 
-                model.Product p = new model.Product();
+                Product p = new Product();
                 p.setProductId(rs.getInt("product_id"));
                 p.setProductName(rs.getString("product_name"));
                 p.setSellingPrice(rs.getDouble("selling_price"));
                 p.setUnit(rs.getString("unit"));
 
-                dto.CustomerOrderDTO detailDto = new dto.CustomerOrderDTO();
+                CustomerOrderDTO detailDto = new CustomerOrderDTO();
                 detailDto.setDetail(cod);
                 detailDto.setProduct(p);
                 details.add(detailDto);
@@ -121,7 +123,7 @@ public class CustomerOrderDAO extends DBContext {
 
                 // 2. Insert Details
                 try (PreparedStatement psDetail = connection.prepareStatement(insertDetailSql)) {
-                    for (model.CustomerOrderDetail detail : details) {
+                    for (CustomerOrderDetail detail : details) {
                         psDetail.setInt(1, orderId);
                         psDetail.setInt(2, detail.getQuotationDetailId());
                         psDetail.setInt(3, detail.getQuantity());
@@ -135,7 +137,7 @@ public class CustomerOrderDAO extends DBContext {
                 // 3. Deduct stock from products
                 String deductStockSql = "UPDATE product SET quantity_available = quantity_available - ? WHERE product_id = ?";
                 try (PreparedStatement psStock = connection.prepareStatement(deductStockSql)) {
-                    for (model.CustomerOrderDetail detail : details) {
+                    for (CustomerOrderDetail detail : details) {
                         psStock.setInt(1, detail.getQuantity());
                         psStock.setInt(2, detail.getProductId());
                         psStock.addBatch();

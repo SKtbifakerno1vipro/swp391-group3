@@ -102,6 +102,7 @@ CREATE TABLE product (
     product_status VARCHAR(20),
     reorder_level INT CHECK (reorder_level >= 0),
     quantity_available INT DEFAULT 0 CHECK (quantity_available >= 0),
+	quantity_reserve INT DEFAULT 0 CHECK (quantity_reserve >= 0), --them cai nay cho hop logic
     updated_by INT,
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
@@ -417,38 +418,42 @@ INSERT INTO product (product_name, cost_price, selling_price, description, unit,
 GO
 
 -- 6. PHAN QUYEN (PERMISSION)
--- Permission seed is centralized below to match SecurityFilter url_pattern.
-INSERT INTO permission (permission_name)
-VALUES
-(N'View Dashboard'),
-(N'View User List'),
-(N'View User Detail'),
-(N'Create User'),
-(N'Edit User'),
-(N'View Role List'),
-(N'View Role Detail'),
-(N'Add Role'),
-(N'Edit Role Permissions'),
-(N'View Category List'),
-(N'Create Category'),
-(N'Edit Category'),
-(N'Delete Category'),
-(N'View Product List'),
-(N'Create Product'),
-(N'Edit Product'),
-(N'Delete Product'),
-(N'View Customer List'),
-(N'View Customer Detail'),
-(N'Create Customer'),
-(N'Edit Customer'),
-(N'View Quotation List'),
+INSERT INTO permission (permission_name) VALUES
+(N'Dashboard'),
+(N'Role List'),
+(N'Edit Role Permission'),
+(N'User List'),
+(N'User Create'),
+(N'Profile'),
+(N'User Edit'),
+(N'Customer List'),
+(N'Customer Create'),
+(N'Customer Detail'),
+(N'Order List'),
+(N'Order Create'),
+(N'Order Detail'),
+(N'Category List'),
+(N'Category edit'),
+(N'Product List'),
+(N'Product Create'),
+(N'Product Detail'),
+(N'Quotation List'),
 (N'Create Quotation'),
-(N'View Quotation Detail'),
-(N'View Contract List'),
-(N'Save Contract'),
-(N'View Order List'),
-(N'View Order Detail'),
-(N'Issue Invoice');
+(N'Quotation Detail'),
+(N'Contract List'),
+(N'Contract Create'),
+(N'Contract Detail(Edit)'),
+(N'Invoice List'),
+(N'Invoice Create'),
+(N'Invoice Detail'),
+(N'Preview Invoice'),
+(N'Payment List'),
+(N'Payment Detail'),
+(N'Email Logs'),
+(N'System Audit Logs'),
+(N'Revenue Report'),
+(N'Acceptance Record'),
+(N'Product Review');
 GO
 
 -- 7. QUY TRINH HOP DONG 01: KHACH HANG 01 (LAM TRON BO TOI THANH TOAN)
@@ -507,8 +512,8 @@ INSERT INTO customer_order (customer_id, customer_contract_id, order_status, cre
 );
 DECLARE @O1 INT = SCOPE_IDENTITY();
 INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (@O1, @QD1, 100, 15000, 22000);
-INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, sub_total, tax_amount, total_amount, created_by) 
-VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2090000.00, 209000.00, 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
+INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, total_amount, created_by) 
+VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
 INSERT INTO payment (customer_contract_id, invoice_id, amount, payment_type, payment_status, paid_at, created_by) VALUES (@C1, SCOPE_IDENTITY(), 2299000.00, 'BANK_TRANSFER', 'COMPLETED', SYSDATETIME(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 GO
 
@@ -552,11 +557,7 @@ INSERT INTO contract_revision_item (history_id, contract_id, revision_type, revi
 (@H2, @C2, N'Thanh toán', N'Muốn thanh toán 100% sau khi nhận hàng thay vì đặt cọc');
 GO
 
--- 9. KHO (GIAO DICH NHAP KHO BAN ĐAU)
-INSERT INTO stock_transaction (product_id, transaction_type, quantity_in, quantity_out, transaction_date) VALUES 
-((SELECT product_id FROM product WHERE product_name = N'Bột Mì Meizan'), 'INITIAL_STOCK', 500, 0, GETDATE()),
-((SELECT product_id FROM product WHERE product_name = N'Đường Biên Hòa'), 'INITIAL_STOCK', 1000, 0, GETDATE());
-GO
+
 
 
 -- ==========================================================
@@ -744,49 +745,49 @@ GO
 select * from role_permission
 -- 1. System Admin (role_id = 1)
 INSERT INTO role_permission (role_id, permission_id)
-SELECT 1, permission_id FROM permission WHERE permission_name IN (
-    N'View Dashboard', N'View User List', N'View User Detail', N'Create User', N'Edit User',
-    N'View Role List', N'View Role Detail', N'Add Role', N'Edit Role Permissions',
-    N'View Product List', N'Create Product', N'Edit Product', N'Delete Product',
-    N'View Quotation List', N'Create Quotation', N'View Contract List', N'Save Contract',
-    N'View Order List', N'View Order Detail', N'Issue Invoice'
-);
+SELECT 1, permission_id FROM permission;
 
 -- 2. Manager (role_id = 2)
 INSERT INTO role_permission (role_id, permission_id)
 SELECT 2, permission_id FROM permission WHERE permission_name IN (
-    N'View Dashboard', N'View User List', N'View User Detail', N'View Role List', N'View Role Detail',
-    N'View Customer List', N'View Customer Detail', N'Create Customer', N'Edit Customer',
-    N'View Order List', N'View Order Detail', N'View Product List', N'View Category List',
-    N'View Quotation List', N'View Contract List', N'Issue Invoice'
+    N'Dashboard', N'Role List', N'User List', N'Profile', N'Customer List', N'Order List', 
+    N'Order Create', N'Order Detail', N'Product List', N'Product Detail', 
+    N'Contract List', N'Contract Detail(Edit)', N'Invoice List', N'Invoice Detail', 
+    N'Preview Invoice', N'Payment List', N'Payment Detail', N'Revenue Report', N'Acceptance Record',
+    N'Product Review'
 );
 
 -- 3. Customer (role_id = 3)
 INSERT INTO role_permission (role_id, permission_id)
 SELECT 3, permission_id FROM permission WHERE permission_name IN (
-    N'View Dashboard', N'View Customer Detail', N'View Quotation List', N'View Contract List'
+    N'Dashboard', N'Customer Detail', N'Order List', N'Order Detail', N'Category List', N'Category edit',
+    N'Product List', N'Quotation List', N'Quotation Detail', N'Contract List', N'Contract Detail(Edit)',
+    N'Invoice List', N'Preview Invoice', N'Payment List', N'Product Review'
 );
 
 -- 4. Sale Staff (role_id = 4)
 INSERT INTO role_permission (role_id, permission_id)
 SELECT 4, permission_id FROM permission WHERE permission_name IN (
-    N'View Dashboard', N'View Customer List', N'View Customer Detail', N'Create Customer', N'Edit Customer',
-    N'View Quotation List', N'Create Quotation', N'View Contract List',
-    N'View Order List', N'View Order Detail', N'View Product List', N'View Category List'
+    N'Dashboard', N'Profile', N'Customer List', N'Customer Create', N'Customer Detail',
+    N'Order List', N'Order Create', N'Order Detail', N'Category List', N'Category edit',
+    N'Product List', N'Product Detail', N'Quotation List', N'Create Quotation', N'Quotation Detail',
+    N'Payment List', N'Payment Detail', N'Product Review'
 );
 
 -- 5. Admin Officer (role_id = 5)
 INSERT INTO role_permission (role_id, permission_id)
 SELECT 5, permission_id FROM permission WHERE permission_name IN (
-    N'View Dashboard', N'View Contract List', N'Save Contract',
-    N'View Order List', N'View Order Detail', N'Issue Invoice'
+    N'Dashboard', N'Profile', N'Customer List', N'Customer Detail', N'Order List', N'Order Create',
+    N'Order Detail', N'Quotation List', N'Quotation Detail', N'Contract List', N'Contract Create',
+    N'Contract Detail(Edit)', N'Invoice List', N'Invoice Create', N'Invoice Detail', N'Preview Invoice',
+    N'Payment List', N'Payment Detail', N'Acceptance Record', N'Product Review'
 );
 
 -- 6. Warehouse Staff (role_id = 6)
 INSERT INTO role_permission (role_id, permission_id)
 SELECT 6, permission_id FROM permission WHERE permission_name IN (
-    N'View Dashboard', N'View Product List', N'Create Product', N'Edit Product', N'Delete Product',
-    N'View Category List', N'Create Category', N'Edit Category', N'Delete Category'
+    N'Dashboard', N'Profile', N'Order List', N'Order Detail', N'Category List', N'Category edit',
+    N'Product List', N'Product Create', N'Product Detail', N'Product Review'
 );
 GO
 

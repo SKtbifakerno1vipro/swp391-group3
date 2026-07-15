@@ -11,6 +11,7 @@ import java.util.List;
 import model.Invoice;
 import dto.InvoiceItemDTO;
 import java.sql.SQLException;
+import service.CustomerService;
 
 public class InvoiceDAO extends DBContext {
 
@@ -34,6 +35,7 @@ public class InvoiceDAO extends DBContext {
     }
 
     public String validateInvoice(Invoice invoice) {
+        CustomerService cService = new CustomerService();
         if ("RELEASED".equals(invoice.getInvoiceStatus())) {
             String invoiceNo = invoice.getInvoiceNo();
             if (invoiceNo != null && !invoiceNo.trim().isEmpty() && !invoiceNo.equals("0") && !invoiceNo.startsWith("INV-")) {
@@ -42,10 +44,12 @@ public class InvoiceDAO extends DBContext {
                 }
             }
         }
+        
         String taxCode = invoice.getBuyerTaxCode();
         if (taxCode == null || taxCode.trim().isEmpty()) {
             return "Mã số thuế người mua không được để trống!";
         }
+        
         String trimmedTax = taxCode.trim();
         if (!trimmedTax.matches("^\\d{10}$") && !trimmedTax.matches("^\\d{10}-\\d{3}$")) {
             return "Mã số thuế không đúng định dạng (Phải gồm 10 số hoặc 13 số dạng XXXXXXXXXX-XXX)!";
@@ -78,7 +82,7 @@ public class InvoiceDAO extends DBContext {
             return "Ký hiệu hóa đơn không khớp với năm phát hành (Phải chứa năm '" + yy + "')!";
         }
 
-        return null; // Valid
+        return null; 
     }
 
     public boolean insertInvoice(Invoice invoice) {
@@ -227,8 +231,8 @@ public class InvoiceDAO extends DBContext {
         try {
             String sql = "select COUNT(iv.invoice_id) as total from invoice iv";
             if (forCustomer) {
-                sql += " inner join customer_order co on iv.customer_order_id = co.customer_order_id"
-                        + " inner join customer c on co.customer_id = c.customer_id";
+                sql += " join customer_order co on iv.customer_order_id = co.customer_order_id"
+                        + " join customer c on co.customer_id = c.customer_id";
             }
             sql += " WHERE 1 = 1";
             if (forCustomer) {
@@ -305,21 +309,6 @@ public class InvoiceDAO extends DBContext {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public List<Invoice> getInvoicesByContractId(int contractId) {
-        List<Invoice> list = new ArrayList<>();
-        String sql = "SELECT * FROM invoice WHERE customer_contract_id = ? ORDER BY invoice_id DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, contractId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapResultSetToInvoice(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
     }
 
     public List<Invoice> getInvoicesByOrderId(int orderId) {
@@ -428,17 +417,17 @@ public class InvoiceDAO extends DBContext {
 
     public List<Invoice> getInvoicesSince(Timestamp sinceTime, Integer customerUserId) {
         List<Invoice> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder(
+        String sql = 
                 "SELECT iv.* "
                 + "FROM invoice iv "
                 + "JOIN customer_order co ON iv.customer_order_id = co.customer_order_id "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
-                + "WHERE (iv.created_at > ? OR iv.updated_at > ? OR iv.issue_date > ?) "
-        );
+                + "WHERE (iv.created_at > ? OR iv.updated_at > ? OR iv.issue_date > ?) ";
+
         if (customerUserId != null) {
-            sql.append("AND c.user_id = ? AND iv.invoice_status = 'RELEASED' ");
+            sql += ("AND c.user_id = ? AND iv.invoice_status = 'RELEASED' ");
         }
-        sql.append("ORDER BY iv.created_at ASC, iv.updated_at ASC, iv.issue_date ASC");
+        sql+=("ORDER BY iv.created_at ASC, iv.updated_at ASC, iv.issue_date ASC");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             ps.setTimestamp(1, sinceTime);
