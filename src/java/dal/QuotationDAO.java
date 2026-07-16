@@ -568,8 +568,7 @@ public class QuotationDAO extends DBContext {
                 + "    ) "
                 + "    FROM quotation_detail qd "
                 + "    WHERE qd.quotation_id = q.quotation_id"
-                + "), 0.00), "
-                + "q.created_at = GETDATE() "
+                + "), 0.00) "
                 + "FROM quotation q "
                 + "WHERE q.quotation_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

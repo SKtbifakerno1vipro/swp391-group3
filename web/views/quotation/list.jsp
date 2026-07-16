@@ -98,7 +98,7 @@
                             <tr>
                                 <td>${quotation.quotationId}</td>
                                 <td>${quotation.customerName}</td>
-                                <td>${quotation.quotationDate}</td>
+                                <td>${quotation.formattedQuotationDate}</td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${quotation.quotationStatus == 'DRAFT'}">Nháp</c:when>
@@ -112,7 +112,7 @@
                                     <fmt:formatNumber value="${quotation.totalPrice != null ? quotation.totalPrice : 0}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
                                 </td>
                                 <td>${quotation.createdByName}</td>
-                                <td>${quotation.createdAt}</td>
+                                <td>${quotation.formattedCreatedAt}</td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${quotation.hasContract && quotation.contractId != null}">

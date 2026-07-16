@@ -85,18 +85,16 @@ public class LoginController extends HttpServlet {
             // Login Success: Reset attempts and set user session
             session.setAttribute("failedAttempts", 0);
             session.setAttribute("user", authenticatedUser);
+            AuditLogService.log(user.getUserId(), "LOGIN", "Auth", authenticatedUser.getUserName() + " vừa đăng nhập  vào hệ thống");
             if (authenticatedUser.getRoleId() == 6) {
                 response.sendRedirect(request.getContextPath() + "/product-list");
             } else {
                 response.sendRedirect(request.getContextPath() + "/dashboard");
             }
-            AuditLogService.log(user.getUserId(), "LOGIN", "Auth", authenticatedUser.getUserName() + " vừa đăng nhập  vào hệ thống");
-            response.sendRedirect(request.getContextPath() + "/dashboard");
         } else {
             // Login Failed: Increment attempts
             failedAttempts++;
             session.setAttribute("failedAttempts", failedAttempts);
-
             int attemptsLeft = MAX_FAILED_ATTEMPTS - failedAttempts;
             request.setAttribute("error", "Invalid username or password. Attempts left: " + attemptsLeft);
             request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
