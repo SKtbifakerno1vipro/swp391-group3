@@ -174,7 +174,7 @@ public class Contract {
     // XHieu-begin - delete contact me
     public String getFormattedSignDate() {
         if (this.signDate != null) {
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             return this.signDate.format(formatter);
         }
         return "N/A";
@@ -182,7 +182,7 @@ public class Contract {
 
     public String getFormattedEffectiveDate() {
         if (this.effectiveDate != null) {
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
             return this.effectiveDate.format(formatter);
         }
         return "N/A";

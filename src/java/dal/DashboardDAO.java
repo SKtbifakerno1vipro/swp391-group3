@@ -8,22 +8,16 @@ import dto.ActivityDTO;
 import dto.RecentInvoiceDTO;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
-
 import java.sql.ResultSet;
-
 import java.util.ArrayList;
-
 import java.util.HashMap;
-
 import java.util.LinkedHashMap;
-
 import java.util.List;
-
 import java.util.Map;
-
 import dto.TopProductDTO;
 import dto.TopCustomerDTO;
-
+import  java.sql.Timestamp;
+import  java.time.LocalDateTime;
 public class DashboardDAO extends DBContext {
 
     public int count(String tableName) {
@@ -672,8 +666,8 @@ public class DashboardDAO extends DBContext {
                 + "ORDER BY sal.created_at DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                java.sql.Timestamp ts = rs.getTimestamp("created_at");
-                java.time.LocalDateTime ldt = (ts != null) ? ts.toLocalDateTime() : null;
+               Timestamp ts = rs.getTimestamp("created_at");
+                LocalDateTime ldt = (ts != null) ? ts.toLocalDateTime() : null;
                 list.add(new ActivityDTO(
                         ldt,
                         rs.getString("full_name"),

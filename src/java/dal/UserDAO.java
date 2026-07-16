@@ -205,7 +205,7 @@ public class UserDAO extends DBContext {
 
         String sql = "UPDATE [user] SET password_hash = ?, updated_at = GETDATE() WHERE user_id = ?";
 
-        try (java.sql.Connection conn = new DBContext().getConnection(); java.sql.PreparedStatement stm = conn.prepareStatement(sql)) {
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement stm = conn.prepareStatement(sql)) {
 
             stm.setString(1, hashedNewPassword);
             stm.setInt(2, userId);
@@ -245,10 +245,10 @@ public class UserDAO extends DBContext {
 //        if (user.getGender() != null && !user.getGender().trim().isEmpty()) {
 //            stm.setString(3, user.getGender());
 //        } else 
-            stm.setNull(4, java.sql.Types.CHAR);
+            stm.setNull(4, Types.CHAR);
 
             // 5. date_of_birth
-            stm.setNull(5, java.sql.Types.DATE);
+            stm.setNull(5, Types.DATE);
 
             // 6. full_name
             stm.setString(6, user.getFullName());
@@ -257,7 +257,7 @@ public class UserDAO extends DBContext {
 //        if (user.getAddress() != null && !user.getAddress().trim().isEmpty()) {
 //            stm.setString(6, user.getAddress());
 //        } else 
-            stm.setNull(7, java.sql.Types.NVARCHAR);
+            stm.setNull(7, Types.NVARCHAR);
 
             // 8. phone
             stm.setString(8, user.getPhone());

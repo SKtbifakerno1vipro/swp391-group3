@@ -37,6 +37,17 @@ public class QuotationDetailController extends HttpServlet {
             // Lay thong tin chung, san pham trong quotation, history va list product de add them.
             Quotation quotation = quotationService.getQuotationById(quotationId);
             List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotationId);
+            
+            if (quotation != null && details != null) {
+                BigDecimal total = BigDecimal.ZERO;
+                for (QuotationDetail d : details) {
+                    if (d.getAmount() != null) {
+                        total = total.add(d.getAmount());
+                    }
+                }
+                quotation.setTotalPrice(total);
+            }
+            
             List<QuotationHistory> histories = quotationService.getHistoryByQuotationId(quotationId);
             List<Product> products = quotationService.getAllProducts();
             
