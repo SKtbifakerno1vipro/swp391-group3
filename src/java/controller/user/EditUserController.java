@@ -35,7 +35,14 @@ public class EditUserController extends HttpServlet {
         
         if (idStr != null && !idStr.trim().isEmpty()) {
             try {
-                User u = userService.getUserById(Integer.parseInt(idStr));
+                int targetId = Integer.parseInt(idStr);
+                // Security check: Admin (1) and Manager (2) can view other users. Others only view themselves.
+                if (currentUser.getRoleId() != 1 && currentUser.getRoleId() != 2 && targetId != currentUser.getUserId()) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to view this profile.");
+                    return;
+                }
+                
+                User u = userService.getUserById(targetId);
                 if (u != null) {
                     if ("1".equals(request.getParameter("success"))) {
                         request.setAttribute("successMsg", "Cập nhật thông tin thành công!");
@@ -45,12 +52,17 @@ public class EditUserController extends HttpServlet {
                     request.setAttribute("userService", userService);
                     request.getRequestDispatcher("/views/user/detail.jsp").forward(request, response);
                 } else {
-                    response.sendRedirect("user-list");
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found.");
                 }
             } catch (Exception e) {
-                response.sendRedirect("user-list");
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid User ID.");
             }
         } else {
+            // Security check: Only Admin (Role 1) can create users
+            if (currentUser.getRoleId() != 1) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to create users.");
+                return;
+            }
             
             request.setAttribute("mode", "create");
             request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
@@ -70,6 +82,21 @@ public class EditUserController extends HttpServlet {
         
         String idStr = request.getParameter("id");
         boolean isEdit = (idStr != null && !idStr.isEmpty());
+        
+        if (isEdit) {
+            int targetId = Integer.parseInt(idStr);
+            // Security check: Only Admin (Role 1) can edit other users
+            if (currentUser.getRoleId() != 1 && targetId != currentUser.getUserId()) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to edit this profile.");
+                return;
+            }
+        } else {
+            // Security check: Only Admin (Role 1) can create users
+            if (currentUser.getRoleId() != 1) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to create users.");
+                return;
+            }
+        }
         
         String action = request.getParameter("action");
         if ("resetPassword".equals(action) && isEdit) {
