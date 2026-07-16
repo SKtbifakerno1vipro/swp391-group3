@@ -97,7 +97,7 @@
                                     <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">Xem</a>
                                     <c:if test="${sessionScope.user.roleId != 3}">
                                         <c:if test="${item.customerOrder.orderStatus != 'COMPLETED'}">
-                                            <c:if test="${item.customerOrder.orderStatus != 'SHIPPING'}">
+                                            <c:if test="${item.customerOrder.orderStatus != 'SHIPPING' && item.customerOrder.orderStatus != 'CANCELLED'}">
                                                 <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này không?');">Xóa</a>    
                                             </c:if>
                                         </c:if>
