@@ -174,6 +174,7 @@
                                 <option value="CREATE" ${actionType == 'CREATE' ? 'selected' : ''}>CREATE</option>
                                 <option value="UPDATE" ${actionType == 'UPDATE' ? 'selected' : ''}>UPDATE</option>
                                 <option value="DELETE" ${actionType == 'DELETE' ? 'selected' : ''}>DELETE</option>
+                                <option value="LOGOUT" ${actionType == 'LOGOUT' ? 'selected' : ''}>LOGOUT</option>
                             </select>
                         </div>
                         
