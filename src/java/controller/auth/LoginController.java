@@ -91,7 +91,7 @@ public class LoginController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/dashboard");
             }
             AuditLogService.log(user.getUserId(), "LOGIN", "Auth", authenticatedUser.getUserName() + " vừa đăng nhập  vào hệ thống");
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+            return;
         } else {
             // Login Failed: Increment attempts
             failedAttempts++;

@@ -43,7 +43,6 @@ public class SecurityFilter implements Filter {
     );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
-            "/dashboard",
             "/user/password/change",
             "/realtime/notifications"
     );
@@ -57,13 +56,10 @@ public class SecurityFilter implements Filter {
             "/user-list",
             "/create-user",
             "/edit-user",
-            "/edit-user",
             "/user-detail",
             "/customer/list",
-            "/customer-list",
             "/customer/create",
             "/customer/detail",
-            "/customer-detail",
             "/customer/edit",
             "/customer-order-list",
             "/customer-order",
@@ -106,7 +102,6 @@ public class SecurityFilter implements Filter {
             "/user-list",
             "/edit-user",
             "/customer/list",
-            "/customer-list",
             "/customer-order-list",
             "/customer-order",
             "/create-order",
@@ -131,7 +126,6 @@ public class SecurityFilter implements Filter {
     private static final List<String> CUSTOMER_URLS = List.of(
             "/dashboard",
             "/customer/detail",
-            "/customer-detail",
             "/customer/edit",
             "/customer-order-list",
             "/customer-order",
@@ -148,22 +142,18 @@ public class SecurityFilter implements Filter {
             "/preview",
             "/payment/list",
             "/payment",
-            "/realtime/notifications",
+            "/payment/detail",
             "/product-review",
             "/Signature",
             "/SignatureAcceptance",
+            "/realtime/notifications",
             "/export-pdf"
     );
 
     private static final List<String> SALE_STAFF_URLS = List.of(
             "/dashboard",
             "/edit-user",
-            "/customer/list",
-            "/customer-list",
-            "/customer/create",
-            "/customer/detail",
-            "/customer-detail",
-            "/customer/edit",
+            "/customer",
             "/customer-order-list",
             "/customer-order",
             "/create-order",
@@ -177,6 +167,9 @@ public class SecurityFilter implements Filter {
             "/quotation-list",
             "/quotation-create",
             "/quotation-detail",
+            "/invoice/create",
+            "/invoice",
+            "/preview",
             "/payment/list",
             "/payment",
             "/payment/detail",
@@ -188,9 +181,7 @@ public class SecurityFilter implements Filter {
             "/dashboard",
             "/edit-user",
             "/customer/list",
-            "/customer-list",
             "/customer/detail",
-            "/customer-detail",
             "/customer/edit",
             "/customer-order-list",
             "/customer-order",
@@ -275,9 +266,13 @@ public class SecurityFilter implements Filter {
                     if (cDAO.validateToken(contractId, token)) {
                         chain.doFilter(request, response);
                         return;
+                    } else {
+                        res.sendRedirect(req.getContextPath() + "/login");
+                        return;
                     }
                 } catch (Exception e) {
                     res.sendRedirect(req.getContextPath() + "/login");
+                    return;
                 }
             }
         }
@@ -403,12 +398,10 @@ public class SecurityFilter implements Filter {
                     }
                 }
             case "/customer/list":
-            case "/customer-list":
                 return "Customer List";
             case "/customer/create":
                 return "Customer Create";
             case "/customer/detail":
-            case "/customer-detail":
             case "/customer/edit":
                 return "Customer Detail";
             case "/customer-order-list":
