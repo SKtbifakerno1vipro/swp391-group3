@@ -178,18 +178,20 @@
                                                 </c:choose>
                                             </span>
                                         </td>
-                                         <td style="white-space: nowrap; vertical-align: middle;">
-                                             <div style="display: inline-flex; gap: 8px; align-items: center;">
-                                                 <a href="${pageContext.request.contextPath}/invoice?invoiceId=${i.invoiceId}" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">Xem</a>
-                                                 <c:if test="${i.invoiceStatus != 'CANCELED'}">
-                                                     <form action="${pageContext.request.contextPath}/invoice-list" method="post" style="display: inline; margin: 0; padding: 0; background: none; border: none; box-shadow: none;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy hóa đơn này không?');">
-                                                         <input type="hidden" name="action" value="cancel">
-                                                         <input type="hidden" name="invoiceId" value="${i.invoiceId}">
-                                                         <input type="submit" value="Hủy" style="padding: 4px 10px; font-size: 11px; background-color: var(--danger-soft); color: var(--danger); border: none; border-radius: 6px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-width: 50px; line-height: normal;">
-                                                     </form>
-                                                 </c:if>
-                                             </div>
-                                         </td>
+                                        <td style="white-space: nowrap; vertical-align: middle;">
+                                            <div style="display: inline-flex; gap: 8px; align-items: center;">
+                                                <a href="${pageContext.request.contextPath}/invoice?invoiceId=${i.invoiceId}" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">Xem</a>
+                                                <c:if test="${i.invoiceStatus != 'CANCELED'}">
+                                                    <form action="${pageContext.request.contextPath}/invoice-list" method="post" style="display: inline; margin: 0; padding: 0; background: none; border: none; box-shadow: none;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy hóa đơn này không?');">
+                                                        <input type="hidden" name="action" value="cancel">
+                                                        <input type="hidden" name="invoiceId" value="${i.invoiceId}">
+                                                        <c:if test="${sessionScope.user.roleId != 3}">
+                                                            <input type="submit" value="Hủy" style="padding: 4px 10px; font-size: 11px; background-color: var(--danger-soft); color: var(--danger); border: none; border-radius: 6px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-width: 50px; line-height: normal;">
+                                                        </c:if>
+                                                    </form>
+                                                </c:if>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </c:forEach>
                             </table>

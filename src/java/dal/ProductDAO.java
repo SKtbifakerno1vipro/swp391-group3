@@ -202,6 +202,7 @@ public class ProductDAO extends DBContext {
         p.setUnit(rs.getString("unit"));
         p.setProductStatus(rs.getString("product_status"));
         p.setQuantityAvailable(rs.getInt("quantity_available"));
+        p.setQuantityReserve(rs.getInt("quantity_reserve"));
 
         int updatedBy = rs.getInt("updated_by");
         if (!rs.wasNull()) {
@@ -362,6 +363,18 @@ public class ProductDAO extends DBContext {
             }
         } catch (Exception e) {
             System.err.println("Error in isProductUsed: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean updateQuantityReserve(int productId, int quantityReserve) {
+        String sql = "UPDATE product SET quantity_reserve = ? WHERE product_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, quantityReserve);
+            ps.setInt(2, productId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("updateQuantityReserve: " + e.getMessage());
         }
         return false;
     }

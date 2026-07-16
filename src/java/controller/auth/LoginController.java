@@ -25,7 +25,12 @@ public class LoginController extends HttpServlet {
         HttpSession session = request.getSession(false);
         // If user already logged in, redirect to dashboard
         if (session != null && session.getAttribute("user") != null) {
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+            User user = (User) session.getAttribute("user");
+            if (user.getRoleId() == 6) {
+                response.sendRedirect(request.getContextPath() + "/product-list");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+            }
             return;
         }
 
@@ -80,6 +85,11 @@ public class LoginController extends HttpServlet {
             // Login Success: Reset attempts and set user session
             session.setAttribute("failedAttempts", 0);
             session.setAttribute("user", authenticatedUser);
+            if (authenticatedUser.getRoleId() == 6) {
+                response.sendRedirect(request.getContextPath() + "/product-list");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+            }
             AuditLogService.log(user.getUserId(), "LOGIN", "Auth", authenticatedUser.getUserName() + " vừa đăng nhập  vào hệ thống");
             response.sendRedirect(request.getContextPath() + "/dashboard");
         } else {

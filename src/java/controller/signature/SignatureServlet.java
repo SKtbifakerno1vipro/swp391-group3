@@ -185,11 +185,17 @@ public class SignatureServlet extends HttpServlet {
 
             fileName = sService.standardFileName(fileName) + "_" + System.currentTimeMillis() + ".png";
 
+            String resWeb = sService.storeSignature(signatureData, uploadWebFile, fileName);
+            if (!"SUCCESS".equals(resWeb)) {
+                throw new IllegalArgumentException(resWeb);
+            }
+            String resBuild = sService.storeSignature(signatureData, uploadBuildFile, fileName);
+            if (!"SUCCESS".equals(resBuild)) {
+                throw new IllegalArgumentException(resBuild);
+            }
             s.setFileName(fileName);
             s.setFileUrl(fileName);
 
-            sService.storeSignature(signatureData, uploadWebFile, fileName);
-            sService.storeSignature(signatureData, uploadBuildFile, fileName);
             sService.insertSignature(s);
             List<Signature> sigList = sService.getSignaturesByContractId(contractId);
             for (Signature signature : sigList) {
@@ -217,7 +223,7 @@ public class SignatureServlet extends HttpServlet {
                 ctrService.insertHistory(history);
 
                 // Automatically create a PENDING payment record if it doesn't exist yet
-                paymentService.createPendingPaymentForContractIfNotExists(contractId);
+                // paymentService.createPendingPaymentForContractIfNotExists(contractId);
             }
             response.sendRedirect("contract-detail?id=" + contractId);
 

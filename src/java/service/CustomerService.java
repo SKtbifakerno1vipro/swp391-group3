@@ -76,7 +76,6 @@ public class CustomerService {
 
         if (cus != null && !cus.isEmpty()) {
             for (User cu : cus) {
-
                 if (userName != null && userName.trim().equalsIgnoreCase(cu.getUserName())) {
                     return "Username already exists in the system";
                 }

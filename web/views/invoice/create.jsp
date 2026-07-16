@@ -2,7 +2,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
-    String defaultSymbol = "1C" + String.format("%02d", LocalDate.now().getYear() % 100) + "TYY";
+    String defaultSymbol = "1K" + String.format("%02d", LocalDate.now().getYear() % 100) + "TYY";
     pageContext.setAttribute("defaultSymbol", defaultSymbol);
 %>
 <!DOCTYPE html>
@@ -350,7 +350,7 @@
                         </div>
                     </c:if>
 
-                    <c:set var="isReadOnly" value="${not empty invoice && invoice.invoiceStatus != 'UNRELEASED'}"/>
+                    <c:set var="isReadOnly" value="${not empty invoice && (invoice.invoiceStatus != 'UNRELEASED')}"/>
                     <input type="hidden" name="invoiceId" value="${invoice.invoiceId}">
                     <input type="hidden" name="customerContractId" id="customerContractId" value="${not empty invoice ? invoice.customerContractId : order.customerContractId}">
                     <input type="hidden" name="customerOrderId" id="customerOrderId" value="${not empty invoice ? invoice.customerOrderId : order.customerOrderId}">
@@ -371,11 +371,11 @@
                             <div class="buyer-group form-group" style="margin-top: 15px;">
                                 <label>Mã số thuế</label>
                                 <div class="input-wrapper">
-                                    <input type="text" name="buyerTaxCode" id="buyerTaxCode" value="${not empty invoice ? invoice.buyerTaxCode : customer.taxCode}" ${isReadOnly ? 'readonly' : ''}>
+                                    <input type="text" name="buyerTaxCode" id="buyerTaxCode" value="${not empty invoice ? invoice.buyerTaxCode : customer.taxCode}" readonly>
                                 </div>
                             </div>
                             <div class="buyer-group form-group" style="margin-top: 15px;">
-                                <label>Tên người mua</label>
+                                <label>Tên Công Ty</label>
                                 <div class="input-wrapper">
                                     <input type="text" name="buyerName" id="buyerName" value="${not empty invoice ? invoice.buyerName : customer.companyName}" ${isReadOnly ? 'readonly' : ''}>
                                 </div>
@@ -576,7 +576,6 @@
                                         <c:if test="${sessionScope.user.roleId != 3}">
                                             <button type="submit" name="action" value="notice" class="btn-action success"><span class="material-symbols-outlined" style="font-size: 16px;">mail</span> Thông báo phát hành hóa đơn</button>
                                         </c:if>
-                                        <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">edit</span> Cập nhật bản nháp</button>
                                     </c:if>
                                     <c:if test="${invoice.invoiceStatus == 'RELEASED' && sessionScope.user.roleId != 3}">
                                         <button type="submit" name="action" value="notice" class="btn-action success"><span class="material-symbols-outlined" style="font-size: 16px;">mail</span> Gửi lại thông báo phát hành</button>

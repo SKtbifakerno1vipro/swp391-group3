@@ -30,6 +30,12 @@ public class DetailCustomerController extends HttpServlet {
         String action = request.getParameter("action");
         // check deactive customer truoc 
         if ("deactivate".equals(action)) {
+            jakarta.servlet.http.HttpSession session = request.getSession(false);
+            User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
+            if (currentUser == null || (currentUser.getRoleId() != 1 && currentUser.getRoleId() != 2 && currentUser.getRoleId() != 4)) {
+                response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
+                return;
+            }
             try {
                 int idCus = Integer.parseInt(request.getParameter("id_cus"));
                 customerService.deactivateCustomer(idCus);
@@ -40,6 +46,12 @@ public class DetailCustomerController extends HttpServlet {
                 return;
             }
         } else if ("activate".equals(action)) {
+            jakarta.servlet.http.HttpSession session = request.getSession(false);
+            User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
+            if (currentUser == null || (currentUser.getRoleId() != 1 && currentUser.getRoleId() != 2 && currentUser.getRoleId() != 4)) {
+                response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
+                return;
+            }
             try {
                 int idCus = Integer.parseInt(request.getParameter("id_cus"));
                 customerService.activateCustomer(idCus);

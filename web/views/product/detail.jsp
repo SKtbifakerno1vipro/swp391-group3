@@ -467,6 +467,10 @@
                                         <td>Số lượng</td>
                                         <td><input type="number" name="quantity" value="${product.quantityAvailable}" min="0" ${action != 'detail' ? ' ' : 'readonly'} required></td>
                                     </tr>
+                                    <tr>
+                                        <td>Số lượng đặt trước</td>
+                                        <td><input type="number" name="reserve" value="${product.quantityReserve}" readonly></td>
+                                    </tr>
                                 </c:if>
                                 <tr>
                                     <td>Danh mục</td>
