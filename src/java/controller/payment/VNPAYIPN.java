@@ -90,9 +90,6 @@ public class VNPAYIPN extends HttpServlet {
                         checkOrderId = true;
                         contractId = p.getCustomerContractId();
                     }
-                } else if (vnp_TxnRef != null && vnp_TxnRef.equals("HD88923")) {
-                    checkOrderId = true;
-                    contractId = paymentService.getAnyContractId();
                 }
 
                 // 2. Check checkAmount (vnp_Amount is valid)
@@ -100,23 +97,15 @@ public class VNPAYIPN extends HttpServlet {
                 BigDecimal amountPaid = BigDecimal.valueOf(amountCents / 100.0);
                 boolean checkAmount = false;
                 if (checkOrderId) {
-                    if (paymentId > 0) {
-                        Payment p = paymentService.getPaymentById(paymentId);
-                        checkAmount = (p != null && amountPaid.compareTo(p.getAmount()) == 0);
-                    } else if (vnp_TxnRef.equals("HD88923")) {
-                        checkAmount = amountPaid.compareTo(BigDecimal.valueOf(50000.0)) == 0;
-                    }
+                    Payment p = paymentService.getPaymentById(paymentId);
+                    checkAmount = (p != null && amountPaid.compareTo(p.getAmount()) == 0);
                 }
 
                 // 3. Check checkOrderStatus (PaymentStatus is pending/not confirmed yet)
                 boolean checkOrderStatus = false;
                 if (checkOrderId) {
-                    if (paymentId > 0) {
-                        Payment p = paymentService.getPaymentById(paymentId);
-                        checkOrderStatus = (p != null && "PENDING".equals(p.getPaymentStatus()));
-                    } else {
-                        checkOrderStatus = true; // For demo/mock HD88923
-                    }
+                    Payment p = paymentService.getPaymentById(paymentId);
+                    checkOrderStatus = (p != null && "PENDING".equals(p.getPaymentStatus()));
                 }
 
                 String newStatus = "00".equals(vnp_ResponseCode) ? "COMPLETED" : "FAILED";
@@ -124,17 +113,7 @@ public class VNPAYIPN extends HttpServlet {
                 if (checkOrderId) {
                     if (checkAmount) {
                         if (checkOrderStatus) {
-                            if (paymentId > 0) {
-                                paymentService.updatePaymentStatus(paymentId, newStatus);
-                            } else {
-                                Payment payment = new Payment();
-                                payment.setCustomerContractId(contractId);
-                                payment.setAmount(amountPaid);
-                                payment.setPaymentType("VNPAY");
-                                payment.setPaidAt("COMPLETED".equals(newStatus) ? LocalDateTime.now() : null);
-                                payment.setPaymentStatus(newStatus);
-                                paymentService.insertPayment(payment);
-                            }
+                            paymentService.updatePaymentStatus(paymentId, newStatus);
                             
                             response.getWriter().print("{\"RspCode\":\"00\",\"Message\":\"Confirm Success\"}");
                         } else {
