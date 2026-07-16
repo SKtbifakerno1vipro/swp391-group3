@@ -73,10 +73,6 @@ public class ProductService {
         return productDAO.isProductNameExists(productName, excludeProductId);
     }
 
-    public boolean isProductUsed(int productId) {
-        return productDAO.isProductUsed(productId);
-    }
-
     public boolean updateQuantityReserve(int productId, int quantityReserve) {
         return productDAO.updateQuantityReserve(productId, quantityReserve);
     }

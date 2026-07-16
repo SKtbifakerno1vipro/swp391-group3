@@ -79,6 +79,10 @@ public class InvoiceService {
         return invoiceDAO.getInvoiceById(id);
     }
 
+    public Invoice getInvoiceByContractId(int contractId) {
+        return invoiceDAO.getInvoiceByContractId(contractId);
+    }
+
     public Invoice getInvoiceByOrderId(int orderId) {
         return invoiceDAO.getInvoiceByOrderId(orderId);
     }

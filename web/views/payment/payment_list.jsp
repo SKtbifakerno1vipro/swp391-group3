@@ -186,8 +186,21 @@
             </jsp:include>
             <main class="main legacy-page">
                 <h2>Quản lý thanh toán</h2>
- 
-                <form action="${pageContext.request.contextPath}/payment/list" method="GET" class="search-form-responsive">
+
+                <c:if test="${not empty sessionScope.successMessage}">
+                    <div style="color: #065f46; background-color: #d1fae5; border: 1px solid #10b981; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
+                        ${sessionScope.successMessage}
+                        <% session.removeAttribute("successMessage"); %>
+                    </div>
+                </c:if>
+                <c:if test="${not empty sessionScope.errorMessage}">
+                    <div style="color: #991b1b; background-color: #fee2e2; border: 1px solid #ef4444; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
+                        ${sessionScope.errorMessage}
+                        <% session.removeAttribute("errorMessage"); %>
+                    </div>
+                </c:if>                <form action="${pageContext.request.contextPath}/payment/list" method="GET" class="search-form-responsive">
                     <!-- Row 1: Basic search (Contract, Customer Name, Status) -->
                     <div class="search-row">
                         <span class="search-label">Tìm kiếm:</span>
@@ -308,7 +321,14 @@
                                 <td>${p.formattedCreatedAt}</td>
                                 <td>${p.formattedPaidAt}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/payment/detail?id=${p.paymentId}" style="color: #0284c7; text-decoration: none; font-weight: bold;">Xem chi tiết</a>
+                                    <a href="${pageContext.request.contextPath}/payment/detail?id=${p.paymentId}" style="color: #0284c7; text-decoration: none; font-weight: bold; margin-right: 10px; display: inline-block; vertical-align: middle;">Xem chi tiết</a>
+                                    <c:if test="${p.paymentStatus == 'COMPLETED' && p.canIssue == true}">
+                                        <a href="javascript:void(0);" onclick="if(confirm('Bạn có chắc chắn muốn phát hành hóa đơn cho thanh toán này?')) { document.getElementById('issueForm-${p.paymentId}').submit(); }" style="color: #059669; text-decoration: none; font-weight: bold; display: inline-block; vertical-align: middle;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">Xuất hóa đơn</a>
+                                        <form id="issueForm-${p.paymentId}" action="${pageContext.request.contextPath}/invoice" method="POST" style="display: none;">
+                                            <input type="hidden" name="customerContractId" value="${p.customerContractId}"/>
+                                            <input type="hidden" name="action" value="notice"/>
+                                        </form>
+                                    </c:if>
                                 </td>
                             </tr>
                         </c:forEach>

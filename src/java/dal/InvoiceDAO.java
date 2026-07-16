@@ -311,6 +311,21 @@ public class InvoiceDAO extends DBContext {
         return null;
     }
 
+    public Invoice getInvoiceByContractId(int contractId) {
+        String sql = "SELECT TOP 1 * FROM invoice WHERE customer_contract_id = ? ORDER BY invoice_id DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contractId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToInvoice(rs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<Invoice> getInvoicesByOrderId(int orderId) {
         List<Invoice> list = new ArrayList<>();
         String sql = "SELECT * FROM invoice WHERE customer_order_id = ? ORDER BY invoice_id DESC";

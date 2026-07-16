@@ -8,16 +8,18 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.Invoice;
 
 import model.Payment;
 import model.User;
+import service.InvoiceService;
 import service.PaymentService;
 
 @WebServlet(name = "PaymentListController", urlPatterns = {"/payment/list"})
 public class PaymentListController extends HttpServlet {
 
     private final PaymentService paymentService = new PaymentService();
-
+    private final InvoiceService invoiceService = new InvoiceService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -91,6 +93,16 @@ public class PaymentListController extends HttpServlet {
         }
 
         request.setAttribute("list", list);
+        //nguyenkien - edit begin
+        if (list != null) {
+            for (Payment p : list) {
+                Invoice invoice = invoiceService.getInvoiceByContractId(p.getCustomerContractId());
+                if ("READY".equals(invoice.getInvoiceStatus())) {
+                    p.setCanIssue(true);
+                }
+            }
+        }
+        //nguyenkien - edit end
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRecords", totalRecords);

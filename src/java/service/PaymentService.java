@@ -66,6 +66,10 @@ public class PaymentService {
         return paymentDAO.updatePaymentStatus(paymentId, status);
     }
 
+    public Payment getPaymentByContractId(int contractId) {
+        return paymentDAO.getPaymentByContractId(contractId);
+    }
+
     public boolean hasPaymentForContract(int contractId) {
         return paymentDAO.hasPaymentForContract(contractId);
     }

@@ -351,22 +351,6 @@ public class ProductDAO extends DBContext {
         return false;
     }
 
-    public boolean isProductUsed(int productId) {
-        // Kiểm tra xem sản phẩm đã có trong chi tiết Báo giá nào chưa để tránh xóa nhầm
-        String sql = "SELECT COUNT(*) FROM quotation_detail WHERE product_id = ?";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, productId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (Exception e) {
-            System.err.println("Error in isProductUsed: " + e.getMessage());
-        }
-        return false;
-    }
-
     public boolean updateQuantityReserve(int productId, int quantityReserve) {
         String sql = "UPDATE product SET quantity_reserve = ? WHERE product_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

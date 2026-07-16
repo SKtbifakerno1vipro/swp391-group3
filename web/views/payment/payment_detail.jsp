@@ -126,7 +126,21 @@
             </jsp:include>
             <main class="main legacy-page">
                 <h2>Xác nhận giao dịch</h2>
-                
+
+                <c:if test="${not empty sessionScope.successMessage}">
+                    <div style="color: #065f46; background-color: #d1fae5; border: 1px solid #10b981; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; max-width: 600px; margin: 0 auto 20px auto;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
+                        ${sessionScope.successMessage}
+                        <% session.removeAttribute("successMessage"); %>
+                    </div>
+                </c:if>
+                <c:if test="${not empty sessionScope.errorMessage}">
+                    <div style="color: #991b1b; background-color: #fee2e2; border: 1px solid #ef4444; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; max-width: 600px; margin: 0 auto 20px auto;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
+                        ${sessionScope.errorMessage}
+                        <% session.removeAttribute("errorMessage"); %>
+                    </div>
+                </c:if>
                 <div class="receipt-container">
                     <div class="receipt-header">
                         <span class="material-symbols-outlined" style="font-size: 3rem; color: #10b981;">check_circle</span>
@@ -228,6 +242,16 @@
                                     </c:choose>
                                 </button>
                             </form>
+                        </c:if>
+
+                        <c:if test="${payment.paymentStatus == 'COMPLETED' && payment.canIssue == true}">
+                            <div style="margin-top: 15px;">
+                                <a href="javascript:void(0);" onclick="if(confirm('Bạn có chắc chắn muốn phát hành hóa đơn cho thanh toán này?')) { document.getElementById('issueForm-detail').submit(); }" style="color: #059669; text-decoration: none; font-weight: bold; font-size: 1rem; display: inline-block;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">Xuất hóa đơn</a>
+                                <form id="issueForm-detail" action="${pageContext.request.contextPath}/invoice" method="POST" style="display: none;">
+                                    <input type="hidden" name="customerContractId" value="${payment.customerContractId}"/>
+                                    <input type="hidden" name="action" value="notice"/>
+                                </form>
+                            </div>
                         </c:if>
                     </div>
                 </div>

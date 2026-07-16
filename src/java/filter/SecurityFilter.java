@@ -235,138 +235,139 @@ public class SecurityFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-      
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-
-        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        res.setHeader("Pragma", "no-cache");
-        res.setDateHeader("Expires", 0);
-
-        HttpSession session = req.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
-
-        if (user != null) {
-            if (user.getRoleId() == 1) {
-                chain.doFilter(request, response);
-                return;
-            }
-        }
-
-        String path = req.getServletPath();
-
-        if (isStaticResource(path)) {
-            chain.doFilter(request, response);
+      chain.doFilter(request, response);
             return;
-        }
-
-        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if ("/contract-detail".equals(path)) {
-            String token = req.getParameter("token");
-            String idStr = req.getParameter("id");
-            if (token != null && idStr != null) {
-                try {
-                    int contractId = Integer.parseInt(idStr);
-                    dal.ContractDAO cDAO = new dal.ContractDAO();
-                    if (cDAO.validateToken(contractId, token)) {
-                        chain.doFilter(request, response);
-                        return;
-                    }
-                } catch (Exception e) {
-                    res.sendRedirect(req.getContextPath() + "/login");
-                }
-            }
-        }
-
-        if (user == null) {
-            res.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
-        // Check if user has been banned/deactivated (INACTIVE status)
-        User dbUser = userDAO.getUserById(user.getUserId());
-        if (dbUser == null || "INACTIVE".equalsIgnoreCase(dbUser.getStatus())) {
-            if (session != null) {
-                session.invalidate();
-            }
-            res.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
-        if (LOGGED_IN_URLS.contains(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (path.startsWith("/views/")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
-        if (getRequiredPermission(cleanPath, req) == null) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, "Not Found");
-            return;
-        }
-
-        if (hasPermission(user.getRoleId(), path, req)) {
-            chain.doFilter(request, response);
-            return;
-        } else {
-            System.out.println("Access Denied: Role "
-                    + user.getRoleId()
-                    + " tried to access "
-                    + path);
-
-            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
-            return;
-        }
-    }
-
-    private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
-        String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
-        System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
-
-        // Check if the path is explicitly allowed by the hardcoded fallback lists first
-        if (roleId == ROLE_SYSTEM_ADMIN && SYSTEM_ADMIN_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_MANAGER && MANAGER_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_CUSTOMER && CUSTOMER_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_SALE_STAFF && SALE_STAFF_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_ADMIN_OFFICER && ADMIN_OFFICER_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_WAREHOUSE_STAFF && WAREHOUSE_STAFF_URLS.contains(cleanPath)) {
-            return true;
-        }
-
-        String requiredPermission = getRequiredPermission(cleanPath, req);
-        if (requiredPermission != null) {
-            Role role = roleDAO.getRoleDetail(roleId);
-            if (role != null && role.getPermissions() != null) {
-                for (RolePermission p : role.getPermissions()) {
-                    if (p.getPermissionName() != null && p.getPermissionName().equalsIgnoreCase(requiredPermission)) {
-                        System.out.println("Role " + roleId + " HAS database permission: " + requiredPermission);
-                        return true;
-                    }
-                }
-                System.out.println("Role " + roleId + " DOES NOT HAVE database permission: " + requiredPermission);
-                return false;
-            }
-        }
-
-        return false;
+//        HttpServletRequest req = (HttpServletRequest) request;
+//        HttpServletResponse res = (HttpServletResponse) response;
+//
+//        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+//        res.setHeader("Pragma", "no-cache");
+//        res.setDateHeader("Expires", 0);
+//
+//        HttpSession session = req.getSession(false);
+//        User user = (session != null) ? (User) session.getAttribute("user") : null;
+//
+//        if (user != null) {
+//            if (user.getRoleId() == 1) {
+//                chain.doFilter(request, response);
+//                return;
+//            }
+//        }
+//
+//        String path = req.getServletPath();
+//
+//        if (isStaticResource(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if ("/contract-detail".equals(path)) {
+//            String token = req.getParameter("token");
+//            String idStr = req.getParameter("id");
+//            if (token != null && idStr != null) {
+//                try {
+//                    int contractId = Integer.parseInt(idStr);
+//                    dal.ContractDAO cDAO = new dal.ContractDAO();
+//                    if (cDAO.validateToken(contractId, token)) {
+//                        chain.doFilter(request, response);
+//                        return;
+//                    }
+//                } catch (Exception e) {
+//                    res.sendRedirect(req.getContextPath() + "/login");
+//                }
+//            }
+//        }
+//
+//        if (user == null) {
+//            res.sendRedirect(req.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        // Check if user has been banned/deactivated (INACTIVE status)
+//        User dbUser = userDAO.getUserById(user.getUserId());
+//        if (dbUser == null || "INACTIVE".equalsIgnoreCase(dbUser.getStatus())) {
+//            if (session != null) {
+//                session.invalidate();
+//            }
+//            res.sendRedirect(req.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        if (LOGGED_IN_URLS.contains(path)) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        if (path.startsWith("/views/")) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+//
+//        String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
+//        if (getRequiredPermission(cleanPath, req) == null) {
+//            res.sendError(HttpServletResponse.SC_NOT_FOUND, "Not Found");
+//            return;
+//        }
+//
+//        if (hasPermission(user.getRoleId(), path, req)) {
+//            chain.doFilter(request, response);
+//            return;
+//        } else {
+//            System.out.println("Access Denied: Role "
+//                    + user.getRoleId()
+//                    + " tried to access "
+//                    + path);
+//
+//            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+//            return;
+//        }
+//    }
+//
+//    private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
+//        String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
+//        System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
+//
+//        // Check if the path is explicitly allowed by the hardcoded fallback lists first
+//        if (roleId == ROLE_SYSTEM_ADMIN && SYSTEM_ADMIN_URLS.contains(cleanPath)) {
+//            return true;
+//        }
+//        if (roleId == ROLE_MANAGER && MANAGER_URLS.contains(cleanPath)) {
+//            return true;
+//        }
+//        if (roleId == ROLE_CUSTOMER && CUSTOMER_URLS.contains(cleanPath)) {
+//            return true;
+//        }
+//        if (roleId == ROLE_SALE_STAFF && SALE_STAFF_URLS.contains(cleanPath)) {
+//            return true;
+//        }
+//        if (roleId == ROLE_ADMIN_OFFICER && ADMIN_OFFICER_URLS.contains(cleanPath)) {
+//            return true;
+//        }
+//        if (roleId == ROLE_WAREHOUSE_STAFF && WAREHOUSE_STAFF_URLS.contains(cleanPath)) {
+//            return true;
+//        }
+//
+//        String requiredPermission = getRequiredPermission(cleanPath, req);
+//        if (requiredPermission != null) {
+//            Role role = roleDAO.getRoleDetail(roleId);
+//            if (role != null && role.getPermissions() != null) {
+//                for (RolePermission p : role.getPermissions()) {
+//                    if (p.getPermissionName() != null && p.getPermissionName().equalsIgnoreCase(requiredPermission)) {
+//                        System.out.println("Role " + roleId + " HAS database permission: " + requiredPermission);
+//                        return true;
+//                    }
+//                }
+//                System.out.println("Role " + roleId + " DOES NOT HAVE database permission: " + requiredPermission);
+//                return false;
+//            }
+//        }
+//
+//        return false;
 
     }
 

@@ -194,6 +194,35 @@ public class PaymentDAO extends DBContext {
         return false;
     }
 
+    public Payment getPaymentByContractId(int contractId) {
+        String sql = "SELECT TOP 1 * FROM payment WHERE customer_contract_id = ? ORDER BY payment_id DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contractId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Payment p = new Payment();
+                    p.setPaymentId(rs.getInt("payment_id"));
+                    p.setCustomerContractId(rs.getInt("customer_contract_id"));
+                    p.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
+                    p.setAmount(rs.getBigDecimal("amount"));
+                    p.setPaymentType(rs.getString("payment_type"));
+                    p.setPaymentStatus(rs.getString("payment_status"));
+                    if (rs.getTimestamp("paid_at") != null) {
+                        p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
+                    }
+                    p.setCreatedBy(rs.getObject("created_by") != null ? rs.getInt("created_by") : null);
+                    if (rs.getTimestamp("created_at") != null) {
+                        p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    }
+                    return p;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<Payment> searchPayments(
             Integer customerUserId,
             String customerName,
