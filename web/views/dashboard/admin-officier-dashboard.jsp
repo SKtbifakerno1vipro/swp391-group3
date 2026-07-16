@@ -214,7 +214,6 @@
                                         <th>Khách hàng</th>
                                         <th>Số tiền</th>
                                         <th style="width:1%; white-space:nowrap;">Trạng thái</th>
-                                        <th style="width:1%; white-space:nowrap;">Thanh toán</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -242,17 +241,6 @@
                                                         <c:when test="${i.invoiceStatus == 'CANCELLED'}">Đã hủy</c:when>
                                                         <c:when test="${i.invoiceStatus == 'OVERDUE'}">Quá hạn</c:when>
                                                         <c:otherwise>${i.invoiceStatus}</c:otherwise>
-                                                    </c:choose>
-                                                </span>
-                                            </td>
-                                            <td style="white-space:nowrap;">
-                                                <span class="badge" style="
-                                                    background:${i.paymentStatus == 'PAID' ? '#dcefe1' : (i.paymentStatus == 'UNPAID' ? '#fbeaea' : '#f0ece4')}; 
-                                                    color:${i.paymentStatus == 'PAID' ? '#4a7c59' : (i.paymentStatus == 'UNPAID' ? '#b83230' : '#646b66')};">
-                                                    <c:choose>
-                                                        <c:when test="${i.paymentStatus == 'PAID'}">Đã thanh toán</c:when>
-                                                        <c:when test="${i.paymentStatus == 'UNPAID'}">Chưa thanh toán</c:when>
-                                                        <c:otherwise>Chưa thanh toán</c:otherwise>
                                                     </c:choose>
                                                 </span>
                                             </td>

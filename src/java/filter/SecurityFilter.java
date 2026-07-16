@@ -153,7 +153,10 @@ public class SecurityFilter implements Filter {
     private static final List<String> SALE_STAFF_URLS = List.of(
             "/dashboard",
             "/edit-user",
-            "/customer",
+            "/customer/list",
+            "/customer/create",
+            "/customer/detail",
+            "/customer/edit",
             "/customer-order-list",
             "/customer-order",
             "/create-order",
@@ -226,7 +229,7 @@ public class SecurityFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-      
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 

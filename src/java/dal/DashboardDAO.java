@@ -718,12 +718,12 @@ public class DashboardDAO extends DBContext {
     public List<RecentInvoiceDTO> getRecentInvoicesForOfficer(int limit, String startDate, String endDate) {
         List<RecentInvoiceDTO> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT TOP (?) i.invoice_no, i.issue_date, i.total_amount, i.invoice_status, "
-                + "c.contract_number, cu.company_name, o.customer_order_id, p.payment_status "
+                + "c.contract_number, cu.company_name, o.customer_order_id "
                 + "FROM invoice i "
-                + " JOIN customer_contract c ON i.customer_contract_id = c.customer_contract_id "
-                + " JOIN customer cu ON c.customer_id = cu.customer_id "
-                + " JOIN customer_order o ON i.customer_order_id = o.customer_order_id "
-                + " JOIN payment p ON i.invoice_id = p.invoice_id WHERE 1=1 ");
+                + "  JOIN customer_contract c ON i.customer_contract_id = c.customer_contract_id "
+                + "  JOIN customer cu ON c.customer_id = cu.customer_id "
+                + "  JOIN customer_order o ON i.customer_order_id = o.customer_order_id "
+                + "WHERE 1=1 ");
 
         if (startDate != null && !startDate.isEmpty()) {
             sql.append(" AND i.issue_date >= ? ");
@@ -753,7 +753,6 @@ public class DashboardDAO extends DBContext {
                     inv.setContractNumber(rs.getString("contract_number"));
                     inv.setCompanyName(rs.getString("company_name"));
                     inv.setOrderId(rs.getInt("customer_order_id"));
-                    inv.setPaymentStatus(rs.getString("payment_status"));
                     list.add(inv);
                 }
             }
