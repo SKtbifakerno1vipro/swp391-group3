@@ -43,7 +43,7 @@
                 <table border="1" cellpadding="7" cellspacing="0">
                     <tr><th>Mã báo giá</th><td>${quotation.quotationId}</td></tr>
                     <tr><th>Khách hàng</th><td>${quotation.customerName}</td></tr>
-                    <tr><th>Ngày báo giá</th><td>${quotation.quotationDate}</td></tr>
+                    <tr><th>Ngày báo giá</th><td>${quotation.formattedQuotationDate}</td></tr>
                     <tr><th>Trạng thái</th><td>
                         <c:choose>
                              <c:when test="${quotation.quotationStatus == 'DRAFT'}">Nháp</c:when>
@@ -55,7 +55,7 @@
                     </td></tr>
                     <tr><th>Tổng giá</th><td><strong><fmt:formatNumber value="${quotation.totalPrice != null ? quotation.totalPrice : 0}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></strong></td></tr>
                     <tr><th>Người tạo</th><td>${quotation.createdByName}</td></tr>
-                    <tr><th>Ngày tạo</th><td>${quotation.createdAt}</td></tr>
+                    <tr><th>Ngày tạo</th><td>${quotation.formattedCreatedAt}</td></tr>
                 </table>
 
                 <br>
@@ -227,7 +227,7 @@
 
                         <c:forEach items="${histories}" var="history">
                             <tr>
-                                <td>${history.createdAt}</td>
+                                <td>${history.formattedCreatedAt}</td>
                                 <td><c:out value="${history.createdByName != null ? history.createdByName : 'Hệ thống'}"/></td>
                                 <td>${history.editHistory}</td>
                             </tr>

@@ -1,17 +1,20 @@
 package model;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class QuotationHistory {
+
     private int quotationHistoryId;
     private int quotationId;
     private Integer createdBy; // Integer cho phep null, int thi khong.
     private String createdByName; // Store user name
     private LocalDateTime createdAt;
     private String editHistory;
-    
-    public QuotationHistory(){   
+
+    public QuotationHistory() {
     }
-    
+
     public QuotationHistory(int quotationHistoryId, int quotationId, Integer createdBy, String createdByName, LocalDateTime createdAt, String editHistory) {
         this.quotationHistoryId = quotationHistoryId;
         this.quotationId = quotationId;
@@ -53,6 +56,14 @@ public class QuotationHistory {
         this.createdAt = createdAt;
     }
 
+    public String getFormattedCreatedAt() {
+        if (this.createdAt != null) {
+            DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.createdAt.format(formatter);
+        }
+        return "";
+    }
+
     public String getEditHistory() {
         return editHistory;
     }
@@ -60,7 +71,7 @@ public class QuotationHistory {
     public void setEditHistory(String editHistory) {
         this.editHistory = editHistory;
     }
-    
+
     public String getCreatedByName() {
         return createdByName;
     }
@@ -69,4 +80,3 @@ public class QuotationHistory {
         this.createdByName = createdByName;
     }
 }
-

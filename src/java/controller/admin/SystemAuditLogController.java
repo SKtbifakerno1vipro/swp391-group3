@@ -52,7 +52,7 @@ public class SystemAuditLogController extends HttpServlet {
 
         if (actionType != null) actionType = actionType.trim();
         if (affectedObject != null) affectedObject = affectedObject.trim();
-        if (searchUser != null) searchUser = searchUser.trim();
+        if (searchUser != null) searchUser = searchUser.trim().replaceAll("\\s+", " ");
         if (startDate != null) startDate = startDate.trim();
         if (endDate != null) endDate = endDate.trim();
 

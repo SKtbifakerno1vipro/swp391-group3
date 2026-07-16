@@ -362,6 +362,7 @@ public class SecurityFilter implements Filter {
         }
 
         return false;
+
     }
 
     private String getRequiredPermission(String path, HttpServletRequest req) {
