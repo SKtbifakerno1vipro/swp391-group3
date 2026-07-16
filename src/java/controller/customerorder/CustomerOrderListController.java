@@ -54,7 +54,7 @@ public class CustomerOrderListController extends HttpServlet {
         }
 
         if ("search".equals(action) && keyword != null && !keyword.trim().isEmpty()) {
-            keyword = keyword.trim();           
+            keyword = keyword.trim().replaceAll("\\s+"," ");
             listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize, sortBy, sortOrder, userId, roleName);
             totalRecords = customerOrderService.getTotalSearchCount(keyword, userId, roleName);
         } else {
