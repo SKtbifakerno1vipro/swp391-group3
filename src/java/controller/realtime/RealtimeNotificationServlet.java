@@ -32,6 +32,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
     private final InvoiceService iService = new InvoiceService();
     private final CustomerOrderDAO customerOrderDAO = new CustomerOrderDAO();
     private final ProductReviewService reviewService = new ProductReviewService();
+    private final dal.QuotationDAO quotationDAO = new dal.QuotationDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -58,6 +59,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
 
 
         int lastContractHistoryId = contractDAO.getMaxContractHistoryId();
+        int lastQuotationHistoryId = quotationDAO.getMaxQuotationHistoryId();
         System.out.println("[Realtime Servlet] Client connected: " + user.getUserName() + " (Role: " + user.getRoleId() + ")");
 
         while (!writer.checkError()) {
@@ -241,6 +243,65 @@ public class RealtimeNotificationServlet extends HttpServlet {
                         lastContractHistoryId = h.getHistoryId();
                     }
 
+                }
+            }
+
+            // Quotation Notifications
+            List<model.QuotationHistory> newQHistories = quotationDAO.getQuotationHistoriesSinceId(lastQuotationHistoryId);
+            for (model.QuotationHistory qh : newQHistories) {
+                if (qh.getCreatedAt() != null) {
+                    boolean shouldNotify = false;
+                    String title = "";
+                    String msg = "";
+                    String type = "info";
+                    String link = request.getContextPath() + "/quotation-detail?id=" + qh.getQuotationId();
+                    String btnText = "Xem chi tiết";
+
+                    String editHistory = qh.getEditHistory();
+                    if (editHistory != null && editHistory.contains("Cap nhat trang thai thanh: ")) {
+                        String newStatus = editHistory.replace("Cap nhat trang thai thanh: ", "").trim();
+
+                        model.Quotation quo = quotationDAO.getQuotationById(qh.getQuotationId());
+                        int customerUserId = -1;
+                        if (quo != null) {
+                            service.CustomerService custSvc = new service.CustomerService();
+                            dto.CustomerDTO cDTO = custSvc.getCustomerDTOByCusId(quo.getCustomerId());
+                            if (cDTO != null && cDTO.getUser() != null) {
+                                customerUserId = cDTO.getUser().getUserId();
+                            }
+                        }
+
+                        if ("ACCEPTED".equals(newStatus)) {
+                            if (roleId == 5) {
+                                shouldNotify = true;
+                                type = "success";
+                                title = "Báo giá được duyệt";
+                                msg = "Báo giá #" + qh.getQuotationId() + " đã được Sale duyệt. Hãy tạo Hợp đồng nháp.";
+                            } else if (roleId == 3 && user.getUserId() == customerUserId) {
+                                shouldNotify = true;
+                                type = "success";
+                                title = "Báo giá đã chốt";
+                                msg = "Báo giá #" + qh.getQuotationId() + " của bạn đã chốt thành công. Hợp đồng sẽ sớm được gửi đến.";
+                            }
+                        }
+                    }
+
+                    if (shouldNotify) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("{\"type\":\"").append(escapeJson(type)).append("\"");
+                        sb.append(",\"title\":\"").append(escapeJson(title)).append("\"");
+                        sb.append(",\"message\":\"").append(escapeJson(msg)).append("\"");
+                        sb.append(",\"link\":\"").append(escapeJson(link)).append("\"");
+                        sb.append(",\"btnText\":\"").append(escapeJson(btnText)).append("\"");
+                        sb.append("}");
+
+                        writer.write("event: notification\n");
+                        writer.write("data: " + sb.toString() + "\n\n");
+                    }
+
+                    if (qh.getQuotationHistoryId() > lastQuotationHistoryId) {
+                        lastQuotationHistoryId = qh.getQuotationHistoryId();
+                    }
                 }
             }
 

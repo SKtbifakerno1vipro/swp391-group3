@@ -20,9 +20,6 @@
             <main class="main legacy-page">
                 <h2>Quản lý Hợp đồng</h2>
                 <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5}">
-                    <div style="margin-bottom: 15px;">
-                        <a href="${pageContext.request.contextPath}/contract-save" class="button primary" style="padding: 8px 16px; background-color: var(--primary); color: white; text-decoration: none; border-radius: 4px; display: inline-block;">Thêm Hợp đồng</a>
-                    </div>
                 </c:if>
                 <form action="contract-list" method="GET">
                     <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Mã hợp đồng">

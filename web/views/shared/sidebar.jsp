@@ -218,7 +218,7 @@
                                     href="${pageContext.request.contextPath}/revenue-report" title="Báo cáo doanh thu">
                                     <div class="sidebar-icon-wrap"><span
                                             class="material-symbols-outlined">analytics</span></div>
-                                    <span class="sidebar-text">Báo cáo doanh thu</span>
+                                    <span class="sidebar-text">Báo cáo </span>
                                 </a>
                             </c:if>
                             <c:if test="${sessionScope.user.roleId == 1}">

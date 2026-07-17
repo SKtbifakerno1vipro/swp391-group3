@@ -47,7 +47,7 @@ public class LoginController extends HttpServlet {
 
         // 1. Validate Input
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Username and password cannot be empty.");
+            request.setAttribute("error", "Username và  password không được để trống.");
             request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
             return;
         }
@@ -59,7 +59,7 @@ public class LoginController extends HttpServlet {
         }
 
         if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
-            request.setAttribute("error", "Too many failed attempts. Please try again later or contact support.");
+            request.setAttribute("error", "Quá nhiều lần thử thất bại. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ.");
             request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
             return;
         }
@@ -68,7 +68,7 @@ public class LoginController extends HttpServlet {
         User user = userService.findUserByUsername(username);
         if (user != null) {
             if ("INACTIVE".equals(user.getStatus())) {
-                request.setAttribute("error", "Your account has been locked by the administrator.");
+                request.setAttribute("error", "Tài khoản của bạn đã bị admin khoá!");
                 request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
                 return;
             }
@@ -97,7 +97,7 @@ public class LoginController extends HttpServlet {
             failedAttempts++;
             session.setAttribute("failedAttempts", failedAttempts);
             int attemptsLeft = MAX_FAILED_ATTEMPTS - failedAttempts;
-            request.setAttribute("error", "Invalid username or password. Attempts left: " + attemptsLeft);
+            request.setAttribute("error", "Tên người dùng hoặc mật khẩu không hợp lệ. Số lần thử còn lại: " + attemptsLeft);
             request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
         }
     }

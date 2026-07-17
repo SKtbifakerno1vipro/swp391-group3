@@ -14,13 +14,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Properties;
 import model.User;
-
+import service.AuditLogService;
 @WebServlet(name="AcceptanceRecordController", urlPatterns={"/AcceptanceRecordController"})
 public class AcceptanceRecordController extends HttpServlet {
 
     private CustomerOrderService customerOrderService = new CustomerOrderService();
+    private AuditLogService AuditLogService = new AuditLogService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -84,7 +86,7 @@ public class AcceptanceRecordController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
                 return;
             }
-            java.time.LocalDate now = java.time.LocalDate.now();
+            LocalDate now = LocalDate.now();
             request.setAttribute("day", String.format("%02d", now.getDayOfMonth()));
             request.setAttribute("month", String.format("%02d", now.getMonthValue()));
             request.setAttribute("year", now.getYear());
@@ -134,7 +136,7 @@ public class AcceptanceRecordController extends HttpServlet {
 
             boolean updated = customerOrderService.updateOrderStatus(orderId, "COMPLETED");
             if (updated) {
-                service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "Order", "Khách hàng " + currentUser.getFullName() + " xác nhận nhận hàng thành công đơn hàng ID: " + orderId);
+                AuditLogService.log(currentUser.getUserId(), "UPDATE", "Order", "Khách hàng " + currentUser.getFullName() + " xác nhận nhận hàng thành công đơn hàng ID: " + orderId);
                 session.setAttribute("successMessage", "Xác nhận giao hàng thành công.");
             } else {
                 session.setAttribute("errorMessage", "Không thể cập nhật trạng thái đơn hàng.");

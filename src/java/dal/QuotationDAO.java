@@ -14,60 +14,67 @@ import model.QuotationDetail;
 
 public class QuotationDAO extends DBContext {
 
-    public List<Quotation> getAllQuotations(Integer saleId) {
-        List<Quotation> list = new ArrayList<>();
-        String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
-                + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
-                + "customer.company_name, [user].user_name, "
-                + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract, "
-                + "customer_contract.customer_contract_id AS contract_id "
+    public int getTotalQuotations(String searchText, String status, String fromDate, String toDate, Integer saleId, Integer userId, Integer roleId) {
+        String sql = "SELECT count(*) "
                 + "FROM quotation "
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
                 + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
                 + "LEFT JOIN customer_contract ON quotation.quotation_id = customer_contract.quotation_id "
                 + "WHERE 1=1 ";
+
+        if (searchText != null && !searchText.trim().isEmpty()) {
+            sql += " AND customer.company_name LIKE ? ";
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            sql += " AND quotation.quotation_status = ? ";
+        }
+        if (fromDate != null && !fromDate.trim().isEmpty()) {
+            sql += " AND quotation.quotation_date >= ? ";
+        }
+        if (toDate != null && !toDate.trim().isEmpty()) {
+            sql += " AND quotation.quotation_date <= ? ";
+        }
         if (saleId != null) {
             sql += " AND customer.assigned_to_user_id = ? ";
         }
-        sql += " ORDER BY quotation.quotation_id ASC";
+        if (userId != null && roleId != null && roleId == 3) {
+            sql += " AND customer.user_id = ? ";
+        }
+
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            if (saleId != null) {
-                ps.setInt(1, saleId);
+            int paramIndex = 1;
+
+            if (searchText != null && !searchText.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + searchText + "%");
             }
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(paramIndex++, status);
+            }
+            if (fromDate != null && !fromDate.trim().isEmpty()) {
+                ps.setString(paramIndex++, fromDate + " 00:00:00");
+            }
+            if (toDate != null && !toDate.trim().isEmpty()) {
+                ps.setString(paramIndex++, toDate + " 23:59:59");
+            }
+            if (saleId != null) {
+                ps.setInt(paramIndex++, saleId);
+            }
+            if (userId != null && roleId != null && roleId == 3) {
+                ps.setInt(paramIndex++, userId);
+            }
+
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Quotation quotation = new Quotation();
-                quotation.setQuotationId(rs.getInt("quotation_id"));
-                quotation.setCustomerId(rs.getInt("customer_id"));
-                if (rs.getTimestamp("quotation_date") != null) {
-                    quotation.setQuotationDate(rs.getTimestamp("quotation_date").toLocalDateTime());
-                }
-                quotation.setQuotationStatus(rs.getString("quotation_status"));
-                quotation.setCreatedBy(rs.getInt("created_by"));
-                if (rs.getTimestamp("created_at") != null) {
-                    quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                }
-                quotation.setCustomerName(rs.getString("company_name"));
-                quotation.setCreatedByName(rs.getString("user_name"));
-                quotation.setHasContract(rs.getBoolean("has_contract"));
-                quotation.setTotalPrice(rs.getBigDecimal("total_price"));
-                
-                int contractId = rs.getInt("contract_id");
-                if (!rs.wasNull()) {
-                    quotation.setContractId(contractId);
-                }
-                
-                list.add(quotation);
+            if (rs.next()) {
+                return rs.getInt(1);
             }
         } catch (Exception e) {
-            System.out.println("getAllQuotations error: " + e.getMessage());
+            System.out.println("getTotalQuotations error: " + e.getMessage());
         }
-        return list;
+        return 0;
     }
 
-
-    public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate, Integer saleId) {
+    public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate, Integer saleId, Integer userId, Integer roleId, int pageIndex, int pageSize) {
 
         List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
@@ -79,14 +86,14 @@ public class QuotationDAO extends DBContext {
                 + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
                 + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
                 + "LEFT JOIN customer_contract ON quotation.quotation_id = customer_contract.quotation_id "
-                + "WHERE 1=1 "; // Co dau cach o cuoi
+                + "WHERE 1=1 "; 
 
         if (searchText != null && !searchText.trim().isEmpty()) {
-            sql += " AND customer.company_name LIKE ? "; // Them dau cach
+            sql += " AND customer.company_name LIKE ? "; 
         }
 
         if (status != null && !status.trim().isEmpty()) {
-            sql += " AND quotation.quotation_status = ? "; // Them dau cach
+            sql += " AND quotation.quotation_status = ? "; 
         }
 
         if (fromDate != null && !fromDate.trim().isEmpty()) {
@@ -100,20 +107,22 @@ public class QuotationDAO extends DBContext {
 
         if (saleId != null) {
             sql += " AND customer.assigned_to_user_id = ? ";
-
+        }
+        if (userId != null && roleId != null && roleId == 3) {
+            sql += " AND customer.user_id = ? ";
         }
 
-        sql += " ORDER BY quotation.quotation_date DESC";
+        sql += " ORDER BY quotation.quotation_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             int paramIndex = 1;
 
             if (searchText != null && !searchText.trim().isEmpty()) {
-                ps.setString(paramIndex++, "%" + searchText + "%"); // Dung ++ de tang vi tri
+                ps.setString(paramIndex++, "%" + searchText + "%"); 
             }
             if (status != null && !status.trim().isEmpty()) {
-                ps.setString(paramIndex++, status); // Dung ++ de tang vi tri
+                ps.setString(paramIndex++, status); 
             }
             if (fromDate != null && !fromDate.trim().isEmpty()) {
                 ps.setString(paramIndex++, fromDate + " 00:00:00");
@@ -124,8 +133,13 @@ public class QuotationDAO extends DBContext {
 
             if (saleId != null) {
                 ps.setInt(paramIndex++, saleId);
-
             }
+            if (userId != null && roleId != null && roleId == 3) {
+                ps.setInt(paramIndex++, userId);
+            }
+            
+            ps.setInt(paramIndex++, (pageIndex - 1) * pageSize);
+            ps.setInt(paramIndex++, pageSize);
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -153,7 +167,7 @@ public class QuotationDAO extends DBContext {
                 list.add(quotation);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("searchQuotations error: " + e.getMessage());
         }
         return list;
     }
@@ -592,5 +606,45 @@ public class QuotationDAO extends DBContext {
             System.out.println("hasDraftQuotation error: " + e.getMessage());
         }
         return false;
+    }
+
+    public int getMaxQuotationHistoryId() {
+        String sql = "SELECT MAX(quotation_history_id) FROM quotation_history";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("getMaxQuotationHistoryId error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public List<QuotationHistory> getQuotationHistoriesSinceId(int lastId) {
+        List<QuotationHistory> list = new ArrayList<>();
+        String sql = "SELECT qh.*, u.user_name FROM quotation_history qh "
+                   + "LEFT JOIN [user] u ON qh.created_by = u.user_id "
+                   + "WHERE qh.quotation_history_id > ? ORDER BY qh.quotation_history_id ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, lastId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    QuotationHistory h = new QuotationHistory();
+                    h.setQuotationHistoryId(rs.getInt("quotation_history_id"));
+                    h.setQuotationId(rs.getInt("quotation_id"));
+                    h.setCreatedBy(rs.getInt("created_by"));
+                    h.setCreatedByName(rs.getString("user_name"));
+                    if (rs.getTimestamp("created_at") != null) {
+                        h.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    }
+                    h.setEditHistory(rs.getString("edit_history"));
+                    list.add(h);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getQuotationHistoriesSinceId error: " + e.getMessage());
+        }
+        return list;
     }
 }
