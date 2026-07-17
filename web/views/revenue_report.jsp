@@ -47,6 +47,8 @@
                 min-width: 0;
                 padding: 26px 34px 38px;
                 flex-grow: 1;
+                max-width: 100% !important;
+                margin: 0 !important;
             }
 
             .topbar {
@@ -64,6 +66,31 @@
                 letter-spacing: .08em;
                 text-transform: uppercase;
                 font-size: 12px;
+            }
+
+            .filter-group {
+                display: flex;
+                gap: 8px;
+                background: var(--surface-soft);
+                padding: 4px;
+                border-radius: 8px;
+            }
+
+            .filter-btn {
+                border: none;
+                background: transparent;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--muted);
+                cursor: pointer;
+                transition: var(--transition);
+            }
+
+            .filter-btn.active {
+                background: var(--danger);
+                color: #fff;
             }
 
             h1 {
@@ -138,11 +165,11 @@
             }
 
             /* Layout Columns */
-            .stats-columns {
+            .bottom-split {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-                gap: 25px;
-                margin-bottom: 30px;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+                gap: 20px;
+                align-items: stretch;
             }
 
             .section-card {
@@ -276,15 +303,75 @@
                 color: var(--line);
             }
 
+            .chart-container {
+                position: relative;
+                height: 250px;
+                width: 100%;
+            }
+
+
+            /* Table Styles */
+            .data-table-wrapper {
+                overflow-x: auto;
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 26px;
+                padding: 20px;
+                box-shadow: var(--shadow);
+            }
+
+            .data-table-wrapper h3 {
+                margin: 0 0 22px 0;
+                font-family: 'Literata', Georgia, serif;
+                font-size: 20px;
+                color: var(--text);
+                position: relative;
+                padding-bottom: 10px;
+                border-bottom: 1px solid var(--surface-soft);
+            }
+
+            .data-table {
+                width: 100%;
+                border-collapse: collapse;
+                text-align: left;
+            }
+
+            .data-table th, .data-table td {
+                padding: 12px 10px;
+                border-bottom: 1px solid var(--surface-soft);
+                color: var(--text);
+                font-size: 13px;
+            }
+
+            .data-table th {
+                color: var(--muted);
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                font-size: 11px;
+                white-space: normal;
+            }
+
+            .data-table tr:hover td {
+                background: var(--surface-soft);
+            }
+            
+            .data-table td.amount {
+                color: var(--primary);
+                font-weight: 800;
+            }
+
+            @media (max-width: 1100px) {
+                .bottom-split {
+                    grid-template-columns: 1fr;
+                }
+            }
             @media (max-width: 820px) {
                 .dashboard-shell {
                     grid-template-columns: 1fr;
                 }
                 .main {
                     padding: 22px 16px;
-                }
-                .stats-columns, .status-breakdowns {
-                    grid-template-columns: 1fr;
                 }
             }
         </style>
@@ -298,19 +385,23 @@
             <main class="main">
                 <section class="topbar">
                     <div>
-                        <p class="eyebrow">Analytics & Reporting</p>
-                        <h1>System Statistics Report</h1>
-                        <p>Visual overview of Products, Orders, Quotations, and Contracts.</p>
+                        <p class="eyebrow">Dashboard / Tài chính</p>
+                        <h1>Tổng quan tài chính</h1>
+                        <p>Tổng quan doanh thu, chi phí và lợi nhuận của tuần/tháng.</p>
+                    </div>
+                    <div class="filter-group">
+                        <button class="filter-btn">Hôm nay</button>
+                        <button class="filter-btn">Tuần này</button>
+                        <button class="filter-btn active">Tháng này</button>
                     </div>
                 </section>
 
-                <!-- Summary Grid KPI Cards -->
                 <section class="summary-grid">
                     <div class="kpi-card" style="--card-color: #3b82f6; --card-soft-color: #dbeafe;">
-                        <div class="kpi-icon"><span class="material-symbols-outlined">inventory_2</span></div>
+                        <div class="kpi-icon"><span class="material-symbols-outlined">payments</span></div>
                         <div class="kpi-info">
-                            <h4><c:out value="${totalProducts}"/></h4>
-                            <p>Total Products</p>
+                            <h4><fmt:formatNumber value="${totalRevenue}" type="number" maxFractionDigits="0"/> đ</h4>
+                            <p>Tổng doanh thu</p>
                         </div>
                     </div>
 
@@ -338,13 +429,10 @@
                         </div>
                     </div>
                 </section>
-
-                <!-- Top Performing Metrics -->
-                <section class="stats-columns">
-
-                    <!-- Top Customers CSS Bar Chart -->
+                <section class="bottom-split">
+                    <!-- Left Column: Chart -->
                     <div class="section-card">
-                        <h3>Top 5 Customers by Orders</h3>
+                        <h3>Hiệu suất khách hàng</h3>
                         <div class="stat-list">
                             <c:choose>
                                 <c:when test="${empty topCustomers}">
@@ -354,148 +442,119 @@
                                     </div>
                                 </c:when>
                                 <c:otherwise>
-                                    <c:set var="maxCustOrders" value="${topCustomers[0].totalOrders}" />
-                                    <c:forEach items="${topCustomers}" var="item">
-                                        <c:set var="custPct" value="${maxCustOrders gt 0 ? (item.totalOrders * 100.0 / maxCustOrders) : 0}" />
-                                        <div class="stat-item">
-                                            <div class="stat-meta">
-                                                <span class="stat-title"><c:out value="${item.companyName}"/></span>
-                                                <span class="stat-value"><c:out value="${item.totalOrders}"/> Orders</span>
-                                            </div>
-                                            <div class="progress-track">
-                                                <div class="progress-fill" style="--bar-width: <fmt:formatNumber value='${custPct}' maxFractionDigits='1'/>%; --grad-start: #ffedd5; --grad-end: #f97316;"></div>
-                                            </div>
-                                        </div>
-                                    </c:forEach>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                    </div>
-
-                    <!-- Top Selling Products CSS Bar Chart -->
-                    <div class="section-card">
-                        <h3>Top 5 Selling Products</h3>
-                        <div class="stat-list">
-                            <c:choose>
-                                <c:when test="${empty topSellingProducts}">
-                                    <div class="empty-state">
-                                        <span class="material-symbols-outlined">inventory_2</span>
-                                        <p>No product sales data available</p>
+                                    <div class="chart-container">
+                                        <canvas id="customersChart"></canvas>
                                     </div>
-                                </c:when>
-                                <c:otherwise>
-                                    <c:set var="maxProdSold" value="${topSellingProducts[0].totalSold}" />
-                                    <c:forEach items="${topSellingProducts}" var="item">
-                                        <c:set var="prodPct" value="${maxProdSold gt 0 ? (item.totalSold * 100.0 / maxProdSold) : 0}" />
-                                        <div class="stat-item">
-                                            <div class="stat-meta">
-                                                <span class="stat-title"><c:out value="${item.productName}"/></span>
-                                                <span class="stat-value"><c:out value="${item.totalSold}"/> Sold</span>
-                                            </div>
-                                            <div class="progress-track">
-                                                <div class="progress-fill" style="--bar-width: <fmt:formatNumber value='${prodPct}' maxFractionDigits='1'/>%; --grad-start: #ccfbf1; --grad-end: #0d9488;"></div>
-                                            </div>
-                                        </div>
-                                    </c:forEach>
                                 </c:otherwise>
                             </c:choose>
                         </div>
                     </div>
 
-                </section>
-
-                <!-- Status Breakdown Lists -->
-                <section class="status-breakdowns">
-
-                    <!-- Orders by Status -->
-                    <div class="section-card">
-                        <h3>Orders by Status</h3>
-                        <div class="stat-list">
-                            <c:choose>
-                                <c:when test="${empty orderStatusCounts}">
-                                    <div class="empty-state">
-                                        <span class="material-symbols-outlined">shopping_cart</span>
-                                        <p>No order status records found</p>
-                                    </div>
-                                </c:when>
-                                <c:otherwise>
-                                    <c:forEach items="${orderStatusCounts}" var="entry">
-                                        <c:set var="orderPct" value="${totalOrders gt 0 ? (entry.total * 100.0 / totalOrders) : 0}" />
-                                        <div class="stat-item">
-                                            <div class="stat-meta">
-                                                <span class="badge-status" style="background-color: var(--primary-soft); color: var(--primary);"><c:out value="${entry.status}"/></span>
-                                                <span class="stat-value"><c:out value="${entry.total}"/></span>
-                                            </div>
-                                            <div class="progress-track">
-                                                <div class="progress-fill" style="--bar-width: <fmt:formatNumber value='${orderPct}' maxFractionDigits='1'/>%; --grad-start: var(--primary-soft); --grad-end: var(--primary);"></div>
-                                            </div>
-                                        </div>
+                    <!-- Right Column: Data Table -->
+                    <div class="data-table-wrapper">
+                    <h3>Recent Revenue (Invoices)</h3>
+                    <c:choose>
+                        <c:when test="${empty recentInvoices}">
+                            <div class="empty-state">
+                                <span class="material-symbols-outlined">receipt_long</span>
+                                <p>No recent invoices found</p>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mã HĐ</th>
+                                        <th>Khách hàng</th>
+                                        <th>Mã Hợp đồng</th>
+                                        <th>Ngày lập</th>
+                                        <th>Trạng thái</th>
+                                        <th style="text-align: right;">Số tiền</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="inv" items="${recentInvoices}">
+                                        <tr>
+                                            <td style="font-weight:700;">${inv.invoiceNo}</td>
+                                            <td>${inv.companyName}</td>
+                                            <td>${inv.contractNumber}</td>
+                                            <td><fmt:formatDate value="${inv.issueDate}" pattern="dd/MM/yyyy"/></td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${inv.invoiceStatus == 'PAID'}">
+                                                        <span class="badge-status" style="background:#dcefe1; color:#4a7c59;">Đã thanh toán</span>
+                                                    </c:when>
+                                                    <c:when test="${inv.invoiceStatus == 'PENDING'}">
+                                                        <span class="badge-status" style="background:#fef3c7; color:#b1812f;">Chờ xử lý</span>
+                                                    </c:when>
+                                                    <c:when test="${inv.invoiceStatus == 'CANCELLED'}">
+                                                        <span class="badge-status" style="background:#fbeaea; color:#b83230;">Đã hủy</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge-status" style="background:var(--surface-strong); color:var(--muted);">${inv.invoiceStatus}</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td class="amount" style="text-align: right;">
+                                                <fmt:formatNumber value="${inv.totalAmount}" type="number" maxFractionDigits="0"/>đ
+                                            </td>
+                                            <td>
+                                                <a href="#" style="color:var(--primary); text-decoration:none; font-weight:700; font-size:12px; background:var(--primary-soft); padding:6px 12px; border-radius:6px;">Chi tiết</a>
+                                            </td>
+                                        </tr>
                                     </c:forEach>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
+                                </tbody>
+                            </table>
+                        </c:otherwise>
+                    </c:choose>
                     </div>
-
-                    <!-- Quotations by Status -->
-                    <div class="section-card">
-                        <h3>Quotations by Status</h3>
-                        <div class="stat-list">
-                            <c:choose>
-                                <c:when test="${empty quotationStatusCounts}">
-                                    <div class="empty-state">
-                                        <span class="material-symbols-outlined">request_quote</span>
-                                        <p>No quotation status records found</p>
-                                    </div>
-                                </c:when>
-                                <c:otherwise>
-                                    <c:forEach items="${quotationStatusCounts}" var="entry">
-                                        <c:set var="quotPct" value="${totalQuotations gt 0 ? (entry.total * 100.0 / totalQuotations) : 0}" />
-                                        <div class="stat-item">
-                                            <div class="stat-meta">
-                                                <span class="badge-status" style="background-color: #fef3c7; color: var(--tertiary);"><c:out value="${entry.status}"/></span>
-                                                <span class="stat-value"><c:out value="${entry.total}"/></span>
-                                            </div>
-                                            <div class="progress-track">
-                                                <div class="progress-fill" style="--bar-width: <fmt:formatNumber value='${quotPct}' maxFractionDigits='1'/>%; --grad-start: #fef3c7; --grad-end: var(--tertiary);"></div>
-                                            </div>
-                                        </div>
-                                    </c:forEach>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                    </div>
-
-                    <!-- Contracts by Status -->
-                    <div class="section-card">
-                        <h3>Contracts by Status</h3>
-                        <div class="stat-list">
-                            <c:choose>
-                                <c:when test="${empty contractStatusCounts}">
-                                    <div class="empty-state">
-                                        <span class="material-symbols-outlined">description</span>
-                                        <p>No contract status records found</p>
-                                    </div>
-                                </c:when>
-                                <c:otherwise>
-                                    <c:forEach items="${contractStatusCounts}" var="entry">
-                                        <c:set var="contractPct" value="${totalContracts gt 0 ? (entry.total * 100.0 / totalContracts) : 0}" />
-                                        <div class="stat-item">
-                                            <div class="stat-meta">
-                                                <span class="badge-status" style="background-color: #f5e8db; color: var(--secondary);"><c:out value="${entry.status}"/></span>
-                                                <span class="stat-value"><c:out value="${entry.total}"/></span>
-                                            </div>
-                                            <div class="progress-track">
-                                                <div class="progress-fill" style="--bar-width: <fmt:formatNumber value='${contractPct}' maxFractionDigits='1'/>%; --grad-start: #f5e8db; --grad-end: var(--secondary);"></div>
-                                            </div>
-                                        </div>
-                                    </c:forEach>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                    </div>
-
                 </section>
             </main>
         </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // Common Chart Defaults
+            Chart.defaults.font.family = "'Nunito Sans', sans-serif";
+            Chart.defaults.color = '#646b66';
+            Chart.defaults.scale.grid.color = '#f0ece4';
+            
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } }
+                }
+            };
+            const barOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            };
+
+            // Top Customers Bar Chart
+            <c:if test="${not empty topCustomers}">
+            new Chart(document.getElementById('customersChart'), {
+                type: 'bar',
+                data: {
+                    labels: [
+                        <c:forEach items="${topCustomers}" var="c">"${c.companyName}",</c:forEach>
+                    ],
+                    datasets: [{
+                        label: 'Orders',
+                        data: [
+                            <c:forEach items="${topCustomers}" var="c">${c.totalOrders},</c:forEach>
+                        ],
+                        backgroundColor: '#b83230',
+                        borderRadius: 6
+                    }]
+                },
+                options: barOptions
+            });
+            </c:if>
+
+        </script>
     </body>
 </html>

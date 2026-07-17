@@ -84,6 +84,7 @@ public class DashboardController extends HttpServlet {
             request.setAttribute("draftContracts", dashboardDAO.countDraftContracts());
             request.setAttribute("contractStatusCounts", dashboardDAO.countContractStatusForOfficer()); // circle
             request.setAttribute("contractsNeedingAction", dashboardDAO.getContractNeedingAction(5, startDate, endDate));
+            request.setAttribute("quotationsNeedingAction", dashboardDAO.getQuotationsAwaitingContract(5, startDate, endDate));
             request.setAttribute("recentInvoices", dashboardDAO.getRecentInvoicesForOfficer(10, startDate, endDate));
             request.setAttribute("invoiceSummary", dashboardDAO.getInvoiceSummaryForOfficer());
             request.getRequestDispatcher("/views/dashboard/admin-officier-dashboard.jsp").forward(request, response);

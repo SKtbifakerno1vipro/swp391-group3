@@ -10,6 +10,7 @@ import model.User;
 import dto.TopProductDTO;
 import dto.TopCustomerDTO;
 import dto.StatusStatisticDTO;
+import dto.RecentInvoiceDTO;
 import java.io.IOException;
 import java.util.Map;
 import service.RevenueService;
@@ -39,6 +40,7 @@ public class RevenueController extends HttpServlet {
         int totalOrders = dao.getTotalOrders(filterUserId);
         int totalQuotations = dao.getTotalQuotations(filterUserId);
         int totalContracts = dao.getTotalContracts(filterUserId);
+        double totalRevenue = dao.getTotalRevenue(filterUserId);
 
         List<StatusStatisticDTO> orderStatusCounts = dao.countByStatus("customer_order", "order_status", filterUserId);
         List<StatusStatisticDTO> quotationStatusCounts = dao.countByStatus("quotation", "quotation_status", filterUserId);
@@ -48,10 +50,14 @@ public class RevenueController extends HttpServlet {
         
         List<TopProductDTO> topSellingProducts = dao.getTopSellingProducts(5, filterUserId);
 
+        // Fetch recent invoices for the table
+        List<dto.RecentInvoiceDTO> recentInvoices = dao.getRecentInvoicesForOfficer(10, null, null);
+
         request.setAttribute("totalProducts", totalProducts);
         request.setAttribute("totalOrders", totalOrders);
         request.setAttribute("totalQuotations", totalQuotations);
         request.setAttribute("totalContracts", totalContracts);
+        request.setAttribute("totalRevenue", totalRevenue);
         
         request.setAttribute("orderStatusCounts", orderStatusCounts);
         request.setAttribute("quotationStatusCounts", quotationStatusCounts);
@@ -59,6 +65,7 @@ public class RevenueController extends HttpServlet {
         
         request.setAttribute("topCustomers", topCustomers);
         request.setAttribute("topSellingProducts", topSellingProducts);
+        request.setAttribute("recentInvoices", recentInvoices);
         
         request.getRequestDispatcher("/views/revenue_report.jsp").forward(request, response);
     }

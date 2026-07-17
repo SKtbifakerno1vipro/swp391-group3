@@ -55,6 +55,17 @@ public class QuotationDetailController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/quotation-list");
                 return;
             }
+
+            HttpSession session = request.getSession(false);
+            User user = (session != null) ? (User) session.getAttribute("user") : null;
+            if (user != null && user.getRoleId() == 3) {
+                service.CustomerService customerService = new service.CustomerService();
+                dto.CustomerDTO customerDTO = customerService.getCustomerDTOByUserId(user.getUserId());
+                if (customerDTO == null || customerDTO.getCustomer().getCustomerId() != quotation.getCustomerId()) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-list?message=unauthorized");
+                    return;
+                }
+            }
             
             request.setAttribute("message", request.getParameter("message"));
             request.setAttribute("quotation", quotation);
@@ -91,10 +102,14 @@ public class QuotationDetailController extends HttpServlet {
             HttpSession session = request.getSession(false);
             User user = (session != null) ? (User) session.getAttribute("user") : null;
             if (user != null && user.getRoleId() == 3) {
-                if (!"accept".equals(action)) {
-                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
-                    return;
-                }
+                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
+                return;
+            }
+
+            Quotation quotation = quotationService.getQuotationById(quotationId);
+            if (quotation == null || (!"DRAFT".equals(quotation.getQuotationStatus()) && !"PENDING".equals(quotation.getQuotationStatus()))) {
+                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
+                return;
             }
 
             if ("accept".equals(action)) {
