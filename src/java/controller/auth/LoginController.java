@@ -91,6 +91,7 @@ public class LoginController extends HttpServlet {
             } else {
                 response.sendRedirect(request.getContextPath() + "/dashboard");
             }
+            return;
         } else {
             // Login Failed: Increment attempts
             failedAttempts++;

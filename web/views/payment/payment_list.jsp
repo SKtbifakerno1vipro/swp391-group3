@@ -322,12 +322,19 @@
                                 <td>${p.formattedPaidAt}</td>
                                 <td>
                                     <a href="${pageContext.request.contextPath}/payment/detail?id=${p.paymentId}" style="color: #0284c7; text-decoration: none; font-weight: bold; margin-right: 10px; display: inline-block; vertical-align: middle;">Xem chi tiết</a>
-                                    <c:if test="${p.paymentStatus == 'COMPLETED' && p.canIssue == true}">
-                                        <a href="javascript:void(0);" onclick="if(confirm('Bạn có chắc chắn muốn phát hành hóa đơn cho thanh toán này?')) { document.getElementById('issueForm-${p.paymentId}').submit(); }" style="color: #059669; text-decoration: none; font-weight: bold; display: inline-block; vertical-align: middle;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">Xuất hóa đơn</a>
-                                        <form id="issueForm-${p.paymentId}" action="${pageContext.request.contextPath}/invoice" method="POST" style="display: none;">
-                                            <input type="hidden" name="customerContractId" value="${p.customerContractId}"/>
-                                            <input type="hidden" name="action" value="notice"/>
-                                        </form>
+                                    <c:if test="${not empty p.invoice}"> 
+                                        <c:choose>
+                                            <c:when test="${p.paymentStatus == 'COMPLETED' && p.canIssue == true}">
+                                                <a href="javascript:void(0);" onclick="if(confirm('Bạn có chắc chắn muốn phát hành hóa đơn cho thanh toán này?')) { document.getElementById('issueForm-${p.paymentId}').submit(); }" style="color: #059669; text-decoration: none; font-weight: bold; display: inline-block; vertical-align: middle;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">Xuất hóa đơn</a>
+                                                <form id="issueForm-${p.paymentId}" action="${pageContext.request.contextPath}/invoice" method="POST" style="display: none;">
+                                                    <input type="hidden" name="customerContractId" value="${p.customerContractId}"/>
+                                                    <input type="hidden" name="action" value="notice"/>
+                                                </form>
+                                            </c:when>
+                                            <c:when test="${p.paymentStatus == 'COMPLETED' && p.invoice.invoiceStatus == 'RELEASED'}">
+                                                <a href="${pageContext.request.contextPath}/invoice?invoiceId=${p.invoice.invoiceId}" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">Xem hóa đơn</a>
+                                            </c:when>
+                                        </c:choose>
                                     </c:if>
                                 </td>
                             </tr>

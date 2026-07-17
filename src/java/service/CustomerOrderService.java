@@ -20,9 +20,9 @@ public class CustomerOrderService {
         return customerOrderDAO.getCustomerOrderDTOById(id);
     }
 
-    public CustomerOrderDTO getOrderByContractId(int contractId) {
-        return customerOrderDAO.getOrderByContractId(contractId);
-    }
+//    public CustomerOrderDTO getOrderByContractId(int contractId) {
+//        return customerOrderDAO.getOrderByContractId(contractId);
+//    }
 
 //    public List<dto.CustomerOrderDTO> getOrderDetails(int orderId) {
 //        return customerOrderDAO.getDetailsByOrderId(orderId);

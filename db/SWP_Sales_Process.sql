@@ -365,7 +365,7 @@ CREATE TABLE product_review (
     reply_content NVARCHAR(1000) NULL,        -- Nội dung phản hồi của nhân viên
     replied_by INT NULL,                      -- FK liên kết bảng user (nhân viên phản hồi)
     replied_at DATETIME NULL,                 -- Thời gian phản hồi
-    status VARCHAR(20) DEFAULT 'ACTIVE'       -- Trạng thái: ACTIVE, HIDDEN, INACTIVE
+    status VARCHAR(20) DEFAULT 'ACTIVE',      -- Trạng thái: ACTIVE, HIDDEN, INACTIVE
 	FOREIGN KEY (product_id) REFERENCES product(product_id),
     FOREIGN KEY (user_id) REFERENCES [user](user_id),
     FOREIGN KEY (replied_by) REFERENCES [user](user_id)

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import model.Invoice;
 
 import model.Payment;
@@ -38,18 +39,18 @@ public class PaymentListController extends HttpServlet {
         String endDate = request.getParameter("endDate");
         
         String minAmountRaw = request.getParameter("minAmount");
-        java.math.BigDecimal minAmount = null;
+        BigDecimal minAmount = null;
         if (minAmountRaw != null && !minAmountRaw.isBlank()) {
             try {
-                minAmount = new java.math.BigDecimal(minAmountRaw.trim());
+                minAmount = new BigDecimal(minAmountRaw.trim());
             } catch (Exception e) {}
         }
 
         String maxAmountRaw = request.getParameter("maxAmount");
-        java.math.BigDecimal maxAmount = null;
+        BigDecimal maxAmount = null;
         if (maxAmountRaw != null && !maxAmountRaw.isBlank()) {
             try {
-                maxAmount = new java.math.BigDecimal(maxAmountRaw.trim());
+                maxAmount = new BigDecimal(maxAmountRaw.trim());
             } catch (Exception e) {}
         }
 
@@ -93,16 +94,15 @@ public class PaymentListController extends HttpServlet {
         }
 
         request.setAttribute("list", list);
-        //nguyenkien - edit begin
         if (list != null) {
             for (Payment p : list) {
                 Invoice invoice = invoiceService.getInvoiceByContractId(p.getCustomerContractId());
-                if ("READY".equals(invoice.getInvoiceStatus())) {
+                p.setInvoice(invoice);
+                if (invoice != null && "READY".equals(invoice.getInvoiceStatus())) {
                     p.setCanIssue(true);
                 }
             }
         }
-        //nguyenkien - edit end
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRecords", totalRecords);

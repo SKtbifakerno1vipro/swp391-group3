@@ -54,8 +54,10 @@ public class PaymentDetailController extends HttpServlet {
             request.setAttribute("payment", payment);
             Invoice invoice = invoiceService.getInvoiceByContractId(payment.getCustomerContractId());
             boolean canIssue = (invoice != null && "READY".equals(invoice.getInvoiceStatus()));
-            payment.setPaymentStatus(idStr);
+            payment.setInvoice(invoice);
+            payment.setCanIssue(canIssue);
             request.setAttribute("canIssue", canIssue);
+            request.setAttribute("invoice", invoice);
             request.getRequestDispatcher("/views/payment/payment_detail.jsp").forward(request, response);
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/payment/list");

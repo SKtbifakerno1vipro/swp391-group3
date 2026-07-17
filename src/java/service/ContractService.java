@@ -148,8 +148,8 @@ public class ContractService {
                 + "    </div>"
                 + "</body>"
                 + "</html>";
-//        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
-        EmailUtils.sendEmailAsync("kiennguyenba2005@gmail.com", subject, content);
+        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
+        EmailUtils.sendEmailAsync("maytinhasus2@gmail.com", subject, content);
     }
 
     public void noticeSendFinalContractPdf(int contractId, String token) {
@@ -187,7 +187,7 @@ public class ContractService {
                 + "</body>"
                 + "</html>";
         EmailUtils.sendEmailAsync("omovie111@gmail.com", subject, content);
-//        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
+        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
     }
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,

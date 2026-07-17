@@ -15,18 +15,18 @@ public class QuotationListController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         String searchText = request.getParameter("search");
         if (searchText != null) {
             searchText = searchText.trim().replaceAll("\\s+", " ");
         }
-               
+
         String status = request.getParameter("status");
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
-        
+
         jakarta.servlet.http.HttpSession session = request.getSession(false);
         model.User user = (session != null) ? (model.User) session.getAttribute("user") : null;
 
@@ -43,7 +43,7 @@ public class QuotationListController extends HttpServlet {
         if (roleName.contains("sale")) {
             saleId = user.getUserId();
         }
-        
+
         QuotationService quotationService = new QuotationService();
         List<Quotation> quotationList;
 
@@ -61,9 +61,11 @@ public class QuotationListController extends HttpServlet {
             quotationList = quotationService.getAllQuotations(saleId);
         }
 
+        quotationList.sort((q1, q2) -> Integer.compare(q1.getQuotationId(), q2.getQuotationId()));
+
         // Pagination
         int page = 1;
-        int pageSize = 2;
+        int pageSize = 19;
         String pageParam = request.getParameter("page");
 
         if (pageParam != null && !pageParam.isBlank()) {
@@ -88,10 +90,10 @@ public class QuotationListController extends HttpServlet {
 
         int fromIndex = Math.min((page - 1) * pageSize, totalQuotations);
         int toIndex = Math.min(fromIndex + pageSize, totalQuotations);
-        List<Quotation> pagedQuotationList = totalQuotations == 0 
-                ? java.util.Collections.emptyList() 
+        List<Quotation> pagedQuotationList = totalQuotations == 0
+                ? java.util.Collections.emptyList()
                 : quotationList.subList(fromIndex, toIndex);
-       
+
         request.setAttribute("searchText", searchText);
         request.setAttribute("status", status);
         request.setAttribute("fromDate", fromDate);
@@ -101,5 +103,5 @@ public class QuotationListController extends HttpServlet {
         request.setAttribute("totalQuotations", totalQuotations);
         request.setAttribute("quotationList", pagedQuotationList);
         request.getRequestDispatcher("/views/quotation/list.jsp").forward(request, response);
-    } 
+    }
 }

@@ -567,8 +567,12 @@
                                 </c:when>
                                 <c:otherwise>
                                     <c:if test="${invoice.invoiceStatus == 'UNRELEASED'}">
+                                        <c:if test="${sessionScope.user.roleId == 2}">
+                                            <button type="submit" name="action" value="ready" class="btn-action success"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Lưu Hóa Đơn</button>
+                                        </c:if>
                                         <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Cập nhật bản nháp</button>
                                     </c:if>
+                                    
                                 </c:otherwise>
                             </c:choose>
                             <a href="${pageContext.request.contextPath}/invoice-list" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">close</span> Đóng</a>

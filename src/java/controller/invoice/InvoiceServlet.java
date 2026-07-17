@@ -235,12 +235,7 @@ public class InvoiceServlet extends HttpServlet {
 
             if (invoiceId > 0) {
                 Invoice existingInvoice = iService.getInvoiceById(invoiceId);
-                if ("notice".equalsIgnoreCase(action)) {
-                    invoice.setInvoiceStatus("RELEASED");
-                    invoice.setIssueDate(LocalDateTime.now());
-                    int year = LocalDateTime.now().getYear();
-                    invoice.setInvoiceNo(iService.getNextInvoiceNo(year));
-                } else if ("ready".equalsIgnoreCase(action)) {
+                if ("ready".equalsIgnoreCase(action)) {
                     invoice.setInvoiceStatus("READY");
                     invoice.setIssueDate(null);
                     invoice.setInvoiceNo(existingInvoice != null ? existingInvoice.getInvoiceNo() : ("DFT-" + orderId + "-" + System.currentTimeMillis()));

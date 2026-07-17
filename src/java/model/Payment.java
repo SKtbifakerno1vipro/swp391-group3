@@ -19,7 +19,16 @@ public class Payment {
     private String contractNumber;
     private String customerName;
     private boolean canIssue;
-    
+    private Invoice invoice;
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
+    }
+
     public Payment() {}
 
     public int getPaymentId() {
