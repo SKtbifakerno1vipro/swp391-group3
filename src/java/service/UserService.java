@@ -19,7 +19,7 @@ public class UserService {
     public void notificationForStaff(User u, String password) {
         String emailSubject = "Thong tin tai khoan Bakery System";
         String emailContent = "Xin chao " + u.getFullName() + ",\n\n"
-                + "Tai khoan cua ban da duoc tao thanh cong.\n"
+                + "Tai khoan cua ban da co the truy cap vao he thong.\n"
                 + "Thong tin dang nhap:\n"
                 + "- Username: " + u.getUserName() + "\n"
                 + "- Password: " + password + "\n\n"

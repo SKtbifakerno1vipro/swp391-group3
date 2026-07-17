@@ -10,6 +10,7 @@ import java.io.IOException;
 import model.User;
 
 import jakarta.servlet.annotation.WebServlet;
+import service.AuditLogService;
 
 @WebServlet(name = "LoginController", urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
@@ -24,7 +25,12 @@ public class LoginController extends HttpServlet {
         HttpSession session = request.getSession(false);
         // If user already logged in, redirect to dashboard
         if (session != null && session.getAttribute("user") != null) {
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+            User user = (User) session.getAttribute("user");
+            if (user.getRoleId() == 6) {
+                response.sendRedirect(request.getContextPath() + "/product-list");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+            }
             return;
         }
 
@@ -41,7 +47,7 @@ public class LoginController extends HttpServlet {
 
         // 1. Validate Input
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Username and password cannot be empty.");
+            request.setAttribute("error", "Username và  password không được để trống.");
             request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
             return;
         }
@@ -53,7 +59,7 @@ public class LoginController extends HttpServlet {
         }
 
         if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
-            request.setAttribute("error", "Too many failed attempts. Please try again later or contact support.");
+            request.setAttribute("error", "Quá nhiều lần thử thất bại. Vui lòng thử lại sau hoặc liên hệ bộ phận hỗ trợ.");
             request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
             return;
         }
@@ -62,7 +68,7 @@ public class LoginController extends HttpServlet {
         User user = userService.findUserByUsername(username);
         if (user != null) {
             if ("INACTIVE".equals(user.getStatus())) {
-                request.setAttribute("error", "Your account has been locked by the administrator.");
+                request.setAttribute("error", "Tài khoản của bạn đã bị admin khoá!");
                 request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
                 return;
             }
@@ -79,15 +85,19 @@ public class LoginController extends HttpServlet {
             // Login Success: Reset attempts and set user session
             session.setAttribute("failedAttempts", 0);
             session.setAttribute("user", authenticatedUser);
-
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+            AuditLogService.log(user.getUserId(), "LOGIN", "Auth", authenticatedUser.getUserName() + " vừa đăng nhập  vào hệ thống");
+            if (authenticatedUser.getRoleId() == 6) {
+                response.sendRedirect(request.getContextPath() + "/product-list");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+            }
+            return;
         } else {
             // Login Failed: Increment attempts
             failedAttempts++;
             session.setAttribute("failedAttempts", failedAttempts);
-
             int attemptsLeft = MAX_FAILED_ATTEMPTS - failedAttempts;
-            request.setAttribute("error", "Invalid username or password. Attempts left: " + attemptsLeft);
+            request.setAttribute("error", "Tên người dùng hoặc mật khẩu không hợp lệ. Số lần thử còn lại: " + attemptsLeft);
             request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
         }
     }

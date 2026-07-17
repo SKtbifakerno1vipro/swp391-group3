@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.*;
 import dto.*;
-import java.math.BigDecimal;
+import java.util.UUID;
 
 public class ContractDAO extends DBContext {
 
@@ -24,7 +24,7 @@ public class ContractDAO extends DBContext {
             ps.setString(5, c.getContractContent());
             ps.setString(6, c.getStorageType());
             ps.setInt(7, c.getCreatedBy());
-            ps.setString(8, c.getToken() != null ? c.getToken() : java.util.UUID.randomUUID().toString());
+            ps.setString(8, c.getToken() != null ? c.getToken() : UUID.randomUUID().toString());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -42,7 +42,7 @@ public class ContractDAO extends DBContext {
     }
 
     public String refreshContractToken(int contractId) {
-        String newToken = java.util.UUID.randomUUID().toString();
+        String newToken = UUID.randomUUID().toString();
         String sql = "UPDATE customer_contract SET token = ?, token_expired_at = DATEADD(minute, 30, GETDATE()) WHERE customer_contract_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, newToken);
@@ -562,11 +562,9 @@ public class ContractDAO extends DBContext {
         return list;
     }
 
-
     public int getMaxContractHistoryId() {
         String sql = "select max(history_id) FROM contract_edit_history";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -683,33 +681,6 @@ public class ContractDAO extends DBContext {
             e.printStackTrace();
         }
         return items;
-    }
-
-    public BigDecimal calculateTotalAmountWithTaxAndDiscount(int quotationId) {
-        String sql = """
-                     SELECT SUM(
-                         (quantity * selling_price) 
-                         * (1 + (ISNULL(tax_percent, 0) / 100.0)) 
-                         * (1 - (ISNULL(discount_percent, 0) / 100.0))
-                     ) as total_amount
-                     FROM quotation_detail 
-                     WHERE quotation_id = ?""";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, quotationId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    BigDecimal totalAmount = rs.getBigDecimal("total_amount");
-                    if (totalAmount == null) {
-                        totalAmount = BigDecimal.ZERO;
-                    }
-                    return totalAmount.compareTo(BigDecimal.ZERO) > 0 ? totalAmount : java.math.BigDecimal.ZERO;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return BigDecimal.ZERO;
     }
 
     public CustomerDTO getCustomerDTOByContractId(int contractId) {

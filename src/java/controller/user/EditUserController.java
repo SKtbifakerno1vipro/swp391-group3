@@ -15,27 +15,34 @@ import java.sql.Date;
 
 @WebServlet(name = "EditUserController", urlPatterns = {"/edit-user"})
 public class EditUserController extends HttpServlet {
-    
+
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null) {
             response.sendRedirect("login");
             return;
         }
-        
+
         String idStr = request.getParameter("id");
         request.setAttribute("roles", roleService.getAllRolesForCreateUser());
-        
+
         if (idStr != null && !idStr.trim().isEmpty()) {
             try {
-                User u = userService.getUserById(Integer.parseInt(idStr));
+                int targetId = Integer.parseInt(idStr);
+                // Security check: Admin (1) and Manager (2) can view other users. Others only view themselves.
+                if (currentUser.getRoleId() != 1 && currentUser.getRoleId() != 2 && targetId != currentUser.getUserId()) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to view this profile.");
+                    return;
+                }
+
+                User u = userService.getUserById(targetId);
                 if (u != null) {
                     if ("1".equals(request.getParameter("success"))) {
                         request.setAttribute("successMsg", "Cập nhật thông tin thành công!");
@@ -45,81 +52,103 @@ public class EditUserController extends HttpServlet {
                     request.setAttribute("userService", userService);
                     request.getRequestDispatcher("/views/user/detail.jsp").forward(request, response);
                 } else {
-                    response.sendRedirect("user-list");
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found.");
                 }
             } catch (Exception e) {
-                response.sendRedirect("user-list");
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid User ID.");
             }
         } else {
-            
+            // Security check: Only Admin (Role 1) can create users
+            if (currentUser.getRoleId() != 1) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to create users.");
+                return;
+            }
+
             request.setAttribute("mode", "create");
             request.getRequestDispatcher("/views/user/create.jsp").forward(request, response);
         }
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null) {
             response.sendRedirect("login");
             return;
         }
-        
+
         String idStr = request.getParameter("id");
         boolean isEdit = (idStr != null && !idStr.isEmpty());
-        
+
+        if (isEdit) {
+            int targetId = Integer.parseInt(idStr);
+            // Security check: Only Admin (Role 1) can edit other users
+            if (currentUser.getRoleId() != 1 && targetId != currentUser.getUserId()) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to edit this profile.");
+                return;
+            }
+        } else {
+            // Security check: Only Admin (Role 1) can create users
+            if (currentUser.getRoleId() != 1) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to create users.");
+                return;
+            }
+        }
+
         String action = request.getParameter("action");
         if ("resetPassword".equals(action) && isEdit) {
             try {
-                userService.changePassword(Integer.parseInt(idStr), null, "123456");
+                User changePassUser = userService.getUserById(Integer.parseInt(idStr));
+                String newPassword = "123456";
+                userService.changePassword(changePassUser.getUserId(), null, newPassword);
                 service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", "Reset password for User ID: " + idStr);
-                request.setAttribute("successMsg", "Đã khôi phục mật khẩu về mặc định: 123456");
-                
-                User resetUser = userService.getUserById(Integer.parseInt(idStr));
-                request.setAttribute("u", resetUser);
+                request.setAttribute("successMsg", "Đã khôi phục mật khẩu về mặc định!");
+                userService.notificationForStaff(changePassUser, newPassword);
+                request.setAttribute("u", changePassUser);
                 request.setAttribute("mode", "edit");
                 request.setAttribute("userService", userService);
                 request.setAttribute("roles", roleService.getAllRolesForCreateUser());
                 request.getRequestDispatcher("/views/user/detail.jsp").forward(request, response);
                 return;
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
-        
+
         User u = new User();
         if (isEdit) {
             u.setUserId(Integer.parseInt(idStr));
         }
-        
+
         String rawUserName = request.getParameter("userName");
         u.setUserName(rawUserName != null ? rawUserName.trim() : "");
-        
+
         String rawEmail = request.getParameter("email");
         u.setEmail(rawEmail != null ? rawEmail.trim() : "");
-        
+
         String rawFullName = request.getParameter("fullName");
         u.setFullName(rawFullName != null ? rawFullName.trim() : "");
-        
+
         String rawPhone = request.getParameter("phone");
         u.setPhone(rawPhone != null ? rawPhone.trim() : "");
-        
+
         u.setStatus(request.getParameter("status"));
         u.setGender(request.getParameter("gender"));
-        
+
         String rawAddress = request.getParameter("address");
         u.setAddress(rawAddress != null ? rawAddress.trim() : "");
-        
+
         String rawDob = request.getParameter("dateBirth");
         if (rawDob != null && !rawDob.trim().isEmpty()) {
             try {
                 u.setDateBirth(Date.valueOf(rawDob.trim()));
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
-        
+
         try {
             u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
         } catch (Exception e) {
@@ -137,7 +166,7 @@ public class EditUserController extends HttpServlet {
         if (error == null) {
             error = Validation.validatePhone(u.getPhone());
         }
-        
+
         if (error == null) {
             if (userService.isEmailDuplicate(u.getEmail(), u.getUserId())) {
                 error = "Email duplicated!";
@@ -149,7 +178,7 @@ public class EditUserController extends HttpServlet {
                 error = "Username duplicated!";
             }
         }
-        
+
         String password = PasswordUtils.generateRandomText();
         if (!isEdit && error == null) {
             if (password == null || password.trim().isEmpty()) {
@@ -158,7 +187,7 @@ public class EditUserController extends HttpServlet {
                 u.setPassword(password);
             }
         }
-        
+
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("u", u);
@@ -167,16 +196,16 @@ public class EditUserController extends HttpServlet {
             request.getRequestDispatcher(targetJSP).forward(request, response);
             return;
         }
-        
+
         if (isEdit) {
             u.setUpdatedBy(currentUser.getUserId());
         } else {
             u.setCreatedBy(currentUser.getUserId());
             u.setUpdatedBy(currentUser.getUserId());
         }
-        
+
         boolean success = isEdit ? userService.updateUser(u) : userService.createUser(u);
-        
+
         if (success) {
             if (isEdit) {
                 service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", "Cập nhật thông tin tài khoản: " + u.getUserName() + " (ID: " + u.getUserId() + ", Tên: " + u.getFullName() + ")");

@@ -124,7 +124,7 @@
             }
 
             .input-small[type="number"] {
-                width: 100px !important;
+                width: 160px !important;
             }
 
             .input-small:focus {
@@ -190,9 +190,11 @@
                 <form action="${pageContext.request.contextPath}/payment/list" method="GET" class="search-form-responsive">
                     <!-- Row 1: Basic search (Contract, Customer Name, Status) -->
                     <div class="search-row">
-                        <span class="search-label">Tìm kiếm thanh toán:</span>
+                        <span class="search-label">Tìm kiếm:</span>
                         
-                        <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng..." class="input-small" />
+                        <c:if test="${sessionScope.user.roleId != 3}">
+                            <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng..." class="input-small" />
+                        </c:if>
                         
                         <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Số hợp đồng..." class="input-small" />
                         

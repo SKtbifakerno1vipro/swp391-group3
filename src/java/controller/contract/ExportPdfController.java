@@ -119,7 +119,7 @@ public class ExportPdfController extends HttpServlet {
         // 5. Trả PDF về trình duyệt
         String safeFileName = contract.getContractNumber().replaceAll("[\\\\/:*?\"<>|]", "-");
         String encodedFileName = URLEncoder.encode("Contract_" + safeFileName + ".pdf", "UTF-8").replaceAll("\\+", "%20");
-        response.setContentType("application/octet-stream");
+        response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName);
         response.setContentLength(baos.size());
 

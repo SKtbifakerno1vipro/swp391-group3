@@ -174,18 +174,10 @@
                                 <option value="CREATE" ${actionType == 'CREATE' ? 'selected' : ''}>CREATE</option>
                                 <option value="UPDATE" ${actionType == 'UPDATE' ? 'selected' : ''}>UPDATE</option>
                                 <option value="DELETE" ${actionType == 'DELETE' ? 'selected' : ''}>DELETE</option>
+                                <option value="LOGOUT" ${actionType == 'LOGOUT' ? 'selected' : ''}>LOGOUT</option>
                             </select>
                         </div>
                         
-                        <div>
-                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Affected Object</span>
-                            <select name="affectedObject">
-                                <option value="">-- All Objects --</option>
-                                <c:forEach var="obj" items="${affectedObjects}">
-                                    <option value="${obj}" ${affectedObject == obj ? 'selected' : ''}>${obj}</option>
-                                </c:forEach>
-                            </select>
-                        </div>
                         
                         <div>
                             <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Start Date</span>

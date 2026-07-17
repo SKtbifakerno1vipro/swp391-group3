@@ -5,9 +5,7 @@ import dal.CustomerDAO;
 import dal.ContractDAO;
 import model.Payment;
 import model.ContractHistory;
-import dal.InvoiceDAO;
 import dal.CustomerOrderDAO;
-import dto.CustomerOrderDTO;
 import model.Invoice;
 import model.User;
 import dto.CustomerDTO;
@@ -21,7 +19,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.List;
+import model.ProductReview;
 import service.InvoiceService;
+import service.ProductReviewService;
 
 @WebServlet(name = "RealtimeNotificationServlet", urlPatterns = {"/realtime/notifications"})
 public class RealtimeNotificationServlet extends HttpServlet {
@@ -31,7 +31,8 @@ public class RealtimeNotificationServlet extends HttpServlet {
     private final ContractDAO contractDAO = new ContractDAO();
     private final InvoiceService iService = new InvoiceService();
     private final CustomerOrderDAO customerOrderDAO = new CustomerOrderDAO();
-    private static final java.util.Map<Integer, String> invoiceStatusCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private final ProductReviewService reviewService = new ProductReviewService();
+    private final dal.QuotationDAO quotationDAO = new dal.QuotationDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -54,9 +55,11 @@ public class RealtimeNotificationServlet extends HttpServlet {
         Timestamp lastCheckedPayment = new Timestamp(startTime);
         Timestamp lastCheckedCustomer = new Timestamp(startTime);
         Timestamp lastCheckedInvoice = new Timestamp(startTime);
+        Timestamp lastCheckedProductReview = new Timestamp(startTime);
+
 
         int lastContractHistoryId = contractDAO.getMaxContractHistoryId();
-
+        int lastQuotationHistoryId = quotationDAO.getMaxQuotationHistoryId();
         System.out.println("[Realtime Servlet] Client connected: " + user.getUserName() + " (Role: " + user.getRoleId() + ")");
 
         while (!writer.checkError()) {
@@ -243,6 +246,65 @@ public class RealtimeNotificationServlet extends HttpServlet {
                 }
             }
 
+            // Quotation Notifications
+            List<model.QuotationHistory> newQHistories = quotationDAO.getQuotationHistoriesSinceId(lastQuotationHistoryId);
+            for (model.QuotationHistory qh : newQHistories) {
+                if (qh.getCreatedAt() != null) {
+                    boolean shouldNotify = false;
+                    String title = "";
+                    String msg = "";
+                    String type = "info";
+                    String link = request.getContextPath() + "/quotation-detail?id=" + qh.getQuotationId();
+                    String btnText = "Xem chi tiết";
+
+                    String editHistory = qh.getEditHistory();
+                    if (editHistory != null && editHistory.contains("Cap nhat trang thai thanh: ")) {
+                        String newStatus = editHistory.replace("Cap nhat trang thai thanh: ", "").trim();
+
+                        model.Quotation quo = quotationDAO.getQuotationById(qh.getQuotationId());
+                        int customerUserId = -1;
+                        if (quo != null) {
+                            service.CustomerService custSvc = new service.CustomerService();
+                            dto.CustomerDTO cDTO = custSvc.getCustomerDTOByCusId(quo.getCustomerId());
+                            if (cDTO != null && cDTO.getUser() != null) {
+                                customerUserId = cDTO.getUser().getUserId();
+                            }
+                        }
+
+                        if ("ACCEPTED".equals(newStatus)) {
+                            if (roleId == 5) {
+                                shouldNotify = true;
+                                type = "success";
+                                title = "Báo giá được duyệt";
+                                msg = "Báo giá #" + qh.getQuotationId() + " đã được Sale duyệt. Hãy tạo Hợp đồng nháp.";
+                            } else if (roleId == 3 && user.getUserId() == customerUserId) {
+                                shouldNotify = true;
+                                type = "success";
+                                title = "Báo giá đã chốt";
+                                msg = "Báo giá #" + qh.getQuotationId() + " của bạn đã chốt thành công. Hợp đồng sẽ sớm được gửi đến.";
+                            }
+                        }
+                    }
+
+                    if (shouldNotify) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("{\"type\":\"").append(escapeJson(type)).append("\"");
+                        sb.append(",\"title\":\"").append(escapeJson(title)).append("\"");
+                        sb.append(",\"message\":\"").append(escapeJson(msg)).append("\"");
+                        sb.append(",\"link\":\"").append(escapeJson(link)).append("\"");
+                        sb.append(",\"btnText\":\"").append(escapeJson(btnText)).append("\"");
+                        sb.append("}");
+
+                        writer.write("event: notification\n");
+                        writer.write("data: " + sb.toString() + "\n\n");
+                    }
+
+                    if (qh.getQuotationHistoryId() > lastQuotationHistoryId) {
+                        lastQuotationHistoryId = qh.getQuotationHistoryId();
+                    }
+                }
+            }
+
             //Invoice Notification - Begin
             List<Invoice> invoiceList = iService.getInvoicesSince(lastCheckedInvoice, (roleId == 3 ? user.getUserId() : null));
             for (Invoice iv : invoiceList) {
@@ -309,6 +371,61 @@ public class RealtimeNotificationServlet extends HttpServlet {
                     Timestamp iTime = Timestamp.valueOf(iv.getIssueDate());
                     if (iTime.after(lastCheckedInvoice)) {
                         lastCheckedInvoice = new Timestamp(iTime.getTime() + 1000);
+                    }
+                }
+            }
+
+            // 5. Product Review Notifications
+            List<ProductReview> newReviews = reviewService.getReviewsSince(lastCheckedProductReview, (roleId == 3 ? user.getUserId() : null));
+            for (ProductReview pr : newReviews) {
+                boolean shouldNotify = false;
+                String type = "info";
+                String title = "";
+                String msg = "";
+                String link = "";
+                String btnText = "Xem ngay";
+
+                // A. Nếu khách hàng mới gửi đánh giá (chưa phản hồi) -> Báo cho nhân viên (Staff/Manager/Admin)
+                if (pr.getRepliedBy() == null) {
+                    if (roleId != 3) { // Nhân viên
+                        shouldNotify = true;
+                        title = "Đánh giá sản phẩm mới";
+                        msg = String.format("Khách hàng %s đã đánh giá %d sao cho sản phẩm %s.", 
+                                           pr.getCompanyName(), pr.getRating(), pr.getProductName());
+                        link = request.getContextPath() + "/product-review";
+                    }
+                } 
+                // B. Nếu nhân viên đã phản hồi đánh giá -> Báo cho chính khách hàng gửi đánh giá đó
+                else {
+                    if (roleId == 3 && user.getUserId() == pr.getUserId()) { // Đúng khách hàng viết đánh giá
+                        shouldNotify = true;
+                        type = "success";
+                        title = "Phản hồi đánh giá";
+                        msg = String.format("Cửa hàng đã phản hồi nhận xét của bạn về sản phẩm %s.", pr.getProductName());
+                        link = request.getContextPath() + "/edit-product?id=" + pr.getProductId() + "&action=detail";
+                    }
+                }
+
+                if (shouldNotify) {
+                    writer.write("event: notification\n");
+                    writer.write("data: {\"type\":\"" + type
+                            + "\",\"title\":\"" + escapeJson(title)
+                            + "\",\"message\":\"" + escapeJson(msg)
+                            + "\",\"link\":\"" + escapeJson(link)
+                            + "\",\"btnText\":\"" + escapeJson(btnText) + "\"}\n\n");
+                }
+
+                // Cập nhật lại mốc thời gian quét
+                if (pr.getCreatedAt() != null) {
+                    Timestamp rTime = new Timestamp(pr.getCreatedAt().getTime());
+                    if (rTime.after(lastCheckedProductReview)) {
+                        lastCheckedProductReview = new Timestamp(rTime.getTime() + 1000);
+                    }
+                }
+                if (pr.getRepliedAt() != null) {
+                    Timestamp repTime = new Timestamp(pr.getRepliedAt().getTime());
+                    if (repTime.after(lastCheckedProductReview)) {
+                        lastCheckedProductReview = new Timestamp(repTime.getTime() + 1000);
                     }
                 }
             }

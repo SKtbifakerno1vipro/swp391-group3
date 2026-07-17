@@ -14,11 +14,12 @@ import model.Quotation;
 import model.QuotationDetail;
 import model.QuotationHistory;
 import model.User;
+import service.ProductService;
 import service.QuotationService;
 
 @WebServlet(name = "QuotationDetailController", urlPatterns = { "/quotation-detail" })
 public class QuotationDetailController extends HttpServlet {
-
+    private final ProductService pService = new ProductService();
     /*
      * doGet chay khi user bam view: /quotation-detail?id=1
      */
@@ -37,6 +38,17 @@ public class QuotationDetailController extends HttpServlet {
             // them.
             Quotation quotation = quotationService.getQuotationById(quotationId);
             List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotationId);
+            
+            if (quotation != null && details != null) {
+                BigDecimal total = BigDecimal.ZERO;
+                for (QuotationDetail d : details) {
+                    if (d.getAmount() != null) {
+                        total = total.add(d.getAmount());
+                    }
+                }
+                quotation.setTotalPrice(total);
+            }
+            
             List<QuotationHistory> histories = quotationService.getHistoryByQuotationId(quotationId);
             List<Product> products = quotationService.getAllProducts();
 
@@ -45,6 +57,20 @@ public class QuotationDetailController extends HttpServlet {
                 return;
             }
 
+<<<<<<< HEAD
+=======
+            HttpSession session = request.getSession(false);
+            User user = (session != null) ? (User) session.getAttribute("user") : null;
+            if (user != null && user.getRoleId() == 3) {
+                service.CustomerService customerService = new service.CustomerService();
+                dto.CustomerDTO customerDTO = customerService.getCustomerDTOByUserId(user.getUserId());
+                if (customerDTO == null || customerDTO.getCustomer().getCustomerId() != quotation.getCustomerId()) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-list?message=unauthorized");
+                    return;
+                }
+            }
+            
+>>>>>>> 82f89d5717e0ab74238e9d04ef7ecf73b298cabb
             request.setAttribute("message", request.getParameter("message"));
             request.setAttribute("quotation", quotation);
             request.setAttribute("details", details);
@@ -73,6 +99,8 @@ public class QuotationDetailController extends HttpServlet {
 
         try {
             quotationId = Integer.parseInt(request.getParameter("quotationId"));
+            String prodIdStr = request.getParameter("productId");
+            int productId = (prodIdStr != null && !prodIdStr.isEmpty()) ? Integer.parseInt(prodIdStr) : 0;
             QuotationService quotationService = new QuotationService();
             Integer userId = getCurrentUserId(request);
 
@@ -80,12 +108,26 @@ public class QuotationDetailController extends HttpServlet {
             User user = (session != null) ? (User) session.getAttribute("user") : null;
 
             if (user != null && user.getRoleId() == 3) {
+<<<<<<< HEAD
                 if (!"accept".equals(action)) {
                     response.sendRedirect(
                             request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
                     return;
                 }
             } else if ("accept".equals(action)) {
+=======
+                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
+                return;
+            }
+
+            Quotation quotation = quotationService.getQuotationById(quotationId);
+            if (quotation == null || (!"DRAFT".equals(quotation.getQuotationStatus()) && !"PENDING".equals(quotation.getQuotationStatus()))) {
+                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
+                return;
+            }
+
+            if ("accept".equals(action)) {
+>>>>>>> 82f89d5717e0ab74238e9d04ef7ecf73b298cabb
                 quotationService.updateStatus(quotationId, "ACCEPTED", userId);
                 response.sendRedirect(
                         request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=accepted");
@@ -104,9 +146,7 @@ public class QuotationDetailController extends HttpServlet {
             }
 
             if ("addProduct".equals(action)) {
-                int productId = Integer.parseInt(request.getParameter("productId"));
-                dal.ProductDAO productDAO = new dal.ProductDAO();
-                Product prod = productDAO.getProductById(productId);
+                Product prod = pService.getProductById(productId);
                 if (prod == null) {
                     response.sendRedirect(
                             request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
@@ -116,21 +156,25 @@ public class QuotationDetailController extends HttpServlet {
                 String qtyParam = request.getParameter("quantity");
                 int requestedQty = (qtyParam != null && !qtyParam.isEmpty()) ? Integer.parseInt(qtyParam) : 1;
 
+<<<<<<< HEAD
                 // kiem tra so luong don hang trong kho
+=======
+>>>>>>> 82f89d5717e0ab74238e9d04ef7ecf73b298cabb
                 int existingQty = 0;
                 QuotationDetail oldDetail = quotationService.getQuotationDetailByProduct(quotationId, productId);
                 if (oldDetail != null) {
                     existingQty = oldDetail.getQuantity();
                 }
-                int totalRequestedQty = existingQty + requestedQty;
-
-                if (totalRequestedQty > prod.getQuantityAvailable()) {
+                int totalRequest = requestedQty + existingQty;
+                int reserveTemp = prod.getQuantityReserve() + requestedQty;
+                int difference = prod.getQuantityAvailable() - reserveTemp;
+                if (difference < 0 ){
+                    int maxAllowed = prod.getQuantityAvailable() - prod.getQuantityReserve();
                     response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
-                            + "&message=stockError&stock=" + prod.getQuantityAvailable()
-                            + "&required=" + totalRequestedQty);
+                            + "&message=stockError");
                     return;
                 }
-
+                
                 QuotationDetail detail = new QuotationDetail();
                 detail.setProductId(productId);
                 detail.setProductName(prod.getProductName());
@@ -151,6 +195,9 @@ public class QuotationDetailController extends HttpServlet {
                 detail.setQuotationId(quotationId);
 
                 boolean success = quotationService.addProductToQuotation(detail, userId);
+                if (success) {
+                    pService.updateQuantityReserve(prod.getProductId(), reserveTemp);
+                }
                 response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
                         + (success ? "&message=addSuccess" : "&message=addFailed"));
                 return;
@@ -159,9 +206,23 @@ public class QuotationDetailController extends HttpServlet {
             if ("deleteProduct".equals(action)) {
                 int quotationDetailId = Integer.parseInt(request.getParameter("quotationDetailId"));
                 String productName = request.getParameter("productName");
+<<<<<<< HEAD
 
                 boolean success = quotationService.deleteProductFromQuotation(quotationId, quotationDetailId,
                         productName, userId);
+=======
+                Product prod = pService.getProductById(productId);
+                if (prod == null) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
+                    return;
+                }
+                QuotationDetail detail = quotationService.getQuotationDetailByProduct(quotationId, prod.getProductId());
+                boolean success = quotationService.deleteProductFromQuotation(quotationId, quotationDetailId, productName, userId);
+                if (success && detail != null) {
+                    int newReserve = prod.getQuantityReserve() - detail.getQuantity();
+                    pService.updateQuantityReserve(productId, newReserve < 0 ? 0 : newReserve);
+                }
+>>>>>>> 82f89d5717e0ab74238e9d04ef7ecf73b298cabb
                 response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
                         + (success ? "&message=deleteSuccess" : "&message=deleteFailed"));
                 return;
@@ -173,17 +234,29 @@ public class QuotationDetailController extends HttpServlet {
                 detail.setQuotationDetailId(quotationDetailId);
                 detail.setQuotationId(quotationId);
 
-                // Check stock
-                dal.ProductDAO productDAO = new dal.ProductDAO();
-                Product prod = productDAO.getProductById(detail.getProductId());
-                if (prod != null && detail.getQuantity() > prod.getQuantityAvailable()) {
+                Product prod = pService.getProductById(detail.getProductId());
+                if (prod == null) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
+                    return;
+                }
+
+                // Check stock delta
+                QuotationDetail oldDetail = quotationService.getQuotationDetailByProduct(quotationId, detail.getProductId());
+                int oldQty = (oldDetail != null) ? oldDetail.getQuantity() : 0;
+                int diff = detail.getQuantity() - oldQty;
+                int reserveTemp = prod.getQuantityReserve() + diff;
+
+                if (reserveTemp > prod.getQuantityAvailable()) {
+                    int maxAllowed = prod.getQuantityAvailable() - (prod.getQuantityReserve() - oldQty);
                     response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
-                            + "&message=stockError&stock=" + prod.getQuantityAvailable()
-                            + "&required=" + detail.getQuantity());
+                            + "&message=stockError");
                     return;
                 }
 
                 boolean success = quotationService.updateQuotationDetail(detail, userId);
+                if (success) {
+                    pService.updateQuantityReserve(detail.getProductId(), reserveTemp);
+                }
                 response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
                         + (success ? "&message=saveSuccess" : "&message=saveFailed"));
                 return;

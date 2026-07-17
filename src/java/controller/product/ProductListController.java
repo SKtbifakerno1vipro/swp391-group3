@@ -21,8 +21,8 @@ import service.ProductService;
  *
  * @author ADMIN
  */
-@WebServlet(name = "ProductList", urlPatterns = {"/product-list"})
-public class ProductList extends HttpServlet {
+@WebServlet(name = "ProductListController", urlPatterns = {"/product-list"})
+public class ProductListController extends HttpServlet {
 
     private ProductService pService = new ProductService();
     private final int PAGE_SIZE = 10;

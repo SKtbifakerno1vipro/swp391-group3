@@ -22,11 +22,13 @@
             <!-- Section 2: Navigation Menu -->
             <div class="sidebar-section nav-section">
                 <nav class="nav-group" aria-label="Main navigation">
-                    <a class="nav-link ${param.activeMenu == 'dashboard' ? 'active' : ''}"
-                        href="${pageContext.request.contextPath}/dashboard" title="Bảng điều khiển">
-                        <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">dashboard</span></div>
-                        <span class="sidebar-text">Bảng điều khiển</span>
-                    </a>
+                    <c:if test="${sessionScope.user.roleId != 6}">
+                        <a class="nav-link ${param.activeMenu == 'dashboard' ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/dashboard" title="Bảng điều khiển">
+                            <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">dashboard</span></div>
+                            <span class="sidebar-text">Bảng điều khiển</span>
+                        </a>
+                    </c:if>
                     <c:choose>
 
                         <c:when test="${sessionScope.user.roleId == 3}">
@@ -107,6 +109,39 @@
                                 <span class="sidebar-text">Thanh toán</span>
                             </a>
                         </c:when>
+                        <c:when test="${sessionScope.user.roleId == 6}">
+                            <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/edit-user?id=${sessionScope.user.userId}"
+                                title="Hồ sơ của tôi">
+                                <div class="sidebar-icon-wrap"><span
+                                        class="material-symbols-outlined">account_circle</span></div>
+                                <span class="sidebar-text">Hồ sơ của tôi</span>
+                            </a>
+                            <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/customer-order-list" title="Đơn hàng">
+                                <div class="sidebar-icon-wrap"><span
+                                        class="material-symbols-outlined">receipt_long</span></div>
+                                <span class="sidebar-text">Đơn hàng</span>
+                            </a>
+                            <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/product-list" title="Sản phẩm">
+                                <div class="sidebar-icon-wrap"><span
+                                        class="material-symbols-outlined">inventory_2</span></div>
+                                <span class="sidebar-text">Sản phẩm</span>
+                            </a>
+                            <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/category/list" title="Danh mục">
+                                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">category</span>
+                                </div>
+                                <span class="sidebar-text">Danh mục</span>
+                            </a>
+                            <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/product-review" title="Đánh giá & Phản hồi">
+                                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span>
+                                </div>
+                                <span class="sidebar-text">Đánh giá</span>
+                            </a>
+                        </c:when>
                         <c:otherwise>
                             <a class="nav-link ${param.activeMenu == 'customers' ? 'active' : ''}"
                                 href="${pageContext.request.contextPath}/customer/list" title="Khách hàng">
@@ -185,7 +220,7 @@
                                     href="${pageContext.request.contextPath}/revenue-report" title="Báo cáo doanh thu">
                                     <div class="sidebar-icon-wrap"><span
                                             class="material-symbols-outlined">analytics</span></div>
-                                    <span class="sidebar-text">Báo cáo doanh thu</span>
+                                    <span class="sidebar-text">Báo cáo </span>
                                 </a>
                             </c:if>
                             <c:if test="${sessionScope.user.roleId == 1}">
@@ -227,6 +262,7 @@
                                         <c:when test="${sessionScope.user.roleId == 3}">Customer</c:when>
                                         <c:when test="${sessionScope.user.roleId == 4}">Sale</c:when>
                                         <c:when test="${sessionScope.user.roleId == 5}">Admin Officer</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 6}">Warehouse</c:when>
                                         <c:otherwise>Role
                                             <c:out value="${sessionScope.user.roleId}" />
                                         </c:otherwise>

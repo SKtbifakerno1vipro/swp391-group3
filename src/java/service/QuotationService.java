@@ -20,14 +20,13 @@ public class QuotationService {
         this.productService = new ProductService();
     }
 
-    public List<Quotation> getAllQuotations(Integer saleId) {
-        return quotationDAO.getAllQuotations(saleId);
+    public int getTotalQuotations(String search, String status, String fromDate, String toDate, Integer saleId, Integer userId, Integer roleId) {
+        return quotationDAO.getTotalQuotations(search, status, fromDate, toDate, saleId, userId, roleId);
     }
 
     public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate,
-            Integer saleId) {
-        return quotationDAO.searchQuotations(search, status, fromDate, toDate, saleId);
-
+            Integer saleId, Integer userId, Integer roleId, int pageIndex, int pageSize) {
+        return quotationDAO.searchQuotations(search, status, fromDate, toDate, saleId, userId, roleId, pageIndex, pageSize);
     }
 
     public List<CustomerDTO> getAllCustomers() {

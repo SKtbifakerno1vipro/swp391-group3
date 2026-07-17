@@ -65,7 +65,9 @@
                     </c:if>
 
                     <div style="margin-bottom: 15px;">
-                        <a href="${pageContext.request.contextPath}/category/create">Thêm danh mục</a> |
+                        <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 4 || sessionScope.user.roleId == 6}">
+                            <a href="${pageContext.request.contextPath}/category/create">Thêm danh mục</a> |
+                        </c:if>
                         <a href="${pageContext.request.contextPath}/product-list">Sản phẩm</a>
                     </div>
 
@@ -74,13 +76,15 @@
                             <tr>
                                 <th>Mã danh mục</th>
                                 <th>Tên danh mục</th>
-                                <th>Hành động</th>
+                                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 4 || sessionScope.user.roleId == 6}">
+                                    <th>Hành động</th>
+                                </c:if>
                             </tr>
                         </thead>
                         <tbody>
                             <c:if test="${empty categoryList}">
                                 <tr>
-                                    <td colspan="3">Không tìm thấy danh mục nào.</td>
+                                    <td colspan="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 4 || sessionScope.user.roleId == 6 ? 3 : 2}">Không tìm thấy danh mục nào.</td>
                                 </tr>
                             </c:if>
 
@@ -88,12 +92,13 @@
                                 <tr>
                                     <td>${category.categoryId}</td>
                                     <td>${category.categoryName}</td>
-                                    <td>
-                                        <a
-                                            href="${pageContext.request.contextPath}/category/edit?categoryId=${category.categoryId}">Sửa</a>
-                                        <a href="${pageContext.request.contextPath}/category/delete?categoryId=${category.categoryId}"
-                                            onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này không?');">Xóa</a>
-                                    </td>
+                                    <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 4 || sessionScope.user.roleId == 6}">
+                                        <td>
+                                            <a href="${pageContext.request.contextPath}/category/edit?categoryId=${category.categoryId}">Sửa</a> |
+                                            <a href="${pageContext.request.contextPath}/category/delete?categoryId=${category.categoryId}"
+                                                onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này không?');">Xóa</a>
+                                        </td>
+                                    </c:if>
                                 </tr>
                             </c:forEach>
                         </tbody>

@@ -3,7 +3,7 @@ package service;
 import dal.ProductReviewDAO;
 import java.util.List;
 import model.ProductReview;
-
+import java.sql.Timestamp;
 public class ProductReviewService {
 
     private final ProductReviewDAO productReviewDAO = new ProductReviewDAO();
@@ -42,5 +42,9 @@ public class ProductReviewService {
 
     public boolean deleteReview(int reviewId, int userId) {
         return productReviewDAO.deleteReview(reviewId, userId);
+    }
+
+    public List<ProductReview> getReviewsSince(Timestamp since, Integer customerUserId) {
+        return productReviewDAO.getReviewsSince(since, customerUserId);
     }
 }
