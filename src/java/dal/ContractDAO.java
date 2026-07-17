@@ -341,6 +341,28 @@ public class ContractDAO extends DBContext {
         return false;
     }
 
+    public boolean checkOwnContractByCustomer(Contract contract, User user) {
+        String sql = """
+                    select count(1) from dbo.customer_contract c
+                    join dbo.customer cust on c.customer_id = cust.customer_id
+                    where c.customer_contract_id =? and cust.user_id= ?
+                     and cust.customer_id >0 
+                    """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contract.getContractId());
+            ps.setInt(2, user.getUserId());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return false;
+    }
+
     public Contract getContractByQuotationId(int quotationId) {
         String sql = """
                      SELECT *, cu.company_name FROM customer_contract  co 
