@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import model.Role;
 
-@WebServlet(name = "RoleListController", urlPatterns = {"/role-list"})
+@WebServlet(name = "RoleListController", urlPatterns = { "/role-list" })
 public class RoleListController extends HttpServlet {
 
     private final RoleService roleService = new RoleService();
@@ -32,11 +32,12 @@ public class RoleListController extends HttpServlet {
         // neu searchtext khong null va ko rong thi thuc hien chuc nang cua search role
         if (searchText != null && !searchText.isBlank()) {
             roles = roleService.searchRoles(searchText);
-        } //neu khong thi van hien thi getAllRoles 
+        }
+        // neu khong thi van hien thi getAllRoles
         else {
             roles = roleService.getAllRoles();
         }
-        //chuc nang chia trang, 1 trang size bao nhieu
+        // chuc nang chia trang, 1 trang size bao nhieu
         int page = 1;
         int pageSize = 5;
         String pageParam = request.getParameter("page");
@@ -48,9 +49,11 @@ public class RoleListController extends HttpServlet {
                 page = 1;
             }
         }
-// thuat toan chia trang 
+        // thuat toan chia trang
         int totalRoles = roles.size();
-        //tinh tong trang
+        // roles là cái đã khai báo để lấy toàn bộ các list roles ra rồi.
+        // .size() là chức năng trong java để đếm số lượng phần tử trong list đó ra.
+        // tinh tong trang
         int totalPages = (int) Math.ceil((double) totalRoles / pageSize);
         if (totalPages == 0) {
             totalPages = 1;
@@ -61,10 +64,15 @@ public class RoleListController extends HttpServlet {
         if (page > totalPages) {
             page = totalPages;
         }
-//tinh vi tri cat 
+        // tinh vi tri cat
         int fromIndex = Math.min((page - 1) * pageSize, totalRoles);
         int toIndex = Math.min(fromIndex + pageSize, totalRoles);
-        List<Role> roleList = totalRoles == 0 ? Collections.emptyList() : roles.subList(fromIndex, toIndex);
+        List<Role> roleList;
+        if (totalRoles == 0) {
+            roleList = Collections.emptyList();
+        } else {
+            roleList = roles.subList(fromIndex, toIndex);
+        }
 
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);

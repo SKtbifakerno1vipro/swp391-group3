@@ -436,6 +436,7 @@ INSERT INTO permission (permission_name) VALUES
 (N'Product List'),
 (N'Product Create'),
 (N'Product Detail'),
+(N'Product Review'),
 (N'Quotation List'),
 (N'Create Quotation'),
 (N'Quotation Detail'),

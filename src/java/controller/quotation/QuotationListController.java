@@ -8,25 +8,26 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Quotation;
+import model.Role;
 import service.QuotationService;
 
-@WebServlet(name = "QuotationListController", urlPatterns = {"/quotation-list"})
+@WebServlet(name = "QuotationListController", urlPatterns = { "/quotation-list" })
 public class QuotationListController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         String searchText = request.getParameter("search");
         if (searchText != null) {
             searchText = searchText.trim().replaceAll("\\s+", " ");
         }
-               
+
         String status = request.getParameter("status");
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
-        
+
         jakarta.servlet.http.HttpSession session = request.getSession(false);
         model.User user = (session != null) ? (model.User) session.getAttribute("user") : null;
 
@@ -36,14 +37,14 @@ public class QuotationListController extends HttpServlet {
         }
 
         service.RoleService roleService = new service.RoleService();
-        model.Role userRole = roleService.getRoleById(user.getRoleId());
+        Role userRole = roleService.getRoleById(user.getRoleId());
         String roleName = userRole != null ? userRole.getRoleName().toLowerCase() : "";
 
         Integer saleId = null;
         if (roleName.contains("sale")) {
             saleId = user.getUserId();
         }
-        
+
         QuotationService quotationService = new QuotationService();
         List<Quotation> quotationList;
 
@@ -88,10 +89,10 @@ public class QuotationListController extends HttpServlet {
 
         int fromIndex = Math.min((page - 1) * pageSize, totalQuotations);
         int toIndex = Math.min(fromIndex + pageSize, totalQuotations);
-        List<Quotation> pagedQuotationList = totalQuotations == 0 
-                ? java.util.Collections.emptyList() 
+        List<Quotation> pagedQuotationList = totalQuotations == 0
+                ? java.util.Collections.emptyList()
                 : quotationList.subList(fromIndex, toIndex);
-       
+
         request.setAttribute("searchText", searchText);
         request.setAttribute("status", status);
         request.setAttribute("fromDate", fromDate);
@@ -101,5 +102,5 @@ public class QuotationListController extends HttpServlet {
         request.setAttribute("totalQuotations", totalQuotations);
         request.setAttribute("quotationList", pagedQuotationList);
         request.getRequestDispatcher("/views/quotation/list.jsp").forward(request, response);
-    } 
+    }
 }

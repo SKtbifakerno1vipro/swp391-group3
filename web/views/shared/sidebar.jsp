@@ -127,8 +127,10 @@
                                 <span class="sidebar-text">Sản phẩm</span>
                             </a>
                             <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}"
-                                href="${pageContext.request.contextPath}/product-review" title="Đánh giá & Phản hồi">
-                                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span>
+                                href="${pageContext.request.contextPath}/product-review"
+                                title="Đánh giá & Phản hồi">
+                                <div class="sidebar-icon-wrap"><span
+                                        class="material-symbols-outlined">reviews</span>
                                 </div>
                                 <span class="sidebar-text">Đánh giá</span>
                             </a>
