@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Category;
+import model.Product;
 import model.User;
 import service.ProductService;
 
@@ -76,28 +77,31 @@ public class ProductListController extends HttpServlet {
         String searchText = request.getParameter("searchText");
         String minPriceRaw = request.getParameter("minPrice");
         String maxPriceRaw = request.getParameter("maxPrice");
-        
+
         Double minPrice = null;
         Double maxPrice = null;
         if (minPriceRaw != null && !minPriceRaw.trim().isEmpty()) {
             try {
                 minPrice = Double.parseDouble(minPriceRaw.trim());
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
         if (maxPriceRaw != null && !maxPriceRaw.trim().isEmpty()) {
             try {
                 maxPrice = Double.parseDouble(maxPriceRaw.trim());
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
-        
+
         String pageSizeRaw = request.getParameter("pageSize");
         int pageSize = 10;
         if (pageSizeRaw != null && !pageSizeRaw.trim().isEmpty()) {
             try {
                 pageSize = Integer.parseInt(pageSizeRaw.trim());
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
-        
+
         String pageRaw = request.getParameter("page");
         String totalPageRaw = request.getParameter("totalPage");
         Category c = new Category();
@@ -128,7 +132,7 @@ public class ProductListController extends HttpServlet {
         request.setAttribute("totalRow", totalRow);
         request.setAttribute("categories", categories);
         request.getRequestDispatcher("/views/product/list.jsp").forward(request, response);
-        
+
     }
 
     /**
@@ -142,9 +146,32 @@ public class ProductListController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-         String id = request.getParameter("id");
-         pService.deleteProduct(Integer.parseInt(id));
-         response.sendRedirect(request.getContextPath() + "/product-list");
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login");
+            return;
+        }
+        if (user.getRoleId() == 3) {
+            session.setAttribute("errorProduct", "Quý khách không thể thực hiện tính năng này.");
+            response.sendRedirect(request.getContextPath() + "/product-list");
+            return;
+        }
+
+        String idRaw = request.getParameter("id");
+        try {
+            int id = Integer.parseInt(idRaw);
+            Product product = pService.getProductById(id);
+            if (product.getQuantityReserve() == 0) {
+                pService.deleteProduct(Integer.parseInt(idRaw));
+            } else {
+                session.setAttribute("errorProduct", "Sản phẩm này không thể xóa.");
+            }
+        } catch (Exception e) {
+            session.setAttribute("errorProduct", "ID sản phẩm lỗi.");
+        }
+
+        response.sendRedirect(request.getContextPath() + "/product-list");
     }
 
     /**

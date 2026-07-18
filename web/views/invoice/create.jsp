@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" import="java.time.LocalDate"%>
+L<%@page contentType="text/html" pageEncoding="UTF-8" import="java.time.LocalDate"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
@@ -566,7 +566,6 @@
                                     <c:if test="${sessionScope.user.roleId != 3}">
                                         <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Lưu nháp</button>
                                     </c:if>
-                                    <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Lưu nháp</button>
                                 </c:when>
                                 <c:otherwise>
                                     <c:if test="${invoice.invoiceStatus == 'UNRELEASED'}">
