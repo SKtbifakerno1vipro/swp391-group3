@@ -107,7 +107,7 @@ public class DetailCustomerController extends HttpServlet {
             List<Quotation> listQuotationsForCus = quotationService.getQuotationsByCustomerId(idCus);
             List<ContractCustomerDTO> listContractsForCus = contractService.searchContracts(
                     null, null, null, null, 1, 1000, cusDTO.getUser().getUserId(), 3,
-                    null, null, null, null, null
+                    null, null, null, null, null, null
             );
             
             request.setAttribute("listOrdersForCus", listOrdersCus);

@@ -9,7 +9,7 @@ import model.Quotation;
 import model.Role;
 
 public class RoleDAO extends DBContext {
-//lay toan bo roles 
+    // lay toan bo roles
     public List<Role> getAllRoles() {
         List<Role> roles = new ArrayList<>();
         try {
@@ -17,14 +17,15 @@ public class RoleDAO extends DBContext {
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                Role role = new Role();
+                Role role = new Role(); // tạo ra 1 đối tượng role mới vì ở trên là list<Role> giúp lặp qua từng dòng
+                                        // trong kết quả trả về
                 role.setRoleId(rs.getInt("role_id"));
                 role.setRoleName(rs.getString("role_name"));
                 role.setCreateAt(rs.getTimestamp("created_at"));
                 role.setUpdateAt(rs.getTimestamp("updated_at"));
                 role.setStatus(rs.getString("status"));
 
-                roles.add(role);
+                roles.add(role); // bo cac doi tuong role nay vao danh sach roles
             }
         } catch (Exception e) {
             System.out.println("getAllRoles eror: ");
@@ -32,7 +33,8 @@ public class RoleDAO extends DBContext {
         }
         return roles;
     }
-//tao roles
+
+    // tao roles
     public int createRole(String roleName) {
         String sql = "INSERT INTO role (role_name) VALUES (?)";
 
@@ -55,8 +57,9 @@ public class RoleDAO extends DBContext {
 
         return -1;
     }
-//lay role theo ID
-    public model.Role getRoleById(int id) {
+
+    // lay role theo ID
+    public Role getRoleById(int id) {
         String sql = "SELECT * FROM role WHERE role_id = ?";
         try {
             java.sql.PreparedStatement st = connection.prepareStatement(sql);
@@ -76,7 +79,8 @@ public class RoleDAO extends DBContext {
         }
         return null;
     }
-//cap nhat role
+
+    // cap nhat role
     public boolean updateRole(model.Role role) {
         String sql = "UPDATE role SET role_name = ?, updated_at = GETDATE() WHERE role_id = ?";
         try {
@@ -90,19 +94,19 @@ public class RoleDAO extends DBContext {
         return false;
     }
 
-//lay role chi tiet
+    // lay role chi tiet
     public model.Role getRoleDetail(int id) {
         model.Role role = null;
-        //join 1: dung đe lay danh sach cac permission đuoc gan cho role.
-        //join 2: dung đe lay ten permission tu bang permission.
-        //dung left join đe ngay ca chua co quyen van lay ra đuoc
+        // join 1: dung đe lay danh sach cac permission đuoc gan cho role.
+        // join 2: dung đe lay ten permission tu bang permission.
+        // dung left join đe ngay ca chua co quyen van lay ra đuoc
         String sql = """
-                     SELECT r.role_id, r.role_name, r.created_at, r.updated_at, r.status, p.permission_id, p.permission_name
-                     FROM role r
-                     LEFT JOIN role_permission rp ON r.role_id = rp.role_id
-                     LEFT JOIN permission p ON rp.permission_id = p.permission_id
-                     WHERE r.role_id = ?
-                     """;
+                SELECT r.role_id, r.role_name, r.created_at, r.updated_at, r.status, p.permission_id, p.permission_name
+                FROM role r
+                LEFT JOIN role_permission rp ON r.role_id = rp.role_id
+                LEFT JOIN permission p ON rp.permission_id = p.permission_id
+                WHERE r.role_id = ?
+                """;
         try {
             java.sql.PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, id);
@@ -132,7 +136,8 @@ public class RoleDAO extends DBContext {
         }
         return role;
     }
-//lay toan bo phan quyen
+
+    // lay toan bo phan quyen
     public java.util.List<model.RolePermission> getAllPermissions() {
         java.util.List<model.RolePermission> list = new java.util.ArrayList<>();
         String sql = "SELECT * FROM permission";
@@ -150,7 +155,8 @@ public class RoleDAO extends DBContext {
         }
         return list;
     }
-//cap nhat quyen
+
+    // cap nhat quyen
     public void updateRolePermissions(
             int roleId,
             List<Integer> permissionIds) {
@@ -159,11 +165,9 @@ public class RoleDAO extends DBContext {
 
             connection.setAutoCommit(false);
 
-            String sqlDelete
-                    = "DELETE FROM role_permission WHERE role_id = ?";
+            String sqlDelete = "DELETE FROM role_permission WHERE role_id = ?";
 
-            PreparedStatement stDel
-                    = connection.prepareStatement(sqlDelete);
+            PreparedStatement stDel = connection.prepareStatement(sqlDelete);
 
             stDel.setInt(1, roleId);
 
@@ -172,13 +176,11 @@ public class RoleDAO extends DBContext {
             if (permissionIds != null
                     && !permissionIds.isEmpty()) {
 
-                String sqlInsert
-                        = "INSERT INTO role_permission "
+                String sqlInsert = "INSERT INTO role_permission "
                         + "(role_id, permission_id) "
                         + "VALUES (?, ?)";
 
-                PreparedStatement stIns
-                        = connection.prepareStatement(sqlInsert);
+                PreparedStatement stIns = connection.prepareStatement(sqlInsert);
 
                 for (Integer pId : permissionIds) {
 
@@ -217,7 +219,8 @@ public class RoleDAO extends DBContext {
             }
         }
     }
-//lay id theo name
+
+    // lay id theo name
     // begin - Xhieu - contact me wwhen remove
     public int getRoleIdByName(String roleName) {
         String sql = "SELECT role_id FROM role WHERE role_name = ?";
@@ -234,8 +237,9 @@ public class RoleDAO extends DBContext {
         }
         return 0;
     }
+
     // end - Xhieu
-//check xem ten role da ton tai truoc do chua
+    // check xem ten role da ton tai truoc do chua
     public boolean isRoleNameExists(String roleName) {
         String sql = "SELECT COUNT(*) FROM role WHERE role_name = ?";
         try {
@@ -251,7 +255,8 @@ public class RoleDAO extends DBContext {
         }
         return false;
     }
-//search role
+
+    // search role
     public List<Role> searchRole(String searchText) {
         List<Role> list = new ArrayList<>();
         String sql = "SELECT role_id, role_name, created_at, updated_at, status FROM role "
@@ -260,7 +265,7 @@ public class RoleDAO extends DBContext {
         if (searchText != null && !searchText.trim().isEmpty()) {
             sql += "AND role_name LIKE ?";
         }
-        //DESC: tang dan, ASC: giam dan
+        // DESC: tang dan, ASC: giam dan
         sql += " ORDER BY role.created_at DESC";
 
         try {
@@ -286,16 +291,17 @@ public class RoleDAO extends DBContext {
         }
         return list;
     }
-//lay role theo trang (phan trang)
+
+    // lay role theo trang (phan trang)
     public List<Role> getrolesByPage(int page, int pageSize) {
         List<Role> list = new ArrayList<>();
 
         String sql = """
-             SELECT role_id, role_name, created_at, updated_at, status 
-             FROM role 
-             ORDER BY role_id 
-             OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
-             """;
+                SELECT role_id, role_name, created_at, updated_at, status
+                FROM role
+                ORDER BY role_id
+                OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+                """;
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -322,7 +328,8 @@ public class RoleDAO extends DBContext {
 
         return list;
     }
-//dem so roles hien co  
+
+    // dem so roles hien co
     public int countRoles() {
         String sql = "SELECT COUNT(*) FROM role";
         try {

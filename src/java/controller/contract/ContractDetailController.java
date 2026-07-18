@@ -81,8 +81,8 @@ public class ContractDetailController extends HttpServlet {
                     int roleId = (user != null) ? user.getRoleId() : 0;
 
                     //check the contract is ownership by that customer ?
-                    if (user.getRoleId() == 3 && !contractService.checkOwnContractByCustomer(contract, user)) {
-                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to view this profile.");
+                    if (roleId == 3 && !contractService.checkOwnContractByCustomer(contract, user)) {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to view this contract.");
                         return;
                     }
 

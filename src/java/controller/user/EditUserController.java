@@ -85,7 +85,7 @@ public class EditUserController extends HttpServlet {
 
         if (isEdit) {
             int targetId = Integer.parseInt(idStr);
-            // Security check: Only Admin (Role 1) can edit other users
+            // Security check: Only Admin (Role 1) can edit other users and each user can edit their profile
             if (currentUser.getRoleId() != 1 && targetId != currentUser.getUserId()) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to edit this profile.");
                 return;
@@ -118,28 +118,31 @@ public class EditUserController extends HttpServlet {
             }
         }
 
-        User u = new User();
+        User u = isEdit ? userService.getUserById(Integer.parseInt(idStr)) : new User();
         if (isEdit) {
             u.setUserId(Integer.parseInt(idStr));
         }
 
         String rawUserName = request.getParameter("userName");
-        u.setUserName(rawUserName != null ? rawUserName.trim() : "");
+        if (rawUserName != null) u.setUserName(rawUserName.trim());
 
         String rawEmail = request.getParameter("email");
-        u.setEmail(rawEmail != null ? rawEmail.trim() : "");
+        if (rawEmail != null) u.setEmail(rawEmail.trim());
 
         String rawFullName = request.getParameter("fullName");
-        u.setFullName(rawFullName != null ? rawFullName.trim() : "");
+        if (rawFullName != null) u.setFullName(rawFullName.trim());
 
         String rawPhone = request.getParameter("phone");
-        u.setPhone(rawPhone != null ? rawPhone.trim() : "");
+        if (rawPhone != null) u.setPhone(rawPhone.trim());
 
-        u.setStatus(request.getParameter("status"));
-        u.setGender(request.getParameter("gender"));
+        String rawStatus = request.getParameter("status");
+        if (rawStatus != null && !rawStatus.trim().isEmpty()) u.setStatus(rawStatus.trim());
+
+        String rawGender = request.getParameter("gender");
+        if (rawGender != null && !rawGender.trim().isEmpty()) u.setGender(rawGender.trim());
 
         String rawAddress = request.getParameter("address");
-        u.setAddress(rawAddress != null ? rawAddress.trim() : "");
+        if (rawAddress != null) u.setAddress(rawAddress.trim());
 
         String rawDob = request.getParameter("dateBirth");
         if (rawDob != null && !rawDob.trim().isEmpty()) {
@@ -149,10 +152,12 @@ public class EditUserController extends HttpServlet {
             }
         }
 
-        try {
-            u.setRoleId(Integer.parseInt(request.getParameter("roleId")));
-        } catch (Exception e) {
-            u.setRoleId(0);
+        String rawRoleId = request.getParameter("roleId");
+        if (rawRoleId != null && !rawRoleId.trim().isEmpty()) {
+            try {
+                u.setRoleId(Integer.parseInt(rawRoleId.trim()));
+            } catch (Exception e) {
+            }
         }
 
         // 3. Validation Logic
@@ -209,6 +214,11 @@ public class EditUserController extends HttpServlet {
         if (success) {
             if (isEdit) {
                 service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", "Cập nhật thông tin tài khoản: " + u.getUserName() + " (ID: " + u.getUserId() + ", Tên: " + u.getFullName() + ")");
+                //validate when change role ID for yourself to other role
+                if (currentUser.getUserId() == u.getUserId()) {
+                    User freshUser = userService.getUserById(u.getUserId());
+                    session.setAttribute("user", freshUser);
+                }
                 response.sendRedirect(request.getContextPath() + "/edit-user?id=" + u.getUserId() + "&success=1");
             } else {
                 service.AuditLogService.log(currentUser.getUserId(), "CREATE", "User", "Tạo tài khoản mới: " + u.getUserName() + " (Email: " + u.getEmail() + ", Tên: " + u.getFullName() + ")");

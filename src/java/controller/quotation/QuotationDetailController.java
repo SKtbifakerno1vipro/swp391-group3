@@ -58,7 +58,13 @@ public class QuotationDetailController extends HttpServlet {
 
             HttpSession session = request.getSession(false);
             User user = (session != null) ? (User) session.getAttribute("user") : null;
-            if (user != null && user.getRoleId() == 3) {
+            if (user == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+
+            // Kiểm tra phân quyền truy cập đối với Khách hàng (roleId == 3)
+            if (user.getRoleId() == 3) {
                 service.CustomerService customerService = new service.CustomerService();
                 dto.CustomerDTO customerDTO = customerService.getCustomerDTOByUserId(user.getUserId());
                 if (customerDTO == null || customerDTO.getCustomer().getCustomerId() != quotation.getCustomerId()) {
@@ -66,7 +72,32 @@ public class QuotationDetailController extends HttpServlet {
                     return;
                 }
             }
-            
+
+            // Mặc định cho phép quản lý (các vai trò như Manager, Admin, Admin Officer)
+            boolean isAllowedToManage = true;
+
+            // Nếu người dùng là nhân viên Sale (roleId == 4)
+            if (user.getRoleId() == 4) {
+                // Kiểm tra xem Sale này có phải người tạo báo giá không
+                boolean isCreator = (quotation.getCreatedBy() != null && quotation.getCreatedBy().equals(user.getUserId()));
+
+                // Kiểm tra xem Sale này có phải người phụ trách khách hàng của báo giá không
+                service.CustomerService customerService = new service.CustomerService();
+                dto.CustomerDTO customer = customerService.getCustomerDTOById(quotation.getCustomerId());
+                boolean isAssigned = (customer != null && customer.getCustomer() != null 
+                        && customer.getCustomer().getAssignedToUserId() != null 
+                        && customer.getCustomer().getAssignedToUserId().equals(user.getUserId()));
+
+                // Nếu không phải người tạo và cũng không được phân công khách hàng thì chặn không cho xem
+                if (!isCreator && !isAssigned) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-list?message=unauthorized");
+                    return;
+                }
+                
+                isAllowedToManage = isCreator || isAssigned;
+            }
+
+            request.setAttribute("isAllowedToManage", isAllowedToManage);
             request.setAttribute("message", request.getParameter("message"));
             request.setAttribute("quotation", quotation);
             request.setAttribute("details", details);
@@ -101,20 +132,55 @@ public class QuotationDetailController extends HttpServlet {
 
             HttpSession session = request.getSession(false);
             User user = (session != null) ? (User) session.getAttribute("user") : null;
-            if (user != null && user.getRoleId() == 3) {
+            if (user == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+
+            // Khách hàng (roleId == 3) không được phép sửa đổi dữ liệu báo giá
+            if (user.getRoleId() == 3) {
                 response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
                 return;
             }
 
             Quotation quotation = quotationService.getQuotationById(quotationId);
-            if (quotation == null || (!"DRAFT".equals(quotation.getQuotationStatus()) && !"PENDING".equals(quotation.getQuotationStatus()))) {
-                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
+            if (quotation == null) {
+                response.sendRedirect(request.getContextPath() + "/quotation-list");
                 return;
             }
 
+            // Kiểm tra phân quyền cho nhân viên Sale (roleId == 4)
+            if (user.getRoleId() == 4) {
+                boolean isCreator = (quotation.getCreatedBy() != null && quotation.getCreatedBy().equals(user.getUserId()));
+                service.CustomerService customerService = new service.CustomerService();
+                dto.CustomerDTO customer = customerService.getCustomerDTOById(quotation.getCustomerId());
+                boolean isAssigned = (customer != null && customer.getCustomer() != null 
+                        && customer.getCustomer().getAssignedToUserId() != null 
+                        && customer.getCustomer().getAssignedToUserId().equals(user.getUserId()));
+
+                if (!isCreator && !isAssigned) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=permissionDenied");
+                    return;
+                }
+            }
+
+            // Chặn sửa đổi nếu trạng thái báo giá KHÔNG PHẢI DRAFT hoặc PENDING
+            if (!"DRAFT".equals(quotation.getQuotationStatus()) && !"PENDING".equals(quotation.getQuotationStatus())) {
+                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidStatus");
+                return;
+            }
+
+            // Hành động Duyệt báo giá (Accept)
             if ("accept".equals(action)) {
                 quotationService.updateStatus(quotationId, "ACCEPTED", userId);
                 response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=accepted");
+                return;
+            }
+
+            // Hành động Từ chối / Hủy báo giá (Reject)
+            if ("reject".equals(action)) {
+                quotationService.updateStatus(quotationId, "REJECTED", userId);
+                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=rejected");
                 return;
             }
 
