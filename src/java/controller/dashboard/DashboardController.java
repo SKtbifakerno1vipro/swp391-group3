@@ -59,11 +59,11 @@ public class DashboardController extends HttpServlet {
 
             List<ContractCustomerDTO> recentContracts = contractService.searchContracts(
                     null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
-                    null, null, null, null, null
+                    null, null, null, null, null, null
             );
             int totalContracts = contractService.getTotalContracts(
                     null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
-                    null, null, null, null, null
+                    null, null, null, null, null, null
             );
             request.setAttribute("totalContracts", totalContracts);
             request.setAttribute("recentContracts", recentContracts);
