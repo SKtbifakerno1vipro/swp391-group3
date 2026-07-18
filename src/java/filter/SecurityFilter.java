@@ -20,17 +20,17 @@ import jakarta.servlet.http.HttpSession;
 
 @WebFilter(filterName = "SecurityFilter", urlPatterns = {"/*"})
 public class SecurityFilter implements Filter {
-    
+
     private final RoleDAO roleDAO = new RoleDAO();
     private final UserDAO userDAO = new UserDAO();
-    
+
     private static final int ROLE_SYSTEM_ADMIN = 1;
     private static final int ROLE_MANAGER = 2;
     private static final int ROLE_CUSTOMER = 3;
     private static final int ROLE_SALE_STAFF = 4;
     private static final int ROLE_ADMIN_OFFICER = 5;
     private static final int ROLE_WAREHOUSE_STAFF = 6;
-    
+
     private static final List<String> PUBLIC_URLS = List.of(
             "/login",
             "/logout",
@@ -41,12 +41,12 @@ public class SecurityFilter implements Filter {
             "/payment/return",
             "/export-pdf"
     );
-    
+
     private static final List<String> LOGGED_IN_URLS = List.of(
             "/user/password/change",
             "/realtime/notifications"
     );
-    
+
     private static final List<String> SYSTEM_ADMIN_URLS = List.of(
             "/dashboard",
             "/admin-dashboard",
@@ -94,7 +94,7 @@ public class SecurityFilter implements Filter {
             "/realtime/notifications",
             "/export-pdf"
     );
-    
+
     private static final List<String> MANAGER_URLS = List.of(
             "/dashboard",
             "/role-list",
@@ -113,6 +113,7 @@ public class SecurityFilter implements Filter {
             "/invoice-list",
             "/invoice",
             "/preview",
+            "/invoice/create",
             "/payment/list",
             "/payment",
             "/payment/detail",
@@ -122,7 +123,7 @@ public class SecurityFilter implements Filter {
             "/realtime/notifications",
             "/export-pdf"
     );
-    
+
     private static final List<String> CUSTOMER_URLS = List.of(
             "/dashboard",
             "/customer/detail",
@@ -149,7 +150,7 @@ public class SecurityFilter implements Filter {
             "/realtime/notifications",
             "/export-pdf"
     );
-    
+
     private static final List<String> SALE_STAFF_URLS = List.of(
             "/dashboard",
             "/edit-user",
@@ -179,16 +180,16 @@ public class SecurityFilter implements Filter {
             "/realtime/notifications",
             "/export-pdf"
     );
-    
+
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
             "/dashboard",
             "/edit-user",
             "/customer/list",
             "/customer/detail",
-            "/customer/edit",
             "/customer-order-list",
             "/customer-order",
             "/create-order",
+            "/product-review",
             "/quotation-list",
             "/quotation-detail",
             "/contract-list",
@@ -202,15 +203,13 @@ public class SecurityFilter implements Filter {
             "/payment/list",
             "/payment",
             "/payment/detail",
-            "/product-review",
             "/Signature",
             "/SignatureAcceptance",
             "/realtime/notifications",
             "/export-pdf"
     );
-    
+
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
-            "/edit-user",
             "/customer-order-list",
             "/customer-order",
             "/category/list",
@@ -222,24 +221,25 @@ public class SecurityFilter implements Filter {
             "/edit-product",
             "/product-delete",
             "/product-review",
+            "/contract-list",
             "/realtime/notifications",
             "/export-pdf"
     );
-    
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-        
+
         res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         res.setHeader("Pragma", "no-cache");
         res.setDateHeader("Expires", 0);
-        
+
         HttpSession session = req.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
-        
+
         if (user != null) {
             if (userDAO.checkBanUser(user)) { //check user banned by admin, if that is true, cannot do anything
                 session.invalidate();
@@ -251,19 +251,19 @@ public class SecurityFilter implements Filter {
                 return;
             }
         }
-        
+
         String path = req.getServletPath();
-        
+
         if (isStaticResource(path)) {
             chain.doFilter(request, response);
             return;
         }
-        
+
         if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
             chain.doFilter(request, response);
             return;
         }
-        
+
         if ("/contract-detail".equals(path)) {
             String token = req.getParameter("token");
             String idStr = req.getParameter("id");
@@ -284,7 +284,7 @@ public class SecurityFilter implements Filter {
                 }
             }
         }
-        
+
         if (user == null) {
             res.sendRedirect(req.getContextPath() + "/login");
             return;
@@ -299,23 +299,23 @@ public class SecurityFilter implements Filter {
             res.sendRedirect(req.getContextPath() + "/login");
             return;
         }
-        
+
         if (LOGGED_IN_URLS.contains(path)) {
             chain.doFilter(request, response);
             return;
         }
-        
+
         if (path.startsWith("/views/")) {
             chain.doFilter(request, response);
             return;
         }
-        
+
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
         if (getRequiredPermission(cleanPath, req) == null) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND, "Not Found");
             return;
         }
-        
+
         if (hasPermission(user.getRoleId(), path, req)) {
             chain.doFilter(request, response);
             return;
@@ -324,12 +324,12 @@ public class SecurityFilter implements Filter {
                     + user.getRoleId()
                     + " tried to access "
                     + path);
-            
+
             res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
             return;
         }
     }
-    
+
     private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
         System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
@@ -353,7 +353,7 @@ public class SecurityFilter implements Filter {
         if (roleId == ROLE_WAREHOUSE_STAFF && WAREHOUSE_STAFF_URLS.contains(cleanPath)) {
             return true;
         }
-        
+
         String requiredPermission = getRequiredPermission(cleanPath, req);
         if (requiredPermission != null) {
             Role role = roleDAO.getRoleDetail(roleId);
@@ -368,11 +368,11 @@ public class SecurityFilter implements Filter {
                 return false;
             }
         }
-        
+
         return false;
-        
+
     }
-    
+
     private String getRequiredPermission(String path, HttpServletRequest req) {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
         switch (cleanPath) {
@@ -473,7 +473,7 @@ public class SecurityFilter implements Filter {
                 return null;
         }
     }
-    
+
     private boolean isStaticResource(String path) {
         return path.startsWith("/assets/")
                 || path.startsWith("/css/")
@@ -491,11 +491,11 @@ public class SecurityFilter implements Filter {
                 || path.endsWith(".woff")
                 || path.endsWith(".woff2");
     }
-    
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }
-    
+
     @Override
     public void destroy() {
     }

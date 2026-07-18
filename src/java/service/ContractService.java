@@ -196,17 +196,16 @@ public class ContractService {
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
-            String fromDate, String toDate, String taxCode, String phone, String email) {
+            String fromDate, String toDate, String taxCode, String phone, String email, String customerType) {
         return contractDAO.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize, userId, roleId,
-                fromDate, toDate, taxCode, phone, email);
+                fromDate, toDate, taxCode, phone, email, customerType);
     }
 
     public int getTotalContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
-            String fromDate, String toDate, String taxCode, String phone, String email) {
-
+            String fromDate, String toDate, String taxCode, String phone, String email, String customerType) {
         return contractDAO.getTotalContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize, userId, roleId,
-                fromDate, toDate, taxCode, phone, email);
+                fromDate, toDate, taxCode, phone, email, customerType);
     }
 
     public Contract getContractById(int id) {
