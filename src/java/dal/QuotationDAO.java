@@ -65,34 +65,8 @@ public class QuotationDAO extends DBContext {
             }
 
             ResultSet rs = ps.executeQuery();
-<<<<<<< HEAD
-            while (rs.next()) {
-                Quotation quotation = new Quotation();
-                quotation.setQuotationId(rs.getInt("quotation_id"));
-                quotation.setCustomerId(rs.getInt("customer_id"));
-                if (rs.getTimestamp("quotation_date") != null) {
-                    quotation.setQuotationDate(rs.getTimestamp("quotation_date").toLocalDateTime());
-                }
-                quotation.setQuotationStatus(rs.getString("quotation_status"));
-                quotation.setCreatedBy(rs.getInt("created_by"));
-                if (rs.getTimestamp("created_at") != null) {
-                    quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                }
-                quotation.setCustomerName(rs.getString("company_name"));
-                quotation.setCreatedByName(rs.getString("user_name"));
-                quotation.setHasContract(rs.getBoolean("has_contract"));
-                quotation.setTotalPrice(rs.getBigDecimal("total_price"));
-
-                int contractId = rs.getInt("contract_id");
-                if (!rs.wasNull()) {
-                    quotation.setContractId(contractId);
-                }
-
-                list.add(quotation);
-=======
             if (rs.next()) {
                 return rs.getInt(1);
->>>>>>> 82f89d5717e0ab74238e9d04ef7ecf73b298cabb
             }
         } catch (Exception e) {
             System.out.println("getTotalQuotations error: " + e.getMessage());
@@ -100,12 +74,7 @@ public class QuotationDAO extends DBContext {
         return 0;
     }
 
-<<<<<<< HEAD
-    public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate,
-            Integer saleId) {
-=======
     public List<Quotation> searchQuotations(String searchText, String status, String fromDate, String toDate, Integer saleId, Integer userId, Integer roleId, int pageIndex, int pageSize) {
->>>>>>> 82f89d5717e0ab74238e9d04ef7ecf73b298cabb
 
         List<Quotation> list = new ArrayList<>();
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
@@ -134,6 +103,7 @@ public class QuotationDAO extends DBContext {
         if (toDate != null && !toDate.trim().isEmpty()) {
             sql += " AND quotation.quotation_date <= ? ";
         }
+
 
         if (saleId != null) {
             sql += " AND customer.assigned_to_user_id = ? ";
@@ -180,7 +150,7 @@ public class QuotationDAO extends DBContext {
                     quotation.setQuotationDate(rs.getTimestamp("quotation_date").toLocalDateTime());
                 }
                 quotation.setQuotationStatus(rs.getString("quotation_status"));
-                quotation.setCreatedBy(rs.getInt("created_by"));
+                quotation.setCreatedBy(rs.getInt("created_by"));      
                 if (rs.getTimestamp("created_at") != null) {
                     quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 }
@@ -188,12 +158,12 @@ public class QuotationDAO extends DBContext {
                 quotation.setCreatedByName(rs.getString("user_name"));
                 quotation.setHasContract(rs.getBoolean("has_contract"));
                 quotation.setTotalPrice(rs.getBigDecimal("total_price"));
-
+                
                 int contractId = rs.getInt("contract_id");
                 if (!rs.wasNull()) {
                     quotation.setContractId(contractId);
                 }
-
+                
                 list.add(quotation);
             }
         } catch (Exception e) {
@@ -202,22 +172,11 @@ public class QuotationDAO extends DBContext {
         return list;
     }
 
-    public void updateStatus(int quotationId, String status) {
-        String sql = "UPDATE quotation SET quotation_status = ?, created_at = GETDATE() WHERE quotation_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, status);
-            ps.setInt(2, quotationId);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public List<QuotationHistory> getHistoryByQuotationId(int quotationId) {
         List<QuotationHistory> histories = new ArrayList<>();
         String sql = "SELECT qh.*, u.user_name FROM quotation_history qh "
-                + "LEFT JOIN [user] u ON qh.created_by = u.user_id "
-                + "WHERE qh.quotation_id = ? ORDER BY qh.created_at DESC";
+                   + "LEFT JOIN [user] u ON qh.created_by = u.user_id "
+                   + "WHERE qh.quotation_id = ? ORDER BY qh.created_at DESC";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, quotationId);
@@ -239,7 +198,7 @@ public class QuotationDAO extends DBContext {
     }
 
     /*
-     * Tao boi Phu. Ham nay tim quotation theo id.
+    Tao boi Phu. Ham nay tim quotation theo id.
      */
     public Quotation getQuotationById(int quotationId) {
         String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
@@ -382,18 +341,18 @@ public class QuotationDAO extends DBContext {
          * Neu chi lay quotation_detail thi chi co product_id, nguoi dung kho hieu.
          */
         String sql = """
-                SELECT qd.quotation_detail_id,
-                       qd.quotation_id,
-                       qd.product_id,
-                       qd.quantity,
-                       qd.discount_percent,
-                       qd.tax_percent,
-                       qd.product_name,
-                       qd.unit,
-                       qd.cost_price,
-                       qd.selling_price
-                FROM quotation_detail qd
-                WHERE qd.quotation_id = ?""";
+                     SELECT qd.quotation_detail_id,
+                            qd.quotation_id, 
+                            qd.product_id, 
+                            qd.quantity, 
+                            qd.discount_percent, 
+                            qd.tax_percent, 
+                            qd.product_name,
+                            qd.unit,
+                            qd.cost_price,
+                            qd.selling_price
+                     FROM quotation_detail qd
+                     WHERE qd.quotation_id = ?""";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -422,8 +381,7 @@ public class QuotationDAO extends DBContext {
                  */
                 BigDecimal quantity = new BigDecimal(detail.getQuantity());
                 BigDecimal subtotal = detail.getSellingPrice().multiply(quantity);
-                BigDecimal discountAmount = subtotal.multiply(detail.getDiscountPercent())
-                        .divide(new BigDecimal("100"));
+                BigDecimal discountAmount = subtotal.multiply(detail.getDiscountPercent()).divide(new BigDecimal("100"));
                 BigDecimal afterDiscount = subtotal.subtract(discountAmount);
                 BigDecimal taxAmount = afterDiscount.multiply(detail.getTaxPercent()).divide(new BigDecimal("100"));
                 BigDecimal amount = afterDiscount.add(taxAmount);
@@ -522,6 +480,17 @@ public class QuotationDAO extends DBContext {
         return false;
     }
 
+    public void updateStatus(int quotationId, String status) {
+        String sql = "UPDATE quotation SET quotation_status = ?, created_at = GETDATE() WHERE quotation_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, quotationId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // XHieu-begin - delete contact me
     public List<Quotation> getQuotationsByCustomerId(int customerId) {
         List<Quotation> list = new ArrayList<>();
@@ -556,12 +525,12 @@ public class QuotationDAO extends DBContext {
                 quotation.setCreatedByName(rs.getString("user_name"));
                 quotation.setHasContract(rs.getBoolean("has_contract"));
                 quotation.setTotalPrice(rs.getBigDecimal("total_price"));
-
+                
                 int contractId = rs.getInt("contract_id");
                 if (!rs.wasNull()) {
                     quotation.setContractId(contractId);
                 }
-
+                
                 list.add(quotation);
             }
         } catch (Exception e) {

@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebFilter(filterName = "SecurityFilter", urlPatterns = { "/*" })
+@WebFilter(filterName = "SecurityFilter", urlPatterns = {"/*"})
 public class SecurityFilter implements Filter {
 
     private final RoleDAO roleDAO = new RoleDAO();
@@ -39,11 +39,13 @@ public class SecurityFilter implements Filter {
             "/user/password/change",
             "/payment/ipn",
             "/payment/return",
-            "/export-pdf");
+            "/export-pdf"
+    );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
             "/user/password/change",
-            "/realtime/notifications");
+            "/realtime/notifications"
+    );
 
     private static final List<String> SYSTEM_ADMIN_URLS = List.of(
             "/dashboard",
@@ -90,8 +92,8 @@ public class SecurityFilter implements Filter {
             "/Signature",
             "/SignatureAcceptance",
             "/realtime/notifications",
-            "/export-pdf",
-            "/product-review");
+            "/export-pdf"
+    );
 
     private static final List<String> MANAGER_URLS = List.of(
             "/dashboard",
@@ -119,8 +121,8 @@ public class SecurityFilter implements Filter {
             "/Signature",
             "/SignatureAcceptance",
             "/realtime/notifications",
-            "/export-pdf",
-            "/product-review");
+            "/export-pdf"
+    );
 
     private static final List<String> CUSTOMER_URLS = List.of(
             "/dashboard",
@@ -147,14 +149,9 @@ public class SecurityFilter implements Filter {
             "/payment/detail",
             "/Signature",
             "/SignatureAcceptance",
-<<<<<<< HEAD
-            "/export-pdf",
-            "/product-review");
-=======
             "/realtime/notifications",
             "/export-pdf"
     );
->>>>>>> 82f89d5717e0ab74238e9d04ef7ecf73b298cabb
 
     private static final List<String> SALE_STAFF_URLS = List.of(
             "/dashboard",
@@ -183,8 +180,8 @@ public class SecurityFilter implements Filter {
             "/payment",
             "/payment/detail",
             "/realtime/notifications",
-            "/export-pdf",
-            "/product-review");
+            "/export-pdf"
+    );
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
             "/dashboard",
@@ -211,8 +208,8 @@ public class SecurityFilter implements Filter {
             "/Signature",
             "/SignatureAcceptance",
             "/realtime/notifications",
-            "/export-pdf",
-            "/product-review");
+            "/export-pdf"
+    );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
             "/customer-order-list",
@@ -228,20 +225,12 @@ public class SecurityFilter implements Filter {
             "/product-review",
             "/contract-list",
             "/realtime/notifications",
-            "/export-pdf");
+            "/export-pdf"
+    );
 
-<<<<<<< HEAD
-    //
-
-=======
->>>>>>> 82f89d5717e0ab74238e9d04ef7ecf73b298cabb
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-<<<<<<< HEAD
-=======
-
->>>>>>> vtpp
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 

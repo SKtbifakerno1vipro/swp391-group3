@@ -8,10 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Quotation;
-import model.Role;
 import service.QuotationService;
 
-@WebServlet(name = "QuotationListController", urlPatterns = { "/quotation-list" })
+@WebServlet(name = "QuotationListController", urlPatterns = {"/quotation-list"})
 public class QuotationListController extends HttpServlet {
 
     @Override
@@ -37,7 +36,7 @@ public class QuotationListController extends HttpServlet {
         }
 
         service.RoleService roleService = new service.RoleService();
-        Role userRole = roleService.getRoleById(user.getRoleId());
+        model.Role userRole = roleService.getRoleById(user.getRoleId());
         String roleName = userRole != null ? userRole.getRoleName().toLowerCase() : "";
 
         Integer saleId = null;
@@ -66,19 +65,11 @@ public class QuotationListController extends HttpServlet {
             pageIndex = 1;
         }
 
-<<<<<<< HEAD
-        int fromIndex = Math.min((page - 1) * pageSize, totalQuotations);
-        int toIndex = Math.min(fromIndex + pageSize, totalQuotations);
-        List<Quotation> pagedQuotationList = totalQuotations == 0
-                ? java.util.Collections.emptyList()
-                : quotationList.subList(fromIndex, toIndex);
-=======
         List<Quotation> quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate, saleId, user.getUserId(), user.getRoleId(), pageIndex, pageSize);
 
         request.setAttribute("endPage", endPage);
         request.setAttribute("currentPage", pageIndex);
         request.setAttribute("quotationList", quotationList);
->>>>>>> 82f89d5717e0ab74238e9d04ef7ecf73b298cabb
 
         request.setAttribute("searchText", searchText);
         request.setAttribute("status", status);
