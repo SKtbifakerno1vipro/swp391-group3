@@ -563,6 +563,9 @@
                         <div class="actions-right">
                             <c:choose>
                                 <c:when test="${empty invoice}">
+                                    <c:if test="${sessionScope.user.roleId != 3}">
+                                        <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Lưu nháp</button>
+                                    </c:if>
                                     <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Lưu nháp</button>
                                 </c:when>
                                 <c:otherwise>

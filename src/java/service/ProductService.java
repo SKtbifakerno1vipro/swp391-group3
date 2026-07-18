@@ -9,10 +9,6 @@ public class ProductService {
 
     private final ProductDAO productDAO = new ProductDAO();
 
-    public List<Product> getAllProducts() {
-        return productDAO.getAllProducts();
-    }
-
     public Product getProductById(int id) {
         return productDAO.getProductById(id);
     }
@@ -25,8 +21,12 @@ public class ProductService {
         return productDAO.updateProduct(product);
     }
 
-    public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status, int totalRow, int page, int totalPage, int pageSize) {
-    return productDAO.searchProduct(searchText, categoryId, sort, status, totalRow, page, totalPage, pageSize);
+    public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status, Double minPrice, Double maxPrice, int totalRow, int page, int totalPage, int pageSize) {
+        return productDAO.searchProduct(searchText, categoryId, sort, status, minPrice, maxPrice, totalRow, page, totalPage, pageSize);
+    }
+    
+    public List<Product> getAllProducts(){
+        return productDAO.searchProduct(null, null, null, null, null, null, 0, 0, 0, 0);
     }
 
     public List<Category> getAllCategory() {
@@ -48,8 +48,8 @@ public class ProductService {
         return productDAO.getUpdateByWithProductId(id);
     }
 
-    public int countProduct(String searchText, Integer categoryId, String status) {
-        return productDAO.countProduct(searchText, categoryId, status);
+    public int countProduct(String searchText, Integer categoryId, String status, Double minPrice, Double maxPrice) {
+        return productDAO.countProduct(searchText, categoryId, status, minPrice, maxPrice);
     }
 
     public int calculateTotalPage(int totalRow, int pageSize) {

@@ -87,12 +87,22 @@ public class EditProductController extends HttpServlet {
         List<String> statusList = pService.getProductStatus();
 
         if ("create".equals(action)) {
+            if (user.getRoleId() == 3) {
+                session.setAttribute("errorProduct", "Quý khách không có tính năng này.");
+                response.sendRedirect(request.getContextPath() + "/product-list");
+                return;
+            }
             request.setAttribute("units", units);
             request.setAttribute("action", action);
             request.setAttribute("categories", categories);
             request.setAttribute("statusList", statusList);
             request.getRequestDispatcher("/views/product/create.jsp").forward(request, response);
         } else if ("edit".equals(action) || "detail".equals(action)) {
+            if ("edit".equals(action) && user.getRoleId() == 3) {
+                session.setAttribute("errorProduct", "Quý khách không có tính năng này.");
+                response.sendRedirect(request.getContextPath() + "/product-list");
+                return;
+            }
             String productId = request.getParameter("id");
             if (productId == null || productId.isEmpty()) {
                 session.setAttribute("errorProduct", "Không tìm thấy sản phẩm.");
@@ -155,15 +165,19 @@ public class EditProductController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        User u = (User) session.getAttribute("user");
-        if (u == null) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
         String action = request.getParameter("action");
         String productId = request.getParameter("id");
-
+        if (user.getRoleId() == 3) {
+                session.setAttribute("errorProduct", "Quý khách không có tính năng này.");
+                response.sendRedirect(request.getContextPath() + "/product-list");
+                return;
+            }
         int id = 0;
         if ("edit".equals(action)) {
             try {
@@ -264,12 +278,12 @@ public class EditProductController extends HttpServlet {
             product.setDescription(des);
             product.setUnit(unit);
             product.setProductStatus(status);
-            product.setUpdatedBy(u.getUserId());
+            product.setUpdatedBy(user.getUserId());
 
             if ("create".equals(action)) {
                 boolean isCreated = pService.createProduct(product);
                 if (isCreated) {
-                    service.AuditLogService.log(u.getUserId(), "CREATE", "Product", "Tạo sản phẩm: " + name);
+                    service.AuditLogService.log(user.getUserId(), "CREATE", "Product", "Tạo sản phẩm: " + name);
                     response.sendRedirect(request.getContextPath() + "/product-list");
                 } else {
                     session.setAttribute("errorProduct", "Tạo sản phẩm thất bại.");
@@ -280,7 +294,7 @@ public class EditProductController extends HttpServlet {
 
                 boolean isUpdated = pService.updateProduct(product);
                 if (isUpdated) {
-                    service.AuditLogService.log(u.getUserId(), "UPDATE", "Product", "Chỉnh sửa sản phẩm ID: " + id);
+                    service.AuditLogService.log(user.getUserId(), "UPDATE", "Product", "Chỉnh sửa sản phẩm ID: " + id);
                     response.sendRedirect(request.getContextPath() + "/edit-product?id=" + id + "&action=detail");
                 } else {
                     session.setAttribute("errorProduct", "Cập nhật sản phẩm thất bại.");

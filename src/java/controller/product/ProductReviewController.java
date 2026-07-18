@@ -24,10 +24,15 @@ public class ProductReviewController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
+        User user = (User) session.getAttribute("user");
 
-        if (user == null || user.getRoleId() == 3) {
+        if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        if (user.getRoleId() == 3) {
+            session.setAttribute("errorProduct", "Quý khách không có tính năng này.");
+            response.sendRedirect(request.getContextPath()+"/product-list");
             return;
         }
 

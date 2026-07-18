@@ -69,6 +69,12 @@
                                 </div>
                                 <span class="sidebar-text">Thanh toán của tôi</span>
                             </a>
+                            <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/product-list" title="Sản phẩm">
+                                <div class="sidebar-icon-wrap"><span
+                                        class="material-symbols-outlined">inventory_2</span></div>
+                                <span class="sidebar-text">Sản phẩm</span>
+                            </a>
                         </c:when>
                         <c:when test="${sessionScope.user.roleId == 5}">
                             <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}"
@@ -149,30 +155,6 @@
                                 </div>
                                 <span class="sidebar-text">Khách hàng</span>
                             </a>
-                            <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
-                                href="${pageContext.request.contextPath}/customer-order-list" title="Đơn hàng">
-                                <div class="sidebar-icon-wrap"><span
-                                        class="material-symbols-outlined">receipt_long</span></div>
-                                <span class="sidebar-text">Đơn hàng</span>
-                            </a>
-                            <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
-                                href="${pageContext.request.contextPath}/product-list" title="Sản phẩm">
-                                <div class="sidebar-icon-wrap"><span
-                                        class="material-symbols-outlined">inventory_2</span></div>
-                                <span class="sidebar-text">Sản phẩm</span>
-                            </a>
-                            <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}"
-                                href="${pageContext.request.contextPath}/product-review" title="Đánh giá & Phản hồi">
-                                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span>
-                                </div>
-                                <span class="sidebar-text">Đánh giá</span>
-                            </a>
-                            <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}"
-                                href="${pageContext.request.contextPath}/category/list" title="Danh mục">
-                                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">category</span>
-                                </div>
-                                <span class="sidebar-text">Danh mục</span>
-                            </a>
                             <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}"
                                 href="${pageContext.request.contextPath}/quotation-list" title="Báo giá">
                                 <div class="sidebar-icon-wrap"><span
@@ -187,17 +169,41 @@
                                     <span class="sidebar-text">Hợp đồng</span>
                                 </a>
                             </c:if>
-                            <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
-                                href="${pageContext.request.contextPath}/payment/list" title="Thanh toán">
-                                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">payments</span>
-                                </div>
-                                <span class="sidebar-text">Thanh toán</span>
+                            <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/customer-order-list" title="Đơn hàng">
+                                <div class="sidebar-icon-wrap"><span
+                                        class="material-symbols-outlined">receipt_long</span></div>
+                                <span class="sidebar-text">Đơn hàng</span>
                             </a>
                             <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}"
                                 href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn">
                                 <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt</span>
                                 </div>
                                 <span class="sidebar-text">Hóa đơn</span>
+                            </a>
+                            <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/payment/list" title="Thanh toán">
+                                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">payments</span>
+                                </div>
+                                <span class="sidebar-text">Thanh toán</span>
+                            </a>
+                            <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/product-list" title="Sản phẩm">
+                                <div class="sidebar-icon-wrap"><span
+                                        class="material-symbols-outlined">inventory_2</span></div>
+                                <span class="sidebar-text">Sản phẩm</span>
+                            </a>
+                            <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/category/list" title="Danh mục">
+                                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">category</span>
+                                </div>
+                                <span class="sidebar-text">Danh mục</span>
+                            </a>
+                            <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/product-review" title="Đánh giá & Phản hồi">
+                                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span>
+                                </div>
+                                <span class="sidebar-text">Đánh giá</span>
                             </a>
                             <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
                                 <a class="nav-link ${param.activeMenu == 'users' ? 'active' : ''}"

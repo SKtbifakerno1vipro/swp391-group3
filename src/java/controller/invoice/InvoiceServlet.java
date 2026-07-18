@@ -136,13 +136,17 @@ public class InvoiceServlet extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        if (user.getRoleId() == 3) {
+            session.setAttribute("errorInvoice", "Quý khách không sử dụng tính năng này!");
+            response.sendRedirect(request.getContextPath()+"/invoice-list");
+            return;
+        }
         String actionParam = request.getParameter("action");
         if ("notice".equalsIgnoreCase(actionParam)) {
             String contractIdRaw = request.getParameter("customerContractId");
             if (contractIdRaw != null && !contractIdRaw.trim().isEmpty()) {
                 try {
                     int contractId = Integer.parseInt(contractIdRaw.trim());
-                    service.PaymentService paymentService = new service.PaymentService();
                     Payment payment = paymentService.getPaymentByContractId(contractId);
                     
                     if (payment != null && "COMPLETED".equals(payment.getPaymentStatus())) {

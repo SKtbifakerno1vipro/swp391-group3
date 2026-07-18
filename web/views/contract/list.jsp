@@ -53,7 +53,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Mã Hợp Đồng</th>
+                            <th>Số Hợp Đồng</th>
                             <th>Khách hàng</th>
                             <th>Trạng thái</th>
                             <th>Hình thức lưu</th>

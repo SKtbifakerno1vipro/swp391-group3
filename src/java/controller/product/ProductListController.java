@@ -74,6 +74,30 @@ public class ProductListController extends HttpServlet {
         List<Category> categories = pService.getAllCategory();
         String sort = request.getParameter("sort");
         String searchText = request.getParameter("searchText");
+        String minPriceRaw = request.getParameter("minPrice");
+        String maxPriceRaw = request.getParameter("maxPrice");
+        
+        Double minPrice = null;
+        Double maxPrice = null;
+        if (minPriceRaw != null && !minPriceRaw.trim().isEmpty()) {
+            try {
+                minPrice = Double.parseDouble(minPriceRaw.trim());
+            } catch (Exception e) {}
+        }
+        if (maxPriceRaw != null && !maxPriceRaw.trim().isEmpty()) {
+            try {
+                maxPrice = Double.parseDouble(maxPriceRaw.trim());
+            } catch (Exception e) {}
+        }
+        
+        String pageSizeRaw = request.getParameter("pageSize");
+        int pageSize = 10;
+        if (pageSizeRaw != null && !pageSizeRaw.trim().isEmpty()) {
+            try {
+                pageSize = Integer.parseInt(pageSizeRaw.trim());
+            } catch (Exception e) {}
+        }
+        
         String pageRaw = request.getParameter("page");
         String totalPageRaw = request.getParameter("totalPage");
         Category c = new Category();
@@ -83,8 +107,8 @@ public class ProductListController extends HttpServlet {
         int categoryId = (request.getParameter("categoryId") == null || request.getParameter("categoryId").isEmpty()) ? 0 : Integer.parseInt(request.getParameter("categoryId"));
         int page = (pageRaw == null || pageRaw.isEmpty()) ? 1 : Integer.parseInt(pageRaw);
         int totalPage = (totalPageRaw == null || totalPageRaw.isEmpty()) ? 1 : Integer.parseInt(totalPageRaw);
-        int totalRow = pService.countProduct(searchText, categoryId, "ACTIVE");
-        totalPage = pService.calculateTotalPage(totalRow, PAGE_SIZE);
+        int totalRow = pService.countProduct(searchText, categoryId, "ACTIVE", minPrice, maxPrice);
+        totalPage = pService.calculateTotalPage(totalRow, pageSize);
         page = pService.nomalizePage(page, totalPage);
         if (searchText != null) {
             searchText = searchText.trim();
@@ -93,9 +117,12 @@ public class ProductListController extends HttpServlet {
         session.removeAttribute("errorProduct");
         request.setAttribute("categoryId", categoryId);
         request.setAttribute("searchText", searchText);
+        request.setAttribute("minPrice", minPriceRaw);
+        request.setAttribute("maxPrice", maxPriceRaw);
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("errorProduct", error);
         request.setAttribute("sort", sort);
-        request.setAttribute("products", pService.searchProduct(searchText, categoryId, sort, "ACTIVE", totalRow, page, totalPage, PAGE_SIZE));
+        request.setAttribute("products", pService.searchProduct(searchText, categoryId, sort, "ACTIVE", minPrice, maxPrice, totalRow, page, totalPage, pageSize));
         request.setAttribute("totalPage", totalPage);
         request.setAttribute("page", page);
         request.setAttribute("totalRow", totalRow);

@@ -98,9 +98,6 @@ public class PaymentListController extends HttpServlet {
             for (Payment p : list) {
                 Invoice invoice = invoiceService.getInvoiceByContractId(p.getCustomerContractId());
                 p.setInvoice(invoice);
-                if (invoice != null && "READY".equals(invoice.getInvoiceStatus())) {
-                    p.setCanIssue(true);
-                }
             }
         }
         request.setAttribute("currentPage", page);
