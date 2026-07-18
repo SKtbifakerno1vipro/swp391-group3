@@ -58,11 +58,11 @@ public class ContractDAO extends DBContext {
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
-            String fromDate, String toDate, String taxCode, String phone, String email) {
+            String fromDate, String toDate, String taxCode, String phone, String email, String customerType) {
         List<ContractCustomerDTO> list = new ArrayList<>();
         String sql = """
                     SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type,  c.created_at,
-                    cust.company_name, cust.user_id, cust.tax_code, u.email, u.phone,
+                    cust.company_name, cust.user_id, cust.tax_code, u.email, u.phone, cust.customer_type,
                     (SELECT TOP 1 co.customer_order_id FROM customer_order co WHERE co.customer_contract_id = c.customer_contract_id) AS order_id
                     FROM customer_contract c 
                     JOIN customer cust
@@ -101,6 +101,9 @@ public class ContractDAO extends DBContext {
         if (email != null && !email.trim().isEmpty()) {
             sql += " AND u.email LIKE ? ";
         }
+        if (customerType != null && !customerType.trim().isEmpty()) {
+            sql += " AND cust.customer_type = ? ";
+        }
 
         sql += " ORDER BY c.customer_contract_id desc OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
@@ -136,6 +139,9 @@ public class ContractDAO extends DBContext {
             if (email != null && !email.trim().isEmpty()) {
                 ps.setString(index++, "%" + email.trim() + "%");
             }
+            if (customerType != null && !customerType.trim().isEmpty()) {
+                ps.setString(index++, customerType.trim());
+            }
 
             ps.setInt(index++, (pageIndex - 1) * pageSize);
             ps.setInt(index++, pageSize);
@@ -148,6 +154,7 @@ public class ContractDAO extends DBContext {
                 c.setContractStatus(rs.getString("contract_status"));
                 c.setStorageType(rs.getString("storage_type"));
                 c.setCustomerName(rs.getString("company_name"));
+                c.setCustomerType(rs.getString("customer_type"));
                 if (rs.getTimestamp("created_at") != null) {
                     c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 }
@@ -165,7 +172,7 @@ public class ContractDAO extends DBContext {
 
     public int getTotalContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
-            String fromDate, String toDate, String taxCode, String phone, String email) {
+            String fromDate, String toDate, String taxCode, String phone, String email, String customerType) {
 
         String sql = "SELECT COUNT(*) FROM customer_contract c "
                 + " JOIN customer cust ON c.customer_id = cust.customer_id "
@@ -201,6 +208,9 @@ public class ContractDAO extends DBContext {
         if (email != null && !email.trim().isEmpty()) {
             sql += " AND u.email LIKE ? ";
         }
+        if (customerType != null && !customerType.trim().isEmpty()) {
+            sql += " AND cust.customer_type = ? ";
+        }
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
@@ -233,6 +243,9 @@ public class ContractDAO extends DBContext {
             }
             if (email != null && !email.trim().isEmpty()) {
                 ps.setString(index++, "%" + email.trim() + "%");
+            }
+            if (customerType != null && !customerType.trim().isEmpty()) {
+                ps.setString(index++, customerType.trim());
             }
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -338,6 +351,28 @@ public class ContractDAO extends DBContext {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        return false;
+    }
+
+    public boolean checkOwnContractByCustomer(Contract contract, User user) {
+        String sql = """
+                    select count(1) from dbo.customer_contract c
+                    join dbo.customer cust on c.customer_id = cust.customer_id
+                    where c.customer_contract_id =? and cust.user_id= ?
+                     and cust.customer_id >0 
+                    """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contract.getContractId());
+            ps.setInt(2, user.getUserId());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
         return false;
     }
 

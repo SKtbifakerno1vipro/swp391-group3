@@ -212,11 +212,11 @@ public class CustomerOrderController extends HttpServlet {
             String pageParam = request.getParameter("productPage");
             int productPage = (pageParam != null && !pageParam.isBlank()) ? Integer.parseInt(pageParam) : 1;
             
-            int totalProducts = productService.countProduct(null, null, "ACTIVE");
+            int totalProducts = productService.countProduct(null, null, "ACTIVE", null, null);
             int totalProductPages = productService.calculateTotalPage(totalProducts, PAGE_SIZE);
             productPage = productService.nomalizePage(productPage, totalProductPages);
             
-            List<Product> products = productService.searchProduct(null, null, null, "ACTIVE", totalProducts, productPage, totalProductPages, PAGE_SIZE);
+            List<Product> products = productService.searchProduct(null, null, null, "ACTIVE", null, null, totalProducts, productPage, totalProductPages, PAGE_SIZE);
             
             request.setAttribute("products", products);
             request.setAttribute("currentProductPage", productPage);

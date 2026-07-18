@@ -150,18 +150,34 @@
 
                     <!-- Column 2: Nhắc việc -->
                     <div class="content-card">
-                        <h3>Hợp đồng Cần Xử Lý</h3>
+                        <h3>Tài liệu Cần Xử Lý</h3>
                         <div class="table-wrapper">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Mã HĐ</th>
+                                        <th>Mã TL</th>
+                                        <th>Loại</th>
                                         <th>Khách hàng</th>
                                         <th>Trạng thái</th>
                                         <th style="text-align:right;">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <c:forEach var="q" items="${quotationsNeedingAction}">
+                                        <tr>
+                                            <td style="font-weight:bold;">BG-${q.quotationId}</td>
+                                            <td><span class="badge" style="background:#e3f2fd; color:#1976d2;">Báo giá</span></td>
+                                            <td>${q.customerName}</td>
+                                            <td>
+                                                <span class="badge" style="background:var(--primary-soft); color:var(--primary);">
+                                                    Đã duyệt (Chờ tạo HĐ)
+                                                </span>
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <a href="${pageContext.request.contextPath}/quotation-detail?id=${q.quotationId}" style="color:var(--primary); font-weight:bold;">Xem</a>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
                                     <c:forEach var="c" items="${contractsNeedingAction}">
                                         <c:set var="bg" value="var(--surface-strong)" />
                                         <c:set var="col" value="var(--muted)" />
@@ -173,6 +189,7 @@
                                         </c:choose>
                                         <tr>
                                             <td style="font-weight:bold;">${c.contractNumber}</td>
+                                            <td><span class="badge" style="background:#f3e5f5; color:#7b1fa2;">Hợp đồng</span></td>
                                             <td>${c.customerName}</td>
                                             <td>
                                                 <span class="badge" style="background:${bg}; color:${col};">
@@ -194,8 +211,8 @@
                                             </td>
                                         </tr>
                                     </c:forEach>
-                                    <c:if test="${empty contractsNeedingAction}">
-                                        <tr><td colspan="4" style="text-align:center; color:var(--muted); padding:20px;">Không có công việc nào cần xử lý. Rất tốt!</td></tr>
+                                    <c:if test="${empty contractsNeedingAction && empty quotationsNeedingAction}">
+                                        <tr><td colspan="5" style="text-align:center; color:var(--muted); padding:20px;">Không có tài liệu nào cần xử lý. Rất tốt!</td></tr>
                                     </c:if>
                                 </tbody>
                             </table>
@@ -214,6 +231,7 @@
                                         <th>Khách hàng</th>
                                         <th>Số tiền</th>
                                         <th style="width:1%; white-space:nowrap;">Trạng thái</th>
+                                        <th style="text-align:right;">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -243,6 +261,9 @@
                                                         <c:otherwise>${i.invoiceStatus}</c:otherwise>
                                                     </c:choose>
                                                 </span>
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <a href="${pageContext.request.contextPath}/invoice?invoiceId=${i.invoiceId}" style="color:var(--primary); font-weight:bold;">Xem</a>
                                             </td>
                                         </tr>
                                     </c:forEach>

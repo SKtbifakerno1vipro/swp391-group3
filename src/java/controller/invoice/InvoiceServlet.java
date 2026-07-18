@@ -20,10 +20,12 @@ import dto.CustomerOrderDTO;
 import dto.CustomerDTO;
 import dto.InvoiceItemDTO;
 import model.Invoice;
+import model.Payment;
 import model.User;
 import service.CustomerOrderService;
 import service.CustomerService;
 import service.InvoiceService;
+import service.PaymentService;
 import service.RoleService;
 import service.UserService;
 
@@ -35,7 +37,7 @@ public class InvoiceServlet extends HttpServlet {
     private final RoleService rService = new RoleService();
     private final UserService uService = new UserService();
     private final CustomerOrderService coService = new CustomerOrderService();
-
+    private final PaymentService paymentService = new PaymentService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -134,6 +136,64 @@ public class InvoiceServlet extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        if (user.getRoleId() == 3) {
+            session.setAttribute("errorInvoice", "Quý khách không sử dụng tính năng này!");
+            response.sendRedirect(request.getContextPath()+"/invoice-list");
+            return;
+        }
+        String actionParam = request.getParameter("action");
+        if ("notice".equalsIgnoreCase(actionParam)) {
+            String contractIdRaw = request.getParameter("customerContractId");
+            if (contractIdRaw != null && !contractIdRaw.trim().isEmpty()) {
+                try {
+                    int contractId = Integer.parseInt(contractIdRaw.trim());
+                    Payment payment = paymentService.getPaymentByContractId(contractId);
+                    
+                    if (payment != null && "COMPLETED".equals(payment.getPaymentStatus())) {
+                        Invoice invoice = iService.getInvoiceByContractId(contractId);
+                        if (invoice != null && "READY".equals(invoice.getInvoiceStatus())) {
+                            invoice.setInvoiceStatus("RELEASED");
+                            invoice.setIssueDate(LocalDateTime.now());
+                            int year = LocalDateTime.now().getYear();
+                            String nextNo = iService.getNextInvoiceNo(year);
+                            invoice.setInvoiceNo(nextNo);
+                            
+                            boolean success = iService.updateInvoice(invoice);
+                            if (success) {
+//                                String scheme = request.getScheme();
+//                                String serverName = request.getServerName();
+//                                int serverPort = request.getServerPort();
+//                                String contextPath = request.getContextPath();
+                                String baseUrl = "http://localhost:9999/SWP391_GROUP3/";
+                                
+                                iService.emailIssueInvoice(invoice.getInvoiceId(), baseUrl);
+                                session.setAttribute("successMessage", "Phát hành hóa đơn thành công!");
+                            } else {
+                                session.setAttribute("errorMessage", "Cập nhật trạng thái hóa đơn thất bại.");
+                            }
+                        } else {
+                            session.setAttribute("errorMessage", "Hóa đơn phải ở trạng thái READY mới có thể phát hành.");
+                        }
+                    } else {
+                        session.setAttribute("errorMessage", "Thanh toán chưa hoàn tất.");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    session.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
+                }
+            } else {
+                session.setAttribute("errorMessage", "Thiếu thông tin hợp đồng.");
+            }
+            
+            String referer = request.getHeader("referer");
+            if (referer != null && !referer.trim().isEmpty()) {
+                response.sendRedirect(referer);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/payment/list");
+            }
+            return;
+        }
+
         Invoice invoice = null;
         int orderId = 0;
 
@@ -179,12 +239,7 @@ public class InvoiceServlet extends HttpServlet {
 
             if (invoiceId > 0) {
                 Invoice existingInvoice = iService.getInvoiceById(invoiceId);
-                if ("notice".equalsIgnoreCase(action)) {
-                    invoice.setInvoiceStatus("RELEASED");
-                    invoice.setIssueDate(LocalDateTime.now());
-                    int year = LocalDateTime.now().getYear();
-                    invoice.setInvoiceNo(iService.getNextInvoiceNo(year));
-                } else if ("ready".equalsIgnoreCase(action)) {
+                if ("ready".equalsIgnoreCase(action)) {
                     invoice.setInvoiceStatus("READY");
                     invoice.setIssueDate(null);
                     invoice.setInvoiceNo(existingInvoice != null ? existingInvoice.getInvoiceNo() : ("DFT-" + orderId + "-" + System.currentTimeMillis()));

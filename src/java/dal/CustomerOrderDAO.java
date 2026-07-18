@@ -54,6 +54,24 @@ public class CustomerOrderDAO extends DBContext {
         return null;
     }
 
+    public CustomerOrderDTO getOrderByContractId(int contractId) {
+        String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name "
+                + "FROM customer_order co "
+                + "JOIN customer c ON co.customer_id = c.customer_id "
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
+                + "WHERE co.customer_contract_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contractId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToDTO(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<CustomerOrderDTO> getDetailsByOrderId(int orderId) {
         List<CustomerOrderDTO> details = new ArrayList<>();
         String sql = "SELECT cod.*, qd.product_name, qd.unit, qd.product_id, qd.tax_percent, qd.discount_percent "

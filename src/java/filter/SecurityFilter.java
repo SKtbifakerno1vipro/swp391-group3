@@ -113,6 +113,7 @@ public class SecurityFilter implements Filter {
             "/invoice-list",
             "/invoice",
             "/preview",
+            "/invoice/create",
             "/payment/list",
             "/payment",
             "/payment/detail",
@@ -134,16 +135,18 @@ public class SecurityFilter implements Filter {
             "/category/edit",
             "/category/delete",
             "/product-list",
+            "/edit-product",
+            "/product-review",
             "/quotation-list",
             "/quotation-detail",
             "/contract-list",
             "/contract-detail",
             "/invoice-list",
+            "/invoice",
             "/preview",
             "/payment/list",
             "/payment",
             "/payment/detail",
-            "/product-review",
             "/Signature",
             "/SignatureAcceptance",
             "/realtime/notifications",
@@ -185,10 +188,10 @@ public class SecurityFilter implements Filter {
             "/edit-user",
             "/customer/list",
             "/customer/detail",
-            "/customer/edit",
             "/customer-order-list",
             "/customer-order",
             "/create-order",
+            "/product-review",
             "/quotation-list",
             "/quotation-detail",
             "/contract-list",
@@ -202,7 +205,6 @@ public class SecurityFilter implements Filter {
             "/payment/list",
             "/payment",
             "/payment/detail",
-            "/product-review",
             "/Signature",
             "/SignatureAcceptance",
             "/realtime/notifications",
@@ -210,7 +212,6 @@ public class SecurityFilter implements Filter {
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
-            "/edit-user",
             "/customer-order-list",
             "/customer-order",
             "/category/list",
@@ -222,6 +223,7 @@ public class SecurityFilter implements Filter {
             "/edit-product",
             "/product-delete",
             "/product-review",
+            "/contract-list",
             "/realtime/notifications",
             "/export-pdf"
     );
@@ -229,7 +231,10 @@ public class SecurityFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+<<<<<<< HEAD
+=======
 
+>>>>>>> vtpp
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
@@ -241,6 +246,11 @@ public class SecurityFilter implements Filter {
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
         if (user != null) {
+            if (userDAO.checkBanUser(user)) { //check user banned by admin, if that is true, cannot do anything
+                session.invalidate();
+                ((HttpServletResponse) response).sendRedirect("login.jsp");
+                return;
+            }
             if (user.getRoleId() == 1) {
                 chain.doFilter(request, response);
                 return;
@@ -269,13 +279,9 @@ public class SecurityFilter implements Filter {
                     if (cDAO.validateToken(contractId, token)) {
                         chain.doFilter(request, response);
                         return;
-                    } else {
-                        res.sendRedirect(req.getContextPath() + "/login");
-                        return;
                     }
                 } catch (Exception e) {
                     res.sendRedirect(req.getContextPath() + "/login");
-                    return;
                 }
             }
         }

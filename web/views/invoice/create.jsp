@@ -563,6 +563,9 @@
                         <div class="actions-right">
                             <c:choose>
                                 <c:when test="${empty invoice}">
+                                    <c:if test="${sessionScope.user.roleId != 3}">
+                                        <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Lưu nháp</button>
+                                    </c:if>
                                     <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Lưu nháp</button>
                                 </c:when>
                                 <c:otherwise>
@@ -572,14 +575,7 @@
                                         </c:if>
                                         <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Cập nhật bản nháp</button>
                                     </c:if>
-                                    <c:if test="${invoice.invoiceStatus == 'READY'}">
-                                        <c:if test="${sessionScope.user.roleId != 3}">
-                                            <button type="submit" name="action" value="notice" class="btn-action success"><span class="material-symbols-outlined" style="font-size: 16px;">mail</span> Thông báo phát hành hóa đơn</button>
-                                        </c:if>
-                                    </c:if>
-                                    <c:if test="${invoice.invoiceStatus == 'RELEASED' && sessionScope.user.roleId != 3}">
-                                        <button type="submit" name="action" value="notice" class="btn-action success"><span class="material-symbols-outlined" style="font-size: 16px;">mail</span> Gửi lại thông báo phát hành</button>
-                                    </c:if>
+                                    
                                 </c:otherwise>
                             </c:choose>
                             <a href="${pageContext.request.contextPath}/invoice-list" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">close</span> Đóng</a>
