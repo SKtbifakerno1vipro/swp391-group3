@@ -92,7 +92,10 @@ public class SecurityFilter implements Filter {
             "/Signature",
             "/SignatureAcceptance",
             "/realtime/notifications",
-            "/export-pdf"
+            "/export-pdf",
+            "/import-request-list",
+            "/import-request-create",
+            "/import-request-detail"
     );
 
     private static final List<String> MANAGER_URLS = List.of(
@@ -121,7 +124,10 @@ public class SecurityFilter implements Filter {
             "/Signature",
             "/SignatureAcceptance",
             "/realtime/notifications",
-            "/export-pdf"
+            "/export-pdf",
+            "/import-request-list",
+            "/import-request-create",
+            "/import-request-detail"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
@@ -180,7 +186,10 @@ public class SecurityFilter implements Filter {
             "/payment",
             "/payment/detail",
             "/realtime/notifications",
-            "/export-pdf"
+            "/export-pdf",
+            "/import-request-list",
+            "/import-request-create",
+            "/import-request-detail"
     );
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
@@ -225,7 +234,9 @@ public class SecurityFilter implements Filter {
             "/product-review",
             "/contract-list",
             "/realtime/notifications",
-            "/export-pdf"
+            "/export-pdf",
+            "/import-request-list",
+            "/import-request-detail"
     );
 
     @Override
@@ -242,6 +253,11 @@ public class SecurityFilter implements Filter {
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
         if (user != null) {
+            // Đếm số lượng yêu cầu nhập kho Pending để hiển thị ở sidebar
+            dal.ImportRequestDAO importRequestDAOForCount = new dal.ImportRequestDAO();
+            int pendingImportsCount = importRequestDAOForCount.countPendingRequests();
+            req.setAttribute("pendingImportsCount", pendingImportsCount);
+
             if (userDAO.checkBanUser(user)) { //check user banned by admin, if that is true, cannot do anything
                 session.invalidate();
                 ((HttpServletResponse) response).sendRedirect("login.jsp");
@@ -466,6 +482,10 @@ public class SecurityFilter implements Filter {
             case "/Signature":
             case "/SignatureAcceptance":
                 return "Acceptance Record";
+            case "/import-request-list":
+            case "/import-request-create":
+            case "/import-request-detail":
+                return "Dashboard";
             default:
                 return null;
         }

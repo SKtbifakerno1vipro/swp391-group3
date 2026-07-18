@@ -38,6 +38,7 @@
                             <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}" href="${pageContext.request.contextPath}/contract-list" title="Hợp đồng"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div><span class="sidebar-text">Hợp đồng</span></a>
                             <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}" href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt</span></div><span class="sidebar-text">Hóa đơn</span></a>
                             <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}" href="${pageContext.request.contextPath}/payment/list" title="Thanh toán"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">payments</span></div><span class="sidebar-text">Thanh toán</span></a>
+                            <a class="nav-link ${param.activeMenu == 'import-requests' ? 'active' : ''}" href="${pageContext.request.contextPath}/import-request-list" title="Yêu cầu nhập kho"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">unarchive</span></div><span class="sidebar-text">Yêu cầu nhập kho</span></a>
                             <a class="nav-link ${param.activeMenu == 'revenue' ? 'active' : ''}" href="${pageContext.request.contextPath}/revenue-report" title="Báo cáo doanh thu"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">analytics</span></div><span class="sidebar-text">Báo cáo</span></a>
                             <a class="nav-link ${param.activeMenu == 'emailLogs' ? 'active' : ''}" href="${pageContext.request.contextPath}/email/logs" title="Nhật ký Email"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">mail</span></div><span class="sidebar-text">Nhật ký Email</span></a>
                             <a class="nav-link ${param.activeMenu == 'auditLogs' ? 'active' : ''}" href="${pageContext.request.contextPath}/admin/audit-logs" title="Nhật ký hệ thống"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">history</span></div><span class="sidebar-text">Nhật ký hệ thống</span></a>
@@ -56,6 +57,7 @@
                             <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}" href="${pageContext.request.contextPath}/contract-list" title="Hợp đồng"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div><span class="sidebar-text">Hợp đồng</span></a>
                             <a class="nav-link ${param.activeMenu == 'invoices' ? 'active' : ''}" href="${pageContext.request.contextPath}/invoice-list" title="Hóa đơn"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt</span></div><span class="sidebar-text">Hóa đơn</span></a>
                             <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}" href="${pageContext.request.contextPath}/payment/list" title="Thanh toán"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">payments</span></div><span class="sidebar-text">Thanh toán</span></a>
+                            <a class="nav-link ${param.activeMenu == 'import-requests' ? 'active' : ''}" href="${pageContext.request.contextPath}/import-request-list" title="Yêu cầu nhập kho"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">unarchive</span></div><span class="sidebar-text">Yêu cầu nhập kho</span></a>
                             <a class="nav-link ${param.activeMenu == 'revenue' ? 'active' : ''}" href="${pageContext.request.contextPath}/revenue-report" title="Báo cáo doanh thu"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">analytics</span></div><span class="sidebar-text">Báo cáo</span></a>
                         </c:when>
 
@@ -83,6 +85,7 @@
                             <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}" href="${pageContext.request.contextPath}/product-review" title="Đánh giá & Phản hồi"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span></div><span class="sidebar-text">Đánh giá</span></a>
                             <a class="nav-link ${param.activeMenu == 'quotations' ? 'active' : ''}" href="${pageContext.request.contextPath}/quotation-list" title="Báo giá"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">request_quote</span></div><span class="sidebar-text">Báo giá</span></a>
                             <a class="nav-link ${param.activeMenu == 'payments' ? 'active' : ''}" href="${pageContext.request.contextPath}/payment/list" title="Thanh toán"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">payments</span></div><span class="sidebar-text">Thanh toán</span></a>
+                            <a class="nav-link ${param.activeMenu == 'import-requests' ? 'active' : ''}" href="${pageContext.request.contextPath}/import-request-list" title="Yêu cầu nhập kho"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">unarchive</span></div><span class="sidebar-text">Yêu cầu nhập kho</span></a>
                         </c:when>
 
                         <%-- ROLE 5: ADMIN OFFICER --%>
@@ -106,6 +109,15 @@
                             <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}" href="${pageContext.request.contextPath}/product-list" title="Sản phẩm"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">inventory_2</span></div><span class="sidebar-text">Sản phẩm</span></a>
                             <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}" href="${pageContext.request.contextPath}/product-review" title="Đánh giá & Phản hồi"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span></div><span class="sidebar-text">Đánh giá</span></a>
                             <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}" href="${pageContext.request.contextPath}/contract-list" title="Hợp đồng"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div><span class="sidebar-text">Hợp đồng</span></a>
+                            <a class="nav-link ${param.activeMenu == 'import-requests' ? 'active' : ''}" href="${pageContext.request.contextPath}/import-request-list" title="Yêu cầu nhập kho">
+                                <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">unarchive</span></div>
+                                <span class="sidebar-text">
+                                    Yêu cầu nhập kho
+                                    <c:if test="${pendingImportsCount > 0}">
+                                        <span style="background-color: #ff9800; color: white; border-radius: 10px; padding: 2px 8px; font-size: 11px; margin-left: 5px;">${pendingImportsCount}</span>
+                                    </c:if>
+                                </span>
+                            </a>
                         </c:when>
 
                     </c:choose>
