@@ -29,14 +29,31 @@
                 <c:if test="${message == 'invalidStatus'}"><p style="color: red; font-weight: bold;">Trạng thái yêu cầu không hợp lệ cho hành động này.</p></c:if>
                 <c:if test="${message == 'dbError'}"><p style="color: red; font-weight: bold;">Lỗi hệ thống database. Vui lòng thử lại.</p></c:if>
 
-                <%-- Nút thêm mới yêu cầu nhập kho --%>
-                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 4}">
-                    <div style="margin-bottom: 20px;">
-                        <a href="${pageContext.request.contextPath}/import-request-create">
-                            <button style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">Tạo yêu cầu mới</button>
-                        </a>
-                    </div>
-                </c:if>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                    <%-- Thanh tìm kiếm (Thiết kế đơn giản, tách biệt, giống Role list) --%>
+                    <form action="${pageContext.request.contextPath}/import-request-list" method="get" style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" name="search" value="<c:out value="${searchText}"/>" placeholder="Tìm tên sản phẩm, người tạo..." style="padding: 8px 12px; width: 280px; border: 1px solid #ccc; border-radius: 4px;">
+                        <button type="submit" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">search</span>Tìm kiếm
+                        </button>
+                        <c:if test="${not empty searchText}">
+                            <a href="${pageContext.request.contextPath}/import-request-list" style="text-decoration: none;">
+                                <button type="button" style="padding: 8px 16px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Xóa lọc</button>
+                            </a>
+                        </c:if>
+                    </form>
+
+                    <%-- Nút thêm mới yêu cầu nhập kho --%>
+                    <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 4}">
+                        <div>
+                            <a href="${pageContext.request.contextPath}/import-request-create" style="text-decoration: none;">
+                                <button style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: bold;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">add</span>Tạo yêu cầu mới
+                                </button>
+                            </a>
+                        </div>
+                    </c:if>
+                </div>
 
                 <table border="1" cellpadding="7" cellspacing="0" style="width: 100%; border-collapse: collapse;">
                     <thead>
@@ -85,6 +102,28 @@
                         </c:forEach>
                     </tbody>
                 </table>
+
+                <%-- Phân trang (Sử dụng cấu trúc phân trang chuẩn của project) --%>
+                <div class="pagination" style="margin-top: 20px; display: flex; justify-content: center; gap: 5px; align-items: center;">
+                    <c:if test="${currentPage > 1}">
+                        <a class="page-link" href="${pageContext.request.contextPath}/import-request-list?page=${currentPage - 1}&search=${searchText}" style="padding: 6px 12px; border: 1px solid #ddd; text-decoration: none; color: #007bff; border-radius: 4px;">&lt;</a>
+                    </c:if>
+                    
+                    <c:forEach begin="1" end="${totalPages}" var="i">
+                        <c:choose>
+                            <c:when test="${i == currentPage}">
+                                <span class="page-current" style="padding: 6px 12px; border: 1px solid #007bff; background-color: #007bff; color: white; font-weight: bold; border-radius: 4px;">${i}</span>
+                            </c:when>
+                            <c:otherwise>
+                                <a class="page-link" href="${pageContext.request.contextPath}/import-request-list?page=${i}&search=${searchText}" style="padding: 6px 12px; border: 1px solid #ddd; text-decoration: none; color: #007bff; border-radius: 4px;">${i}</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:forEach>
+                    
+                    <c:if test="${currentPage < totalPages}">
+                        <a class="page-link" href="${pageContext.request.contextPath}/import-request-list?page=${currentPage + 1}&search=${searchText}" style="padding: 6px 12px; border: 1px solid #ddd; text-decoration: none; color: #007bff; border-radius: 4px;">&gt;</a>
+                    </c:if>
+                </div>
             </main>
         </div>
     </body>

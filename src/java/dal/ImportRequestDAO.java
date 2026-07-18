@@ -19,8 +19,9 @@ public class ImportRequestDAO extends DBContext {
                    + "JOIN product p ON ir.product_id = p.product_id "
                    + "JOIN [user] u_c ON ir.created_by = u_c.user_id "
                    + "LEFT JOIN [user] u_i ON ir.imported_by = u_i.user_id "
-                   + "ORDER BY ir.import_id DESC";
+                   + "ORDER BY ir.created_date DESC, ir.import_id DESC";
         try {
+            System.out.println("[DEBUG] ImportRequestDAO: getAllImportRequests called");
             PreparedStatement stm = connection.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
@@ -28,6 +29,36 @@ public class ImportRequestDAO extends DBContext {
             }
         } catch (Exception e) {
             System.out.println("ImportRequestDAO getAllImportRequests error: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // Tìm kiếm yêu cầu nhập kho theo tên sản phẩm hoặc tên người tạo hoặc ghi chú
+    public List<ImportRequest> searchImportRequests(String searchText) {
+        List<ImportRequest> list = new ArrayList<>();
+        String sql = "SELECT ir.*, p.product_name, u_c.full_name AS creator_name, u_i.full_name AS importer_name "
+                   + "FROM import_request ir "
+                   + "JOIN product p ON ir.product_id = p.product_id "
+                   + "JOIN [user] u_c ON ir.created_by = u_c.user_id "
+                   + "LEFT JOIN [user] u_i ON ir.imported_by = u_i.user_id "
+                   + "WHERE p.product_name LIKE ? OR u_c.full_name LIKE ? OR ir.note LIKE ? "
+                   + "ORDER BY ir.created_date DESC, ir.import_id DESC";
+        try {
+            String searchPattern = "%" + searchText + "%";
+            System.out.println("[DEBUG] ImportRequestDAO: searchImportRequests called with pattern: " + searchPattern);
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setString(1, searchPattern);
+            stm.setString(2, searchPattern);
+            stm.setString(3, searchPattern);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                ImportRequest ir = mapImportRequest(rs);
+                System.out.println("[DEBUG] Match found: IR-" + ir.getImportId() + " " + ir.getProductName());
+                list.add(ir);
+            }
+        } catch (Exception e) {
+            System.out.println("ImportRequestDAO searchImportRequests error: " + e.getMessage());
             e.printStackTrace();
         }
         return list;
