@@ -119,14 +119,14 @@
             </c:when>
             <c:when test="${order.customerOrder.orderStatus == 'COMPLETED'}">
                 <span style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: #28a745; color: white; border-radius: 20px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(40,167,69,0.15);">
-                    ✓ Đơn hàng đã giao thành công
+                     Đơn hàng đã giao thành công
                 </span>
             </c:when>
             <c:when test="${order.customerOrder.orderStatus == 'SHIPPING' && sessionScope.user.roleId == 3}">
                 <form action="${pageContext.request.contextPath}/AcceptanceRecordController" method="POST" onsubmit="return confirm('Bạn có chắc chắn xác nhận đã nhận bàn giao hàng hóa thành công? Thao tác này sẽ cập nhật trạng thái đơn hàng thành hoàn thành.');" style="margin: 0; display: inline-block;">
                     <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
                     <button type="submit" style="padding: 10px 20px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 20px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(40,167,69,0.15); transition: all 0.2s ease;">
-                        ✓ Xác Nhận Giao Hàng Thành Công
+                         Xác Nhận Giao Hàng Thành Công
                     </button>
                 </form>
             </c:when>

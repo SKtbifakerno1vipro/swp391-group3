@@ -25,7 +25,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import model.Invoice;
 import service.InvoiceService;
-
+import service.AuditLogService;
+import service.RoleService;
 @WebServlet(name = "CustomerOrderController", urlPatterns = {"/customer-order"})
 public class CustomerOrderController extends HttpServlet {
 
@@ -35,6 +36,7 @@ public class CustomerOrderController extends HttpServlet {
     private final ProductService productService = new ProductService();
     private final InvoiceService invoiceService = new InvoiceService();
     private final int PAGE_SIZE = 10;
+    private final AuditLogService AuditLogService = new AuditLogService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -60,7 +62,7 @@ public class CustomerOrderController extends HttpServlet {
                 try {
                     int orderId = Integer.parseInt(idParam);
                     customerOrderService.deleteCustomerOrder(orderId);
-                    service.AuditLogService.log(currentUser.getUserId(), "DELETE", "Order", "Xóa đơn hàng ID: " + orderId);
+                    AuditLogService.log(currentUser.getUserId(), "DELETE", "Order", "Xóa đơn hàng ID: " + orderId);
                 } catch (NumberFormatException e) {
                 }
             }
@@ -143,7 +145,7 @@ public class CustomerOrderController extends HttpServlet {
                 int roleId = currentUser.getRoleId();
                 int userId = currentUser.getUserId();
                 
-                service.RoleService roleService = new service.RoleService();
+                RoleService roleService = new RoleService();
                 model.Role userRole = roleService.getRoleById(roleId);
                 String roleName = userRole != null ? userRole.getRoleName().toLowerCase() : "";
                 
@@ -330,7 +332,7 @@ public class CustomerOrderController extends HttpServlet {
             }
 
             if (customerOrderService.createOrder(order, details)) {
-                service.AuditLogService.log(currentUser.getUserId(), "CREATE", "Order", "Tạo đơn hàng mới cho khách hàng ID: " + customerId + " (Số mặt hàng: " + details.size() + ")");
+                AuditLogService.log(currentUser.getUserId(), "CREATE", "Order", "Tạo đơn hàng mới cho khách hàng ID: " + customerId + " (Số mặt hàng: " + details.size() + ")");
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
             } else {
                 request.setAttribute("error", "Tạo đơn hàng thất bại. " + dal.CustomerOrderDAO.lastError);
@@ -347,7 +349,7 @@ public class CustomerOrderController extends HttpServlet {
         int orderId = Integer.parseInt(request.getParameter("orderId"));
         String status = request.getParameter("status");
         
-        dto.CustomerOrderDTO order = customerOrderService.getCustomerOrderById(orderId);
+        CustomerOrderDTO order = customerOrderService.getCustomerOrderById(orderId);
         if (order != null && "COMPLETED".equals(order.getCustomerOrder().getOrderStatus())) {
             response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
             return;
@@ -364,7 +366,7 @@ public class CustomerOrderController extends HttpServlet {
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
         Integer currentUserId = currentUser != null ? currentUser.getUserId() : null;
-        service.AuditLogService.log(currentUserId, "UPDATE", "Order", "Cập nhật trạng thái đơn hàng ID " + orderId + " thành: " + status);
+        AuditLogService.log(currentUserId, "UPDATE", "Order", "Cập nhật trạng thái đơn hàng ID " + orderId + " thành: " + status);
         
         response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
     }
