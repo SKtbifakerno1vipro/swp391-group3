@@ -31,6 +31,9 @@
                 <c:if test="${message == 'deleteFailed'}"><p style="color: red; font-weight: bold;">Xóa sản phẩm thất bại.</p></c:if>
                 <c:if test="${message == 'invalidInput'}"><p style="color: red; font-weight: bold;">Dữ liệu đầu vào không hợp lệ.</p></c:if>
                 <c:if test="${message == 'accepted'}"><p style="color: green; font-weight: bold;">Đã duyệt báo giá thành công.</p></c:if>
+                <c:if test="${message == 'rejected'}"><p style="color: green; font-weight: bold;">Đã hủy/từ chối báo giá thành công.</p></c:if>
+                <c:if test="${message == 'permissionDenied'}"><p style="color: red; font-weight: bold;">Bạn không có quyền thực hiện thao tác này.</p></c:if>
+                <c:if test="${message == 'invalidStatus'}"><p style="color: red; font-weight: bold;">Không thể sửa đổi báo giá đã duyệt hoặc đã từ chối.</p></c:if>
                 <c:if test="${message == 'stockError'}">
                     <p style="color: red; font-weight: bold;">
                         Không đủ hàng cho sản phẩm.
@@ -61,7 +64,7 @@
                 <br>
 
                 <%-- Form them san pham moi vao quotation hien tai bang searchbar. --%>
-                <c:if test="${sessionScope.user.roleId == 4 && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
+                <c:if test="${sessionScope.user.roleId == 4 && isAllowedToManage && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
                     <h2>Thêm sản phẩm</h2>
                     <form action="${pageContext.request.contextPath}/quotation-detail" method="post">
                         <input type="hidden" name="quotationId" value="${quotation.quotationId}">
@@ -98,7 +101,7 @@
                 </c:if>
 
                 <%-- Khoi nay hien thi va cho sua danh sach san pham trong quotation. --%>
-                <c:if test="${sessionScope.user.roleId == 4 && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
+                <c:if test="${sessionScope.user.roleId == 4 && isAllowedToManage && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
                     <div style="margin-bottom: 15px;">
                         <form action="${pageContext.request.contextPath}/quotation-detail" method="post" style="display:inline;">
                             <input type="hidden" name="action" value="applyAll">
@@ -128,7 +131,7 @@
                             <th>Chiết khấu %</th>
                             <th>Thuế %</th>
                             <th>Thành tiền</th>
-                                <c:if test="${sessionScope.user.roleId == 4 && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
+                                <c:if test="${sessionScope.user.roleId == 4 && isAllowedToManage && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
                                 <th>Hành động</th>
                                 </c:if>
                         </tr>
@@ -158,36 +161,36 @@
                                 </td>
                                 <td>
                                     <c:choose>
-                                        <c:when test="${sessionScope.user.roleId == 3}">
-                                            ${detail.quantity}
-                                        </c:when>
-                                        <c:otherwise>
+                                        <c:when test="${sessionScope.user.roleId == 4 && isAllowedToManage && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
                                             <input type="number" name="quantity" min="1" value="${detail.quantity}" required style="width: 70px;">
+                                        </c:when>
+                                        <c:otherwise>
+                                            ${detail.quantity}
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
                                 <td>
                                     <c:choose>
-                                        <c:when test="${sessionScope.user.roleId == 3}">
-                                            ${detail.discountPercent}
-                                        </c:when>
-                                        <c:otherwise>
+                                        <c:when test="${sessionScope.user.roleId == 4 && isAllowedToManage && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
                                             <input type="number" name="discountPercent" min="0" max="100" step="0.01" value="${detail.discountPercent}" readonly style="width: 70px;">
+                                        </c:when>
+                                        <c:otherwise>
+                                            ${detail.discountPercent}
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
                                 <td>
                                     <c:choose>
-                                        <c:when test="${sessionScope.user.roleId == 3}">
-                                            ${detail.taxPercent}
+                                        <c:when test="${sessionScope.user.roleId == 4 && isAllowedToManage && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
+                                            <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="${detail.taxPercent}" readonly style="width: 70px;">
                                         </c:when>
                                         <c:otherwise>
-                                            <input type="number" name="taxPercent" min="0" max="100" step="0.01" value="${detail.taxPercent}" readonly style="width: 70px;">
+                                            ${detail.taxPercent}
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
                                 <td><fmt:formatNumber value="${detail.amount}" type="number" minFractionDigits="2" maxFractionDigits="2" /></td>
-                                <c:if test="${sessionScope.user.roleId == 4 && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
+                                <c:if test="${sessionScope.user.roleId == 4 && isAllowedToManage && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
                                     <td>
                                         <input type="hidden" name="quotationId" value="${quotation.quotationId}">
                                         <input type="hidden" name="quotationDetailId" value="${detail.quotationDetailId}">
@@ -204,7 +207,7 @@
                             <td style="font-weight: bold; color: #2e7d32;">
                                 <fmt:formatNumber value="${quotation.totalPrice != null ? quotation.totalPrice : 0}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
                             </td>
-                            <c:if test="${sessionScope.user.roleId == 4 && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
+                            <c:if test="${sessionScope.user.roleId == 4 && isAllowedToManage && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
                             <td></td>
                             </c:if>
                         </tr>
@@ -237,11 +240,17 @@
 
                 <br>
                 <div style="margin-top: 20px;">
-                    <c:if test="${sessionScope.user.roleId == 4 && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
+                    <c:if test="${sessionScope.user.roleId == 4 && isAllowedToManage && (quotation.quotationStatus == 'DRAFT' || quotation.quotationStatus == 'PENDING')}">
                         <form action="quotation-detail" method="POST" style="display:inline;">
                             <input type="hidden" name="quotationId" value="${quotation.quotationId}">
                             <input type="hidden" name="action" value="accept">
                             <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">Duyệt báo giá</button>
+                        </form>
+                        
+                        <form action="quotation-detail" method="POST" style="display:inline; margin-left: 10px;">
+                            <input type="hidden" name="quotationId" value="${quotation.quotationId}">
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" style="padding: 10px 20px; background-color: #f44336; color: white; border: none; cursor: pointer;" onclick="return confirm('Bạn có chắc chắn muốn hủy/từ chối báo giá này không?')">Hủy báo giá</button>
                         </form>
                     </c:if>
 
