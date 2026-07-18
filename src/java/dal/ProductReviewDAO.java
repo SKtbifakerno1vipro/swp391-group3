@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import model.ProductReview;
+import java.sql.Timestamp;
 
 public class ProductReviewDAO extends DBContext {
 
@@ -169,7 +170,7 @@ public class ProductReviewDAO extends DBContext {
         }
     }
 
-    public List<ProductReview> getReviewsSince(java.sql.Timestamp since, Integer customerUserId) {
+    public List<ProductReview> getReviewsSince(Timestamp since, Integer customerUserId) {
         List<ProductReview> list = new ArrayList<>();
         String sql = "SELECT pr.*, c.company_name, u_staff.full_name AS staff_name, p.product_name "
                    + "FROM product_review pr "

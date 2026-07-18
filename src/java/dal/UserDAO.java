@@ -37,6 +37,26 @@ public class UserDAO extends DBContext {
     }
 
     /*
+    created by vtpp
+    that function will check if admin ban user
+     */
+    public boolean checkBanUser(User u) {
+        String sql = """
+                    select count(1) from dbo.[user] u
+                    where u.user_id=? and u.account_status ='INACTIVE'""";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, u.getUserId());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            System.out.println("searchUsers: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /*
     created by phu
      */
     public List<UserRoleDTO> searchUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail, int pageIndex, int pageSize) {

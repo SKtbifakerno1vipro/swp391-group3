@@ -39,8 +39,12 @@
                 background: #f1f5f9; /* Dashboard shell background color match */
                 border-radius: 50%;
             }
-            .receipt-header::before { left: -6px; }
-            .receipt-header::after { right: -6px; }
+            .receipt-header::before {
+                left: -6px;
+            }
+            .receipt-header::after {
+                right: -6px;
+            }
 
             .receipt-title {
                 font-family: 'Literata', serif;
@@ -126,20 +130,34 @@
             </jsp:include>
             <main class="main legacy-page">
                 <h2>Xác nhận giao dịch</h2>
-                
+
+                <c:if test="${not empty sessionScope.successMessage}">
+                    <div style="color: #065f46; background-color: #d1fae5; border: 1px solid #10b981; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; max-width: 600px; margin: 0 auto 20px auto;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
+                        ${sessionScope.successMessage}
+                        <% session.removeAttribute("successMessage"); %>
+                    </div>
+                </c:if>
+                <c:if test="${not empty sessionScope.errorMessage}">
+                    <div style="color: #991b1b; background-color: #fee2e2; border: 1px solid #ef4444; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; max-width: 600px; margin: 0 auto 20px auto;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
+                        ${sessionScope.errorMessage}
+                        <% session.removeAttribute("errorMessage"); %>
+                    </div>
+                </c:if>
                 <div class="receipt-container">
                     <div class="receipt-header">
                         <span class="material-symbols-outlined" style="font-size: 3rem; color: #10b981;">check_circle</span>
                         <h3 class="receipt-title">Biên lai giao dịch</h3>
                         <p class="receipt-subtitle">Mã tham chiếu: PAY-${payment.paymentId}</p>
                     </div>
-                    
+
                     <div class="receipt-body">
                         <div class="receipt-row">
                             <span class="label">Mã thanh toán</span>
                             <span class="value">#${payment.paymentId}</span>
                         </div>
-                        
+
                         <div class="receipt-row">
                             <span class="label">Mã hợp đồng / đơn hàng</span>
                             <span class="value">
@@ -155,7 +173,7 @@
                                 </c:choose>
                             </span>
                         </div>
-                        
+
                         <div class="receipt-row">
                             <span class="label">Tên khách hàng</span>
                             <span class="value">
@@ -228,6 +246,26 @@
                                     </c:choose>
                                 </button>
                             </form>
+                        </c:if>
+                        <c:if test="${not empty invoice}"> 
+                            <c:choose>
+                                <c:when test="${payment.paymentStatus == 'COMPLETED' && canIssue == true}">
+                                    <div style="margin-top: 15px;">
+                                        <a href="javascript:void(0);" onclick="if (confirm('Bạn có chắc chắn muốn phát hành hóa đơn cho thanh toán này?')) {
+                                                    document.getElementById('issueForm-detail').submit();
+                                                }" style="color: #059669; text-decoration: none; font-weight: bold; font-size: 1rem; display: inline-block;" onmouseover="this.style.textDecoration = 'underline';" onmouseout="this.style.textDecoration = 'none';">Xuất hóa đơn</a>
+                                        <form id="issueForm-detail" action="${pageContext.request.contextPath}/invoice" method="POST" style="display: none;">
+                                            <input type="hidden" name="customerContractId" value="${payment.customerContractId}"/>
+                                            <input type="hidden" name="action" value="notice"/>
+                                        </form>
+                                    </div>
+                                </c:when>
+                                <c:when test="${payment.paymentStatus == 'COMPLETED' && invoice.invoiceStatus == 'RELEASED'}">
+                                    <div style="margin-top: 15px;">
+                                        <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invoice.invoiceId}" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">Xem hóa đơn</a>
+                                    </div>
+                                </c:when>
+                            </c:choose>
                         </c:if>
                     </div>
                 </div>

@@ -40,6 +40,11 @@
                         <option value="TEXT" ${storageType == 'TEXT' ? 'selected' : ''}>Văn bản</option>
                         <option value="IMAGE" ${storageType == 'IMAGE' ? 'selected' : ''}>Ảnh scan</option>
                     </select>
+                    <select name="customerType">
+                        <option value="">-- Loại khách hàng --</option>
+                        <option value="CUSTOMER" ${customerType == 'CUSTOMER' ? 'selected' : ''}>Khách hàng</option>
+                        <option value="LOYAL CUSTOMER" ${customerType == 'LOYAL CUSTOMER' ? 'selected' : ''}>Khách hàng thân thiết</option>
+                    </select>
                     <br>
                     <label>Từ ngày</label>
                     <input type="date" name="fromDate" value="${fromDate}">
@@ -53,8 +58,9 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Mã Hợp Đồng</th>
+                            <th>Số Hợp Đồng</th>
                             <th>Khách hàng</th>
+                            <th>Loại khách hàng</th>
                             <th>Trạng thái</th>
                             <th>Hình thức lưu</th>
                             <th>Mã số thuế</th>
@@ -73,6 +79,13 @@
                                 <td>${c.contractId}</td>
                                 <td>${c.contractNumber}</td>
                                 <td>${c.customerName}</td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${c.customerType == 'CUSTOMER'}">Khách hàng</c:when>
+                                        <c:when test="${c.customerType == 'LOYAL CUSTOMER'}">Khách hàng thân thiết</c:when>
+                                        <c:otherwise>${c.customerType}</c:otherwise>
+                                    </c:choose>
+                                </td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${c.contractStatus == 'DRAFT'}">Nháp</c:when>

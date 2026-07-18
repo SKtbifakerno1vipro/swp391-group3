@@ -7,15 +7,18 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.Invoice;
 
 import model.Payment;
 import model.User;
+import service.InvoiceService;
 import service.PaymentService;
 
 @WebServlet(name = "PaymentDetailController", urlPatterns = {"/payment/detail"})
 public class PaymentDetailController extends HttpServlet {
 
     private final PaymentService paymentService = new PaymentService();
+    private final InvoiceService invoiceService = new InvoiceService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -49,6 +52,12 @@ public class PaymentDetailController extends HttpServlet {
             }
 
             request.setAttribute("payment", payment);
+            Invoice invoice = invoiceService.getInvoiceByContractId(payment.getCustomerContractId());
+            boolean canIssue = (invoice != null && "READY".equals(invoice.getInvoiceStatus()));
+            payment.setInvoice(invoice);
+            payment.setCanIssue(canIssue);
+            request.setAttribute("canIssue", canIssue);
+            request.setAttribute("invoice", invoice);
             request.getRequestDispatcher("/views/payment/payment_detail.jsp").forward(request, response);
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/payment/list");

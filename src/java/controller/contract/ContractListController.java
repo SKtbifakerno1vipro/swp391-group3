@@ -47,6 +47,7 @@ public class ContractListController extends HttpServlet {
         String taxcode = request.getParameter("customerTaxCode") != null ? request.getParameter("customerTaxCode").trim().replaceAll("\\s+", "") : null;
         String phone = request.getParameter("customerPhone") != null ? request.getParameter("customerPhone").trim().replaceAll("\\s+", "") : null;
         String email = request.getParameter("customerEmail") != null ? request.getParameter("customerEmail").trim().replaceAll("\\s+", "") : null;
+        String customerType = request.getParameter("customerType");
         
         // 2. validate page index
         int pageIndex = 1;
@@ -66,7 +67,7 @@ public class ContractListController extends HttpServlet {
 
         int totalRecord = contractService.getTotalContracts(contractNumber, customerName, status, storageType, pageIndex,
                 pageSize, currentUser.getUserId(), currentUser.getRoleId(),
-                fromDate, toDate, taxcode, phone, email);
+                fromDate, toDate, taxcode, phone, email, customerType);
 
         // calculate to the end page
         int endPage = (int) Math.ceil((double) totalRecord / pageSize);
@@ -76,7 +77,7 @@ public class ContractListController extends HttpServlet {
         }
 
         List<ContractCustomerDTO> list = contractService.searchContracts(contractNumber, customerName, status, storageType, pageIndex,
-                pageSize, currentUser.getUserId(), currentUser.getRoleId(), fromDate, toDate, taxcode, phone, email);
+                pageSize, currentUser.getUserId(), currentUser.getRoleId(), fromDate, toDate, taxcode, phone, email, customerType);
 
         request.setAttribute("list", list);
         request.setAttribute("endPage", endPage);
@@ -90,6 +91,7 @@ public class ContractListController extends HttpServlet {
         request.setAttribute("customerTaxCode", taxcode);
         request.setAttribute("customerPhone", phone);
         request.setAttribute("customerEmail", email);
+        request.setAttribute("customerType", customerType);
 
         request.getRequestDispatcher("views/contract/list.jsp").forward(request, response);
     }
