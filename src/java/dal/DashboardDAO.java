@@ -806,4 +806,129 @@ public class DashboardDAO extends DBContext {
         }
         return list;
     }
+
+    // ==========================================
+    // WAREHOUSE DASHBOARD METHODS
+    // ==========================================
+
+    public int getPendingImportRequestsCount() {
+        String sql = "SELECT COUNT(*) FROM import_request WHERE status = 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("getPendingImportRequestsCount error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public int getPendingOrdersCount() {
+        String sql = "SELECT COUNT(*) FROM customer_order WHERE order_status NOT IN ('COMPLETED', 'CANCELLED')";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("getPendingOrdersCount error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public int getLowStockProductsCount() {
+        String sql = "SELECT COUNT(*) FROM product WHERE quantity_available <= reorder_level AND product_status = 'ACTIVE'";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("getLowStockProductsCount error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public List<Map<String, Object>> getLowStockProductsList() {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT p.product_name, c.category_name, p.quantity_available, p.reorder_level "
+                   + "FROM product p "
+                   + "JOIN category c ON p.category_id = c.category_id "
+                   + "WHERE p.quantity_available <= p.reorder_level AND p.product_status = 'ACTIVE' "
+                   + "ORDER BY p.quantity_available ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("productName", rs.getString("product_name"));
+                map.put("categoryName", rs.getString("category_name"));
+                int available = rs.getInt("quantity_available");
+                int reorder = rs.getInt("reorder_level");
+                map.put("available", available);
+                map.put("reorderLevel", reorder);
+                
+                String status = "Low";
+                if (available == 0 || available <= reorder * 0.2 || available <= 5) {
+                    status = "Critical";
+                }
+                map.put("status", status);
+                list.add(map);
+            }
+        } catch (Exception e) {
+            System.out.println("getLowStockProductsList error: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<Map<String, Object>> getPendingImportRequestsList(int limit) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT TOP (?) ir.import_id, p.product_name, ir.quantity, u.full_name AS creator_name, ir.created_date "
+                   + "FROM import_request ir "
+                   + "JOIN product p ON ir.product_id = p.product_id "
+                   + "JOIN [user] u ON ir.created_by = u.user_id "
+                   + "WHERE ir.status = 1 "
+                   + "ORDER BY ir.created_date DESC, ir.import_id DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("importId", rs.getInt("import_id"));
+                    map.put("productName", rs.getString("product_name"));
+                    map.put("quantity", rs.getInt("quantity"));
+                    map.put("creatorName", rs.getString("creator_name"));
+                    map.put("createdDate", rs.getTimestamp("created_date"));
+                    list.add(map);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getPendingImportRequestsList error: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<Map<String, Object>> getRecentOrdersList(int limit) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT TOP (?) co.customer_order_id, c.company_name, co.order_status, co.created_at "
+                   + "FROM customer_order co "
+                   + "JOIN customer c ON co.customer_id = c.customer_id "
+                   + "ORDER BY co.created_at DESC, co.customer_order_id DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("orderId", rs.getInt("customer_order_id"));
+                    map.put("companyName", rs.getString("company_name"));
+                    map.put("status", rs.getString("order_status"));
+                    map.put("createdAt", rs.getTimestamp("created_at"));
+                    list.add(map);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getRecentOrdersList error: " + e.getMessage());
+        }
+        return list;
+    }
 }

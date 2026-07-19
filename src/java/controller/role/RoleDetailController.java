@@ -62,6 +62,7 @@ public class RoleDetailController extends HttpServlet {
         try {
             request.setCharacterEncoding("UTF-8");
             response.setCharacterEncoding("UTF-8");
+
             int roleId = Integer.parseInt(request.getParameter("roleId"));
             String roleName = request.getParameter("roleName");
 
@@ -75,7 +76,7 @@ public class RoleDetailController extends HttpServlet {
                 }
             }
 
-            // Validate
+            // kiểm tra roleName có trống không
             if (roleName == null || roleName.trim().isEmpty()) {
                 Role role = roleService.getRoleDetail(roleId);
                 request.setAttribute("role", role);
@@ -93,7 +94,7 @@ public class RoleDetailController extends HttpServlet {
                 return;
             }
 
-            // Update
+            // update
             Role role = new Role();
             role.setRoleId(roleId);
             role.setRoleName(roleName.trim());
@@ -101,7 +102,6 @@ public class RoleDetailController extends HttpServlet {
             roleService.updateRole(role);
             roleService.updateRolePermissions(roleId, permissionIds);
 
-            // Redirect ve view mode
             response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/role-list");

@@ -17,9 +17,10 @@ import model.User;
 import service.ProductService;
 import service.QuotationService;
 
-@WebServlet(name = "QuotationDetailController", urlPatterns = {"/quotation-detail"})
+@WebServlet(name = "QuotationDetailController", urlPatterns = { "/quotation-detail" })
 public class QuotationDetailController extends HttpServlet {
     private final ProductService pService = new ProductService();
+
     /*
      * doGet chay khi user bam view: /quotation-detail?id=1
      */
@@ -31,13 +32,14 @@ public class QuotationDetailController extends HttpServlet {
 
         try {
             int quotationId = Integer.parseInt(request.getParameter("id"));
-            
+
             QuotationService quotationService = new QuotationService();
-            
-            // Lay thong tin chung, san pham trong quotation, history va list product de add them.
+
+            // Lay thong tin chung, san pham trong quotation, history va list product de add
+            // them.
             Quotation quotation = quotationService.getQuotationById(quotationId);
             List<QuotationDetail> details = quotationService.getQuotationDetailsByQuotationId(quotationId);
-            
+
             if (quotation != null && details != null) {
                 BigDecimal total = BigDecimal.ZERO;
                 for (QuotationDetail d : details) {
@@ -47,10 +49,10 @@ public class QuotationDetailController extends HttpServlet {
                 }
                 quotation.setTotalPrice(total);
             }
-            
+
             List<QuotationHistory> histories = quotationService.getHistoryByQuotationId(quotationId);
             List<Product> products = quotationService.getAllProducts();
-            
+
             if (quotation == null) {
                 response.sendRedirect(request.getContextPath() + "/quotation-list");
                 return;
@@ -58,7 +60,13 @@ public class QuotationDetailController extends HttpServlet {
 
             HttpSession session = request.getSession(false);
             User user = (session != null) ? (User) session.getAttribute("user") : null;
-            if (user != null && user.getRoleId() == 3) {
+            if (user == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+
+            // Kiểm tra phân quyền truy cập đối với Khách hàng (roleId == 3)
+            if (user.getRoleId() == 3) {
                 service.CustomerService customerService = new service.CustomerService();
                 dto.CustomerDTO customerDTO = customerService.getCustomerDTOByUserId(user.getUserId());
                 if (customerDTO == null || customerDTO.getCustomer().getCustomerId() != quotation.getCustomerId()) {
@@ -66,14 +74,41 @@ public class QuotationDetailController extends HttpServlet {
                     return;
                 }
             }
-            
+
+            // Mặc định cho phép quản lý (các vai trò như Manager, Admin, Admin Officer)
+            boolean isAllowedToManage = true;
+
+            // Nếu người dùng là nhân viên Sale (roleId == 4)
+            if (user.getRoleId() == 4) {
+                // Kiểm tra xem Sale này có phải người tạo báo giá không
+                boolean isCreator = (quotation.getCreatedBy() != null
+                        && quotation.getCreatedBy().equals(user.getUserId()));
+
+                // Kiểm tra xem Sale này có phải người phụ trách khách hàng của báo giá không
+                service.CustomerService customerService = new service.CustomerService();
+                dto.CustomerDTO customer = customerService.getCustomerDTOById(quotation.getCustomerId());
+                boolean isAssigned = (customer != null && customer.getCustomer() != null
+                        && customer.getCustomer().getAssignedToUserId() != null
+                        && customer.getCustomer().getAssignedToUserId().equals(user.getUserId()));
+
+                // Nếu không phải người tạo và cũng không được phân công khách hàng thì chặn
+                // không cho xem
+                if (!isCreator && !isAssigned) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-list?message=unauthorized");
+                    return;
+                }
+
+                isAllowedToManage = isCreator || isAssigned;
+            }
+
+            request.setAttribute("isAllowedToManage", isAllowedToManage);
             request.setAttribute("message", request.getParameter("message"));
             request.setAttribute("quotation", quotation);
             request.setAttribute("details", details);
             request.setAttribute("histories", histories);
             request.setAttribute("products", products);
             request.getRequestDispatcher("/views/quotation/detail.jsp").forward(request, response);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new ServletException(e);
@@ -81,7 +116,8 @@ public class QuotationDetailController extends HttpServlet {
     }
 
     /*
-     * doPost xu ly cac action: update detail, add product, delete product, accept quotation.
+     * doPost xu ly cac action: update detail, add product, delete product, accept
+     * quotation.
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -101,29 +137,70 @@ public class QuotationDetailController extends HttpServlet {
 
             HttpSession session = request.getSession(false);
             User user = (session != null) ? (User) session.getAttribute("user") : null;
-            if (user != null && user.getRoleId() == 3) {
-                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
+            if (user == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+
+            // Khách hàng (roleId == 3) không được phép sửa đổi dữ liệu báo giá
+            if (user.getRoleId() == 3) {
+                response.sendRedirect(
+                        request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
                 return;
             }
 
             Quotation quotation = quotationService.getQuotationById(quotationId);
-            if (quotation == null || (!"DRAFT".equals(quotation.getQuotationStatus()) && !"PENDING".equals(quotation.getQuotationStatus()))) {
-                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=unauthorized");
+            if (quotation == null) {
+                response.sendRedirect(request.getContextPath() + "/quotation-list");
                 return;
             }
 
+            // Kiểm tra phân quyền cho nhân viên Sale (roleId == 4)
+            if (user.getRoleId() == 4) {
+                boolean isCreator = (quotation.getCreatedBy() != null
+                        && quotation.getCreatedBy().equals(user.getUserId()));
+                service.CustomerService customerService = new service.CustomerService();
+                dto.CustomerDTO customer = customerService.getCustomerDTOById(quotation.getCustomerId());
+                boolean isAssigned = (customer != null && customer.getCustomer() != null
+                        && customer.getCustomer().getAssignedToUserId() != null
+                        && customer.getCustomer().getAssignedToUserId().equals(user.getUserId()));
+
+                if (!isCreator && !isAssigned) {
+                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
+                            + "&message=permissionDenied");
+                    return;
+                }
+            }
+
+            // Chặn sửa đổi nếu trạng thái báo giá KHÔNG PHẢI DRAFT hoặc PENDING
+            if (!"DRAFT".equals(quotation.getQuotationStatus()) && !"PENDING".equals(quotation.getQuotationStatus())) {
+                response.sendRedirect(
+                        request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidStatus");
+                return;
+            }
+
+            // Hành động Duyệt báo giá (Accept)
             if ("accept".equals(action)) {
                 quotationService.updateStatus(quotationId, "ACCEPTED", userId);
-                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=accepted");
+                response.sendRedirect(
+                        request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=accepted");
+                return;
+            }
+
+            // Hành động Từ chối / Hủy báo giá (Reject)
+            if ("reject".equals(action)) {
+                quotationService.updateStatus(quotationId, "REJECTED", userId);
+                response.sendRedirect(
+                        request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=rejected");
                 return;
             }
 
             if ("applyAll".equals(action)) {
                 BigDecimal discount = new BigDecimal(request.getParameter("discountPercent"));
                 BigDecimal tax = new BigDecimal(request.getParameter("taxPercent"));
-                
+
                 boolean success = quotationService.applyDiscountAndTaxToAll(quotationId, discount, tax, userId);
-                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId 
+                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
                         + (success ? "&message=saveSuccess" : "&message=saveFailed"));
                 return;
             }
@@ -131,7 +208,8 @@ public class QuotationDetailController extends HttpServlet {
             if ("addProduct".equals(action)) {
                 Product prod = pService.getProductById(productId);
                 if (prod == null) {
-                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
+                    response.sendRedirect(
+                            request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
                     return;
                 }
 
@@ -146,13 +224,13 @@ public class QuotationDetailController extends HttpServlet {
                 int totalRequest = requestedQty + existingQty;
                 int reserveTemp = prod.getQuantityReserve() + requestedQty;
                 int difference = prod.getQuantityAvailable() - reserveTemp;
-                if (difference < 0 ){
+                if (difference < 0) {
                     int maxAllowed = prod.getQuantityAvailable() - prod.getQuantityReserve();
                     response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId
                             + "&message=stockError");
                     return;
                 }
-                
+
                 QuotationDetail detail = new QuotationDetail();
                 detail.setProductId(productId);
                 detail.setProductName(prod.getProductName());
@@ -160,13 +238,16 @@ public class QuotationDetailController extends HttpServlet {
                 detail.setCostPrice(BigDecimal.valueOf(prod.getCostPrice()));
                 detail.setSellingPrice(BigDecimal.valueOf(prod.getSellingPrice()));
                 detail.setQuantity(requestedQty);
-                
+
                 String discountParam = request.getParameter("discountPercent");
-                detail.setDiscountPercent(discountParam != null && !discountParam.isEmpty() ? new BigDecimal(discountParam) : BigDecimal.ZERO);
-                
+                detail.setDiscountPercent(
+                        discountParam != null && !discountParam.isEmpty() ? new BigDecimal(discountParam)
+                                : BigDecimal.ZERO);
+
                 String taxParam = request.getParameter("taxPercent");
-                detail.setTaxPercent(taxParam != null && !taxParam.isEmpty() ? new BigDecimal(taxParam) : BigDecimal.ZERO);
-                
+                detail.setTaxPercent(
+                        taxParam != null && !taxParam.isEmpty() ? new BigDecimal(taxParam) : BigDecimal.ZERO);
+
                 detail.setQuotationId(quotationId);
 
                 boolean success = quotationService.addProductToQuotation(detail, userId);
@@ -183,11 +264,13 @@ public class QuotationDetailController extends HttpServlet {
                 String productName = request.getParameter("productName");
                 Product prod = pService.getProductById(productId);
                 if (prod == null) {
-                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
+                    response.sendRedirect(
+                            request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
                     return;
                 }
                 QuotationDetail detail = quotationService.getQuotationDetailByProduct(quotationId, prod.getProductId());
-                boolean success = quotationService.deleteProductFromQuotation(quotationId, quotationDetailId, productName, userId);
+                boolean success = quotationService.deleteProductFromQuotation(quotationId, quotationDetailId,
+                        productName, userId);
                 if (success && detail != null) {
                     int newReserve = prod.getQuantityReserve() - detail.getQuantity();
                     pService.updateQuantityReserve(productId, newReserve < 0 ? 0 : newReserve);
@@ -205,12 +288,14 @@ public class QuotationDetailController extends HttpServlet {
 
                 Product prod = pService.getProductById(detail.getProductId());
                 if (prod == null) {
-                    response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
+                    response.sendRedirect(
+                            request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
                     return;
                 }
 
                 // Check stock delta
-                QuotationDetail oldDetail = quotationService.getQuotationDetailByProduct(quotationId, detail.getProductId());
+                QuotationDetail oldDetail = quotationService.getQuotationDetailByProduct(quotationId,
+                        detail.getProductId());
                 int oldQty = (oldDetail != null) ? oldDetail.getQuantity() : 0;
                 int diff = detail.getQuantity() - oldQty;
                 int reserveTemp = prod.getQuantityReserve() + diff;
@@ -233,7 +318,8 @@ public class QuotationDetailController extends HttpServlet {
 
         } catch (Exception e) {
             if (quotationId > 0) {
-                response.sendRedirect(request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
+                response.sendRedirect(
+                        request.getContextPath() + "/quotation-detail?id=" + quotationId + "&message=invalidInput");
             } else {
                 response.sendRedirect(request.getContextPath() + "/quotation-list");
             }
@@ -248,16 +334,18 @@ public class QuotationDetailController extends HttpServlet {
         detail.setProductId(Integer.parseInt(request.getParameter("productId")));
         detail.setProductName(request.getParameter("productName"));
         detail.setQuantity(Integer.parseInt(request.getParameter("quantity")));
-        
+
         String priceParam = request.getParameter("sellingPrice");
-        detail.setSellingPrice(priceParam != null && !priceParam.isEmpty() ? new BigDecimal(priceParam) : BigDecimal.ZERO);
-        
+        detail.setSellingPrice(
+                priceParam != null && !priceParam.isEmpty() ? new BigDecimal(priceParam) : BigDecimal.ZERO);
+
         String discountParam = request.getParameter("discountPercent");
-        detail.setDiscountPercent(discountParam != null && !discountParam.isEmpty() ? new BigDecimal(discountParam) : BigDecimal.ZERO);
-        
+        detail.setDiscountPercent(
+                discountParam != null && !discountParam.isEmpty() ? new BigDecimal(discountParam) : BigDecimal.ZERO);
+
         String taxParam = request.getParameter("taxPercent");
         detail.setTaxPercent(taxParam != null && !taxParam.isEmpty() ? new BigDecimal(taxParam) : BigDecimal.ZERO);
-        
+
         return detail;
     }
 

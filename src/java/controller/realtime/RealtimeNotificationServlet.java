@@ -56,6 +56,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
         Timestamp lastCheckedCustomer = new Timestamp(startTime);
         Timestamp lastCheckedInvoice = new Timestamp(startTime);
         Timestamp lastCheckedProductReview = new Timestamp(startTime);
+        Timestamp lastCheckedImportRequest = new Timestamp(startTime);
 
 
         int lastContractHistoryId = contractDAO.getMaxContractHistoryId();
@@ -426,6 +427,32 @@ public class RealtimeNotificationServlet extends HttpServlet {
                     Timestamp repTime = new Timestamp(pr.getRepliedAt().getTime());
                     if (repTime.after(lastCheckedProductReview)) {
                         lastCheckedProductReview = new Timestamp(repTime.getTime() + 1000);
+                    }
+                }
+            }
+
+            // 6. Import Request Notifications (Báo cho Manager, System Admin và Warehouse Staff khi có yêu cầu mới)
+            dal.RoleDAO roleDAOForImport = new dal.RoleDAO();
+            int warehouseRoleId = roleDAOForImport.getRoleIdByName("Warehouse Staff");
+            if (roleId == 1 || roleId == 2 || (roleId == warehouseRoleId && warehouseRoleId != -1)) {
+                dal.ImportRequestDAO importRequestDAO = new dal.ImportRequestDAO();
+                List<model.ImportRequest> newImports = importRequestDAO.getPendingRequestsSince(lastCheckedImportRequest);
+                for (model.ImportRequest ir : newImports) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("{\"type\":\"info\"");
+                    sb.append(",\"title\":\"Yêu cầu nhập kho mới\"");
+                    sb.append(",\"message\":\"Có yêu cầu nhập kho mới từ ").append(escapeJson(ir.getCreatedByName())).append(" cho sản phẩm: ").append(escapeJson(ir.getProductName())).append(" (SL: ").append(ir.getQuantity()).append(").\"");
+                    sb.append(",\"link\":\"").append(request.getContextPath()).append("/import-request-detail?id=").append(ir.getImportId()).append("\"");
+                    sb.append(",\"btnText\":\"Xem chi tiết\"");
+                    sb.append("}");
+
+                    writer.write("event: notification\n");
+                    writer.write("data: " + sb.toString() + "\n\n");
+
+                    if (ir.getCreatedDate() != null) {
+                        if (ir.getCreatedDate().after(lastCheckedImportRequest)) {
+                            lastCheckedImportRequest = new Timestamp(ir.getCreatedDate().getTime() + 1000);
+                        }
                     }
                 }
             }

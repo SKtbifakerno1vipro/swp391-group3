@@ -372,4 +372,16 @@ public class ProductDAO extends DBContext {
         }
         return false;
     }
+
+    public boolean addAvailableQuantity(int productId, int quantity) {
+        String sql = "UPDATE product SET quantity_available = quantity_available + ? WHERE product_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("addAvailableQuantity: " + e.getMessage());
+        }
+        return false;
+    }
 }
