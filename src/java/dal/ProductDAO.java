@@ -10,22 +10,6 @@ import model.Product;
 
 public class ProductDAO extends DBContext {
     
-    public List<Product> getAllProducts() {
-        List<Product> list = new ArrayList<>();
-        String sql = "select * from product p join category c on p.category_id = c.category_id WHERE product_status = 'ACTIVE'";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Product p = mapResultSetToProduct(rs);
-                list.add(p);
-            }
-        } catch (Exception e) {
-            System.out.println("getAllProducts: " + e.getMessage());
-        }
-        return list;
-    }
-
     public Product getProductById(int id) {
         String sql = "select * from product p join category c on p.category_id = c.category_id WHERE product_id = ?";
         try {
@@ -130,20 +114,26 @@ public class ProductDAO extends DBContext {
         return false;
     }
     
-    public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status, int totalRow, int page, int totalPage, int pageSize) {
+    public List<Product> searchProduct(String searchText, Integer categoryId, String sort, String status, Double minPrice, Double maxPrice, int totalRow, int page, int totalPage, int pageSize) {
         List<Product> list = new ArrayList<>();
         try {
             String sql = """
                          select * from product p join category c on p.category_id = c.category_id WHERE 1 = 1
                          """;
             if (searchText != null && !searchText.trim().isEmpty()) {
-                sql += " and product_name LIKE ?";
+                sql += " and (p.product_name LIKE ? OR p.description LIKE ?)";
             }
             if (categoryId != null && categoryId > 0) {
                 sql += " and p.category_id = ?";
             }
             if (status != null && !status.trim().isEmpty()) {
                 sql += " and p.product_status = ?";
+            }
+            if (minPrice != null) {
+                sql += " and p.selling_price >= ?";
+            }
+            if (maxPrice != null) {
+                sql += " and p.selling_price <= ?";
             }
             
             if (sort != null && !sort.trim().isEmpty()) {
@@ -167,13 +157,20 @@ public class ProductDAO extends DBContext {
             PreparedStatement ps = connection.prepareStatement(sql);
             int index = 1;
             if (searchText != null && !searchText.trim().isEmpty()) {
-                ps.setString(index++, "%" + searchText + "%");
+                ps.setString(index++, "%" + searchText.trim() + "%");
+                ps.setString(index++, "%" + searchText.trim() + "%");
             }
             if (categoryId != null && categoryId != 0) {
                 ps.setInt(index++, categoryId);
             }
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(index++, status);
+            }
+            if (minPrice != null) {
+                ps.setDouble(index++, minPrice);
+            }
+            if (maxPrice != null) {
+                ps.setDouble(index++, maxPrice);
             }
 
             if ((page > 0 && page <= totalPage)  && totalRow > 0) {
@@ -217,7 +214,7 @@ public class ProductDAO extends DBContext {
         return p;
     }
 
-    public int countProduct(String searchText, Integer categoryId, String status) {
+    public int countProduct(String searchText, Integer categoryId, String status, Double minPrice, Double maxPrice) {
         try {
             String sql = """
                          select COUNT(*) as total
@@ -225,7 +222,7 @@ public class ProductDAO extends DBContext {
                          where 1=1
                          """;
             if (searchText != null && !searchText.trim().isEmpty()) {
-                sql += " and product_name LIKE ?";
+                sql += " and (p.product_name LIKE ? OR p.description LIKE ?)";
             }
             if (categoryId != null && categoryId > 0) {
                 sql += " and p.category_id = ?";
@@ -233,16 +230,29 @@ public class ProductDAO extends DBContext {
             if (status != null && !status.trim().isEmpty()) {
                 sql += " and p.product_status = ?";
             }
+            if (minPrice != null) {
+                sql += " and p.selling_price >= ?";
+            }
+            if (maxPrice != null) {
+                sql += " and p.selling_price <= ?";
+            }
             PreparedStatement ps = connection.prepareStatement(sql);
             int index = 1;
             if (searchText != null && !searchText.trim().isEmpty()) {
-                ps.setString(index++, "%" + searchText + "%");
+                ps.setString(index++, "%" + searchText.trim() + "%");
+                ps.setString(index++, "%" + searchText.trim() + "%");
             }
             if (categoryId != null && categoryId != 0) {
                 ps.setInt(index++, categoryId);
             }
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(index++, status);
+            }
+            if (minPrice != null) {
+                ps.setDouble(index++, minPrice);
+            }
+            if (maxPrice != null) {
+                ps.setDouble(index++, maxPrice);
             }
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -351,22 +361,6 @@ public class ProductDAO extends DBContext {
         return false;
     }
 
-    public boolean isProductUsed(int productId) {
-        // Kiểm tra xem sản phẩm đã có trong chi tiết Báo giá nào chưa để tránh xóa nhầm
-        String sql = "SELECT COUNT(*) FROM quotation_detail WHERE product_id = ?";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, productId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (Exception e) {
-            System.err.println("Error in isProductUsed: " + e.getMessage());
-        }
-        return false;
-    }
-
     public boolean updateQuantityReserve(int productId, int quantityReserve) {
         String sql = "UPDATE product SET quantity_reserve = ? WHERE product_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -375,6 +369,18 @@ public class ProductDAO extends DBContext {
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("updateQuantityReserve: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean addAvailableQuantity(int productId, int quantity) {
+        String sql = "UPDATE product SET quantity_available = quantity_available + ? WHERE product_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("addAvailableQuantity: " + e.getMessage());
         }
         return false;
     }

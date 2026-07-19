@@ -32,6 +32,7 @@ public class RealtimeNotificationServlet extends HttpServlet {
     private final InvoiceService iService = new InvoiceService();
     private final CustomerOrderDAO customerOrderDAO = new CustomerOrderDAO();
     private final ProductReviewService reviewService = new ProductReviewService();
+    private final dal.QuotationDAO quotationDAO = new dal.QuotationDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -55,9 +56,11 @@ public class RealtimeNotificationServlet extends HttpServlet {
         Timestamp lastCheckedCustomer = new Timestamp(startTime);
         Timestamp lastCheckedInvoice = new Timestamp(startTime);
         Timestamp lastCheckedProductReview = new Timestamp(startTime);
+        Timestamp lastCheckedImportRequest = new Timestamp(startTime);
 
 
         int lastContractHistoryId = contractDAO.getMaxContractHistoryId();
+        int lastQuotationHistoryId = quotationDAO.getMaxQuotationHistoryId();
         System.out.println("[Realtime Servlet] Client connected: " + user.getUserName() + " (Role: " + user.getRoleId() + ")");
 
         while (!writer.checkError()) {
@@ -244,6 +247,65 @@ public class RealtimeNotificationServlet extends HttpServlet {
                 }
             }
 
+            // Quotation Notifications
+            List<model.QuotationHistory> newQHistories = quotationDAO.getQuotationHistoriesSinceId(lastQuotationHistoryId);
+            for (model.QuotationHistory qh : newQHistories) {
+                if (qh.getCreatedAt() != null) {
+                    boolean shouldNotify = false;
+                    String title = "";
+                    String msg = "";
+                    String type = "info";
+                    String link = request.getContextPath() + "/quotation-detail?id=" + qh.getQuotationId();
+                    String btnText = "Xem chi tiết";
+
+                    String editHistory = qh.getEditHistory();
+                    if (editHistory != null && editHistory.contains("Cap nhat trang thai thanh: ")) {
+                        String newStatus = editHistory.replace("Cap nhat trang thai thanh: ", "").trim();
+
+                        model.Quotation quo = quotationDAO.getQuotationById(qh.getQuotationId());
+                        int customerUserId = -1;
+                        if (quo != null) {
+                            service.CustomerService custSvc = new service.CustomerService();
+                            dto.CustomerDTO cDTO = custSvc.getCustomerDTOByCusId(quo.getCustomerId());
+                            if (cDTO != null && cDTO.getUser() != null) {
+                                customerUserId = cDTO.getUser().getUserId();
+                            }
+                        }
+
+                        if ("ACCEPTED".equals(newStatus)) {
+                            if (roleId == 5) {
+                                shouldNotify = true;
+                                type = "success";
+                                title = "Báo giá được duyệt";
+                                msg = "Báo giá #" + qh.getQuotationId() + " đã được Sale duyệt. Hãy tạo Hợp đồng nháp.";
+                            } else if (roleId == 3 && user.getUserId() == customerUserId) {
+                                shouldNotify = true;
+                                type = "success";
+                                title = "Báo giá đã chốt";
+                                msg = "Báo giá #" + qh.getQuotationId() + " của bạn đã chốt thành công. Hợp đồng sẽ sớm được gửi đến.";
+                            }
+                        }
+                    }
+
+                    if (shouldNotify) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("{\"type\":\"").append(escapeJson(type)).append("\"");
+                        sb.append(",\"title\":\"").append(escapeJson(title)).append("\"");
+                        sb.append(",\"message\":\"").append(escapeJson(msg)).append("\"");
+                        sb.append(",\"link\":\"").append(escapeJson(link)).append("\"");
+                        sb.append(",\"btnText\":\"").append(escapeJson(btnText)).append("\"");
+                        sb.append("}");
+
+                        writer.write("event: notification\n");
+                        writer.write("data: " + sb.toString() + "\n\n");
+                    }
+
+                    if (qh.getQuotationHistoryId() > lastQuotationHistoryId) {
+                        lastQuotationHistoryId = qh.getQuotationHistoryId();
+                    }
+                }
+            }
+
             //Invoice Notification - Begin
             List<Invoice> invoiceList = iService.getInvoicesSince(lastCheckedInvoice, (roleId == 3 ? user.getUserId() : null));
             for (Invoice iv : invoiceList) {
@@ -365,6 +427,32 @@ public class RealtimeNotificationServlet extends HttpServlet {
                     Timestamp repTime = new Timestamp(pr.getRepliedAt().getTime());
                     if (repTime.after(lastCheckedProductReview)) {
                         lastCheckedProductReview = new Timestamp(repTime.getTime() + 1000);
+                    }
+                }
+            }
+
+            // 6. Import Request Notifications (Báo cho Manager, System Admin và Warehouse Staff khi có yêu cầu mới)
+            dal.RoleDAO roleDAOForImport = new dal.RoleDAO();
+            int warehouseRoleId = roleDAOForImport.getRoleIdByName("Warehouse Staff");
+            if (roleId == 1 || roleId == 2 || (roleId == warehouseRoleId && warehouseRoleId != -1)) {
+                dal.ImportRequestDAO importRequestDAO = new dal.ImportRequestDAO();
+                List<model.ImportRequest> newImports = importRequestDAO.getPendingRequestsSince(lastCheckedImportRequest);
+                for (model.ImportRequest ir : newImports) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("{\"type\":\"info\"");
+                    sb.append(",\"title\":\"Yêu cầu nhập kho mới\"");
+                    sb.append(",\"message\":\"Có yêu cầu nhập kho mới từ ").append(escapeJson(ir.getCreatedByName())).append(" cho sản phẩm: ").append(escapeJson(ir.getProductName())).append(" (SL: ").append(ir.getQuantity()).append(").\"");
+                    sb.append(",\"link\":\"").append(request.getContextPath()).append("/import-request-detail?id=").append(ir.getImportId()).append("\"");
+                    sb.append(",\"btnText\":\"Xem chi tiết\"");
+                    sb.append("}");
+
+                    writer.write("event: notification\n");
+                    writer.write("data: " + sb.toString() + "\n\n");
+
+                    if (ir.getCreatedDate() != null) {
+                        if (ir.getCreatedDate().after(lastCheckedImportRequest)) {
+                            lastCheckedImportRequest = new Timestamp(ir.getCreatedDate().getTime() + 1000);
+                        }
                     }
                 }
             }

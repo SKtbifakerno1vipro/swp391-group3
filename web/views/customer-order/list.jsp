@@ -20,14 +20,14 @@
             </jsp:include>
             <main class="main legacy-page">
                 <h2>Danh sách Đơn hàng</h2>
-                <form action="customer-order-list" method="GET" style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                <form action="customer-order-list" method="GET" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                     <input type="hidden" name="search" value="search">
                     <div>
-                        <input type="text" placeholder="Tìm kiếm theo tên hoặc mã số thuế" name="keyword" value="${keyword}" style="padding: 6px; width: 220px;">
+                        <input type="text" placeholder="Tìm kiếm theo tên hoặc mã số thuế" name="keyword" value="${keyword}" style="width: 260px;">
                     </div>
                     <div>
                         <label for="sortBy" style="font-weight: bold; margin-right: 5px;">Sắp xếp theo:</label>
-                        <select name="sortBy" id="sortBy" style="padding: 6px;">
+                        <select name="sortBy" id="sortBy">
                             <option value="orderId" ${sortBy == 'orderId' ? 'selected' : ''}>Mã đơn hàng</option>
                             <option value="customerName" ${sortBy == 'customerName' ? 'selected' : ''}>Tên khách hàng</option>
                             <option value="taxCode" ${sortBy == 'taxCode' ? 'selected' : ''}>Mã số thuế</option>
@@ -36,21 +36,21 @@
                     </div>
                     <div>
                         <label for="sortOrder" style="font-weight: bold; margin-right: 5px;">Thứ tự:</label>
-                        <select name="sortOrder" id="sortOrder" style="padding: 6px;">
+                        <select name="sortOrder" id="sortOrder">
                             <option value="asc" ${sortOrder == 'asc' ? 'selected' : ''}>Tăng dần</option>
                             <option value="desc" ${sortOrder == 'desc' ? 'selected' : ''}>Giảm dần</option>
                         </select>
                     </div>
                     <div>
                         <label style="font-weight: bold; margin-right: 5px;">Kích thước trang:</label>
-                        <select name="pagesize" id="pagesize" style="padding: 6px;">
+                        <select name="pagesize" id="pagesize">
                             <option value="5" ${pagesize == '5' ? 'selected' : ''}>5</option>
                             <option value="10" ${pagesize == '10' ? 'selected' : ''}>10</option>
                             <option value="20" ${pagesize == '20' ? 'selected' : ''}>20</option>
                             <option value="50" ${pagesize == '50' ? 'selected' : ''}>50</option>
                         </select>
                     </div>
-                    <button type="submit" style="padding: 6px 15px; cursor: pointer;">Tìm kiếm/Lọc</button>
+                    <button type="submit">Tìm kiếm/Lọc</button>
                 </form>
                 <br>
                 <table border="1" cellpadding="10" cellspacing="0">
@@ -64,18 +64,9 @@
                             <th>Hành động</th>
                         </tr>
                     </thead>
-                    <% InvoiceService invService = new InvoiceService(); %>
                     <tbody>
                         <c:forEach var="item" items="${orders}">
-                            <%
-                                dto.CustomerOrderDTO itemDto = (dto.CustomerOrderDTO) pageContext.getAttribute("item");
-                                if (itemDto != null && itemDto.getCustomerOrder() != null) {
-                                    Invoice inv = invService.getInvoiceByOrderId(itemDto.getCustomerOrder().getCustomerOrderId());
-                                    pageContext.setAttribute("invOfOrder", inv);
-                                } else {
-                                    pageContext.removeAttribute("invOfOrder");
-                                }
-                            %>
+                            
                             <tr>
                                 <td>${item.customerOrder.customerOrderId}</td>
                                 <td>${item.customerUser.fullName}</td>
@@ -97,14 +88,14 @@
                                     <a href="${pageContext.request.contextPath}/customer-order?id=${item.customerOrder.customerOrderId}">Xem</a>
                                     <c:if test="${sessionScope.user.roleId != 3}">
                                         <c:if test="${item.customerOrder.orderStatus != 'COMPLETED'}">
-                                            <c:if test="${item.customerOrder.orderStatus != 'SHIPPING'}">
+                                            <c:if test="${item.customerOrder.orderStatus != 'SHIPPING' && item.customerOrder.orderStatus != 'CANCELLED'}">
                                                 <a href="${pageContext.request.contextPath}/customer-order?action=delete_order&id=${item.customerOrder.customerOrderId}" style="color: red;" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này không?');">Xóa</a>    
                                             </c:if>
                                         </c:if>
                                     </c:if>
                                     <c:if test="${item.customerOrder.orderStatus == 'COMPLETED'}">
                                         <c:choose>
-                                            <c:when test="${empty invOfOrder}">
+                                            <c:when test="${item.customerOrder.hasInvoice == false}">
                                                 <c:if test="${sessionScope.user.roleId != 3}">
                                                     |
                                                     <a href="${pageContext.request.contextPath}/invoice?orderId=${item.customerOrder.customerOrderId}" style="color: #16a34a; font-weight: bold; text-decoration: none;">Tạo Hóa đơn</a>
@@ -112,7 +103,7 @@
                                             </c:when>
                                             <c:otherwise>
                                                 |
-                                                <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="color: #0284c7; font-weight: bold; text-decoration: none;">Xem Hóa đơn</a>
+                                                <a href="${pageContext.request.contextPath}/invoice?orderId=${item.customerOrder.customerOrderId}" style="color: #0284c7; font-weight: bold; text-decoration: none;">Xem Hóa đơn</a>
                                             </c:otherwise>
                                         </c:choose>
                                     </c:if>

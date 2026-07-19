@@ -99,6 +99,10 @@ public class ContractService {
         return template;
     }
 
+    public boolean checkOwnContractByCustomer(Contract contract, User user) {
+        return contractDAO.checkOwnContractByCustomer(contract, user);
+    }
+
     public boolean validateToken(int contractId, String token) {
         return contractDAO.validateToken(contractId, token);
     }
@@ -149,7 +153,7 @@ public class ContractService {
                 + "</body>"
                 + "</html>";
         EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
-        EmailUtils.sendEmailAsync("omovie111@gmail.com", subject, content);
+        EmailUtils.sendEmailAsync("maytinhasus2@gmail.com", subject, content);
     }
 
     public void noticeSendFinalContractPdf(int contractId, String token) {
@@ -192,17 +196,16 @@ public class ContractService {
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
-            String fromDate, String toDate, String taxCode, String phone, String email) {
+            String fromDate, String toDate, String taxCode, String phone, String email, String customerType) {
         return contractDAO.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize, userId, roleId,
-                fromDate, toDate, taxCode, phone, email);
+                fromDate, toDate, taxCode, phone, email, customerType);
     }
 
     public int getTotalContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
-            String fromDate, String toDate, String taxCode, String phone, String email) {
-
+            String fromDate, String toDate, String taxCode, String phone, String email, String customerType) {
         return contractDAO.getTotalContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize, userId, roleId,
-                fromDate, toDate, taxCode, phone, email);
+                fromDate, toDate, taxCode, phone, email, customerType);
     }
 
     public Contract getContractById(int id) {

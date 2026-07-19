@@ -32,7 +32,7 @@ public class DeleteCategoryController extends HttpServlet {
                 return;
             }
 
-            if (productService.countProduct(null, categoryId, null) > 0) {
+            if (productService.countProduct(null, categoryId, null, null, null) > 0) {
                 response.sendRedirect(request.getContextPath() + "/category/list?status=delete_in_use");
                 return;
             }

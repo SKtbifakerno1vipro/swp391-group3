@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class RecentInvoiceDTO {
+    private int invoiceId;
     private String invoiceNo;
     private Date issueDate;
     private BigDecimal totalAmount;
@@ -14,6 +15,9 @@ public class RecentInvoiceDTO {
     private String paymentStatus;
 
     public RecentInvoiceDTO() {}
+
+    public int getInvoiceId() { return invoiceId; }
+    public void setInvoiceId(int invoiceId) { this.invoiceId = invoiceId; }
 
     public String getInvoiceNo() { return invoiceNo; }
     public void setInvoiceNo(String invoiceNo) { this.invoiceNo = invoiceNo; }

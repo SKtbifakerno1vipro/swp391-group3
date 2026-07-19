@@ -20,9 +20,6 @@
             <main class="main legacy-page">
                 <h2>Quản lý Hợp đồng</h2>
                 <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5}">
-                    <div style="margin-bottom: 15px;">
-                        <a href="${pageContext.request.contextPath}/contract-save" class="button primary" style="padding: 8px 16px; background-color: var(--primary); color: white; text-decoration: none; border-radius: 4px; display: inline-block;">Thêm Hợp đồng</a>
-                    </div>
                 </c:if>
                 <form action="contract-list" method="GET">
                     <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Mã hợp đồng">
@@ -43,6 +40,11 @@
                         <option value="TEXT" ${storageType == 'TEXT' ? 'selected' : ''}>Văn bản</option>
                         <option value="IMAGE" ${storageType == 'IMAGE' ? 'selected' : ''}>Ảnh scan</option>
                     </select>
+                    <select name="customerType">
+                        <option value="">-- Loại khách hàng --</option>
+                        <option value="CUSTOMER" ${customerType == 'CUSTOMER' ? 'selected' : ''}>Khách hàng</option>
+                        <option value="LOYAL CUSTOMER" ${customerType == 'LOYAL CUSTOMER' ? 'selected' : ''}>Khách hàng thân thiết</option>
+                    </select>
                     <br>
                     <label>Từ ngày</label>
                     <input type="date" name="fromDate" value="${fromDate}">
@@ -56,8 +58,9 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Mã Hợp Đồng</th>
+                            <th>Số Hợp Đồng</th>
                             <th>Khách hàng</th>
+                            <th>Loại khách hàng</th>
                             <th>Trạng thái</th>
                             <th>Hình thức lưu</th>
                             <th>Mã số thuế</th>
@@ -76,6 +79,13 @@
                                 <td>${c.contractId}</td>
                                 <td>${c.contractNumber}</td>
                                 <td>${c.customerName}</td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${c.customerType == 'CUSTOMER'}">Khách hàng</c:when>
+                                        <c:when test="${c.customerType == 'LOYAL CUSTOMER'}">Khách hàng thân thiết</c:when>
+                                        <c:otherwise>${c.customerType}</c:otherwise>
+                                    </c:choose>
+                                </td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${c.contractStatus == 'DRAFT'}">Nháp</c:when>

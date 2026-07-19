@@ -45,63 +45,37 @@ public class QuotationListController extends HttpServlet {
         }
 
         QuotationService quotationService = new QuotationService();
-        List<Quotation> quotationList;
-
-        // Kiem tra xem nguoi dung co dang thuc hien tim kiem hoac loc du lieu hay khong
-        boolean isSearching = (searchText != null && !searchText.isBlank())
-                || (status != null && !status.isBlank())
-                || (fromDate != null && !fromDate.isBlank())
-                || (toDate != null && !toDate.isBlank());
-
-        if (isSearching) {
-            // Truong hop co filter/search: goi searchQuotations
-            quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate, saleId);
-        } else {
-            // Truong hop binh thuong: lay toan bo danh sach (kem theo phân quyen saleId neu co)
-            quotationList = quotationService.getAllQuotations(saleId);
-        }
-
-        quotationList.sort((q1, q2) -> Integer.compare(q1.getQuotationId(), q2.getQuotationId()));
-
-        // Pagination
-        int page = 1;
-        int pageSize = 19;
+        int pageSize = 10;
+        int pageIndex = 1;
         String pageParam = request.getParameter("page");
-
         if (pageParam != null && !pageParam.isBlank()) {
             try {
-                page = Integer.parseInt(pageParam);
+                pageIndex = Integer.parseInt(pageParam);
             } catch (NumberFormatException e) {
-                page = 1;
+                pageIndex = 1;
             }
         }
 
-        int totalQuotations = quotationList.size();
-        int totalPages = (int) Math.ceil((double) totalQuotations / pageSize);
-        if (totalPages == 0) {
-            totalPages = 1;
+        int totalQuotations = quotationService.getTotalQuotations(searchText, status, fromDate, toDate, saleId, user.getUserId(), user.getRoleId());
+        int endPage = (int) Math.ceil((double) totalQuotations / pageSize);
+        if (pageIndex > endPage && endPage > 0) {
+            pageIndex = endPage;
         }
-        if (page < 1) {
-            page = 1;
-        }
-        if (page > totalPages) {
-            page = totalPages;
+        if (pageIndex < 1) {
+            pageIndex = 1;
         }
 
-        int fromIndex = Math.min((page - 1) * pageSize, totalQuotations);
-        int toIndex = Math.min(fromIndex + pageSize, totalQuotations);
-        List<Quotation> pagedQuotationList = totalQuotations == 0
-                ? java.util.Collections.emptyList()
-                : quotationList.subList(fromIndex, toIndex);
+        List<Quotation> quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate, saleId, user.getUserId(), user.getRoleId(), pageIndex, pageSize);
+
+        request.setAttribute("endPage", endPage);
+        request.setAttribute("currentPage", pageIndex);
+        request.setAttribute("quotationList", quotationList);
 
         request.setAttribute("searchText", searchText);
         request.setAttribute("status", status);
         request.setAttribute("fromDate", fromDate);
         request.setAttribute("toDate", toDate);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalQuotations", totalQuotations);
-        request.setAttribute("quotationList", pagedQuotationList);
         request.getRequestDispatcher("/views/quotation/list.jsp").forward(request, response);
     }
 }

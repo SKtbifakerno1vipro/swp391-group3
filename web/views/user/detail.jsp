@@ -196,7 +196,7 @@
                                 <button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu thay đổi</button>
                             </c:if>
                             <c:if test="${sessionScope.user.roleId == 1}">
-                                <button class="button danger" type="submit" name="action" value="resetPassword" onclick="return confirm('Bạn có chắc muốn khôi phục mật khẩu về 123456 không?');"><span class="material-symbols-outlined">lock_reset</span>Khôi phục Mật khẩu</button>
+                                <button class="button danger" type="submit" name="action" value="resetPassword" onclick="return confirm('Bạn có chắc muốn khôi phục mật khẩu về mặc định không?');"><span class="material-symbols-outlined">lock_reset</span>Khôi phục Mật khẩu</button>
                             </c:if>
                         </div>
                     </div>

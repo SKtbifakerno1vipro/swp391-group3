@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 public class ContractCustomerDTO {
 
-    private String contractNumber, customerName,
+    private String contractNumber, customerName, customerType,
             storageType, taxCode, phone, email, contractStatus;
     private int contractId;
 
@@ -70,6 +70,14 @@ public class ContractCustomerDTO {
 
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
+    }
+
+    public String getCustomerType() {
+        return customerType;
+    }
+
+    public void setCustomerType(String customerType) {
+        this.customerType = customerType;
     }
 
     public String getStorageType() {

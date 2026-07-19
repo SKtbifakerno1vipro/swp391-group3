@@ -63,25 +63,46 @@
                     <div><form action="${pageContext.request.contextPath}/product-list" method="get">
                             <table>
                                 <tr>
-                                    <td>Tên sản phẩm</td>
-                                    <td><input type="text" name="searchText" value="${searchText}"></td>
+                                    <td>Tìm kiếm:</td>
+                                    <td><input type="text" name="searchText" value="${searchText}" placeholder="Tên sản phẩm, mô tả..." style="width: 220px;"></td>
 
-                                    <td colspan="2">
-                                        Danh mục
+                                    <td>Danh mục:</td>
+                                    <td>
                                         <select name="categoryId">
                                             <c:forEach var="c" items="${categories}">
                                                 <option value="${c.categoryId}" ${c.categoryId == categoryId ? 'selected' : ''}>${c.categoryName}</option>
                                             </c:forEach>
                                         </select>
-                                        | Giá
-                                        <select name="sort">
-                                            <option value="default" ${sort == 'default' ? 'selected' : ''}>Mặc định</option>
-                                            <option value="increase" ${sort == 'increase' ? 'selected' : ''}>Tăng dần</option>
-                                            <option value="decrease" ${sort == 'decrease' ? 'selected' : ''}>Giảm dần</option>
-                                        </select>
                                     </td>
 
-                                    <td><input type="submit" value="Tìm kiếm"></td>
+                                    <td>Sắp xếp:</td>
+                                    <td>
+                                        <select name="sort">
+                                            <option value="default" ${sort == 'default' ? 'selected' : ''}>Mặc định</option>
+                                            <option value="increase" ${sort == 'increase' ? 'selected' : ''}>Giá tăng dần</option>
+                                            <option value="decrease" ${sort == 'decrease' ? 'selected' : ''}>Giá giảm dần</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Giá từ:</td>
+                                    <td>
+                                        <input type="number" step="any" name="minPrice" value="${minPrice}" min="0" placeholder="Min VNĐ" style="width: 110px;">
+                                        đến
+                                        <input type="number" step="any" name="maxPrice" value="${maxPrice}" placeholder="Max VNĐ" style="width: 110px;">
+                                    </td>
+                                    <td>Hiển thị:</td>
+                                    <td>
+                                        <select name="pageSize">
+                                            <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                            <option value="10" ${pageSize == 10 || empty pageSize ? 'selected' : ''}>10</option>
+                                            <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                            <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                        </select>
+                                    </td>
+                                    <td colspan="2" style="text-align: right;">
+                                        <input type="submit" value="Tìm kiếm">
+                                    </td>
                                 </tr>
                             </table>
 
@@ -92,7 +113,9 @@
                     </div>
                     <div>
                         <h3>Danh sách sản phẩm</h3>
-                        <div><a href="${pageContext.request.contextPath}/edit-product?action=create">Thêm sản phẩm</a></div>
+                        <c:if test="${sessionScope.user.roleId != 3}">
+                             <div><a href="${pageContext.request.contextPath}/edit-product?action=create">Thêm sản phẩm</a></div>
+                        </c:if>
                         <div>
                             <table border="1">
                                 <tr>
@@ -171,15 +194,15 @@
                             <c:set var="start" value="${page - numLinksTwoSide > 1 ? page - numLinksTwoSide : 1}"></c:set>
                             <c:set var="end" value="${page + numLinksTwoSide > totalPage ? totalPage : page + numLinksTwoSide}"></c:set>
 
-                                <a class="page-link" href="${pageContext.request.contextPath}/product-list?page=1&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Đầu</a>
-                            <c:if test="${page!=1}"><a class="page-link" href="${pageContext.request.contextPath}/product-list?page=${page - 1}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Trước</a></c:if>
+                                <a class="page-link" href="${pageContext.request.contextPath}/product-list?page=1&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&pageSize=${pageSize}">Đầu</a>
+                            <c:if test="${page!=1}"><a class="page-link" href="${pageContext.request.contextPath}/product-list?page=${page - 1}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&pageSize=${pageSize}">Trước</a></c:if>
                             <c:if test="${start>1}">...</c:if>
                             <c:forEach var="i" begin="${start}" end="${end}">
-                                <a href="${pageContext.request.contextPath}/product-list?page=${i}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}"><span class="${i==page?'page-current' : 'page-link'}">${i}</span> </a>
+                                <a href="${pageContext.request.contextPath}/product-list?page=${i}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&pageSize=${pageSize}"><span class="${i==page?'page-current' : 'page-link'}">${i}</span> </a>
                             </c:forEach>
                             <c:if test="${end < totalPage}">...</c:if>
-                            <c:if test="${page < totalPage}"><a class="page-link" href="${pageContext.request.contextPath}/product-list?page=${page + 1}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Sau</a></c:if>
-                            <a class="page-link" href="${pageContext.request.contextPath}/product-list?page=${totalPage}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}">Cuối</a>
+                            <c:if test="${page < totalPage}"><a class="page-link" href="${pageContext.request.contextPath}/product-list?page=${page + 1}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&pageSize=${pageSize}">Sau</a></c:if>
+                            <a class="page-link" href="${pageContext.request.contextPath}/product-list?page=${totalPage}&searchText=${searchText}&categoryId=${categoryId}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&pageSize=${pageSize}">Cuối</a>
 
                         </div>
                         <div><a href="${pageContext.request.contextPath}/dashboard">Quay lại Trang chủ</a></div>

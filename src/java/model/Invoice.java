@@ -1,6 +1,5 @@
 package model;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Invoice {
@@ -31,6 +30,7 @@ public class Invoice {
     private String customerNote;
     private String internalNote;
 
+    private String contractNo;
     public Invoice() {
     }
 
@@ -211,4 +211,14 @@ public class Invoice {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public String getContractNo() {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
+    }
+    
+    
 }

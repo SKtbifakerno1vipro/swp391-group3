@@ -48,186 +48,9 @@ public class SecurityFilter implements Filter {
             "/realtime/notifications"
     );
 
-    private static final List<String> SYSTEM_ADMIN_URLS = List.of(
-            "/dashboard",
-            "/admin-dashboard",
-            "/role-list", "/role-detail",
-            "/add-role",
-            "/edit-role-permissions",
-            "/user-list",
-            "/create-user",
-            "/edit-user",
-            "/user-detail",
-            "/customer/list",
-            "/customer/create",
-            "/customer/detail",
-            "/customer/edit",
-            "/customer-order-list",
-            "/customer-order",
-            "/create-order",
-            "/category/list",
-            "/category/create",
-            "/category/edit",
-            "/category/delete",
-            "/product-list",
-            "/create-product",
-            "/edit-product",
-            "/product-delete",
-            "/quotation-list",
-            "/quotation-create",
-            "/quotation-detail",
-            "/contract-list",
-            "/contract-save",
-            "/contract-create",
-            "/contract-detail",
-            "/invoice-list",
-            "/invoice",
-            "/preview",
-            "/invoice/create",
-            "/payment/list",
-            "/payment",
-            "/payment/detail",
-            "/email/logs",
-            "/admin/audit-logs",
-            "/revenue-report",
-            "/Signature",
-            "/SignatureAcceptance",
-            "/realtime/notifications",
-            "/export-pdf"
-    );
-
-    private static final List<String> MANAGER_URLS = List.of(
-            "/dashboard",
-            "/role-list",
-            "/role-detail",
-            "/user-list",
-            "/edit-user",
-            "/customer/list",
-            "/customer-order-list",
-            "/customer-order",
-            "/create-order",
-            "/product-list",
-            "/edit-product",
-            "/product-review",
-            "/contract-list",
-            "/contract-detail",
-            "/invoice-list",
-            "/invoice",
-            "/preview",
-            "/payment/list",
-            "/payment",
-            "/payment/detail",
-            "/revenue-report",
-            "/Signature",
-            "/SignatureAcceptance",
-            "/realtime/notifications",
-            "/export-pdf"
-    );
-
-    private static final List<String> CUSTOMER_URLS = List.of(
-            "/dashboard",
-            "/customer/detail",
-            "/customer/edit",
-            "/customer-order-list",
-            "/customer-order",
-            "/category/list",
-            "/category/create",
-            "/category/edit",
-            "/category/delete",
-            "/product-list",
-            "/quotation-list",
-            "/quotation-detail",
-            "/contract-list",
-            "/contract-detail",
-            "/invoice-list",
-            "/preview",
-            "/payment/list",
-            "/payment",
-            "/payment/detail",
-            "/product-review",
-            "/Signature",
-            "/SignatureAcceptance",
-            "/realtime/notifications",
-            "/export-pdf"
-    );
-
-    private static final List<String> SALE_STAFF_URLS = List.of(
-            "/dashboard",
-            "/edit-user",
-            "/customer",
-            "/customer-order-list",
-            "/customer-order",
-            "/create-order",
-            "/category/list",
-            "/category/create",
-            "/category/edit",
-            "/category/delete",
-            "/product-list",
-            "/edit-product",
-            "/product-review",
-            "/quotation-list",
-            "/quotation-create",
-            "/quotation-detail",
-            "/invoice/create",
-            "/invoice",
-            "/preview",
-            "/payment/list",
-            "/payment",
-            "/payment/detail",
-            "/realtime/notifications",
-            "/export-pdf"
-    );
-
-    private static final List<String> ADMIN_OFFICER_URLS = List.of(
-            "/dashboard",
-            "/edit-user",
-            "/customer/list",
-            "/customer/detail",
-            "/customer/edit",
-            "/customer-order-list",
-            "/customer-order",
-            "/create-order",
-            "/quotation-list",
-            "/quotation-detail",
-            "/contract-list",
-            "/contract-save",
-            "/contract-create",
-            "/contract-detail",
-            "/invoice-list",
-            "/invoice",
-            "/preview",
-            "/invoice/create",
-            "/payment/list",
-            "/payment",
-            "/payment/detail",
-            "/product-review",
-            "/Signature",
-            "/SignatureAcceptance",
-            "/realtime/notifications",
-            "/export-pdf"
-    );
-
-    private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
-            "/edit-user",
-            "/customer-order-list",
-            "/customer-order",
-            "/category/list",
-            "/category/create",
-            "/category/edit",
-            "/category/delete",
-            "/product-list",
-            "/create-product",
-            "/edit-product",
-            "/product-delete",
-            "/product-review",
-            "/realtime/notifications",
-            "/export-pdf"
-    );
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-      
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
@@ -239,6 +62,16 @@ public class SecurityFilter implements Filter {
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
         if (user != null) {
+            // Đếm số lượng yêu cầu nhập kho Pending để hiển thị ở sidebar
+            dal.ImportRequestDAO importRequestDAOForCount = new dal.ImportRequestDAO();
+            int pendingImportsCount = importRequestDAOForCount.countPendingRequests();
+            req.setAttribute("pendingImportsCount", pendingImportsCount);
+
+            if (userDAO.checkBanUser(user)) { //check user banned by admin, if that is true, cannot do anything
+                session.invalidate();
+                ((HttpServletResponse) response).sendRedirect("login.jsp");
+                return;
+            }
             if (user.getRoleId() == 1) {
                 chain.doFilter(request, response);
                 return;
@@ -267,13 +100,9 @@ public class SecurityFilter implements Filter {
                     if (cDAO.validateToken(contractId, token)) {
                         chain.doFilter(request, response);
                         return;
-                    } else {
-                        res.sendRedirect(req.getContextPath() + "/login");
-                        return;
                     }
                 } catch (Exception e) {
                     res.sendRedirect(req.getContextPath() + "/login");
-                    return;
                 }
             }
         }
@@ -324,46 +153,48 @@ public class SecurityFilter implements Filter {
     }
 
     private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
+        // Chuẩn hóa đường dẫn bằng cách bỏ dấu / ở cuối (nếu có)
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
-        System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
+        System.out.println("Checking permission for roleId: " + roleId + " on path: " + cleanPath);
 
-        // Check if the path is explicitly allowed by the hardcoded fallback lists first
-        if (roleId == ROLE_SYSTEM_ADMIN && SYSTEM_ADMIN_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_MANAGER && MANAGER_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_CUSTOMER && CUSTOMER_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_SALE_STAFF && SALE_STAFF_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_ADMIN_OFFICER && ADMIN_OFFICER_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_WAREHOUSE_STAFF && WAREHOUSE_STAFF_URLS.contains(cleanPath)) {
-            return true;
-        }
-
+        // Bước 1: Tìm tên quyền yêu cầu tương ứng với URL (Ví dụ: "/role-list" -> "Role List")
         String requiredPermission = getRequiredPermission(cleanPath, req);
-        if (requiredPermission != null) {
+        if (requiredPermission == null) {
+            return false;
+        }
+
+        // Bước 2: Lấy danh sách quyền hạn từ Session (bộ nhớ đệm) để tránh truy vấn DB nhiều lần
+        HttpSession session = req.getSession(false);
+        List<RolePermission> permissions = null;
+        if (session != null) {
+            permissions = (List<RolePermission>) session.getAttribute("userPermissions");
+        }
+
+        // Bước 3: Nếu trong Session chưa có danh sách quyền, ta mới truy vấn Database để lấy lên
+        if (permissions == null) {
             Role role = roleDAO.getRoleDetail(roleId);
-            if (role != null && role.getPermissions() != null) {
-                for (RolePermission p : role.getPermissions()) {
-                    if (p.getPermissionName() != null && p.getPermissionName().equalsIgnoreCase(requiredPermission)) {
-                        System.out.println("Role " + roleId + " HAS database permission: " + requiredPermission);
-                        return true;
-                    }
+            if (role != null) {
+                permissions = role.getPermissions();
+                // Lưu vào Session để tái sử dụng ở các request tiếp theo
+                if (session != null && permissions != null) {
+                    session.setAttribute("userPermissions", permissions);
                 }
-                System.out.println("Role " + roleId + " DOES NOT HAVE database permission: " + requiredPermission);
-                return false;
             }
         }
 
-        return false;
+        // Bước 4: So sánh quyền yêu cầu với các quyền mà User này đang sở hữu
+        if (permissions != null) {
+            for (RolePermission p : permissions) {
+                // Nếu tìm thấy quyền trong danh sách trùng khớp với quyền yêu cầu
+                if (p.getPermissionName() != null && p.getPermissionName().equalsIgnoreCase(requiredPermission)) {
+                    System.out.println("Role " + roleId + " HAS database permission: " + requiredPermission);
+                    return true; // Cho phép đi qua
+                }
+            }
+            System.out.println("Role " + roleId + " DOES NOT HAVE database permission: " + requiredPermission);
+        }
 
+        return false; // Không khớp quyền nào, từ chối truy cập
     }
 
     private String getRequiredPermission(String path, HttpServletRequest req) {
@@ -462,6 +293,11 @@ public class SecurityFilter implements Filter {
             case "/Signature":
             case "/SignatureAcceptance":
                 return "Acceptance Record";
+            case "/warehouse-dashboard":
+            case "/import-request-list":
+            case "/import-request-create":
+            case "/import-request-detail":
+                return "Dashboard";
             default:
                 return null;
         }

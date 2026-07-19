@@ -59,11 +59,11 @@ public class DashboardController extends HttpServlet {
 
             List<ContractCustomerDTO> recentContracts = contractService.searchContracts(
                     null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
-                    null, null, null, null, null
+                    null, null, null, null, null, null
             );
             int totalContracts = contractService.getTotalContracts(
                     null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
-                    null, null, null, null, null
+                    null, null, null, null, null, null
             );
             request.setAttribute("totalContracts", totalContracts);
             request.setAttribute("recentContracts", recentContracts);
@@ -84,9 +84,15 @@ public class DashboardController extends HttpServlet {
             request.setAttribute("draftContracts", dashboardDAO.countDraftContracts());
             request.setAttribute("contractStatusCounts", dashboardDAO.countContractStatusForOfficer()); // circle
             request.setAttribute("contractsNeedingAction", dashboardDAO.getContractNeedingAction(5, startDate, endDate));
+            request.setAttribute("quotationsNeedingAction", dashboardDAO.getQuotationsAwaitingContract(5, startDate, endDate));
             request.setAttribute("recentInvoices", dashboardDAO.getRecentInvoicesForOfficer(10, startDate, endDate));
             request.setAttribute("invoiceSummary", dashboardDAO.getInvoiceSummaryForOfficer());
             request.getRequestDispatcher("/views/dashboard/admin-officier-dashboard.jsp").forward(request, response);
+            return;
+        }
+
+        if (user.getRoleId() == 6) { // ROLE_WAREHOUSE_STAFF
+            response.sendRedirect(request.getContextPath() + "/warehouse-dashboard");
             return;
         }
 

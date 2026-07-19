@@ -18,6 +18,16 @@ public class Payment {
     // Transient fields for display convenience
     private String contractNumber;
     private String customerName;
+    private boolean canIssue;
+    private Invoice invoice;
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
+    }
 
     public Payment() {}
 
@@ -108,6 +118,15 @@ public class Payment {
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
+
+    public boolean isCanIssue() {
+        return canIssue;
+    }
+
+    public void setCanIssue(boolean canIssue) {
+        this.canIssue = canIssue;
+    }
+    
 
     public String getFormattedPaidAt() {
         if (this.paidAt != null) {

@@ -64,6 +64,14 @@ public class InvoiceList extends HttpServlet {
             } catch (Exception ignored) {}
         }
 
+        String pageSizeRaw = request.getParameter("pageSize");
+        int pageSize = PAGE_SIZE;
+        if (pageSizeRaw != null && !pageSizeRaw.trim().isEmpty()) {
+            try {
+                pageSize = Integer.parseInt(pageSizeRaw.trim());
+            } catch (Exception e) {}
+        }
+
         String pageRaw = request.getParameter("page");
         int page = 1;
         if (pageRaw != null && !pageRaw.trim().isEmpty()) {
@@ -78,12 +86,12 @@ public class InvoiceList extends HttpServlet {
         int totalRow = forCustomer 
                 ? invoiceService.countInvoicesForCustomer(searchBuyerName, status, type, startDate, endDate, user.getUserId())
                 : invoiceService.countInvoices(searchBuyerName, status, type, startDate, endDate);
-        int totalPage = productService.calculateTotalPage(totalRow, PAGE_SIZE);
+        int totalPage = productService.calculateTotalPage(totalRow, pageSize);
         page = productService.nomalizePage(page, totalPage);
 
         List<Invoice> list = forCustomer 
-                ? invoiceService.getInvoicesForCustomer(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, PAGE_SIZE, user.getUserId())
-                : invoiceService.getInvoices(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, PAGE_SIZE);
+                ? invoiceService.getInvoicesForCustomer(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, pageSize, user.getUserId())
+                : invoiceService.getInvoices(searchBuyerName, status, type, startDate, endDate, totalRow, page, totalPage, pageSize);
         
         request.setAttribute("invoices", list);
         request.setAttribute("errorInvoice", errorInvoice);
@@ -96,6 +104,7 @@ public class InvoiceList extends HttpServlet {
         request.setAttribute("type", type);
         request.setAttribute("startDate", startDateRaw);
         request.setAttribute("endDate", endDateRaw);
+        request.setAttribute("pageSize", pageSize);
         
         request.getRequestDispatcher("/views/invoice/list.jsp").forward(request, response);
     } 
@@ -103,6 +112,17 @@ public class InvoiceList extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        if (user.getRoleId() == 3) {
+            session.setAttribute("errorInvoice", "Quý khách không có tính năng này");
+            response.sendRedirect(request.getContextPath()+"/invoice-list");
+            return;
+        }
         String action = request.getParameter("action");
         if ("cancel".equals(action)) {
             String invoiceIdRaw = request.getParameter("invoiceId");

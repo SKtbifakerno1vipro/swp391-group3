@@ -21,7 +21,6 @@ import java.time.format.DateTimeFormatter;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-
 @WebServlet(urlPatterns = {"/contract-save"})
 public class ContractSaveController extends HttpServlet {
 
@@ -34,7 +33,7 @@ public class ContractSaveController extends HttpServlet {
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        if (user == null ) {
+        if (user == null) {
             response.sendRedirect("login");
             return;
         }
@@ -46,7 +45,7 @@ public class ContractSaveController extends HttpServlet {
         if (contractIdRaw != null && !contractIdRaw.isEmpty()) {
             int contractId = Integer.parseInt(contractIdRaw);
             Contract contract = contractService.getContractById(contractId);
-            
+
             //if contract not exist with id raw
             if (contract == null) {
                 response.sendRedirect("contract-list");
@@ -111,6 +110,9 @@ public class ContractSaveController extends HttpServlet {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             response.sendRedirect("login");
+            return;
+        } else if (user.getRoleId()!= 5) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to view this profile.");
             return;
         }
 
@@ -177,7 +179,7 @@ public class ContractSaveController extends HttpServlet {
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
             return;
         }
-        
+
         String year = LocalDate.now()
                 .format(DateTimeFormatter.ofPattern("yyyy"));
         String newContractNumber = String.format("%03d", quotationId) + "/" + year + "-HĐ";
@@ -200,7 +202,7 @@ public class ContractSaveController extends HttpServlet {
             service.AuditLogService.log(user.getUserId(), "CREATE", "Contract", "Tạo dự thảo hợp đồng mới: " + newContractNumber + " (ID: " + newId + ")");// from giang
 
             if ("submit_for_review".equals(action)) {
-                 // only DRAFT or PENDING_REVIEW can submit for manager review (officier -> manager)
+                // only DRAFT or PENDING_REVIEW can submit for manager review (officier -> manager)
                 if ("DRAFT".equals(c.getContractStatus()) || "PENDING_REVIEW".equals(c.getContractStatus())) {
                     contractService.updateStatus(newId, "PENDING_REVIEW");
                     insertHistoryForOfficier(c, "PENDING_REVIEW", "Admin officer vừa cập nhật lại hợp đồng và đã gửi cho manager kiểm tra.", user.getUserId());

@@ -44,9 +44,9 @@
             <jsp:include page="/views/shared/sidebar.jsp">
                 <jsp:param name="activeMenu" value="quotations"/>
             </jsp:include>
-             <main class="main legacy-page">
+            <main class="main legacy-page">
                 <h1>Danh sách báo giá</h1>
-                <c:if test="${sessionScope.user.roleId != 3}">
+                <c:if test="${sessionScope.user.roleId == 4}">
                     <p><a href="${pageContext.request.contextPath}/quotation-create">Tạo báo giá mới</a></p>
                 </c:if>
                 <form action="quotation-list" method="GET">
@@ -116,10 +116,10 @@
                                 <td>
                                     <c:choose>
                                         <c:when test="${quotation.hasContract && quotation.contractId != null}">
-                                             <a href="quotation-detail?id=${quotation.quotationId}">Xem chi tiết</a>
+                                            <a href="quotation-detail?id=${quotation.quotationId}">Xem chi tiết</a>
                                         </c:when>
                                         <c:otherwise>
-                                             <a href="quotation-detail?id=${quotation.quotationId}">Xem chi tiết</a>
+                                            <a href="quotation-detail?id=${quotation.quotationId}">Xem chi tiết</a>
                                         </c:otherwise>
                                     </c:choose>
 
@@ -130,8 +130,8 @@
                                                 | <a href="contract-detail?id=${quotation.contractId}" style="color: blue; font-weight: bold;">Xem hợp đồng</a>
                                             </c:when>
                                             <c:otherwise>
-                                                <c:if test="${sessionScope.user.roleId != 3}">
-                                                    | <a href="contract-save?quotationId=${quotation.quotationId}" style="color: green; font-weight: bold;">Tạo hợp đồng</a>
+                                                <c:if test="${sessionScope.user.roleId == 5}">
+                                                    | <a href="contract-save?quotationId=${quotation.quotationId}" style="color: green; font-weight: bold;">Tạo hợp đồng nháp</a>
                                                 </c:if>
                                             </c:otherwise>
                                         </c:choose>
@@ -147,7 +147,7 @@
                     <c:if test="${currentPage > 1}">
                         <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${currentPage - 1}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">&lt;</a>
                     </c:if>
-                    <c:forEach begin="1" end="${totalPages}" var="i">
+                    <c:forEach begin="1" end="${endPage}" var="i">
                         <c:choose>
                             <c:when test="${i == currentPage}">
                                 <span class="page-current">${i}</span>
@@ -157,7 +157,7 @@
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
-                    <c:if test="${currentPage < totalPages}">
+                    <c:if test="${currentPage < endPage}">
                         <a class="page-link" href="${pageContext.request.contextPath}/quotation-list?page=${currentPage + 1}&search=${searchText}&status=${status}&fromDate=${fromDate}&toDate=${toDate}">&gt;</a>
                     </c:if>
                 </div>

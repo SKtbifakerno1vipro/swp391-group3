@@ -152,7 +152,8 @@ public class InvoiceDAO extends DBContext {
     public List<Invoice> getInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, int totalRow, int page, int totalPage, int pageSize, boolean forCustomer, int userId) {
         List<Invoice> list = new ArrayList<>();
         try {
-            String sql = "select iv.* from invoice iv";
+            String sql = "select iv.*, cc.contract_number from invoice iv"
+                    + " left join customer_contract cc on iv.customer_contract_id = cc.customer_contract_id";
             if (forCustomer) {
                 sql += " join customer_order co on iv.customer_order_id = co.customer_order_id"
                         + " join customer c on co.customer_id = c.customer_id";
@@ -164,7 +165,7 @@ public class InvoiceDAO extends DBContext {
             if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
                 searchBuyerName = searchBuyerName.trim();
                 searchBuyerName = searchBuyerName.replaceAll("\\s+", " ");
-                sql += " and iv.buyer_name LIKE ?";
+                sql += " and (iv.buyer_name LIKE ? OR iv.invoice_no LIKE ? OR iv.buyer_tax_code LIKE ? OR iv.buyer_phone LIKE ? OR cc.contract_number LIKE ?)";
             }
             if (status != null && !status.trim().isEmpty()) {
                 status = status.trim();
@@ -197,7 +198,12 @@ public class InvoiceDAO extends DBContext {
                 ps.setInt(index++, userId);
             }
             if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
-                ps.setString(index++, "%" + searchBuyerName.trim() + "%");
+                String searchLike = "%" + searchBuyerName.trim() + "%";
+                ps.setString(index++, searchLike);
+                ps.setString(index++, searchLike);
+                ps.setString(index++, searchLike);
+                ps.setString(index++, searchLike);
+                ps.setString(index++, searchLike);
             }
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(index++, status);
@@ -229,7 +235,8 @@ public class InvoiceDAO extends DBContext {
 
     public int countInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, boolean forCustomer, int userId) {
         try {
-            String sql = "select COUNT(iv.invoice_id) as total from invoice iv";
+            String sql = "select COUNT(iv.invoice_id) as total from invoice iv"
+                    + " left join customer_contract cc on iv.customer_contract_id = cc.customer_contract_id";
             if (forCustomer) {
                 sql += " join customer_order co on iv.customer_order_id = co.customer_order_id"
                         + " join customer c on co.customer_id = c.customer_id";
@@ -239,7 +246,7 @@ public class InvoiceDAO extends DBContext {
                 sql += " and c.user_id = ?";
             }
             if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
-                sql += " and iv.buyer_name LIKE ?";
+                sql += " and (iv.buyer_name LIKE ? OR iv.invoice_no LIKE ? OR iv.buyer_tax_code LIKE ? OR iv.buyer_phone LIKE ? OR cc.contract_number LIKE ?)";
             }
             if (status != null && !status.trim().isEmpty()) {
                 sql += " and iv.invoice_status = ?";
@@ -259,7 +266,12 @@ public class InvoiceDAO extends DBContext {
                 ps.setInt(index++, userId);
             }
             if (searchBuyerName != null && !searchBuyerName.trim().isEmpty()) {
-                ps.setString(index++, "%" + searchBuyerName.trim() + "%");
+                String searchLike = "%" + searchBuyerName.trim() + "%";
+                ps.setString(index++, searchLike);
+                ps.setString(index++, searchLike);
+                ps.setString(index++, searchLike);
+                ps.setString(index++, searchLike);
+                ps.setString(index++, searchLike);
             }
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(index++, status);
@@ -304,6 +316,21 @@ public class InvoiceDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return mapResultSetToInvoice(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Invoice getInvoiceByContractId(int contractId) {
+        String sql = "SELECT TOP 1 * FROM invoice WHERE customer_contract_id = ? ORDER BY invoice_id DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contractId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToInvoice(rs);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -379,7 +406,15 @@ public class InvoiceDAO extends DBContext {
                 invoice.setUpdatedAt(rs.getTimestamp(colIdx).toLocalDateTime());
             }
         } catch (SQLException e) {
-            // Column updated_at is missing in the database schema
+            System.out.println("error getInvoice: updateAt column");
+        }
+        try {
+            int colIdx = rs.findColumn("contract_number");
+            if (colIdx > 0) {
+                invoice.setContractNo(rs.getString(colIdx));
+            }
+        } catch (SQLException e) {
+            System.out.println("error getInvoice: contract_number column");
         }
 
         return invoice;
