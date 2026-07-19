@@ -103,6 +103,7 @@
 
                         <%-- ROLE 6: WAREHOUSE --%>
                         <c:when test="${sessionScope.user.roleId == 6}">
+                            <a class="nav-link ${param.activeMenu == 'dashboard' ? 'active' : ''}" href="${pageContext.request.contextPath}/dashboard" title="Bảng điều khiển"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">dashboard</span></div><span class="sidebar-text">Bảng điều khiển</span></a>
                             <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}" href="${pageContext.request.contextPath}/edit-user?id=${sessionScope.user.userId}" title="Hồ sơ của tôi"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">account_circle</span></div><span class="sidebar-text">Hồ sơ của tôi</span></a>
                             <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}" href="${pageContext.request.contextPath}/customer-order-list" title="Đơn hàng"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt_long</span></div><span class="sidebar-text">Đơn hàng</span></a>
                             <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}" href="${pageContext.request.contextPath}/category/list" title="Danh mục"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">category</span></div><span class="sidebar-text">Danh mục</span></a>

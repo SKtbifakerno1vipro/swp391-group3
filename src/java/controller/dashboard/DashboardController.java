@@ -91,6 +91,11 @@ public class DashboardController extends HttpServlet {
             return;
         }
 
+        if (user.getRoleId() == 6) { // ROLE_WAREHOUSE_STAFF
+            response.sendRedirect(request.getContextPath() + "/warehouse-dashboard");
+            return;
+        }
+
         service.DashboardService dashboardService = new service.DashboardService();
 
         service.RoleService roleService = new service.RoleService();

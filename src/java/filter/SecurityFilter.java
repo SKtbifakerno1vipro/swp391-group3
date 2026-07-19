@@ -50,6 +50,7 @@ public class SecurityFilter implements Filter {
     private static final List<String> SYSTEM_ADMIN_URLS = List.of(
             "/dashboard",
             "/admin-dashboard",
+            "/warehouse-dashboard",
             "/role-list", "/role-detail",
             "/add-role",
             "/edit-role-permissions",
@@ -100,6 +101,7 @@ public class SecurityFilter implements Filter {
 
     private static final List<String> MANAGER_URLS = List.of(
             "/dashboard",
+            "/warehouse-dashboard",
             "/role-list",
             "/role-detail",
             "/user-list",
@@ -221,6 +223,8 @@ public class SecurityFilter implements Filter {
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
+            "/dashboard",
+            "/warehouse-dashboard",
             "/customer-order-list",
             "/customer-order",
             "/category/list",
@@ -482,6 +486,7 @@ public class SecurityFilter implements Filter {
             case "/Signature":
             case "/SignatureAcceptance":
                 return "Acceptance Record";
+            case "/warehouse-dashboard":
             case "/import-request-list":
             case "/import-request-create":
             case "/import-request-detail":
