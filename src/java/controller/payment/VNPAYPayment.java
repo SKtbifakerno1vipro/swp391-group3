@@ -60,6 +60,10 @@ public class VNPAYPayment extends HttpServlet {
         if (paymentId > 0) {
             PaymentService paymentService = new PaymentService();
             Payment p = paymentService.getPaymentById(paymentId);
+            if (p != null && "COMPLETED".equals(p.getPaymentStatus())) {
+                resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId + "&error=" + URLEncoder.encode("Khoản thanh toán này đã hoàn tất từ trước!", StandardCharsets.UTF_8.toString()));
+                return;
+            }
             if (p != null && ("FAILED".equals(p.getPaymentStatus()) || "CANCELLED".equals(p.getPaymentStatus()))) {
                 paymentService.updatePaymentStatus(paymentId, "PENDING");
             }
