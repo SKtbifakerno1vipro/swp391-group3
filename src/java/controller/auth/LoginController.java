@@ -84,6 +84,7 @@ public class LoginController extends HttpServlet {
         if (authenticatedUser != null) {
             // Login Success: Reset attempts and set user session
             session.setAttribute("failedAttempts", 0);
+            session.removeAttribute("userPermissions"); // Xóa cache quyền cũ trong session (nếu có)
             session.setAttribute("user", authenticatedUser);
             AuditLogService.log(user.getUserId(), "LOGIN", "Auth", authenticatedUser.getUserName() + " vừa đăng nhập  vào hệ thống");
             if (authenticatedUser.getRoleId() == 6) {
