@@ -45,7 +45,14 @@ public class SecurityFilter implements Filter {
 
     private static final List<String> LOGGED_IN_URLS = List.of(
             "/user/password/change",
-            "/realtime/notifications"
+            "/realtime/notifications",
+            "/Signature",
+            "/SignatureAcceptance",
+            "/AcceptanceRecordController",
+            "/File",
+            "/payment",
+            "/payment/list",
+            "/payment/detail"
     );
 
     @Override

@@ -33,17 +33,21 @@ public class CustomerOrderService {
     }
 
     public boolean createOrder(model.CustomerOrder order, List<model.CustomerOrderDetail> details) {
+        System.out.println("[CustomerOrderService] Attempting to create order for Contract ID: " + order.getCustomerContractId());
         boolean success = customerOrderDAO.createOrder(order, details);
         // Xhieu - tu dong tao payment
         if (success) {
+            System.out.println("[CustomerOrderService] Order created successfully. Triggering auto-payment creation.");
             try {
                 int contractId = order.getCustomerContractId();
                 PaymentService paymentService = new PaymentService();
                 paymentService.createPendingPaymentForContractIfNotExists(contractId);
             } catch (Exception e) {
-                System.err.println("Failed to automatically create pending payment for contract: " + e.getMessage());
+                System.err.println("[CustomerOrderService] Failed to automatically create pending payment for contract: " + e.getMessage());
                 e.printStackTrace();
             }
+        } else {
+            System.err.println("[CustomerOrderService] Failed to create order in database.");
         }
         return success;
     }

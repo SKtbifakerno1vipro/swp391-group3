@@ -75,6 +75,7 @@ public class PaymentService {
     }
 
     public synchronized void createPendingPaymentForContractIfNotExists(int contractId) {
+        System.out.println("[PaymentService] Checking to create pending payment for contract ID: " + contractId);
         if (!hasPaymentForContract(contractId)) {
             try {
                 ContractDAO contractDAO = new ContractDAO();
@@ -109,14 +110,19 @@ public class PaymentService {
                         int customerUserId = customer.getUser().getUserId();
                         payment.setCreatedBy(customerUserId);
                         insertPayment(payment);
+                        System.out.println("[PaymentService] Successfully auto-created PENDING payment for contract ID: " + contractId + ", Amount: " + total);
                     } else {
-                        System.err.println("Could not resolve Customer user ID for contract customer ID: " + ctr.getCustomerId());
+                        System.err.println("[PaymentService] Could not resolve Customer user ID for contract customer ID: " + ctr.getCustomerId());
                     }
+                } else {
+                    System.err.println("[PaymentService] Contract not found for ID: " + contractId);
                 }
             } catch (Exception ex) {
-                System.err.println("Failed to auto-create payment on signature: " + ex.getMessage());
+                System.err.println("[PaymentService] Failed to auto-create payment: " + ex.getMessage());
                 ex.printStackTrace();
             }
+        } else {
+            System.out.println("[PaymentService] Payment already exists for contract ID: " + contractId + ". Skipping creation.");
         }
     }
 }
