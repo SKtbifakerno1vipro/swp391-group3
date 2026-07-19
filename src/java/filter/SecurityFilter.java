@@ -39,7 +39,8 @@ public class SecurityFilter implements Filter {
             "/user/password/change",
             "/payment/ipn",
             "/payment/return",
-            "/export-pdf"
+            "/export-pdf",
+            "/tool/auto-generate"
     );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
