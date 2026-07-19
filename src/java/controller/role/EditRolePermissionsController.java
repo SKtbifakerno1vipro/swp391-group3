@@ -74,6 +74,7 @@ public class EditRolePermissionsController extends HttpServlet {
         String roleName = role != null ? role.getRoleName() : String.valueOf(roleId);
 
         roleService.updateRolePermissions(roleId, permissionIds);
+        request.getSession().removeAttribute("userPermissions"); // Xóa cache quyền của tài khoản hiện tại để cập nhật mới lập tức
         service.AuditLogService.log(currentUserId, "UPDATE", "Role", "Chỉnh sửa danh sách quyền cho vai trò: " + roleName + " (ID: " + roleId + ")");
         response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
     }
