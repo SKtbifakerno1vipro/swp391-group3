@@ -16,7 +16,7 @@ import java.util.Map;
 import service.RevenueService;
 import java.util.*;
 
-@WebServlet(name = "RevenueController", urlPatterns = {"/revenue-report"})
+@WebServlet(name = "RevenueController", urlPatterns = {"/revenue-report", "/revenue"})
 public class RevenueController extends HttpServlet {
     private final RevenueService revenueService = new RevenueService();
     @Override
