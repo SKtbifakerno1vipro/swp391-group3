@@ -60,6 +60,31 @@ public class CustomerOrderService {
     public boolean updateOrderStatus(int orderId, String status) {
         return customerOrderDAO.updateOrderStatus(orderId, status);
     }
+
+    public boolean isValidStatusTransition(String currentStatus, String newStatus) {
+        if (currentStatus == null || newStatus == null) {
+            return false;
+        }
+        if (currentStatus.equalsIgnoreCase(newStatus)) {
+            return true;
+        }
+        
+        switch (currentStatus.toUpperCase()) {
+            case "PENDING":
+                return "SHIPPING".equalsIgnoreCase(newStatus) 
+                    || "CANCELLED".equalsIgnoreCase(newStatus) 
+                    || "DELETED".equalsIgnoreCase(newStatus);
+            case "SHIPPING":
+                return "COMPLETED".equalsIgnoreCase(newStatus) 
+                    || "CANCELLED".equalsIgnoreCase(newStatus) 
+                    || "DELETED".equalsIgnoreCase(newStatus);
+            case "COMPLETED":
+            case "CANCELLED":
+            case "DELETED":
+            default:
+                return false;
+        }
+    }
     
     public boolean deleteCustomerOrder(int orderId) {
         return customerOrderDAO.deleteCustomerOrder(orderId);

@@ -363,28 +363,40 @@ public class CustomerOrderController extends HttpServlet {
 
     private void handleUpdateStatusAction(HttpServletRequest request, HttpServletResponse response) 
             throws IOException {
+        HttpSession session = request.getSession();
         int orderId = Integer.parseInt(request.getParameter("orderId"));
         String status = request.getParameter("status");
         
         CustomerOrderDTO order = customerOrderService.getCustomerOrderById(orderId);
-        if (order != null && "COMPLETED".equals(order.getCustomerOrder().getOrderStatus())) {
+        if (order == null || order.getCustomerOrder() == null) {
+            session.setAttribute("error", "Đơn hàng không tồn tại hoặc đã bị xóa.");
+            response.sendRedirect(request.getContextPath() + "/customer-order-list");
+            return;
+        }
+        
+        String currentStatus = order.getCustomerOrder().getOrderStatus();
+        
+        // Block setting status to COMPLETED via general status update (must be done via AcceptanceRecord confirmation)
+        if ("COMPLETED".equals(status)) {
+            session.setAttribute("error", "Trạng thái 'Đã hoàn thành' chỉ được cập nhật khi nghiệm thu thành công.");
             response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
             return;
         }
         
-        // Block setting status to COMPLETED via general status update (must be done via AcceptanceRecord confirmation)
-        if ("COMPLETED".equals(status)) {
+        // Validate status transition
+        if (!customerOrderService.isValidStatusTransition(currentStatus, status)) {
+            session.setAttribute("error", "Không thể chuyển trạng thái đơn hàng từ " + currentStatus + " sang " + status + ".");
             response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
             return;
         }
         
         customerOrderService.updateOrderStatus(orderId, status);
         
-        HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
         Integer currentUserId = currentUser != null ? currentUser.getUserId() : null;
         AuditLogService.log(currentUserId, "UPDATE", "Order", "Cập nhật trạng thái đơn hàng ID " + orderId + " thành: " + status);
         
+        session.setAttribute("message", "Cập nhật trạng thái đơn hàng thành công.");
         response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
     }
 
