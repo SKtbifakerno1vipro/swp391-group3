@@ -13,13 +13,17 @@ public class Payment {
     private String paymentType;
     private String paymentStatus;
     private LocalDateTime paidAt;
-    private Integer createdBy;
+    private Integer userId;
     private LocalDateTime createdAt;
 
     // Snapshot fields
     private String customerNameSnapshot;
     private String customerPhoneSnapshot;
     private String customerAddressSnapshot;
+    private String customerTaxCodeSnapshot;
+    private String companyNameSnapshot;
+    private String customerEmailSnapshot;
+    private String createdByNameSnapshot;
 
     // Transient fields for display convenience
     private String contractNumber;
@@ -101,12 +105,12 @@ public class Payment {
         this.paidAt = paidAt;
     }
 
-    public Integer getCreatedBy() {
-        return createdBy;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setCreatedBy(Integer createdBy) {
-        this.createdBy = createdBy;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -180,5 +184,37 @@ public class Payment {
 
     public void setCustomerAddressSnapshot(String customerAddressSnapshot) {
         this.customerAddressSnapshot = customerAddressSnapshot;
+    }
+
+    public String getCustomerTaxCodeSnapshot() {
+        return customerTaxCodeSnapshot;
+    }
+
+    public void setCustomerTaxCodeSnapshot(String customerTaxCodeSnapshot) {
+        this.customerTaxCodeSnapshot = customerTaxCodeSnapshot;
+    }
+
+    public String getCompanyNameSnapshot() {
+        return companyNameSnapshot;
+    }
+
+    public void setCompanyNameSnapshot(String companyNameSnapshot) {
+        this.companyNameSnapshot = companyNameSnapshot;
+    }
+
+    public String getCustomerEmailSnapshot() {
+        return customerEmailSnapshot;
+    }
+
+    public void setCustomerEmailSnapshot(String customerEmailSnapshot) {
+        this.customerEmailSnapshot = customerEmailSnapshot;
+    }
+
+    public String getCreatedByNameSnapshot() {
+        return createdByNameSnapshot;
+    }
+
+    public void setCreatedByNameSnapshot(String createdByNameSnapshot) {
+        this.createdByNameSnapshot = createdByNameSnapshot;
     }
 }

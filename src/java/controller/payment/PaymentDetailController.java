@@ -46,7 +46,7 @@ public class PaymentDetailController extends HttpServlet {
             }
 
             // Security check: Customers should only see their own payments
-            if (user.getRoleId() == 3 && payment.getCreatedBy() != null && payment.getCreatedBy() != user.getUserId()) {
+            if (user.getRoleId() == 3 && payment.getUserId() != null && !payment.getUserId().equals(user.getUserId())) {
                 response.sendRedirect(request.getContextPath() + "/dashboard?error=denied");
                 return;
             }

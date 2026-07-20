@@ -159,7 +159,12 @@
                         </div>
 
                         <div class="receipt-row">
-                            <span class="label">Mã hợp đồng / đơn hàng</span>
+                            <span class="label">Mã đơn hàng</span>
+                            <span class="value">${payment.customerOrderId}</span>
+                        </div>
+
+                        <div class="receipt-row">
+                            <span class="label">Mã hợp đồng</span>
                             <span class="value">
                                 <c:choose>
                                     <c:when test="${not empty payment.contractNumber}">
@@ -175,34 +180,15 @@
                         </div>
 
                         <div class="receipt-row">
-                            <span class="label">Tên khách hàng</span>
-                            <span class="value">
-                                <c:choose>
-                                    <c:when test="${not empty payment.customerName}">
-                                        ${payment.customerName}
-                                    </c:when>
-                                    <c:otherwise>
-                                        Hệ thống / Vô danh
-                                    </c:otherwise>
-                                </c:choose>
-                            </span>
-                        </div>
-
-                        <div class="receipt-row">
-                            <span class="label">Phương thức thanh toán</span>
-                            <span class="value">${payment.paymentType}</span>
-                        </div>
-
-                        <div class="receipt-row">
-                            <span class="label">Số tiền đã trả</span>
+                            <span class="label">Số tiền</span>
                             <span class="value" style="color: #10b981; font-size: 1.15rem;">
                                 <fmt:formatNumber value="${payment.amount}" type="number"/> VNĐ
                             </span>
                         </div>
 
                         <div class="receipt-row">
-                            <span class="label">Ngày giao dịch</span>
-                            <span class="value">${payment.formattedPaidAt}</span>
+                            <span class="label">Phương thức thanh toán</span>
+                            <span class="value">${payment.paymentType}</span>
                         </div>
 
                         <div class="receipt-row">
@@ -227,12 +213,87 @@
                                 </c:choose>
                             </span>
                         </div>
+
+                        <div class="receipt-row">
+                            <span class="label">Ngày tạo</span>
+                            <span class="value">${payment.formattedCreatedAt}</span>
+                        </div>
+
+                        <div class="receipt-row">
+                            <span class="label">Ngày thanh toán</span>
+                            <span class="value">${payment.formattedPaidAt}</span>
+                        </div>
+
+                        <%-- Thông tin khách hàng --%>
+                        <div style="margin: 16px 0 8px 0; font-size: 0.8rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em;">
+                            Thông tin khách hàng
+                        </div>
+
+                        <div class="receipt-row">
+                            <span class="label">Họ tên</span>
+                            <span class="value">
+                                <c:choose>
+                                    <c:when test="${not empty payment.customerNameSnapshot}">${payment.customerNameSnapshot}</c:when>
+                                    <c:otherwise>—</c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
+
+                        <div class="receipt-row">
+                            <span class="label">Công ty</span>
+                            <span class="value">
+                                <c:choose>
+                                    <c:when test="${not empty payment.companyNameSnapshot}">${payment.companyNameSnapshot}</c:when>
+                                    <c:otherwise>—</c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
+
+                        <div class="receipt-row">
+                            <span class="label">Email</span>
+                            <span class="value">
+                                <c:choose>
+                                    <c:when test="${not empty payment.customerEmailSnapshot}">${payment.customerEmailSnapshot}</c:when>
+                                    <c:otherwise>—</c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
+
+                        <div class="receipt-row">
+                            <span class="label">Số điện thoại</span>
+                            <span class="value">
+                                <c:choose>
+                                    <c:when test="${not empty payment.customerPhoneSnapshot}">${payment.customerPhoneSnapshot}</c:when>
+                                    <c:otherwise>—</c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
+
+                        <div class="receipt-row">
+                            <span class="label">Địa chỉ</span>
+                            <span class="value">
+                                <c:choose>
+                                    <c:when test="${not empty payment.customerAddressSnapshot}">${payment.customerAddressSnapshot}</c:when>
+                                    <c:otherwise>—</c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
+
+                        <div class="receipt-row">
+                            <span class="label">Mã số thuế</span>
+                            <span class="value">
+                                <c:choose>
+                                    <c:when test="${not empty payment.customerTaxCodeSnapshot}">${payment.customerTaxCodeSnapshot}</c:when>
+                                    <c:otherwise>—</c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="receipt-footer">
                         <c:if test="${(payment.paymentStatus == 'PENDING' || payment.paymentStatus == 'FAILED' || payment.paymentStatus == 'CANCELLED') && sessionScope.user.roleId == 3}">
                             <form action="${pageContext.request.contextPath}/payment" method="POST" style="margin-top: 15px;">
-                                <input type="hidden" name="orderId" value="${payment.paymentId}">
+                                <input type="hidden" name="paymentId" value="${payment.paymentId}">
                                 <input type="hidden" name="amount" value="${payment.amount.longValue()}">
                                 <button type="submit" class="btn-pay" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #10b981; color: #ffffff; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); width: 100%; box-sizing: border-box;">
                                     <span class="material-symbols-outlined">payment</span>

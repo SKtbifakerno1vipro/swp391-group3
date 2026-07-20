@@ -363,15 +363,19 @@ CREATE TABLE payment (
     payment_type VARCHAR(50),
     payment_status VARCHAR(20),
     paid_at DATETIME2(6),
-    created_by INT,
+    user_id INT,
     customer_name_snapshot NVARCHAR(255),
     customer_phone_snapshot VARCHAR(20),
     customer_address_snapshot NVARCHAR(500),
+    customer_tax_code_snapshot VARCHAR(20),
+    company_name_snapshot NVARCHAR(255),
+    customer_email_snapshot NVARCHAR(255),
+    created_by_name_snapshot NVARCHAR(255),
     created_at DATETIME2(6) DEFAULT SYSDATETIME(),
     FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),
     FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id),
     FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id),
-    FOREIGN KEY (created_by) REFERENCES [user](user_id)
+    FOREIGN KEY (user_id) REFERENCES [user](user_id)
 );
 GO
 

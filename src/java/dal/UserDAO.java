@@ -21,6 +21,7 @@ public class UserDAO extends DBContext {
         u.setPhone(rs.getString("phone"));
         u.setStatus(rs.getString("account_status"));
         u.setRoleId(rs.getInt("role_id"));
+        u.setGender(rs.getString("gender"));
         u.setAddress(rs.getString("address"));
         if (rs.getDate("date_of_birth") != null) {
             u.setDateBirth(rs.getDate("date_of_birth"));
@@ -262,22 +263,28 @@ public class UserDAO extends DBContext {
             stm.setString(3, user.getEmail());
 
             // 4. gender 
-//        if (user.getGender() != null && !user.getGender().trim().isEmpty()) {
-//            stm.setString(3, user.getGender());
-//        } else 
-            stm.setNull(4, Types.CHAR);
+            if (user.getGender() != null && !user.getGender().trim().isEmpty()) {
+                stm.setString(4, user.getGender().trim());
+            } else {
+                stm.setNull(4, Types.CHAR);
+            }
 
             // 5. date_of_birth
-            stm.setNull(5, Types.DATE);
+            if (user.getDateBirth() != null) {
+                stm.setDate(5, new Date(user.getDateBirth().getTime()));
+            } else {
+                stm.setNull(5, Types.DATE);
+            }
 
             // 6. full_name
             stm.setString(6, user.getFullName());
 
             // 7. address 
-//        if (user.getAddress() != null && !user.getAddress().trim().isEmpty()) {
-//            stm.setString(6, user.getAddress());
-//        } else 
-            stm.setNull(7, Types.NVARCHAR);
+            if (user.getAddress() != null && !user.getAddress().trim().isEmpty()) {
+                stm.setString(7, user.getAddress().trim());
+            } else {
+                stm.setNull(7, Types.NVARCHAR);
+            }
 
             // 8. phone
             stm.setString(8, user.getPhone());

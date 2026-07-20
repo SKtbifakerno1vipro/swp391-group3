@@ -60,10 +60,6 @@ public class PaymentService {
         return paymentDAO.getPaymentById(paymentId);
     }
 
-    public int getAnyContractId() {
-        return paymentDAO.getAnyContractId();
-    }
-
     public boolean updatePaymentStatus(int paymentId, String status) {
         return paymentDAO.updatePaymentStatus(paymentId, status);
     }
@@ -89,7 +85,6 @@ public class PaymentService {
         try {
             // Tạm thời đặt số tiền cứng là 100,000 VND để thử nghiệm thanh toán
             BigDecimal totalAmount = BigDecimal.valueOf(100000);
-            Integer customerUserId = null;
             
             CustomerService customerService = new CustomerService();
             CustomerDTO customer = customerService.getCustomerDTOById(order.getCustomerId());
@@ -97,9 +92,13 @@ public class PaymentService {
                 System.err.println("[PaymentService] Could not resolve Customer or User for customer ID: " + order.getCustomerId() + ". Skipping payment creation.");
                 return;
             }
+            Integer customerUserId = customer.getUser().getUserId();
             String customerName = customer.getUser().getFullName();
             String customerPhone = customer.getUser().getPhone();
             String customerAddress = customer.getUser().getAddress();
+            String customerEmail = customer.getUser().getEmail();
+            String customerTaxCode = customer.getCustomer() != null ? customer.getCustomer().getTaxCode() : null;
+            String companyName = customer.getCustomer() != null ? customer.getCustomer().getCompanyName() : null;
             
             Payment payment = new Payment();
             payment.setCustomerContractId(contractId);
@@ -108,11 +107,15 @@ public class PaymentService {
             payment.setPaymentType("VNPAY");
             payment.setPaymentStatus("PENDING");
             payment.setCreatedAt(LocalDateTime.now());
-            payment.setCreatedBy(customerUserId);
+            payment.setUserId(customerUserId);
+            // Chốt snapshot ngay lúc tạo — chuẩn thực tế
             payment.setCustomerNameSnapshot(customerName);
             payment.setCustomerPhoneSnapshot(customerPhone);
             payment.setCustomerAddressSnapshot(customerAddress);
-            
+            payment.setCustomerEmailSnapshot(customerEmail);
+            payment.setCustomerTaxCodeSnapshot(customerTaxCode);
+            payment.setCompanyNameSnapshot(companyName);
+
             int generatedId = paymentDAO.insertPayment(payment);
             System.out.println("[PaymentService] Successfully auto-created PENDING payment ID: " + generatedId + " for Order ID: " + orderId + ", Amount: " + totalAmount);
             

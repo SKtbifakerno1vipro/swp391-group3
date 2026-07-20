@@ -228,7 +228,7 @@
                                 <strong>${product.productName}</strong> (${product.unit} - <fmt:formatNumber value="${product.sellingPrice}" type="number" maxFractionDigits="0"/> đ)
                             </label>
                         </div>
-                        <input type="number" name="qty_${product.productId}" class="product-qty" value="50" min="1" required />
+                        <input type="number" name="qty_${product.productId}" class="product-qty" value="10" min="1" required />
                     </div>
                 </c:forEach>
             </div>
