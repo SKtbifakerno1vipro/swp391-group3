@@ -39,14 +39,7 @@ public class ContractSaveController extends HttpServlet {
         }
 
         String contractIdRaw = request.getParameter("id");
-        String quotationId = request.getParameter("quotationId");
         String quotationIdStr = request.getParameter("quotationId");
-
-        if (contractService.getContractByQuotationId(Integer.parseInt(quotationIdStr)) != null) {
-            request.setAttribute("errorMsg", "Báo giá này đã có hợp đồng!");
-            request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
-            return;
-        }
 
         //check  contract exist by id?
         if (contractIdRaw != null && !contractIdRaw.isEmpty()) {
@@ -74,8 +67,8 @@ public class ContractSaveController extends HttpServlet {
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
 
             // create new contract with quotation
-        } else if (quotationId != null && !quotationId.isEmpty()) {
-            int qId = Integer.parseInt(quotationId);
+        } else if (quotationIdStr != null && !quotationIdStr.isEmpty()) {
+            int qId = Integer.parseInt(quotationIdStr);
             Quotation quotation = quotationService.getQuotationById(qId);
             if (quotation != null) {
                 String templateHtml = generateContractHtml(quotation);
