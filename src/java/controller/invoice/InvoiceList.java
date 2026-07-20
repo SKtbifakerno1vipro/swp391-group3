@@ -129,7 +129,10 @@ public class InvoiceList extends HttpServlet {
             if (invoiceIdRaw != null && !invoiceIdRaw.trim().isEmpty()) {
                 try {
                     int invoiceId = Integer.parseInt(invoiceIdRaw);
-                    invoiceService.updateInvoiceStatus(invoiceId, "CANCELED");
+                    boolean updated = invoiceService.updateInvoiceStatus(invoiceId, "CANCELED");
+                    if (updated) {
+                        service.AuditLogService.log(user.getUserId(), "CANCEL", "Invoice", "Hủy bỏ hóa đơn ID: " + invoiceId);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

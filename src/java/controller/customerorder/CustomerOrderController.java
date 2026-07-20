@@ -102,13 +102,13 @@ public class CustomerOrderController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
                 return;
             }
-            handleCreateAction(request, response, currentUser);
+            CreateAction(request, response, currentUser);
         } else if ("update_status".equals(action)) {
             if (currentUser.getRoleId() == 3) {
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
                 return;
             }
-            handleUpdateStatusAction(request, response);
+            UpdateStatusAction(request, response);
         } else {
             response.sendRedirect(request.getContextPath() + "/customer-order-list");
         }
@@ -155,7 +155,7 @@ public class CustomerOrderController extends HttpServlet {
             request.setAttribute("invOfOrder", invoice);
 
             HttpSession session = request.getSession();
-            model.User currentUser = (model.User) session.getAttribute("user");
+            User currentUser = (User) session.getAttribute("user");
             if (currentUser != null && order.getCustomer() != null) {
                 int roleId = currentUser.getRoleId();
                 int userId = currentUser.getUserId();
@@ -181,9 +181,9 @@ public class CustomerOrderController extends HttpServlet {
 
             List<CustomerOrderDTO> details = customerOrderService.getOrderDetails(orderId);
 
-            // Calculate total from order details
-            double quotationTotal = 0;
-            if (details != null) {
+            // Get total_price from quotation linked via contract
+            double quotationTotal = customerOrderService.getTotalPriceFromQuotationByOrderId(orderId);
+            if (quotationTotal <= 0 && details != null) {
                 for (CustomerOrderDTO item : details) {
                     if (item.getDetail() != null) {
                         quotationTotal += item.getDetail().getTotal();
@@ -285,7 +285,7 @@ public class CustomerOrderController extends HttpServlet {
     }
 
     // --- ACTION HANDLERS ---
-    private void handleCreateAction(HttpServletRequest request, HttpServletResponse response, User currentUser)
+    private void CreateAction(HttpServletRequest request, HttpServletResponse response, User currentUser)
             throws IOException, ServletException {
         String customerIdStr = request.getParameter("customerId");
         String contractIdStr = request.getParameter("customerContractId");
@@ -362,7 +362,7 @@ public class CustomerOrderController extends HttpServlet {
         }
     }
 
-    private void handleUpdateStatusAction(HttpServletRequest request, HttpServletResponse response)
+    private void UpdateStatusAction(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         HttpSession session = request.getSession();
         int orderId = Integer.parseInt(request.getParameter("orderId"));

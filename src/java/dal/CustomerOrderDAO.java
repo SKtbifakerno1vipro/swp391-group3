@@ -94,6 +94,24 @@ public class CustomerOrderDAO extends DBContext {
         return details;
     }
 
+    public double getTotalPriceFromQuotationByOrderId(int orderId) {
+        String sql = "SELECT q.total_price "
+                + "FROM customer_order co "
+                + "JOIN customer_contract cc ON co.customer_contract_id = cc.customer_contract_id "
+                + "JOIN quotation q ON cc.quotation_id = q.quotation_id "
+                + "WHERE co.customer_order_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("total_price");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public boolean createOrder(CustomerOrder order, List<model.CustomerOrderDetail> details) {
         String insertOrderSql = "INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by, created_at) VALUES (?, ?, ?, ?, GETDATE())";
         String insertDetailSql = "INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (?, ?, ?, ?, ?)";
@@ -229,6 +247,16 @@ public class CustomerOrderDAO extends DBContext {
                 psUpdate.setInt(2, orderId);
                 int affected = psUpdate.executeUpdate();
                 if (affected > 0) {
+                    // Update acceptance_status in acceptance_record table
+                    String updateAccSql = "UPDATE acceptance_record SET acceptance_status = ?, updated_at = GETDATE() WHERE customer_order_id = ?";
+                    try (PreparedStatement psAcc = connection.prepareStatement(updateAccSql)) {
+                        psAcc.setString(1, status);
+                        psAcc.setInt(2, orderId);
+                        psAcc.executeUpdate();
+                    } catch (Exception eAcc) {
+                        System.out.println("Failed to update acceptance_record status: " + eAcc.getMessage());
+                    }
+
                     connection.commit();
                     return true;
                 } else {
@@ -255,13 +283,23 @@ public class CustomerOrderDAO extends DBContext {
 
     public boolean deleteCustomerOrder(int orderId) {
         String sql = "UPDATE customer_order SET order_status = 'DELETED' WHERE customer_order_id = ?";
+        String sqlAcc = "UPDATE acceptance_record SET acceptance_status = 'DELETED', updated_at = GETDATE() WHERE customer_order_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, orderId);
-            return ps.executeUpdate() > 0;
+            int affected = ps.executeUpdate();
+            if (affected > 0) {
+                try (PreparedStatement psAcc = connection.prepareStatement(sqlAcc)) {
+                    psAcc.setInt(1, orderId);
+                    psAcc.executeUpdate();
+                } catch (Exception eAcc) {
+                    System.out.println("Failed to update acceptance_record on delete: " + eAcc.getMessage());
+                }
+                return true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     private CustomerOrderDTO mapResultSetToDTO(ResultSet rs) throws java.sql.SQLException {

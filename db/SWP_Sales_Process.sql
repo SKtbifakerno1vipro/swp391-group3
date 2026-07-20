@@ -391,6 +391,44 @@ CREATE TABLE product_review (
     FOREIGN KEY (user_id) REFERENCES [user](user_id),
     FOREIGN KEY (replied_by) REFERENCES [user](user_id)
 );
+GO
+
+-- 20. Acceptance Record (Biên bản nghiệm thu)
+CREATE TABLE acceptance_record (
+    acceptance_record_id INT IDENTITY(1,1) PRIMARY KEY,
+    customer_contract_id INT NOT NULL,
+    customer_order_id INT NOT NULL,
+    record_no NVARCHAR(100) NULL,
+    acceptance_date DATETIME NULL,
+    acceptance_status VARCHAR(50) DEFAULT 'PENDING', -- PENDING, COMPLETED, CANCELLED
+
+    -- Provider / Seller info snapshot (Bên A)
+    provider_name NVARCHAR(255) NULL,
+    provider_rep_name NVARCHAR(255) NULL,
+    provider_tax_code VARCHAR(20) NULL,
+    provider_address NVARCHAR(255) NULL,
+    provider_phone VARCHAR(20) NULL,
+
+    -- Customer / Buyer info snapshot (Bên B)
+    customer_name NVARCHAR(255) NULL,
+    customer_rep_name NVARCHAR(255) NULL,
+    customer_tax_code VARCHAR(20) NULL,
+    customer_address NVARCHAR(255) NULL,
+    customer_phone VARCHAR(20) NULL,
+
+    -- Financial summary
+    total_amount DECIMAL(18,2) DEFAULT 0,
+
+    -- Timestamp
+    created_by INT NULL,
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME DEFAULT GETDATE(),
+
+    FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),
+    FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id),
+    FOREIGN KEY (created_by) REFERENCES [user](user_id)
+);
+GO
 
 
 -- 1. TAO ROLE
