@@ -126,6 +126,7 @@ public class InvoiceList extends HttpServlet {
             return;
         }
         String action = request.getParameter("action");
+        boolean updated = false;
         if ("cancel".equals(action)) {
             String invoiceIdRaw = request.getParameter("invoiceId");
             if (invoiceIdRaw != null && !invoiceIdRaw.trim().isEmpty()) {
@@ -138,9 +139,8 @@ public class InvoiceList extends HttpServlet {
                     } else if ("RELEASED".equals(iv.getInvoiceStatus())) {
                         session.setAttribute("errorInvoice", "Hóa đơn đã phát hành, không thể hủy!");
                     } else {
-                        invoiceService.updateInvoiceStatus(invoiceId, "CANCELED");
+                      updated =  invoiceService.updateInvoiceStatus(invoiceId, "CANCELED");
                     }
-                    boolean updated = invoiceService.updateInvoiceStatus(invoiceId, "CANCELED");
                     if (updated) {
                         service.AuditLogService.log(user.getUserId(), "CANCEL", "Invoice", "Hủy bỏ hóa đơn ID: " + invoiceId);
                     }

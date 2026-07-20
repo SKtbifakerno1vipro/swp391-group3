@@ -571,7 +571,7 @@ L<%@page contentType="text/html" pageEncoding="UTF-8" import="java.time.LocalDat
                                         </c:if>
                                         <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Cập nhật bản nháp</button>
                                     </c:if>
-                                    
+                                     
                                 </c:otherwise>
                             </c:choose>
                             <a href="${pageContext.request.contextPath}/invoice-list" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">close</span> Đóng</a>
