@@ -21,6 +21,19 @@
             <main class="main legacy-page">
                 <h2>Chi tiết Đơn hàng</h2>
 
+                <c:if test="${not empty sessionScope.error}">
+                    <div style="padding: 10px 15px; background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
+                        ${sessionScope.error}
+                    </div>
+                    <c:remove var="error" scope="session"/>
+                </c:if>
+                <c:if test="${not empty sessionScope.message}">
+                    <div style="padding: 10px 15px; background-color: #dcfce7; color: #166534; border: 1px solid #86efac; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
+                        ${sessionScope.message}
+                    </div>
+                    <c:remove var="message" scope="session"/>
+                </c:if>
+
                 <h3>Thông tin Đơn hàng</h3>
                 <c:choose>
                     <c:when test="${sessionScope.user.roleId == 3}">
