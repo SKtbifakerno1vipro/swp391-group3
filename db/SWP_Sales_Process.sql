@@ -674,11 +674,7 @@ INSERT INTO role_permission (role_id, permission_id)
 SELECT 3, permission_id FROM permission WHERE permission_name IN (
     N'Dashboard', N'Profile', N'Customer Detail', N'Order List', N'Order Detail', N'Category List', N'Category edit',
     N'Product List', N'Quotation List', N'Quotation Detail', N'Contract List', N'Contract Detail(Edit)',
-<<<<<<< HEAD
-    N'Invoice List', N'Preview Invoice', N'Payment List', N'Payment Detail', N'Product Review'
-=======
-    N'Invoice List', N'Preview Invoice', N'Payment List', N'Product Review', N'Acceptance Record'
->>>>>>> vtpp
+    N'Invoice List', N'Preview Invoice', N'Payment List', N'Payment Detail', N'Product Review', N'Acceptance Record'
 );
 
 -- 4. Sale Staff (role_id = 4)
