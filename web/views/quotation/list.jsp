@@ -46,7 +46,7 @@
             </jsp:include>
             <main class="main legacy-page">
                 <h1>Danh sách báo giá</h1>
-                <c:if test="${sessionScope.user.roleId == 4}">
+                <c:if test="${(sessionScope.user.roleId == 1 || sessionScope.user.roleId == 4)}">
                     <p><a href="${pageContext.request.contextPath}/quotation-create">Tạo báo giá mới</a></p>
                 </c:if>
                 <form action="quotation-list" method="GET">
@@ -130,7 +130,7 @@
                                                 | <a href="contract-detail?id=${quotation.contractId}" style="color: blue; font-weight: bold;">Xem hợp đồng</a>
                                             </c:when>
                                             <c:otherwise>
-                                                <c:if test="${sessionScope.user.roleId == 5}">
+                                                <c:if test="${(sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5)}">
                                                     | <a href="contract-save?quotationId=${quotation.quotationId}" style="color: green; font-weight: bold;">Tạo hợp đồng nháp</a>
                                                 </c:if>
                                             </c:otherwise>
