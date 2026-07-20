@@ -21,10 +21,30 @@
             <main class="main legacy-page">
                 <h2>Chi tiết Đơn hàng</h2>
 
+                <c:if test="${not empty sessionScope.error}">
+                    <div style="padding: 10px 15px; background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
+                        ${sessionScope.error}
+                    </div>
+                    <c:remove var="error" scope="session"/>
+                </c:if>
+                <c:if test="${not empty sessionScope.message}">
+                    <div style="padding: 10px 15px; background-color: #dcfce7; color: #166534; border: 1px solid #86efac; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
+                        ${sessionScope.message}
+                    </div>
+                    <c:remove var="message" scope="session"/>
+                </c:if>
 
                 <h3>Thông tin Đơn hàng</h3>
                 <c:choose>
                     <c:when test="${sessionScope.user.roleId == 3}">
+                        <h3 style="text-align: left"><strong>${not empty companyName ? companyName : 'Công Ty TNHH Pơ Bread'}</strong></h3>
+                            
+                                <div style="font-size: 13.5px; color: #555; margin-bottom: 12px;">
+                                    <span><strong>Địa chỉ:</strong> ${not empty companyAddress ? companyAddress : 'Tầng 5, Tòa nhà FPT, Khu Công Nghệ Cao Hòa Lạc, Thạch Thất, Hà Nội'}</span>
+                                     <br> <span><strong>ĐT:</strong> ${not empty companyPhone ? companyPhone : '0999.999.999'}</span>
+                                    | <span><strong>MST:</strong> ${not empty companyTaxCode ? companyTaxCode : '0101248141'}</span>
+                                </div>
+                        
                         <ul>
                             <li><strong>Mã đơn hàng:</strong> ${order.customerOrder.customerOrderId}</li>
                             <li><strong>Tên khách hàng:</strong> ${order.customerUser.fullName}</li>
@@ -38,8 +58,8 @@
                                     <c:otherwise>${order.customerOrder.orderStatus}</c:otherwise>
                                 </c:choose>
                             </li>
-                                <c:if test="${order.customerOrder.orderStatus == 'COMPLETED'}">
-                                    <c:if test="${order.customerOrder.hasInvoice == true}">
+                            <c:if test="${order.customerOrder.orderStatus == 'COMPLETED'}">
+                                <c:if test="${order.customerOrder.hasInvoice == true}">
                                     <li style="margin-top: 15px;"><strong>Hành động:</strong>
                                         <a href="${pageContext.request.contextPath}/invoice?invoiceId=${invOfOrder.invoiceId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #0284c7; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);">
                                             <span class="material-symbols-outlined" style="font-size: 18px; color: white;">visibility</span> Xem Hóa đơn
@@ -64,18 +84,27 @@
                         <form action="${pageContext.request.contextPath}/customer-order" method="POST">
                             <input type="hidden" name="orderId" value="${order.customerOrder.customerOrderId}">
                             <input type="hidden" name="action" value="update_status">
+                            <h3 style="text-align: left"><strong>${not empty companyName ? companyName : 'Công Ty TNHH Pơ Bread'}</strong></h3>
+                            
+                                <div style="font-size: 13.5px; color: #555; margin-bottom: 12px;">
+                                    <span><strong>Địa chỉ:</strong> ${not empty companyAddress ? companyAddress : 'Tầng 5, Tòa nhà FPT, Khu Công Nghệ Cao Hòa Lạc, Thạch Thất, Hà Nội'}</span>
+                                     <br> <span><strong>ĐT:</strong> ${not empty companyPhone ? companyPhone : '0999.999.999'}</span>
+                                    | <span><strong>MST:</strong> ${not empty companyTaxCode ? companyTaxCode : '0101248141'}</span>
+                                </div>
+                            
+                            <strong>Mã đơn hàng:</strong> ${order.customerOrder.customerOrderId}
+                            <h4>THÔNG TIN KHÁCH HÀNG:</h4>
                             <ul>
-                                <li><strong>Mã đơn hàng:</strong> ${order.customerOrder.customerOrderId}</li>
                                 <li><strong>Tên khách hàng:</strong> ${order.customerUser.fullName}</li>
                                 <li><strong>Mã số thuế:</strong> ${order.customer.taxCode}</li>
                                 <li><strong>Trạng thái:</strong>
                                     <select name="status" ${order.customerOrder.orderStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'CANCELLED' ? 'disabled' : ''} >
                                         <option value="PENDING" ${order.customerOrder.orderStatus == 'PENDING' ? 'selected' : 'hidden'}>Chờ xử lý</option>
-                                         <option value="SHIPPING" ${order.customerOrder.orderStatus == 'SHIPPING' ? 'selected' : ''}>Đang giao hàng</option>
-                                         <option value="CANCELLED" ${order.customerOrder.orderStatus == 'CANCELLED' ? 'selected' : ''}>Đã hủy</option>
-                                         <option value="COMPLETED" ${order.customerOrder.orderStatus != 'COMPLETED' ? 'hidden' : 'selected'}>ĐÃ HOÀN THÀNH</option>
-                                     </select>
-                                        <button type="submit" ${order.customerOrder.orderStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'CANCELLED' ? 'hidden' : ''}>Cập nhật trạng thái</button>
+                                        <option value="SHIPPING" ${order.customerOrder.orderStatus == 'SHIPPING' ? 'selected' : ''}>Đang giao hàng</option>
+                                        <option value="CANCELLED" ${order.customerOrder.orderStatus == 'CANCELLED' ? 'selected' : ''}>Đã hủy</option>
+                                        <option value="COMPLETED" ${order.customerOrder.orderStatus != 'COMPLETED' ? 'hidden' : 'selected'}>ĐÃ HOÀN THÀNH</option>
+                                    </select>
+                                    <button type="submit" ${order.customerOrder.orderStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'CANCELLED' ? 'hidden' : ''}>Cập nhật trạng thái</button>
                                 </li>
                                 <c:if test="${order.customerOrder.orderStatus == 'COMPLETED'}">
                                     <li style="margin-top: 15px;"><strong>Hành động:</strong>
@@ -99,13 +128,11 @@
                                 </li>
                             </ul>
                         </form>
-                                    <c:if test="${order.customerOrder.orderStatus == 'SHIPPING' || order.customerOrder.orderStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'CANCELLED'}">
+                        <c:if test="${order.customerOrder.orderStatus == 'SHIPPING' || order.customerOrder.orderStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'CANCELLED'}">
                             <a href="${pageContext.request.contextPath}/AcceptanceRecordController?orderId=${order.customerOrder.customerOrderId}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #0284c7; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);">Biên bản nghiệm thu</a>
                         </c:if>
-
                     </c:otherwise>
                 </c:choose>
-
 
                 <h3>Danh sách sản phẩm</h3>
                 <table border="1" cellpadding="10" cellspacing="0">
@@ -130,7 +157,6 @@
                                 </td>
                                 <td><fmt:formatNumber value="${item.detail.sellingPrice}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
                                 <td>
-
                                     <fmt:formatNumber value="${item.detail.discountPercent}" maxFractionDigits="2"/>%
                                 </td>
                                 <td><fmt:formatNumber value="${item.detail.taxPercent}" maxFractionDigits="2"/>%</td>

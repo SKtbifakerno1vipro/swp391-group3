@@ -153,14 +153,25 @@ public class SecurityFilter implements Filter {
 //        }
     }
 
+    private void logDebug(String message) {
+        try {
+            java.io.File file = new java.io.File("e:/Half 5/SWP391/swp391-group3/build/debug.log");
+            java.io.FileWriter fw = new java.io.FileWriter(file, true);
+            fw.write(new java.util.Date() + " - " + message + "\n");
+            fw.close();
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
     private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
         // Chuẩn hóa đường dẫn bằng cách bỏ dấu / ở cuối (nếu có)
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
-        System.out.println("Checking permission for roleId: " + roleId + " on path: " + cleanPath);
-
-        // Bước 1: Tìm tên quyền yêu cầu tương ứng với URL (Ví dụ: "/role-list" -> "Role List")
         String requiredPermission = getRequiredPermission(cleanPath, req);
+        logDebug("Checking permission for roleId: " + roleId + ", path: " + cleanPath + ", required: " + requiredPermission);
+
         if (requiredPermission == null) {
+            logDebug("Required permission is null for path: " + cleanPath);
             return false;
         }
 
@@ -169,17 +180,22 @@ public class SecurityFilter implements Filter {
         List<RolePermission> permissions = null;
         if (session != null) {
             permissions = (List<RolePermission>) session.getAttribute("userPermissions");
+            logDebug("Permissions loaded from session: " + (permissions != null ? permissions.size() : "null"));
         }
 
         // Bước 3: Nếu trong Session chưa có danh sách quyền, ta mới truy vấn Database để lấy lên
         if (permissions == null) {
+            logDebug("Session cache miss. Querying DB for roleId: " + roleId);
             Role role = roleDAO.getRoleDetail(roleId);
             if (role != null) {
                 permissions = role.getPermissions();
+                logDebug("Role loaded from DB: " + role.getRoleName() + ", permissions size: " + (permissions != null ? permissions.size() : "null"));
                 // Lưu vào Session để tái sử dụng ở các request tiếp theo
                 if (session != null && permissions != null) {
                     session.setAttribute("userPermissions", permissions);
                 }
+            } else {
+                logDebug("Role loaded from DB is NULL for roleId: " + roleId);
             }
         }
 
@@ -188,11 +204,11 @@ public class SecurityFilter implements Filter {
             for (RolePermission p : permissions) {
                 // Nếu tìm thấy quyền trong danh sách trùng khớp với quyền yêu cầu
                 if (p.getPermissionName() != null && p.getPermissionName().equalsIgnoreCase(requiredPermission)) {
-                    System.out.println("Role " + roleId + " HAS database permission: " + requiredPermission);
+                    logDebug("Permission MATCHED: " + p.getPermissionName());
                     return true; // Cho phép đi qua
                 }
             }
-            System.out.println("Role " + roleId + " DOES NOT HAVE database permission: " + requiredPermission);
+            logDebug("Permission NOT matched. Required was: " + requiredPermission);
         }
 
         return false; // Không khớp quyền nào, từ chối truy cập
@@ -202,6 +218,7 @@ public class SecurityFilter implements Filter {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
         switch (cleanPath) {
             case "/dashboard":
+            case "/admin-dashboard":
                 return "Dashboard";
             case "/role-list":
             case "/role-detail":
@@ -271,6 +288,8 @@ public class SecurityFilter implements Filter {
             case "/contract-save":
                 return "Contract Create";
             case "/contract-detail":
+            case "/export-pdf":
+            case "/File":
                 return "Contract Detail(Edit)";
             case "/invoice-list":
                 return "Invoice List";
@@ -282,6 +301,8 @@ public class SecurityFilter implements Filter {
                 return "Preview Invoice";
             case "/payment/list":
             case "/payment":
+            case "/payment/return":
+            case "/payment/ipn":
                 return "Payment List";
             case "/payment/detail":
                 return "Payment Detail";
@@ -290,9 +311,11 @@ public class SecurityFilter implements Filter {
             case "/admin/audit-logs":
                 return "System Audit Logs";
             case "/revenue-report":
+            case "/revenue":
                 return "Revenue Report";
             case "/Signature":
             case "/SignatureAcceptance":
+            case "/AcceptanceRecordController":
                 return "Acceptance Record";
             case "/warehouse-dashboard":
             case "/import-request-list":
