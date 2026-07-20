@@ -9,33 +9,24 @@ import java.util.Properties;
 
 public class DBContext {
     protected Connection connection;
+    private static Properties props;
 
-    public DBContext() {
+    static { // chỉ chạy 1 lần duy nhất lúc khởi tạo
         try {
-            Properties props = new Properties();
-            InputStream input = findConfigInputStream();
-
+            props = new Properties();
+            InputStream input = findConfigInputStreamStatic();
             if (input == null) {
                 throw new java.io.FileNotFoundException("Cannot find ConnectDB.properties");
             }
-
             props.load(input);
-
-            String url = props.getProperty("url");
-            String username = props.getProperty("userID");
-            String password = props.getProperty("password");
-
+            input.close(); // đóng lại File Handle
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            System.out.println("URL = " + url);
-            System.out.println("USER = " + username);
-            System.out.println("PASS = " + password);
-            connection = DriverManager.getConnection(url, username, password);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private InputStream findConfigInputStream() {
+    private static InputStream findConfigInputStreamStatic() {
         try {
             File classesDir = new File(DBContext.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             File webInfDir = classesDir.getParentFile();
@@ -44,6 +35,17 @@ public class DBContext {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public DBContext() {
+        try {
+            String url = props.getProperty("url");
+            String username = props.getProperty("userID");
+            String password = props.getProperty("password");
+            connection = DriverManager.getConnection(url, username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

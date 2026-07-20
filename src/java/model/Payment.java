@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 public class Payment {
     private int paymentId;
     private int customerContractId;
+    private Integer customerOrderId;
     private Integer invoiceId;
     private BigDecimal amount;
     private String paymentType;
@@ -14,6 +15,11 @@ public class Payment {
     private LocalDateTime paidAt;
     private Integer createdBy;
     private LocalDateTime createdAt;
+
+    // Snapshot fields
+    private String customerNameSnapshot;
+    private String customerPhoneSnapshot;
+    private String customerAddressSnapshot;
 
     // Transient fields for display convenience
     private String contractNumber;
@@ -45,6 +51,14 @@ public class Payment {
 
     public void setCustomerContractId(int customerContractId) {
         this.customerContractId = customerContractId;
+    }
+
+    public Integer getCustomerOrderId() {
+        return customerOrderId;
+    }
+
+    public void setCustomerOrderId(Integer customerOrderId) {
+        this.customerOrderId = customerOrderId;
     }
 
     public Integer getInvoiceId() {
@@ -142,5 +156,29 @@ public class Payment {
             return this.createdAt.format(formatter);
         }
         return "N/A";
+    }
+
+    public String getCustomerNameSnapshot() {
+        return customerNameSnapshot;
+    }
+
+    public void setCustomerNameSnapshot(String customerNameSnapshot) {
+        this.customerNameSnapshot = customerNameSnapshot;
+    }
+
+    public String getCustomerPhoneSnapshot() {
+        return customerPhoneSnapshot;
+    }
+
+    public void setCustomerPhoneSnapshot(String customerPhoneSnapshot) {
+        this.customerPhoneSnapshot = customerPhoneSnapshot;
+    }
+
+    public String getCustomerAddressSnapshot() {
+        return customerAddressSnapshot;
+    }
+
+    public void setCustomerAddressSnapshot(String customerAddressSnapshot) {
+        this.customerAddressSnapshot = customerAddressSnapshot;
     }
 }

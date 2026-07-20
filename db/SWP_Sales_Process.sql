@@ -357,14 +357,19 @@ GO
 CREATE TABLE payment (
     payment_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_contract_id INT NOT NULL,
+    customer_order_id INT NOT NULL,
     invoice_id INT,
     amount DECIMAL(18,2) CHECK (amount > 0),
     payment_type VARCHAR(50),
     payment_status VARCHAR(20),
     paid_at DATETIME2(6),
     created_by INT,
+    customer_name_snapshot NVARCHAR(255),
+    customer_phone_snapshot VARCHAR(20),
+    customer_address_snapshot NVARCHAR(500),
     created_at DATETIME2(6) DEFAULT SYSDATETIME(),
     FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),
+    FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id),
     FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id),
     FOREIGN KEY (created_by) REFERENCES [user](user_id)
 );

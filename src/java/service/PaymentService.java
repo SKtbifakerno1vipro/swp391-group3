@@ -6,6 +6,8 @@ import dal.QuotationDAO;
 import model.Payment;
 import model.Contract;
 import model.QuotationDetail;
+import model.CustomerOrderDetail;
+import model.CustomerOrder;
 import dto.CustomerDTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -74,55 +76,49 @@ public class PaymentService {
         return paymentDAO.hasPaymentForContract(contractId);
     }
 
-    public synchronized void createPendingPaymentForContractIfNotExists(int contractId) {
-        System.out.println("[PaymentService] Checking to create pending payment for contract ID: " + contractId);
-        if (!hasPaymentForContract(contractId)) {
-            try {
-                ContractDAO contractDAO = new ContractDAO();
-                Contract ctr = contractDAO.getContractById(contractId);
-                if (ctr != null) {
-                    QuotationDAO quotationDao = new QuotationDAO();
-                    model.Quotation quotation = quotationDao.getQuotationById(ctr.getQuotationId());
-                    BigDecimal total = (quotation != null && quotation.getTotalPrice() != null)
-                            ? quotation.getTotalPrice()
-                            : BigDecimal.ZERO;
-
-                    // Fallback to detail sum if total_price is zero or null (e.g., legacy or tool-generated data)
-                    if (total.compareTo(BigDecimal.ZERO) <= 0) {
-                        List<QuotationDetail> qDetails = quotationDao.getQuotationDetailsByQuotationId(ctr.getQuotationId());
-                        double detailSum = 0;
-                        for (QuotationDetail detail : qDetails) {
-                            detailSum += detail.getAmount().doubleValue();
-                        }
-                        total = BigDecimal.valueOf(detailSum);
-                    }
-                    
-                    Payment payment = new Payment();
-                    payment.setCustomerContractId(contractId);
-                    payment.setAmount(total);
-                    payment.setPaymentType("VNPAY");
-                    payment.setPaymentStatus("PENDING");
-                    payment.setCreatedAt(LocalDateTime.now());
-                    
-                    CustomerService customerService = new CustomerService();
-                    CustomerDTO customer = customerService.getCustomerDTOById(ctr.getCustomerId());
-                    if (customer != null) {
-                        int customerUserId = customer.getUser().getUserId();
-                        payment.setCreatedBy(customerUserId);
-                        insertPayment(payment);
-                        System.out.println("[PaymentService] Successfully auto-created PENDING payment for contract ID: " + contractId + ", Amount: " + total);
-                    } else {
-                        System.err.println("[PaymentService] Could not resolve Customer user ID for contract customer ID: " + ctr.getCustomerId());
-                    }
-                } else {
-                    System.err.println("[PaymentService] Contract not found for ID: " + contractId);
-                }
-            } catch (Exception ex) {
-                System.err.println("[PaymentService] Failed to auto-create payment: " + ex.getMessage());
-                ex.printStackTrace();
+    public synchronized void createPendingPaymentForOrder(CustomerOrder order) {
+        int orderId = order.getCustomerOrderId();
+        int contractId = order.getCustomerContractId();
+        System.out.println("[PaymentService] Creating pending payment for Order ID: " + orderId + ", Contract ID: " + contractId);
+        
+        if (paymentDAO.hasPaymentForOrder(orderId)) {
+            System.out.println("[PaymentService] Payment already exists for Order ID: " + orderId + ". Skipping creation.");
+            return;
+        }
+        
+        try {
+            // Tạm thời đặt số tiền cứng là 100,000 VND để thử nghiệm thanh toán
+            BigDecimal totalAmount = BigDecimal.valueOf(100000);
+            Integer customerUserId = null;
+            
+            CustomerService customerService = new CustomerService();
+            CustomerDTO customer = customerService.getCustomerDTOById(order.getCustomerId());
+            if (customer == null || customer.getUser() == null) {
+                System.err.println("[PaymentService] Could not resolve Customer or User for customer ID: " + order.getCustomerId() + ". Skipping payment creation.");
+                return;
             }
-        } else {
-            System.out.println("[PaymentService] Payment already exists for contract ID: " + contractId + ". Skipping creation.");
+            String customerName = customer.getUser().getFullName();
+            String customerPhone = customer.getUser().getPhone();
+            String customerAddress = customer.getUser().getAddress();
+            
+            Payment payment = new Payment();
+            payment.setCustomerContractId(contractId);
+            payment.setCustomerOrderId(orderId);
+            payment.setAmount(totalAmount);
+            payment.setPaymentType("VNPAY");
+            payment.setPaymentStatus("PENDING");
+            payment.setCreatedAt(LocalDateTime.now());
+            payment.setCreatedBy(customerUserId);
+            payment.setCustomerNameSnapshot(customerName);
+            payment.setCustomerPhoneSnapshot(customerPhone);
+            payment.setCustomerAddressSnapshot(customerAddress);
+            
+            int generatedId = paymentDAO.insertPayment(payment);
+            System.out.println("[PaymentService] Successfully auto-created PENDING payment ID: " + generatedId + " for Order ID: " + orderId + ", Amount: " + totalAmount);
+            
+        } catch (Exception e) {
+            System.err.println("[PaymentService] Failed to create pending payment for order ID " + orderId + ": " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

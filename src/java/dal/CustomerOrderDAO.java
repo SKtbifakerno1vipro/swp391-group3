@@ -118,6 +118,7 @@ public class CustomerOrderDAO extends DBContext {
                 try (ResultSet generatedKeys = psOrder.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         orderId = generatedKeys.getInt(1);
+                        order.setCustomerOrderId(orderId);
                     } else {
                         connection.rollback();
                         return false;
