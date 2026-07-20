@@ -63,7 +63,7 @@ public class ContractDAO extends DBContext {
         String sql = """
                     SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type,  c.created_at,
                     cust.company_name, cust.user_id, cust.tax_code, u.email, u.phone, cust.customer_type,
-                    (SELECT TOP 1 co.customer_order_id FROM customer_order co WHERE co.customer_contract_id = c.customer_contract_id) AS order_id
+                    (SELECT TOP 1 co.customer_order_id FROM customer_order co WHERE co.customer_contract_id = c.customer_contract_id AND (co.order_status IS NULL OR co.order_status <> 'DELETED') ORDER BY co.customer_order_id DESC) AS order_id
                     FROM customer_contract c 
                     JOIN customer cust
                     ON c.customer_id = cust.customer_id
