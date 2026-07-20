@@ -135,9 +135,6 @@ public class EditUserController extends HttpServlet {
         String rawPhone = request.getParameter("phone");
         if (rawPhone != null) u.setPhone(rawPhone.trim());
 
-        String rawStatus = request.getParameter("status");
-        if (rawStatus != null && !rawStatus.trim().isEmpty()) u.setStatus(rawStatus.trim());
-
         String rawGender = request.getParameter("gender");
         if (rawGender != null && !rawGender.trim().isEmpty()) u.setGender(rawGender.trim());
 
@@ -152,11 +149,17 @@ public class EditUserController extends HttpServlet {
             }
         }
 
-        String rawRoleId = request.getParameter("roleId");
-        if (rawRoleId != null && !rawRoleId.trim().isEmpty()) {
-            try {
-                u.setRoleId(Integer.parseInt(rawRoleId.trim()));
-            } catch (Exception e) {
+        // Security Check: Only Admin can change Status and Role
+        if (currentUser.getRoleId() == 1) {
+            String rawStatus = request.getParameter("status");
+            if (rawStatus != null && !rawStatus.trim().isEmpty()) u.setStatus(rawStatus.trim());
+
+            String rawRoleId = request.getParameter("roleId");
+            if (rawRoleId != null && !rawRoleId.trim().isEmpty()) {
+                try {
+                    u.setRoleId(Integer.parseInt(rawRoleId.trim()));
+                } catch (Exception e) {
+                }
             }
         }
 
