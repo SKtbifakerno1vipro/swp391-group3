@@ -255,7 +255,7 @@
                     </c:if>
 
                     <c:if test="${sessionScope.user.roleId == 5 && quotation.quotationStatus == 'ACCEPTED'}">
-                        <a href="contract-generate?quotationId=${quotation.quotationId}">
+                        <a href="contract-save?quotationId=${quotation.quotationId}">
                             <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; cursor: pointer;">Tạo hợp đồng nháp</button>
                         </a>
                     </c:if>

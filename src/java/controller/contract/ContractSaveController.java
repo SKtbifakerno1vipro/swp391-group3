@@ -40,6 +40,13 @@ public class ContractSaveController extends HttpServlet {
 
         String contractIdRaw = request.getParameter("id");
         String quotationId = request.getParameter("quotationId");
+        String quotationIdStr = request.getParameter("quotationId");
+
+        if (contractService.getContractByQuotationId(Integer.parseInt(quotationIdStr)) != null) {
+            request.setAttribute("errorMsg", "Báo giá này đã có hợp đồng!");
+            request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
+            return;
+        }
 
         //check  contract exist by id?
         if (contractIdRaw != null && !contractIdRaw.isEmpty()) {
@@ -111,7 +118,7 @@ public class ContractSaveController extends HttpServlet {
         if (user == null) {
             response.sendRedirect("login");
             return;
-        } else if (user.getRoleId()!= 5) {
+        } else if (user.getRoleId() != 5) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to view this profile.");
             return;
         }
