@@ -19,13 +19,18 @@ import dal.UserDAO;
 import dto.CustomerOrderDTO;
 import dto.CustomerDTO;
 import dto.InvoiceItemDTO;
+import model.Contract;
 import model.Invoice;
 import model.Payment;
+import model.Quotation;
+import model.QuotationDetail;
 import model.User;
+import service.ContractService;
 import service.CustomerOrderService;
 import service.CustomerService;
 import service.InvoiceService;
 import service.PaymentService;
+import service.QuotationService;
 import service.RoleService;
 import service.UserService;
 
@@ -37,7 +42,10 @@ public class InvoiceServlet extends HttpServlet {
     private final RoleService rService = new RoleService();
     private final UserService uService = new UserService();
     private final CustomerOrderService coService = new CustomerOrderService();
+    private final ContractService ctService = new ContractService();
+    private final QuotationService qService = new QuotationService();
     private final PaymentService paymentService = new PaymentService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -85,10 +93,12 @@ public class InvoiceServlet extends HttpServlet {
                     }
                 } else {
                     request.setAttribute("error", "Không tìm thấy hóa đơn này.");
+                     
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 request.setAttribute("error", "Lỗi tải thông tin hóa đơn: " + e.getMessage());
+                 request.getRequestDispatcher("/views/invoice/create.jsp").forward(request, response);
             }
         } else if (orderIdRaw != null && !orderIdRaw.trim().isEmpty()) {
             try {
@@ -106,6 +116,10 @@ public class InvoiceServlet extends HttpServlet {
                 e.printStackTrace();
                 request.setAttribute("error", "Lỗi tải thông tin đơn hàng: " + e.getMessage());
             }
+        } else {
+            request.setAttribute("error", "Không có thông tin dữ liệu tải lên");
+            request.getRequestDispatcher("/views/invoice/create.jsp").forward(request, response);
+            return;
         }
 
         Integer createdBy = null;
@@ -138,26 +152,28 @@ public class InvoiceServlet extends HttpServlet {
         }
         if (user.getRoleId() == 3) {
             session.setAttribute("errorInvoice", "Quý khách không sử dụng tính năng này!");
-            response.sendRedirect(request.getContextPath()+"/invoice-list");
+            response.sendRedirect(request.getContextPath() + "/invoice-list");
             return;
         }
         String actionParam = request.getParameter("action");
+        int contractId = 0;
         if ("notice".equalsIgnoreCase(actionParam)) {
             String contractIdRaw = request.getParameter("customerContractId");
             if (contractIdRaw != null && !contractIdRaw.trim().isEmpty()) {
                 try {
-                    int contractId = Integer.parseInt(contractIdRaw.trim());
+                    contractId = Integer.parseInt(contractIdRaw.trim());
                     Payment payment = paymentService.getPaymentByContractId(contractId);
-                    
                     if (payment != null && "COMPLETED".equals(payment.getPaymentStatus())) {
                         Invoice invoice = iService.getInvoiceByContractId(contractId);
-                        if (invoice != null && "READY".equals(invoice.getInvoiceStatus())) {
+                        if (invoice != null && "RELEASED".equals(invoice.getInvoiceStatus())) {
+                            session.setAttribute("errorMessage", "Hóa đơn đã được phát hành.");
+                        } else if (invoice != null && "READY".equals(invoice.getInvoiceStatus())) {
                             invoice.setInvoiceStatus("RELEASED");
                             invoice.setIssueDate(LocalDateTime.now());
                             int year = LocalDateTime.now().getYear();
                             String nextNo = iService.getNextInvoiceNo(year);
                             invoice.setInvoiceNo(nextNo);
-                            
+
                             boolean success = iService.updateInvoice(invoice);
                             if (success) {
 //                                String scheme = request.getScheme();
@@ -165,7 +181,7 @@ public class InvoiceServlet extends HttpServlet {
 //                                int serverPort = request.getServerPort();
 //                                String contextPath = request.getContextPath();
                                 String baseUrl = "http://localhost:9999/SWP391_GROUP3/";
-                                
+
                                 iService.emailIssueInvoice(invoice.getInvoiceId(), baseUrl);
                                 session.setAttribute("successMessage", "Phát hành hóa đơn thành công!");
                             } else {
@@ -184,13 +200,8 @@ public class InvoiceServlet extends HttpServlet {
             } else {
                 session.setAttribute("errorMessage", "Thiếu thông tin hợp đồng.");
             }
-            
-            String referer = request.getHeader("referer");
-            if (referer != null && !referer.trim().isEmpty()) {
-                response.sendRedirect(referer);
-            } else {
-                response.sendRedirect(request.getContextPath() + "/payment/list");
-            }
+
+            response.sendRedirect(request.getContextPath() + "/payment/list");
             return;
         }
 
@@ -200,11 +211,12 @@ public class InvoiceServlet extends HttpServlet {
         try {
             String invoiceIdRaw = request.getParameter("invoiceId");
             int invoiceId = (invoiceIdRaw != null && !invoiceIdRaw.trim().isEmpty()) ? Integer.parseInt(invoiceIdRaw) : 0;
-            int contractId = Integer.parseInt(request.getParameter("customerContractId"));
             orderId = Integer.parseInt(request.getParameter("customerOrderId"));
 
+            String contractIdRaw = request.getParameter("customerContractId");
+            contractId = (contractIdRaw != null && !contractIdRaw.trim().isEmpty()) ? Integer.parseInt(contractIdRaw) : 0;
+
             String action = request.getParameter("action");
-            String invoiceType = request.getParameter("invoiceType");
             String invoiceSymbol = request.getParameter("invoiceSymbol");
 
             String sellerName = request.getParameter("sellerName");
@@ -229,25 +241,72 @@ public class InvoiceServlet extends HttpServlet {
             String internalNote = request.getParameter("internalNotes");
 
             Integer createdBy = user.getUserId();
+            boolean isVAT = false;
+            if (contractId > 0) {
+                Contract c = ctService.getContractById(contractId);
+                if (c != null) {
+                    List<QuotationDetail> qDetailList = qService.getQuotationDetailsByQuotationId(c.getQuotationId());
+                    if (qDetailList != null && !qDetailList.isEmpty()) {
+                        for (QuotationDetail quotationDetail : qDetailList) {
+                            if (quotationDetail.getTaxPercent() != null && quotationDetail.getTaxPercent().compareTo(java.math.BigDecimal.ZERO) > 0) {
+                                isVAT = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else if (taxAmount > 0) {
+                isVAT = true;
+            }
 
             invoice = new Invoice();
             invoice.setInvoiceId(invoiceId);
             invoice.setCustomerContractId(contractId);
             invoice.setCustomerOrderId(orderId);
-            invoice.setInvoiceType(invoiceType);
+            invoice.setInvoiceType(isVAT?"VAT":"SALES");
             invoice.setInvoiceSymbol(invoiceSymbol);
+
+            if (iService.getInvoiceByOrderId(orderId) != null) {
+                if ("create".equals(action)) {
+                    session.setAttribute("errorInvoice", "Hóa đơn này đã được tạo vui lòng kiểm tra lại!");
+                    response.sendRedirect(request.getContextPath() + "/invoice-list");
+                    return;
+                }
+            }
 
             if (invoiceId > 0) {
                 Invoice existingInvoice = iService.getInvoiceById(invoiceId);
-                if ("ready".equalsIgnoreCase(action)) {
-                    invoice.setInvoiceStatus("READY");
-                    invoice.setIssueDate(null);
-                    invoice.setInvoiceNo(existingInvoice != null ? existingInvoice.getInvoiceNo() : ("DFT-" + orderId + "-" + System.currentTimeMillis()));
-                } else {
-                    invoice.setInvoiceStatus("UNRELEASED");
-                    invoice.setIssueDate(null);
-                    invoice.setInvoiceNo(existingInvoice != null ? existingInvoice.getInvoiceNo() : ("DFT-" + orderId + "-" + System.currentTimeMillis()));
+                if (existingInvoice != null) {
+                    String ivStatus = existingInvoice.getInvoiceStatus();
+                    if ("RELEASED".equals(ivStatus) || "CANCELED".equals(ivStatus)) {
+                        String status = "RELEASED".equals(ivStatus) ? "đã phát hành" : "đã hủy";
+                        session.setAttribute("errorInvoice", "Hóa đơn này đã ở trạng thái " + status + ", không thể chỉnh sửa!");
+                        response.sendRedirect(request.getContextPath() + "/invoice-list");
+                        return;
+                    }
+
+                    if ("draft".equals(action)) {
+                        if ("READY".equals(ivStatus)) {
+                            request.setAttribute("error", "Không thể cập nhật nháp! Hóa đơn này vừa được một tài khoản/thiết bị khác chuyển sang trạng thái Sẵn sàng phát hành.");
+                            request.setAttribute("invoice", existingInvoice);
+                            loadInvoiceCreationData(request, orderId);
+                            request.getRequestDispatcher("/views/invoice/create.jsp").forward(request, response);
+                            return;
+                        } else if ("CANCELED".equals(ivStatus)) {
+                            session.setAttribute("errorInvoice", "Không thể cập nhật nháp! Hóa đơn này vừa được một tài khoản/thiết bị khác hủy.");
+                            response.sendRedirect(request.getContextPath() + "/invoice-list");
+                            return;
+                        } else {
+                            invoice.setInvoiceStatus("UNRELEASED");
+
+                        }
+                    } else if ("ready".equals(action)) {
+                        invoice.setInvoiceStatus("READY");
+                    }
+                    invoice.setIssueDate(existingInvoice.getIssueDate());
+                    invoice.setInvoiceNo(existingInvoice.getInvoiceNo());
                 }
+
             } else {
                 if ("ready".equalsIgnoreCase(action)) {
                     invoice.setInvoiceStatus("READY");
@@ -374,6 +433,7 @@ public class InvoiceServlet extends HttpServlet {
             request.setAttribute("subTotal", subTotal);
             request.setAttribute("discountTotal", discountTotal);
             request.setAttribute("taxAmount", taxTotal);
+            request.setAttribute("isVAT", taxTotal > 0);
             request.setAttribute("totalAmount", totalAmount);
 
             if (customerDto != null) {

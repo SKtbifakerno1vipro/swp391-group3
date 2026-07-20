@@ -40,11 +40,7 @@ public class ProductDAO extends DBContext {
             ps.setString(5, product.getUnit());
             ps.setString(6, product.getProductStatus());
             ps.setInt(7, product.getQuantityAvailable());
-            if (product.getCategoryId() != null) {
-                ps.setInt(8, product.getCategoryId());
-            } else {
-                ps.setNull(8, java.sql.Types.INTEGER);
-            }
+            ps.setInt(8, product.getCategoryId());
 
             if (product.getUpdatedBy() != null) {
                 ps.setInt(9, product.getUpdatedBy());

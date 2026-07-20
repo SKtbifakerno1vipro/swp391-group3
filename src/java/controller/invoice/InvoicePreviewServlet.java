@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import dto.InvoiceItemDTO;
 import jakarta.servlet.http.HttpSession;
+import model.User;
 
 @WebServlet(name = "InvoicePreviewServlet", urlPatterns = {"/preview"})
 public class InvoicePreviewServlet extends HttpServlet {
@@ -20,7 +21,11 @@ public class InvoicePreviewServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
         try {
             String[] prodIds = request.getParameterValues("productId");
             String[] prodNames = request.getParameterValues("productName");
@@ -41,7 +46,7 @@ public class InvoicePreviewServlet extends HttpServlet {
                     int quantity = 0;
                     if (quantities != null && i < quantities.length && quantities[i] != null && !quantities[i].isEmpty()) {
                         try {
-                            quantity = (int) Double.parseDouble(quantities[i]);
+                            quantity = Integer.parseInt(quantities[i]);
                         } catch (NumberFormatException e) {
                             quantity = 0;
                         }
@@ -85,14 +90,14 @@ public class InvoicePreviewServlet extends HttpServlet {
                     }
 
                     InvoiceItemDTO item = new InvoiceItemDTO(
-                        productId, productName, unit, quantity, sellingPrice,
-                        discountPercent, taxPercent, lineDiscount, lineTax
+                            productId, productName, unit, quantity, sellingPrice,
+                            discountPercent, taxPercent, lineDiscount, lineTax
                     );
                     orderDetails.add(item);
                 }
             }
             request.setAttribute("orderDetails", orderDetails);
-            
+
             String invoiceType = request.getParameter("invoiceType");
             String invoiceSymbol = request.getParameter("invoiceSymbol");
             String invoiceNo = request.getParameter("invoiceNo");
@@ -131,17 +136,17 @@ public class InvoicePreviewServlet extends HttpServlet {
             request.setAttribute("invoiceNo", invoiceNo);
             request.setAttribute("issueDate", issueDate);
             request.setAttribute("invoiceStatus", invoiceStatus);
-            
+
             request.setAttribute("sellerName", sellerName);
             request.setAttribute("sellerTaxCode", sellerTaxCode);
             request.setAttribute("sellerAddress", sellerAddress);
             request.setAttribute("sellerPhone", sellerPhone);
-            
+
             request.setAttribute("buyerName", buyerName);
             request.setAttribute("buyerTaxCode", buyerTaxCode);
             request.setAttribute("buyerAddress", buyerAddress);
             request.setAttribute("buyerPhone", buyerPhone);
-            
+
             request.setAttribute("subTotal", subTotal);
             request.setAttribute("discountTotal", discountTotal);
             request.setAttribute("taxAmount", taxAmount);
@@ -158,8 +163,10 @@ public class InvoicePreviewServlet extends HttpServlet {
     }
 
     private String convertNumberToWords(long number) {
-        if (number == 0) return "Không đồng";
-        
+        if (number == 0) {
+            return "Không đồng";
+        }
+
         String prefix = "";
         if (number < 0) {
             prefix = "âm ";
@@ -215,12 +222,12 @@ public class InvoicePreviewServlet extends HttpServlet {
             }
 
             String groupStr = groupText.toString().trim();
-            if (!groupStr.isEmpty()) { 
+            if (!groupStr.isEmpty()) {
                 result.append(groupStr).append(" ");
                 if (i < scales.length) {
                     result.append(scales[i]).append(" ");
                 }
-            } else if (i > 0 && i % 3 == 0) { 
+            } else if (i > 0 && i % 3 == 0) {
                 if (i < scales.length) {
                     result.append(scales[i]).append(" ");
                 }
@@ -228,7 +235,9 @@ public class InvoicePreviewServlet extends HttpServlet {
         }
 
         String rawWords = result.toString().replaceAll("\\s+", " ").trim();
-        if (rawWords.isEmpty()) return "Không đồng";
+        if (rawWords.isEmpty()) {
+            return "Không đồng";
+        }
 
         return rawWords.substring(0, 1).toUpperCase() + rawWords.substring(1) + " đồng";
     }

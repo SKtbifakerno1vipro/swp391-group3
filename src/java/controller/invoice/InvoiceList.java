@@ -134,7 +134,9 @@ public class InvoiceList extends HttpServlet {
                     Invoice iv = invoiceService.getInvoiceById(invoiceId);
 
                     if ("CANCELED".equals(iv.getInvoiceStatus())) {
-                        session.setAttribute("errorInvoice", "Hiện tại bạn đã hủy hóa đơn này.");
+                        session.setAttribute("errorInvoice", "Hóa đơn này đã bị hủy trước đó.");
+                    } else if ("RELEASED".equals(iv.getInvoiceStatus())) {
+                        session.setAttribute("errorInvoice", "Hóa đơn đã phát hành, không thể hủy!");
                     } else {
                         invoiceService.updateInvoiceStatus(invoiceId, "CANCELED");
                     }

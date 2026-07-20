@@ -88,7 +88,7 @@
             <form action="Signature" id="signatureForm" method="post">
                 <input type="hidden" name="contractId" value="${contractId}">
                 <input type="hidden" name="signerId" value="${signerId}">
-                <h2>Welcome ${signerName} ${signerId}</h2>
+                <h2>Welcome ${signerName}</h2>
                 <div class="signature-section">
                     <h3>Vui lòng ký vào khung bên dưới</h3>
                     <canvas id="signatureCanvas" width="400" height="200"></canvas>
