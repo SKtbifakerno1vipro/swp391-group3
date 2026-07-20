@@ -34,6 +34,10 @@ public class CustomerOrderService {
         return customerOrderDAO.getDetailsByOrderId(orderId);
     }
 
+    public double getTotalPriceFromQuotationByOrderId(int orderId) {
+        return customerOrderDAO.getTotalPriceFromQuotationByOrderId(orderId);
+    }
+
     public boolean createOrder(model.CustomerOrder order, List<model.CustomerOrderDetail> details) {
         boolean success = customerOrderDAO.createOrder(order, details);
         // Xhieu - tu dong tao payment
