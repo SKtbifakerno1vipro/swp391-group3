@@ -19,13 +19,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import model.Invoice;
 import service.InvoiceService;
-
+import service.AuditLogService;
+import service.RoleService;
 @WebServlet(name = "CustomerOrderController", urlPatterns = {"/customer-order"})
 public class CustomerOrderController extends HttpServlet {
 
@@ -35,6 +38,7 @@ public class CustomerOrderController extends HttpServlet {
     private final ProductService productService = new ProductService();
     private final InvoiceService invoiceService = new InvoiceService();
     private final int PAGE_SIZE = 10;
+    private final AuditLogService AuditLogService = new AuditLogService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -59,7 +63,7 @@ public class CustomerOrderController extends HttpServlet {
                 try {
                     int orderId = Integer.parseInt(idParam);
                     customerOrderService.deleteCustomerOrder(orderId);
-                    service.AuditLogService.log(currentUser.getUserId(), "DELETE", "Order", "Xóa đơn hàng ID: " + orderId);
+                    AuditLogService.log(currentUser.getUserId(), "DELETE", "Order", "Xóa đơn hàng ID: " + orderId);
                 } catch (NumberFormatException e) {
                 }
             }
@@ -123,6 +127,21 @@ public class CustomerOrderController extends HttpServlet {
                 return;
             }
 
+            Properties config = new Properties();
+            try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/resources/config.properties")) {
+                if (is != null) {
+                    config.load(is);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            request.setAttribute("companyName", config.getProperty("company_name"));
+            request.setAttribute("companyAddress", config.getProperty("company_address"));
+            request.setAttribute("companyPhone", config.getProperty("company_phone"));
+            request.setAttribute("companyTaxCode", config.getProperty("company_tax_code"));
+            request.setAttribute("companyRepName", config.getProperty("company_rep_name"));
+            request.setAttribute("companyPosition", config.getProperty("company_position"));
+
             Invoice invoice = invoiceService.getInvoiceByOrderId(orderId);
             if (invoice != null) {
                 isExistInvoice = true;
@@ -141,7 +160,8 @@ public class CustomerOrderController extends HttpServlet {
                 int roleId = currentUser.getRoleId();
                 int userId = currentUser.getUserId();
 
-                service.RoleService roleService = new service.RoleService();
+                
+                RoleService roleService = new RoleService();
                 model.Role userRole = roleService.getRoleById(roleId);
                 String roleName = userRole != null ? userRole.getRoleName().toLowerCase() : "";
 
@@ -330,7 +350,7 @@ public class CustomerOrderController extends HttpServlet {
             }
 
             if (customerOrderService.createOrder(order, details)) {
-                service.AuditLogService.log(currentUser.getUserId(), "CREATE", "Order", "Tạo đơn hàng mới cho khách hàng ID: " + customerId + " (Số mặt hàng: " + details.size() + ")");
+                AuditLogService.log(currentUser.getUserId(), "CREATE", "Order", "Tạo đơn hàng mới cho khách hàng ID: " + customerId + " (Số mặt hàng: " + details.size() + ")");
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
             } else {
                 request.setAttribute("error", "Tạo đơn hàng thất bại. " + dal.CustomerOrderDAO.lastError);
@@ -347,7 +367,9 @@ public class CustomerOrderController extends HttpServlet {
         int orderId = Integer.parseInt(request.getParameter("orderId"));
         String status = request.getParameter("status");
 
-        dto.CustomerOrderDTO order = customerOrderService.getCustomerOrderById(orderId);
+        
+        CustomerOrderDTO order = customerOrderService.getCustomerOrderById(orderId);
+
         if (order != null && "COMPLETED".equals(order.getCustomerOrder().getOrderStatus())) {
             response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
             return;
@@ -364,8 +386,9 @@ public class CustomerOrderController extends HttpServlet {
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
         Integer currentUserId = currentUser != null ? currentUser.getUserId() : null;
-        service.AuditLogService.log(currentUserId, "UPDATE", "Order", "Cập nhật trạng thái đơn hàng ID " + orderId + " thành: " + status);
 
+        AuditLogService.log(currentUserId, "UPDATE", "Order", "Cập nhật trạng thái đơn hàng ID " + orderId + " thành: " + status);
+        
         response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
     }
 

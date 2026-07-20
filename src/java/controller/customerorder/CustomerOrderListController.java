@@ -53,14 +53,12 @@ public class CustomerOrderListController extends HttpServlet {
             roleName = userRole != null ? userRole.getRoleName() : "";
         }
 
-        if ("search".equals(action) && keyword != null && !keyword.trim().isEmpty()) {
-            keyword = keyword.trim().replaceAll("\\s+"," ");
-            listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize, sortBy, sortOrder, userId, roleName);
-            totalRecords = customerOrderService.getTotalSearchCount(keyword, userId, roleName);
-        } else {
-            listOrder = customerOrderService.getOrdersByPage(pageIndex, pageSize, sortBy, sortOrder, userId, roleName);
-            totalRecords = customerOrderService.getTotalOrderCount(userId, roleName);
+        if (keyword != null) {
+            keyword = keyword.trim().replaceAll("\\s+", " ");
         }
+
+        listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize, sortBy, sortOrder, userId, roleName);
+        totalRecords = customerOrderService.getTotalSearchCount(keyword, userId, roleName); 
         for (CustomerOrderDTO customerOrderDTO : listOrder) {
             Invoice invoice = null;
             boolean isExistInvoice = false;
