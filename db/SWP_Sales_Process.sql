@@ -502,41 +502,6 @@ INSERT INTO quotation_detail (quotation_id, product_id, product_name, unit, quan
 SET @QD1 = SCOPE_IDENTITY();
 INSERT INTO quotation_history (quotation_id, created_by, edit_history) VALUES (@Q1, (SELECT user_id FROM [user] WHERE user_name = 'sale_01'), N'Tạo báo giá và khách đã duyệt.');
 
--- Hop dong (Trang thai SIGNED -> ACTIVE)
-INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, created_by) VALUES (
-    (SELECT customer_id FROM customer WHERE tax_code = '0390000001'), 
-    @Q1, 
-    'HD-2026-001', 
-    '/uploads/HD-001.pdf', 
-    'SIGNED', 
-    (SELECT user_id FROM [user] WHERE user_name = 'officer_01')
-);
-DECLARE @C1 INT = SCOPE_IDENTITY();
-
--- Lich su hop dong C1
-INSERT INTO contract_edit_history (contract_id, from_status, to_status, changed_by) VALUES 
-(@C1, NULL, 'DRAFT', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-(@C1, 'DRAFT', 'PENDING_REVIEW', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-(@C1, 'PENDING_REVIEW', 'CUSTOMER_CHECK', (SELECT user_id FROM [user] WHERE user_name = 'manager_01')),
-(@C1, 'PENDING_REVIEW', 'CUSTOMER_CHECK', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-(@C1, 'CUSTOMER_CHECK', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
-
--- Chu ky
-INSERT INTO signature (customer_contract_id, file_name, file_url, signer_user_id, signer_name, signed_at, uploaded_by) VALUES 
-(@C1, 'sign_kh.png', '/sig/kh.png', (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'), N'Nguyễn Văn Một', GETDATE(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
-
--- Don hang & Thanh toan
-INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by) VALUES (
-    (SELECT customer_id FROM customer WHERE tax_code = '0390000001'), 
-    @C1, 
-    'DELIVERED', 
-    (SELECT user_id FROM [user] WHERE user_name = 'officer_01')
-);
-DECLARE @O1 INT = SCOPE_IDENTITY();
-INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (@O1, @QD1, 100, 15000, 22000);
-INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, invoice_type, invoice_symbol, seller_name, seller_tax_code, seller_address, buyer_name, buyer_tax_code, buyer_address, total_amount, created_by) 
-VALUES (@C1, @O1, 'INV-001', GETDATE(), 'PAID', 'VAT', 'K26TYY', N'Công ty TNHH Bánh Ngọt Po Bread', '0101234567', N'1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', N'Công ty Bánh Ngọt ABC', '0390000001', N'1 Đại Cồ Việt, Hà Nội', 2299000.00, (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
-INSERT INTO payment (customer_contract_id, invoice_id, amount, payment_type, payment_status, paid_at, created_by) VALUES (@C1, SCOPE_IDENTITY(), 2299000.00, 'BANK_TRANSFER', 'COMPLETED', SYSDATETIME(), (SELECT user_id FROM [user] WHERE user_name = 'khachhang_01'));
 GO
 
 -- 8. QUY TRINH HOP DONG 02: KHACH HANG 02 (ĐANG TRANG THAI KHACH YEU CAU SUA - REVISION)
@@ -664,11 +629,6 @@ INSERT INTO quotation_detail (quotation_id, product_id, product_name, unit, quan
     10
 );
 
--- 5. Them 3 hop dong mau (De he thong co du customer_contract_id tu 1 den 5)
-INSERT INTO customer_contract (customer_id, quotation_id, contract_number, contract_file_url, contract_status, created_by) VALUES 
-((SELECT customer_id FROM customer WHERE tax_code = '0390000003'), @Q3, 'HD-2026-003', '/uploads/HD-003.pdf', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-((SELECT customer_id FROM customer WHERE tax_code = '0390000004'), @Q4, 'HD-2026-004', '/uploads/HD-004.pdf', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01')),
-((SELECT customer_id FROM customer WHERE tax_code = '0390000005'), @Q5, 'HD-2026-005', '/uploads/HD-005.pdf', 'SIGNED', (SELECT user_id FROM [user] WHERE user_name = 'officer_01'));
 GO
 
 
@@ -676,79 +636,9 @@ USE SWP_Sales_Process;
 GO
 
 -- ==========================================================
--- SU DUNG VONG LAP DE CHEN DONG 30 DON HANG KHONG LO LOI ID
--- ==========================================================
-DECLARE @Loop INT = 1;
-DECLARE @RandomCustomerID INT;
-DECLARE @RandomContractID INT;
-DECLARE @RandomUserID INT;
-DECLARE @RandomProductID INT;
-DECLARE @NewOrderID INT;
-DECLARE @Status VARCHAR(20);
-
-WHILE @Loop <= 30
-BEGIN
-    -- 1. Lay ngau nhien 1 customer_id va customer_contract_id thuoc ve customer do
-    SELECT TOP 1 @RandomCustomerID = customer_id 
-    FROM customer ORDER BY NEWID();
-
-    -- Tim hop dong cua khach hang do, neu khach chua co hop dong thi lay dai 1 hop dong bat ky co san
-    SELECT TOP 1 @RandomContractID = customer_contract_id 
-    FROM customer_contract 
-    WHERE customer_id = @RandomCustomerID;
-
-    IF @RandomContractID IS NULL
-    BEGIN
-        SELECT TOP 1 @RandomContractID = customer_contract_id FROM customer_contract ORDER BY NEWID();
-    END
-
-    -- 2. Lay ngau nhien 1 nhan vien tao don (Role Admin/Manager/Sale...)
-    SELECT TOP 1 @RandomUserID = user_id FROM [user] WHERE role_id IN (SELECT role_id FROM role WHERE role_name IN (N'System Admin', N'Manager', N'Sale Staff', N'Admin Officer')) ORDER BY NEWID();
-
-    -- 3. Gan trang thai ngau nhien
-    SET @Status = CASE WHEN @Loop % 4 = 0 THEN 'COMPLETED'
-                       WHEN @Loop % 4 = 1 THEN 'SHIPPING'
-                       WHEN @Loop % 4 = 2 THEN 'PENDING'
-                       ELSE 'CANCELLED' END;
-
-    -- 4. Chen vao bang customer_order
-    INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by, created_at)
-    VALUES (
-        @RandomCustomerID, 
-        @RandomContractID, 
-        @Status, 
-        @RandomUserID, 
-        DATEADD(MINUTE, -@Loop * 30, GETDATE())
-    );
-
-    -- Lay ID cua don hang vua chen de dung cho bang chi tiet
-    SET @NewOrderID = SCOPE_IDENTITY();
-
-    -- Tìm quotation_id tương ứng với contract của đơn hàng
-    DECLARE @QID INT;
-    SELECT @QID = quotation_id FROM customer_contract WHERE customer_contract_id = @RandomContractID;
-
-    -- Chèn chi tiết cho đơn hàng lấy từ quotation_detail của báo giá đó
-    INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price)
-    SELECT 
-        @NewOrderID, 
-        qd.quotation_detail_id, 
-        (CASE WHEN @Loop % 2 = 0 THEN 2 ELSE 5 END), -- Số lượng ngẫu nhiên 2 hoặc 5
-        p.cost_price, 
-        qd.selling_price
-    FROM quotation_detail qd
-    JOIN product p ON qd.product_id = p.product_id
-    WHERE qd.quotation_id = @QID;
-
-    SET @Loop = @Loop + 1;
-END;
 GO
 
--- Kiem tra lai xem đa đu 30 dong chua
-SELECT 'Tổng số đơn hàng' AS [Bảng], COUNT(*) AS [Số lượng] FROM customer_order
-UNION ALL
-SELECT 'Tổng số chi tiết đơn' AS [Bảng], COUNT(*) AS [Số lượng] FROM customer_order_detail;
-GO
+
 
 select * from [customer_order]
 select * from [user]
@@ -782,9 +672,13 @@ SELECT 2, permission_id FROM permission WHERE permission_name IN (
 -- 3. Customer (role_id = 3)
 INSERT INTO role_permission (role_id, permission_id)
 SELECT 3, permission_id FROM permission WHERE permission_name IN (
-    N'Dashboard', N'Customer Detail', N'Order List', N'Order Detail', N'Category List', N'Category edit',
+    N'Dashboard', N'Profile', N'Customer Detail', N'Order List', N'Order Detail', N'Category List', N'Category edit',
     N'Product List', N'Quotation List', N'Quotation Detail', N'Contract List', N'Contract Detail(Edit)',
+<<<<<<< HEAD
     N'Invoice List', N'Preview Invoice', N'Payment List', N'Payment Detail', N'Product Review'
+=======
+    N'Invoice List', N'Preview Invoice', N'Payment List', N'Product Review', N'Acceptance Record'
+>>>>>>> vtpp
 );
 
 -- 4. Sale Staff (role_id = 4)
