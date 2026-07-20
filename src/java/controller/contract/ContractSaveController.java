@@ -118,7 +118,7 @@ public class ContractSaveController extends HttpServlet {
         if (user == null) {
             response.sendRedirect("login");
             return;
-        } else if (user.getRoleId() != 5) {
+        } else if (user.getRoleId() != 5 && user.getRoleId() != 1) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to view this profile.");
             return;
         }

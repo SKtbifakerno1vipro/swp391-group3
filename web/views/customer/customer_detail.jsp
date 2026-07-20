@@ -325,7 +325,7 @@
                                 <div>
                                     <%-- THEM BAO VE NGHIEP VU: Neu la Sale Staff thi cho phep bam nut tao bao gia nhanh
                                         cho rieng khach nay --%>
-                                         <c:if test="${sessionScope.user.roleId == 4}">
+                                         <c:if test="${(sessionScope.user.roleId == 1 || sessionScope.user.roleId == 4)}">
                                              <a href="${pageContext.request.contextPath}/quotation/create?customerId=${cusDTO.customer.customerId}"
                                                  class="btn-edit">+ Báo giá nhanh</a>
                                          </c:if>

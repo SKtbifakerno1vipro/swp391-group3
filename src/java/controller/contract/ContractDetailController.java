@@ -198,6 +198,10 @@ public class ContractDetailController extends HttpServlet {
 
         //solve all of action request edit
         if ("request_edit".equals(action)) {// when manager and customer request edit 
+            if (user.getRoleId() != 2 && user.getRoleId() != 3 && user.getRoleId() != 1) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Manager or Customer can request edit.");
+                return;
+            }
             // BR : only PENDING_REVIEW or CUSTOMER_CHECK status  can request edit
             String currentStatus = contract.getContractStatus();
             if (!"PENDING_REVIEW".equals(currentStatus) && !"CUSTOMER_CHECK".equals(currentStatus)) {
@@ -231,6 +235,10 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("approve".equals(action)) { //when manager approve that contract
+            if (user.getRoleId() != 2 && user.getRoleId() != 1) { // 2 = Manager, 1 = SystemAdmin
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Manager can approve contracts.");
+                return;
+            }
             // only PENDING_REVIEW status  can approve by Manager
             if (!"PENDING_REVIEW".equals(contract.getContractStatus())) {
                 session.setAttribute("errorSig", "Cần được officer kiểm tra và sửa đổi trước.");
@@ -254,6 +262,10 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("customer_approve".equals(action)) { // if customer approve contract
+            if (user.getRoleId() != 3 && user.getRoleId() != 1) { 
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Customer can approve this contract.");
+                return;
+            }
             // only CUSTOMER_CHECK can be approve by Customer
             if (!"CUSTOMER_CHECK".equals(contract.getContractStatus())) {
                 session.setAttribute("errorSig", "Hợp đồng phải ở trạng thái Chờ khách hàng duyệt trước khi Khách hàng có thể chốt.");
@@ -275,6 +287,10 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("send_to_manager".equals(action)) { //if officier send to manager
+            if (user.getRoleId() != 5 && user.getRoleId() != 1) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Officer can send to manager.");
+                return;
+            }
             // BR: only DRAFT or PENDING_REVIEW can be sent to Manager
             String curStatus = contract.getContractStatus();
             if (!"DRAFT".equals(curStatus) && !"PENDING_REVIEW".equals(curStatus)) {
@@ -298,6 +314,10 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("send_final_contract".equals(action)) {// send customer final contract for storage their contract
+            if (user.getRoleId() != 5 && user.getRoleId() != 1) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Officer can send final contract.");
+                return;
+            }
             if (!"SIGNED".equals(contract.getContractStatus())) {
                 session.setAttribute("errorSig", "Hợp đồng chưa được ký hoàn tất.");
                 response.sendRedirect("contract-detail?id=" + contractId);

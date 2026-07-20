@@ -203,7 +203,7 @@
                                     <c:choose>
                                         <c:when test="${isInternalProcessing}">
                                             <!-- Manager (Role 2) -->
-                                            <c:if test="${sessionScope.user.roleId == 2}">
+                                            <c:if test="${(sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2)}">
                                                 <form method="POST" action="contract-detail">
                                                     <input type="hidden" name="action" value="approve" />
                                                     <input type="hidden" name="contractId" value="${contract.contractId}" />
@@ -226,7 +226,7 @@
 
                                         <c:when test="${canCustomerCheck}">
                                             <!-- Khach hang (Role 3) -->
-                                            <c:if test="${sessionScope.user.roleId == 3}">
+                                            <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 3}">
                                                 <form method="POST" action="contract-detail">
                                                     <input type="hidden" name="action" value="customer_approve" />
                                                     <input type="hidden" name="contractId" value="${contract.contractId}" />
@@ -237,7 +237,7 @@
 
                                         <c:when test="${isApproved}">
                                             <p style="color: var(--primary); text-align: center; font-weight: bold; margin: 10px 0;">Hợp đồng đã chốt</p>
-                                            <c:if test="${sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                                            <c:if test="${(sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2) || sessionScope.user.roleId == 3}">
                                                 <c:if test="${not signed}">
                                                     <form action="Signature" method="get">
                                                         <input type="hidden" name="contractId" value="${contract.contractId}">
@@ -250,7 +250,7 @@
 
                                         <c:when test="${contract.contractStatus == 'SIGNED'}">
                                             <p style="color: var(--primary); text-align: center; font-weight: bold; margin: 10px 0;">Hợp đồng đã ký hoàn tất</p>
-                                            <c:if test="${sessionScope.user.roleId == 2}">
+                                            <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5}">
                                                 <form method="POST" action="contract-detail" style="margin-bottom: 10px;">
                                                     <input type="hidden" name="action" value="send_final_contract" />
                                                     <input type="hidden" name="contractId" value="${contract.contractId}" />
@@ -272,7 +272,7 @@
                             </div>
 
                             <!-- TYPE NOTE BLOCK -->
-                            <c:if test="${(( sessionScope.user.roleId == 2) || ( sessionScope.user.roleId == 3))
+                            <c:if test="${(( (sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2)) || ( sessionScope.user.roleId == 3))
                                           && (contract.contractStatus== 'PENDING_REVIEW' ||contract.contractStatus== 'CUSTOMER_CHECK' ) }">
                                   <div class="type-note-section" style="margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 20px;">
                                       <h3 style="margin-top:0;">Ghi chú</h3>
