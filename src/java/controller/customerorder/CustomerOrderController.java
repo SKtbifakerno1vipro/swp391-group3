@@ -19,9 +19,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import model.Invoice;
 import service.InvoiceService;
@@ -126,6 +128,21 @@ public class CustomerOrderController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
                 return;
             }
+
+            Properties config = new Properties();
+            try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/resources/config.properties")) {
+                if (is != null) {
+                    config.load(is);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            request.setAttribute("companyName", config.getProperty("company_name"));
+            request.setAttribute("companyAddress", config.getProperty("company_address"));
+            request.setAttribute("companyPhone", config.getProperty("company_phone"));
+            request.setAttribute("companyTaxCode", config.getProperty("company_tax_code"));
+            request.setAttribute("companyRepName", config.getProperty("company_rep_name"));
+            request.setAttribute("companyPosition", config.getProperty("company_position"));
 
             Invoice invoice = invoiceService.getInvoiceByOrderId(orderId);
             if (invoice != null) {

@@ -12,9 +12,11 @@ public class CustomerOrderService {
     private final CustomerOrderDAO customerOrderDAO = new CustomerOrderDAO();
     private final CustomerService customerService = new CustomerService();
 
-    public List<CustomerOrderDTO> getAllCustomerOrders() {
-        return customerOrderDAO.getAllCustomerOrders();
-    }
+    
+
+//    public List<CustomerOrderDTO> getAllCustomerOrders() {
+//        return customerOrderDAO.getAllCustomerOrders();
+//    }
 
     public CustomerOrderDTO getCustomerOrderById(int id) {
         return customerOrderDAO.getCustomerOrderDTOById(id);
@@ -46,20 +48,6 @@ public class CustomerOrderService {
             }
         }
         return success;
-    }
-
-
-    
-    public List<CustomerOrderDTO> findbyNameOrTaxcode(String keyword) {
-        return customerOrderDAO.getAllCustomerOrdersByName(keyword);
-    }
-
-    public int getTotalOrderCount(int userId, String roleName) {
-        return customerOrderDAO.getTotalOrders(userId, roleName);
-    }
-
-    public List<CustomerOrderDTO> getOrdersByPage(int page, int size, String sortBy, String sortOrder, int userId, String roleName) {
-        return customerOrderDAO.getOrdersWithPaging(page, size, sortBy, sortOrder, userId, roleName);
     }
 
     public int getTotalSearchCount(String keyword, int userId, String roleName) {
