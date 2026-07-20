@@ -252,8 +252,9 @@ public class SecurityFilter implements Filter {
             case "/customer/create":
                 return "Customer Create";
             case "/customer/detail":
-            case "/customer/edit":
                 return "Customer Detail";
+            case "/customer/edit":
+                return "Customer Edit";
             case "/customer-order-list":
                 return "Order List";
             case "/create-order":
@@ -286,12 +287,13 @@ public class SecurityFilter implements Filter {
                 return "Contract List";
             case "/contract-create":
             case "/contract-save":
-                return "Contract Creatadde";
+                return "Contract Create";
             case "/contract-detail":
             case "/export-pdf":
             case "/File":
-            case "/Signature":
                 return "Contract Detail(Edit)";
+            case "/Signature":
+                return "Signature Contract";
             case "/invoice-list":
                 return "Invoice List";
             case "/invoice/create":
@@ -315,10 +317,13 @@ public class SecurityFilter implements Filter {
             case "/revenue":
                 return "Revenue Report";
             case "/warehouse-dashboard":
+                return "Warehouse Dashboard";
             case "/import-request-list":
+                return "Import Request List";
             case "/import-request-create":
+                return "Import Request Create";
             case "/import-request-detail":
-                return "Dashboard";
+                return "Import Request Detail";
             default:
                 return null;
         }
