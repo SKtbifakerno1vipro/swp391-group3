@@ -17,23 +17,7 @@ public class CustomerOrderDAO extends DBContext {
     public static String lastError = "";
 
     public List<CustomerOrderDTO> getAllCustomerOrders() {
-        List<CustomerOrderDTO> list = new ArrayList<>();
-        String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name "
-                + "FROM customer_order co "
-                + "JOIN customer c ON co.customer_id = c.customer_id "
-                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "ORDER BY co.customer_order_id DESC";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapResultSetToDTO(rs));
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
+        return searchOrdersWithPaging(null, 0, 0, null, null, 0, null);
     }
 
     public CustomerOrderDTO getCustomerOrderDTOById(int id) {
@@ -41,7 +25,7 @@ public class CustomerOrderDAO extends DBContext {
                 + "FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "WHERE co.customer_order_id = ?";
+                + "WHERE co.customer_order_id = ? AND (co.order_status IS NULL OR co.order_status <> 'DELETED')";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -59,7 +43,8 @@ public class CustomerOrderDAO extends DBContext {
                 + "FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "WHERE co.customer_contract_id = ?";
+                + "WHERE co.customer_contract_id = ? AND (co.order_status IS NULL OR co.order_status <> 'DELETED') "
+                + "ORDER BY co.customer_order_id DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
             ResultSet rs = ps.executeQuery();
@@ -107,6 +92,24 @@ public class CustomerOrderDAO extends DBContext {
             e.printStackTrace();
         }
         return details;
+    }
+
+    public double getTotalPriceFromQuotationByOrderId(int orderId) {
+        String sql = "SELECT q.total_price "
+                + "FROM customer_order co "
+                + "JOIN customer_contract cc ON co.customer_contract_id = cc.customer_contract_id "
+                + "JOIN quotation q ON cc.quotation_id = q.quotation_id "
+                + "WHERE co.customer_order_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("total_price");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public boolean createOrder(CustomerOrder order, List<model.CustomerOrderDetail> details) {
@@ -244,6 +247,16 @@ public class CustomerOrderDAO extends DBContext {
                 psUpdate.setInt(2, orderId);
                 int affected = psUpdate.executeUpdate();
                 if (affected > 0) {
+                    // Update acceptance_status in acceptance_record table
+                    String updateAccSql = "UPDATE acceptance_record SET acceptance_status = ?, updated_at = GETDATE() WHERE customer_order_id = ?";
+                    try (PreparedStatement psAcc = connection.prepareStatement(updateAccSql)) {
+                        psAcc.setString(1, status);
+                        psAcc.setInt(2, orderId);
+                        psAcc.executeUpdate();
+                    } catch (Exception eAcc) {
+                        System.out.println("Failed to update acceptance_record status: " + eAcc.getMessage());
+                    }
+
                     connection.commit();
                     return true;
                 } else {
@@ -269,41 +282,24 @@ public class CustomerOrderDAO extends DBContext {
     }
 
     public boolean deleteCustomerOrder(int orderId) {
-        String deleteDetailsSql = "DELETE FROM customer_order_detail WHERE customer_order_id = ?";
-        String deleteOrderSql = "DELETE FROM customer_order WHERE customer_order_id = ?";
-        try {
-            connection.setAutoCommit(false);
-            
-            // Delete details first
-            try (PreparedStatement psDetails = connection.prepareStatement(deleteDetailsSql)) {
-                psDetails.setInt(1, orderId);
-                psDetails.executeUpdate();
+        String sql = "UPDATE customer_order SET order_status = 'DELETED' WHERE customer_order_id = ?";
+        String sqlAcc = "UPDATE acceptance_record SET acceptance_status = 'DELETED', updated_at = GETDATE() WHERE customer_order_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            int affected = ps.executeUpdate();
+            if (affected > 0) {
+                try (PreparedStatement psAcc = connection.prepareStatement(sqlAcc)) {
+                    psAcc.setInt(1, orderId);
+                    psAcc.executeUpdate();
+                } catch (Exception eAcc) {
+                    System.out.println("Failed to update acceptance_record on delete: " + eAcc.getMessage());
+                }
+                return true;
             }
-            
-            // Then delete order
-            int affectedRows;
-            try (PreparedStatement psOrder = connection.prepareStatement(deleteOrderSql)) {
-                psOrder.setInt(1, orderId);
-                affectedRows = psOrder.executeUpdate();
-            }
-            
-            connection.commit();
-            return affectedRows > 0;
         } catch (Exception e) {
-            try {
-                connection.rollback();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
             e.printStackTrace();
-            return false;
-        } finally {
-            try {
-                connection.setAutoCommit(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
+        return false;
     }
 
     private CustomerOrderDTO mapResultSetToDTO(ResultSet rs) throws java.sql.SQLException {
@@ -371,7 +367,7 @@ public class CustomerOrderDAO extends DBContext {
     public int getTotalOrders(int userId, String roleName) {
         String sql = "SELECT COUNT(*) FROM customer_order co " +
                      "JOIN customer c ON co.customer_id = c.customer_id " +
-                     "WHERE 1=1 " + getRoleFilter(userId, roleName);
+                     "WHERE (co.order_status IS NULL OR co.order_status <> 'DELETED') " + getRoleFilter(userId, roleName);
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -394,37 +390,24 @@ public class CustomerOrderDAO extends DBContext {
         return "ORDER BY " + col + " " + dir;
     }
 
-    public List<CustomerOrderDTO> getOrdersWithPaging(int pageIndex, int pageSize, String sortBy, String sortOrder, int userId, String roleName) {
-        List<CustomerOrderDTO> list = new ArrayList<>();
-        String orderBy = getOrderByClause(sortBy, sortOrder);
-        String filter = getRoleFilter(userId, roleName);
-        String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name FROM customer_order co "
-                + "JOIN customer c ON co.customer_id = c.customer_id "
-                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "WHERE 1=1 " + filter
-                + orderBy + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, (pageIndex - 1) * pageSize);
-            ps.setInt(2, pageSize);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapResultSetToDTO(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
 
     public int getTotalOrdersBySearch(String keyword, int userId, String roleName) {
-        String sql = "SELECT COUNT(*) FROM customer_order co "
-                + "JOIN customer c ON co.customer_id = c.customer_id "
-                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "WHERE (u.full_name LIKE ? OR c.tax_code LIKE ?) " + getRoleFilter(userId, roleName);
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            String p = "%" + keyword + "%";
-            ps.setString(1, p);
-            ps.setString(2, p);
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM customer_order co ")
+                .append("JOIN customer c ON co.customer_id = c.customer_id ")
+                .append("LEFT JOIN [user] u ON c.user_id = u.user_id WHERE (co.order_status IS NULL OR co.order_status <> 'DELETED') ");
+
+        boolean hasKeyword = (keyword != null && !keyword.trim().isEmpty());
+        if (hasKeyword) {
+            sql.append("AND (u.full_name LIKE ? OR c.tax_code LIKE ?) ");
+        }
+        sql.append(getRoleFilter(userId, roleName));
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            if (hasKeyword) {
+                String p = "%" + keyword.trim() + "%";
+                ps.setString(1, p);
+                ps.setString(2, p);
+            }
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
@@ -439,17 +422,34 @@ public class CustomerOrderDAO extends DBContext {
         List<CustomerOrderDTO> list = new ArrayList<>();
         String orderBy = getOrderByClause(sortBy, sortOrder);
         String filter = getRoleFilter(userId, roleName);
-        String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name FROM customer_order co "
-                + "JOIN customer c ON co.customer_id = c.customer_id "
-                + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "WHERE (u.full_name LIKE ? OR c.tax_code LIKE ?) " + filter
-                + orderBy + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            String p = "%" + keyword + "%";
-            ps.setString(1, p);
-            ps.setString(2, p);
-            ps.setInt(3, (pageIndex - 1) * pageSize);
-            ps.setInt(4, pageSize);
+
+        StringBuilder sql = new StringBuilder("SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name FROM customer_order co ")
+                .append("JOIN customer c ON co.customer_id = c.customer_id ")
+                .append("LEFT JOIN [user] u ON c.user_id = u.user_id WHERE (co.order_status IS NULL OR co.order_status <> 'DELETED') ");
+
+        boolean hasKeyword = (keyword != null && !keyword.trim().isEmpty());
+        if (hasKeyword) {
+            sql.append("AND (u.full_name LIKE ? OR c.tax_code LIKE ?) ");
+        }
+
+        sql.append(filter).append(" ").append(orderBy);
+
+        boolean hasPaging = (pageIndex > 0 && pageSize > 0);
+        if (hasPaging) {
+            sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
+            if (hasKeyword) {
+                String p = "%" + keyword.trim() + "%";
+                ps.setString(paramIdx++, p);
+                ps.setString(paramIdx++, p);
+            }
+            if (hasPaging) {
+                ps.setInt(paramIdx++, (pageIndex - 1) * pageSize);
+                ps.setInt(paramIdx++, pageSize);
+            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
@@ -460,12 +460,12 @@ public class CustomerOrderDAO extends DBContext {
         return list;
     }
 
-    // Xhieu - begin, xoa nho bao toi
+   
     public int getTotalOrdersCountByCusId(int cusId) {
         String sql = "SELECT COUNT(*) FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "WHERE c.customer_id = ? ";
+                + "WHERE c.customer_id = ? AND (co.order_status IS NULL OR co.order_status <> 'DELETED')";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, cusId);
@@ -484,19 +484,19 @@ public class CustomerOrderDAO extends DBContext {
     public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
         List<CustomerOrderDTO> list = new ArrayList<>();
 
-        // Đoi đieu kien WHERE tu loc theo ma đon hang sang loc theo ma khach hang (customer_id)
+       
         String sql = "SELECT co.*, c.tax_code, c.user_id, c.assigned_to_user_id, u.full_name "
                 + "FROM customer_order co "
                 + "JOIN customer c ON co.customer_id = c.customer_id "
                 + "LEFT JOIN [user] u ON c.user_id = u.user_id "
-                + "WHERE co.customer_id = ? "
+                + "WHERE co.customer_id = ? AND (co.order_status IS NULL OR co.order_status <> 'DELETED') "
                 + "ORDER BY co.created_at DESC"; // Sắp xếp đơn hàng mới nhất lên đầu
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, cusId);
 
             try (ResultSet rs = ps.executeQuery()) {
-                // Thay đoi tu "if (rs.next())" thanh "while (rs.next())" đe duyet qua toan bo danh sach đon hang
+                
                 while (rs.next()) {
                     list.add(mapResultSetToDTO(rs));
                 }
@@ -506,5 +506,5 @@ public class CustomerOrderDAO extends DBContext {
         }
         return list;
     }
-    // Xhieu - end
+    
 }

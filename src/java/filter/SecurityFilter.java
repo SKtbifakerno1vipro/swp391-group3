@@ -44,199 +44,8 @@ public class SecurityFilter implements Filter {
 
     private static final List<String> LOGGED_IN_URLS = List.of(
             "/user/password/change",
-            "/realtime/notifications"
-    );
-
-    private static final List<String> SYSTEM_ADMIN_URLS = List.of(
-            "/dashboard",
-            "/admin-dashboard",
-            "/role-list", "/role-detail",
-            "/add-role",
-            "/edit-role-permissions",
-            "/user-list",
-            "/create-user",
-            "/edit-user",
-            "/user-detail",
-            "/customer/list",
-            "/customer/create",
-            "/customer/detail",
-            "/customer/edit",
-            "/customer-order-list",
-            "/customer-order",
-            "/create-order",
-            "/category/list",
-            "/category/create",
-            "/category/edit",
-            "/category/delete",
-            "/product-list",
-            "/create-product",
-            "/edit-product",
-            "/product-delete",
-            "/quotation-list",
-            "/quotation-create",
-            "/quotation-detail",
-            "/contract-list",
-            "/contract-save",
-            "/contract-create",
-            "/contract-detail",
-            "/invoice-list",
-            "/invoice",
-            "/preview",
-            "/invoice/create",
-            "/payment/list",
-            "/payment",
-            "/payment/detail",
-            "/email/logs",
-            "/admin/audit-logs",
-            "/revenue-report",
-            "/Signature",
-            "/SignatureAcceptance",
             "/realtime/notifications",
-            "/export-pdf",
-            "/import-request-list",
-            "/import-request-create",
-            "/import-request-detail"
-    );
-
-    private static final List<String> MANAGER_URLS = List.of(
-            "/dashboard",
-            "/role-list",
-            "/role-detail",
-            "/user-list",
-            "/edit-user",
-            "/customer/list",
-            "/customer-order-list",
-            "/customer-order",
-            "/create-order",
-            "/product-list",
-            "/edit-product",
-            "/product-review",
-            "/contract-list",
-            "/contract-detail",
-            "/invoice-list",
-            "/invoice",
-            "/preview",
-            "/invoice/create",
-            "/payment/list",
-            "/payment",
-            "/payment/detail",
-            "/revenue-report",
-            "/Signature",
-            "/SignatureAcceptance",
-            "/realtime/notifications",
-            "/export-pdf",
-            "/import-request-list",
-            "/import-request-create",
-            "/import-request-detail"
-    );
-
-    private static final List<String> CUSTOMER_URLS = List.of(
-            "/dashboard",
-            "/customer/detail",
-            "/customer/edit",
-            "/customer-order-list",
-            "/customer-order",
-            "/category/list",
-            "/category/create",
-            "/category/edit",
-            "/category/delete",
-            "/product-list",
-            "/edit-product",
-            "/product-review",
-            "/quotation-list",
-            "/quotation-detail",
-            "/contract-list",
-            "/contract-detail",
-            "/invoice-list",
-            "/invoice",
-            "/preview",
-            "/payment/list",
-            "/payment",
-            "/payment/detail",
-            "/Signature",
-            "/SignatureAcceptance",
-            "/realtime/notifications",
-            "/export-pdf"
-    );
-
-    private static final List<String> SALE_STAFF_URLS = List.of(
-            "/dashboard",
-            "/edit-user",
-            "/customer/list",
-            "/customer/create",
-            "/customer/detail",
-            "/customer/edit",
-            "/customer-order-list",
-            "/customer-order",
-            "/create-order",
-            "/category/list",
-            "/category/create",
-            "/category/edit",
-            "/category/delete",
-            "/product-list",
-            "/edit-product",
-            "/product-review",
-            "/quotation-list",
-            "/quotation-create",
-            "/quotation-detail",
-            "/invoice/create",
-            "/invoice",
-            "/preview",
-            "/payment/list",
-            "/payment",
-            "/payment/detail",
-            "/realtime/notifications",
-            "/export-pdf",
-            "/import-request-list",
-            "/import-request-create",
-            "/import-request-detail"
-    );
-
-    private static final List<String> ADMIN_OFFICER_URLS = List.of(
-            "/dashboard",
-            "/edit-user",
-            "/customer/list",
-            "/customer/detail",
-            "/customer-order-list",
-            "/customer-order",
-            "/create-order",
-            "/product-review",
-            "/quotation-list",
-            "/quotation-detail",
-            "/contract-list",
-            "/contract-save",
-            "/contract-create",
-            "/contract-detail",
-            "/invoice-list",
-            "/invoice",
-            "/preview",
-            "/invoice/create",
-            "/payment/list",
-            "/payment",
-            "/payment/detail",
-            "/Signature",
-            "/SignatureAcceptance",
-            "/realtime/notifications",
-            "/export-pdf"
-    );
-
-    private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
-            "/customer-order-list",
-            "/customer-order",
-            "/category/list",
-            "/category/create",
-            "/category/edit",
-            "/category/delete",
-            "/product-list",
-            "/create-product",
-            "/edit-product",
-            "/product-delete",
-            "/product-review",
-            "/contract-list",
-            "/realtime/notifications",
-            "/export-pdf",
-            "/import-request-list",
-            "/import-request-detail"
+            "/File"
     );
 
     @Override
@@ -344,53 +153,72 @@ public class SecurityFilter implements Filter {
         }
     }
 
+    private void logDebug(String message) {
+        try {
+            java.io.File file = new java.io.File("e:/Half 5/SWP391/swp391-group3/build/debug.log");
+            java.io.FileWriter fw = new java.io.FileWriter(file, true);
+            fw.write(new java.util.Date() + " - " + message + "\n");
+            fw.close();
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
     private boolean hasPermission(int roleId, String path, HttpServletRequest req) {
+        // Chuẩn hóa đường dẫn bằng cách bỏ dấu / ở cuối (nếu có)
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
-        System.out.println("Checking permission for role " + roleId + " on path " + cleanPath);
-
-        // Check if the path is explicitly allowed by the hardcoded fallback lists first
-        if (roleId == ROLE_SYSTEM_ADMIN && SYSTEM_ADMIN_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_MANAGER && MANAGER_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_CUSTOMER && CUSTOMER_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_SALE_STAFF && SALE_STAFF_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_ADMIN_OFFICER && ADMIN_OFFICER_URLS.contains(cleanPath)) {
-            return true;
-        }
-        if (roleId == ROLE_WAREHOUSE_STAFF && WAREHOUSE_STAFF_URLS.contains(cleanPath)) {
-            return true;
-        }
-
         String requiredPermission = getRequiredPermission(cleanPath, req);
-        if (requiredPermission != null) {
+        logDebug("Checking permission for roleId: " + roleId + ", path: " + cleanPath + ", required: " + requiredPermission);
+
+        if (requiredPermission == null) {
+            logDebug("Required permission is null for path: " + cleanPath);
+            return false;
+        }
+
+        // Bước 2: Lấy danh sách quyền hạn từ Session (bộ nhớ đệm) để tránh truy vấn DB nhiều lần
+        HttpSession session = req.getSession(false);
+        List<RolePermission> permissions = null;
+        if (session != null) {
+            permissions = (List<RolePermission>) session.getAttribute("userPermissions");
+            logDebug("Permissions loaded from session: " + (permissions != null ? permissions.size() : "null"));
+        }
+
+        // Bước 3: Nếu trong Session chưa có danh sách quyền, ta mới truy vấn Database để lấy lên
+        if (permissions == null) {
+            logDebug("Session cache miss. Querying DB for roleId: " + roleId);
             Role role = roleDAO.getRoleDetail(roleId);
-            if (role != null && role.getPermissions() != null) {
-                for (RolePermission p : role.getPermissions()) {
-                    if (p.getPermissionName() != null && p.getPermissionName().equalsIgnoreCase(requiredPermission)) {
-                        System.out.println("Role " + roleId + " HAS database permission: " + requiredPermission);
-                        return true;
-                    }
+            if (role != null) {
+                permissions = role.getPermissions();
+                logDebug("Role loaded from DB: " + role.getRoleName() + ", permissions size: " + (permissions != null ? permissions.size() : "null"));
+                // Lưu vào Session để tái sử dụng ở các request tiếp theo
+                if (session != null && permissions != null) {
+                    session.setAttribute("userPermissions", permissions);
                 }
-                System.out.println("Role " + roleId + " DOES NOT HAVE database permission: " + requiredPermission);
-                return false;
+            } else {
+                logDebug("Role loaded from DB is NULL for roleId: " + roleId);
             }
         }
 
-        return false;
+        // Bước 4: So sánh quyền yêu cầu với các quyền mà User này đang sở hữu
+        if (permissions != null) {
+            for (RolePermission p : permissions) {
+                // Nếu tìm thấy quyền trong danh sách trùng khớp với quyền yêu cầu
+                if (p.getPermissionName() != null && p.getPermissionName().equalsIgnoreCase(requiredPermission)) {
+                    logDebug("Permission MATCHED: " + p.getPermissionName());
+                    return true; // Cho phép đi qua
+                }
+            }
+            logDebug("Permission NOT matched. Required was: " + requiredPermission);
+        }
 
+        return false; // Không khớp quyền nào, từ chối truy cập
     }
 
     private String getRequiredPermission(String path, HttpServletRequest req) {
         String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
         switch (cleanPath) {
             case "/dashboard":
+            case "/admin-dashboard":
                 return "Dashboard";
             case "/role-list":
             case "/role-detail":
@@ -409,8 +237,8 @@ public class SecurityFilter implements Filter {
                 if (idParam == null || idParam.trim().isEmpty()) {
                     return "User Create";
                 } else {
-                    jakarta.servlet.http.HttpSession session = req.getSession(false);
-                    model.User user = session != null ? (model.User) session.getAttribute("user") : null;
+                    HttpSession session = req.getSession(false);
+                    User user = session != null ? (model.User) session.getAttribute("user") : null;
                     if (user != null && String.valueOf(user.getUserId()).equals(idParam)) {
                         return "Profile";
                     }
@@ -425,13 +253,15 @@ public class SecurityFilter implements Filter {
             case "/customer/create":
                 return "Customer Create";
             case "/customer/detail":
-            case "/customer/edit":
                 return "Customer Detail";
+            case "/customer/edit":
+                return "Customer Edit";
             case "/customer-order-list":
                 return "Order List";
             case "/create-order":
                 return "Order Create";
             case "/customer-order":
+            case "/AcceptanceRecordController":
                 return "Order Detail";
             case "/category/list":
                 return "Category List";
@@ -460,7 +290,11 @@ public class SecurityFilter implements Filter {
             case "/contract-save":
                 return "Contract Create";
             case "/contract-detail":
+            case "/export-pdf":
+            case "/File":
                 return "Contract Detail(Edit)";
+            case "/Signature":
+                return "Signature Contract";
             case "/invoice-list":
                 return "Invoice List";
             case "/invoice/create":
@@ -471,6 +305,8 @@ public class SecurityFilter implements Filter {
                 return "Preview Invoice";
             case "/payment/list":
             case "/payment":
+            case "/payment/return":
+            case "/payment/ipn":
                 return "Payment List";
             case "/payment/detail":
                 return "Payment Detail";
@@ -479,14 +315,16 @@ public class SecurityFilter implements Filter {
             case "/admin/audit-logs":
                 return "System Audit Logs";
             case "/revenue-report":
+            case "/revenue":
                 return "Revenue Report";
-            case "/Signature":
-            case "/SignatureAcceptance":
-                return "Acceptance Record";
+            case "/warehouse-dashboard":
+                return "Warehouse Dashboard";
             case "/import-request-list":
+                return "Import Request List";
             case "/import-request-create":
+                return "Import Request Create";
             case "/import-request-detail":
-                return "Dashboard";
+                return "Import Request Detail";
             default:
                 return null;
         }

@@ -60,6 +60,7 @@
                             <a class="nav-link ${param.activeMenu == 'import-requests' ? 'active' : ''}" href="${pageContext.request.contextPath}/import-request-list" title="Quản lý Yêu cầu nhập kho"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">unarchive</span></div><span class="sidebar-text">Quản lý Nhập kho</span></a>
                             <a class="nav-link ${param.activeMenu == 'revenue' ? 'active' : ''}" href="${pageContext.request.contextPath}/revenue-report" title="Báo cáo doanh thu"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">analytics</span></div><span class="sidebar-text">Báo cáo doanh thu</span></a>
                             <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}" href="${pageContext.request.contextPath}/edit-user?id=${sessionScope.user.userId}" title="Hồ sơ của tôi"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">account_circle</span></div><span class="sidebar-text">Hồ sơ của tôi</span></a>
+
                         </c:when>
 
                         <%-- ROLE 3: CUSTOMER --%>
@@ -105,6 +106,7 @@
 
                         <%-- ROLE 6: WAREHOUSE --%>
                         <c:when test="${sessionScope.user.roleId == 6}">
+
                             <a class="nav-link ${param.activeMenu == 'dashboard' ? 'active' : ''}" href="${pageContext.request.contextPath}/dashboard" title="Bảng điều khiển"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">dashboard</span></div><span class="sidebar-text">Bảng điều khiển</span></a>
                             <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}" href="${pageContext.request.contextPath}/customer-order-list" title="Quản lý Đơn hàng"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt_long</span></div><span class="sidebar-text">Quản lý Đơn hàng</span></a>
                             <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}" href="${pageContext.request.contextPath}/category/list" title="Quản lý Danh mục"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">category</span></div><span class="sidebar-text">Quản lý Danh mục</span></a>
@@ -112,6 +114,9 @@
                             <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}" href="${pageContext.request.contextPath}/contract-list" title="Quản lý Hợp đồng"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div><span class="sidebar-text">Quản lý Hợp đồng</span></a>
                             <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}" href="${pageContext.request.contextPath}/product-review" title="Quản lý Đánh giá & Phản hồi"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span></div><span class="sidebar-text">Quản lý Đánh giá</span></a>
                             <a class="nav-link ${param.activeMenu == 'import-requests' ? 'active' : ''}" href="${pageContext.request.contextPath}/import-request-list" title="Quản lý Yêu cầu nhập kho">
+
+                            <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}" href="${pageContext.request.contextPath}/edit-user?id=${sessionScope.user.userId}" title="Hồ sơ của tôi"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">account_circle</span></div><span class="sidebar-text">Hồ sơ của tôi</span></a>
+                            <a class="nav-link ${param.activeMenu == 'import-requests' ? 'active' : ''}" href="${pageContext.request.contextPath}/import-request-list" title="Yêu cầu nhập kho">
                                 <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">unarchive</span></div>
                                 <span class="sidebar-text">
                                     Quản lý Nhập kho

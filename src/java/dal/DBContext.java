@@ -21,15 +21,16 @@ public class DBContext {
 
             props.load(input);
 
-            String url = props.getProperty("url");
-            String username = props.getProperty("userID");
-            String password = props.getProperty("password");
+            String url = props.getProperty("url") != null ? props.getProperty("url").trim() : null;
+            String username = props.getProperty("userID") != null ? props.getProperty("userID").trim() : null;
+            String password = props.getProperty("password") != null ? props.getProperty("password").trim() : null;
 
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            System.out.println("URL = " + url);
-            System.out.println("USER = " + username);
-            System.out.println("PASS = " + password);
-            connection = DriverManager.getConnection(url, username, password);
+            Class<?> driverClass = Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            java.sql.Driver driver = (java.sql.Driver) driverClass.getDeclaredConstructor().newInstance();
+            Properties dbProps = new Properties();
+            if (username != null) dbProps.put("user", username);
+            if (password != null) dbProps.put("password", password);
+            connection = driver.connect(url, dbProps);
         } catch (Exception e) {
             e.printStackTrace();
         }

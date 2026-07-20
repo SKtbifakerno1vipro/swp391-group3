@@ -39,7 +39,7 @@ public class ContractSaveController extends HttpServlet {
         }
 
         String contractIdRaw = request.getParameter("id");
-        String quotationId = request.getParameter("quotationId");
+        String quotationIdStr = request.getParameter("quotationId");
 
         //check  contract exist by id?
         if (contractIdRaw != null && !contractIdRaw.isEmpty()) {
@@ -67,8 +67,8 @@ public class ContractSaveController extends HttpServlet {
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);
 
             // create new contract with quotation
-        } else if (quotationId != null && !quotationId.isEmpty()) {
-            int qId = Integer.parseInt(quotationId);
+        } else if (quotationIdStr != null && !quotationIdStr.isEmpty()) {
+            int qId = Integer.parseInt(quotationIdStr);
             Quotation quotation = quotationService.getQuotationById(qId);
             if (quotation != null) {
                 String templateHtml = generateContractHtml(quotation);
@@ -111,7 +111,7 @@ public class ContractSaveController extends HttpServlet {
         if (user == null) {
             response.sendRedirect("login");
             return;
-        } else if (user.getRoleId()!= 5) {
+        } else if (user.getRoleId() != 5 && user.getRoleId() != 1) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to view this profile.");
             return;
         }

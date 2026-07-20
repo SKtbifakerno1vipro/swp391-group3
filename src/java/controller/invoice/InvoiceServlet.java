@@ -183,6 +183,7 @@ public class InvoiceServlet extends HttpServlet {
                                 String baseUrl = "http://localhost:9999/SWP391_GROUP3/";
 
                                 iService.emailIssueInvoice(invoice.getInvoiceId(), baseUrl);
+                                service.AuditLogService.log(user.getUserId(), "RELEASE", "Invoice", "Phát hành hóa đơn điện tử số: " + invoice.getInvoiceNo() + " (Hợp đồng ID: " + contractId + ")");
                                 session.setAttribute("successMessage", "Phát hành hóa đơn thành công!");
                             } else {
                                 session.setAttribute("errorMessage", "Cập nhật trạng thái hóa đơn thất bại.");
@@ -359,8 +360,14 @@ public class InvoiceServlet extends HttpServlet {
             boolean success;
             if (invoiceId > 0) {
                 success = iService.updateInvoice(invoice);
+                if (success) {
+                    service.AuditLogService.log(user.getUserId(), "UPDATE", "Invoice", "Cập nhật thông tin hóa đơn ID: " + invoiceId + " (Số: " + invoice.getInvoiceNo() + ", Trạng thái: " + invoice.getInvoiceStatus() + ")");
+                }
             } else {
                 success = iService.insertInvoice(invoice);
+                if (success) {
+                    service.AuditLogService.log(user.getUserId(), "CREATE", "Invoice", "Tạo mới hóa đơn (Số: " + invoice.getInvoiceNo() + ", Trạng thái: " + invoice.getInvoiceStatus() + ") cho đơn hàng ID: " + orderId);
+                }
             }
 
             if (success) {
