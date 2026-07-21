@@ -440,7 +440,6 @@
                 <section class="page-top">
                     <div><p class="eyebrow">Kiểm soát truy cập</p><h1>Chi tiết vai trò</h1><p>Xem thông tin vai trò và quản lý danh sách quyền hạn tương ứng.</p></div>
                     <div class="actions"><a class="button" href="${pageContext.request.contextPath}/role-list"><span class="material-symbols-outlined">arrow_back</span>Quay lại danh sách</a>
-                        <a class="button primary" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Chỉnh sửa quyền</a></div>
                 </section>
                 <section class="panel">
                     <div class="panel-head"><h2><c:out value="${role.roleName}"/></h2><span class="button"><span class="material-symbols-outlined">shield_person</span>R-${role.roleId}</span></div>

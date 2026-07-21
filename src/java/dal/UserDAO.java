@@ -125,7 +125,7 @@ public class UserDAO extends DBContext {
     created by vu trong phu
      */
     public int getTotalUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail) {
-        String sql = "SELECT count(*) FROM [user] u WHERE 1=1 ";
+        String sql = "SELECT count(*) FROM [user] u WHERE 1=1 and u.role_id != 3";
 
         if (roleId > 0) {
             sql += " AND u.role_id = ?";
