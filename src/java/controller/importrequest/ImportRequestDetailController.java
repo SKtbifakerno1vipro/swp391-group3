@@ -91,9 +91,15 @@ public class ImportRequestDetailController extends HttpServlet {
 
         // --- XỬ LÝ HÀNH ĐỘNG HỦY YÊU CẦU (CANCEL) ---
         if ("cancel".equals(action)) {
-            // Kiểm tra phân quyền: Chỉ cho phép System Admin (1), Manager (2) và Sales Staff (4)
-            if (user.getRoleId() != 1 && user.getRoleId() != 2 && user.getRoleId() != 4) {
+            // Kiểm tra phân quyền: Chỉ cho phép Warehouse Staff (6)
+            if (user.getRoleId() != 6) {
                 response.sendRedirect(request.getContextPath() + "/import-request-detail?id=" + importId + "&message=permissionDenied");
+                return;
+            }
+
+            String wareHousenote = request.getParameter("wareHousenote");
+            if (wareHousenote == null || wareHousenote.trim().isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/import-request-detail?id=" + importId + "&message=missingNote");
                 return;
             }
 
@@ -104,19 +110,20 @@ public class ImportRequestDetailController extends HttpServlet {
                 return;
             }
 
-            boolean success = importRequestDAO.cancelImportRequest(importId);
+            boolean success = importRequestDAO.cancelImportRequest(importId, wareHousenote.trim(), user.getUserId());
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/import-request-detail?id=" + importId + "&message=cancelSuccess");
             } else {
-                response.sendRedirect(request.getContextPath() + "/import-request-detail?id=" + importId + "&message=dbError");
+                // Xử lý xung đột đồng thời (Concurrency): Trạng thái đã bị đổi bởi thiết bị/người dùng khác
+                response.sendRedirect(request.getContextPath() + "/import-request-detail?id=" + importId + "&message=alreadyProcessed");
             }
             return;
         }
 
         // --- XỬ LÝ HÀNH ĐỘNG NHẬP KHO (IMPORT) ---
         if ("import".equals(action)) {
-            // Kiểm tra phân quyền: Cho phép System Admin (1), Manager (2), Sales Staff (4) và Warehouse Staff (6)
-            if (user.getRoleId() != 1 && user.getRoleId() != 2 && user.getRoleId() != 4 && user.getRoleId() != 6) {
+            // Kiểm tra phân quyền: Chỉ cho phép Warehouse Staff (6) được xác nhận nhập kho
+            if (user.getRoleId() != 6) {
                 response.sendRedirect(request.getContextPath() + "/import-request-detail?id=" + importId + "&message=permissionDenied");
                 return;
             }
@@ -133,7 +140,8 @@ public class ImportRequestDetailController extends HttpServlet {
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/import-request-detail?id=" + importId + "&message=importSuccess");
             } else {
-                response.sendRedirect(request.getContextPath() + "/import-request-detail?id=" + importId + "&message=dbError");
+                // Xử lý xung đột đồng thời (Concurrency): Trạng thái đã bị đổi bởi thiết bị/người dùng khác
+                response.sendRedirect(request.getContextPath() + "/import-request-detail?id=" + importId + "&message=alreadyProcessed");
             }
             return;
         }

@@ -27,6 +27,8 @@
                 <c:if test="${message == 'importSuccess'}"><p style="color: green; font-weight: bold;">Nhập kho sản phẩm thành công.</p></c:if>
                 <c:if test="${message == 'permissionDenied'}"><p style="color: red; font-weight: bold;">Bạn không có quyền thực hiện thao tác này.</p></c:if>
                 <c:if test="${message == 'invalidStatus'}"><p style="color: red; font-weight: bold;">Trạng thái yêu cầu không hợp lệ cho hành động này.</p></c:if>
+                <c:if test="${message == 'alreadyProcessed'}"><p style="color: #d32f2f; font-weight: bold; background-color: #ffebee; padding: 10px; border-left: 4px solid #f44336; border-radius: 4px; margin-bottom: 15px;">Yêu cầu này đã được xử lý hoặc hủy trước đó bởi người dùng/thiết bị khác.</p></c:if>
+                <c:if test="${message == 'missingNote'}"><p style="color: #c62828; font-weight: bold; background-color: #ffebee; padding: 10px; border-left: 4px solid #f44336; border-radius: 4px; margin-bottom: 15px;">Vui lòng nhập lý do hủy yêu cầu nhập kho.</p></c:if>
                 <c:if test="${message == 'dbError'}"><p style="color: red; font-weight: bold;">Lỗi hệ thống database. Vui lòng thử lại.</p></c:if>
 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
