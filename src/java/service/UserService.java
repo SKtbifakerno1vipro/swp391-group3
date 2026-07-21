@@ -24,7 +24,7 @@ public class UserService {
                 + "- Username: " + u.getUserName() + "\n"
                 + "- Password: " + password + "\n\n"
                 + "Vui long dang nhap va doi mat khau ngay.";
-        utils.EmailUtils.sendEmailAsync(u.getEmail(), emailSubject, emailContent);
+        utils.EmailUtils.sendEmailAsync(u.getEmail(), emailSubject, emailContent, u.getUserId());
     }
 
     public int getTotalUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail) {

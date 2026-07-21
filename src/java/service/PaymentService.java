@@ -84,10 +84,10 @@ public class PaymentService {
         
         try {
             CustomerOrderService customerOrderService = new CustomerOrderService();
+            CustomerService customerService = new CustomerService();
             double calculatedTotal = customerOrderService.getTotalPriceFromQuotationByOrderId(orderId);
             BigDecimal totalAmount = BigDecimal.valueOf(calculatedTotal);
-            
-            CustomerService customerService = new CustomerService();
+
             CustomerDTO customer = customerService.getCustomerDTOById(order.getCustomerId());
             if (customer == null || customer.getUser() == null) {
                 System.err.println("[PaymentService] Could not resolve Customer or User for customer ID: " + order.getCustomerId() + ". Skipping payment creation.");
@@ -98,9 +98,9 @@ public class PaymentService {
             String customerPhone = customer.getUser().getPhone();
             String customerAddress = customer.getUser().getAddress();
             String customerEmail = customer.getUser().getEmail();
-            String customerTaxCode = customer.getCustomer() != null ? customer.getCustomer().getTaxCode() : null;
-            String companyName = customer.getCustomer() != null ? customer.getCustomer().getCompanyName() : null;
-            
+            String customerTaxCode = customer.getCustomer().getTaxCode();
+            String companyName = customer.getCustomer().getCompanyName();
+
             Payment payment = new Payment();
             payment.setCustomerContractId(contractId);
             payment.setCustomerOrderId(orderId);
@@ -109,7 +109,7 @@ public class PaymentService {
             payment.setPaymentStatus("PENDING");
             payment.setCreatedAt(LocalDateTime.now());
             payment.setUserId(customerUserId);
-            // Chốt snapshot ngay lúc tạo — chuẩn thực tế
+            // Chốt snapshot ngay lúc tạo
             payment.setCustomerNameSnapshot(customerName);
             payment.setCustomerPhoneSnapshot(customerPhone);
             payment.setCustomerAddressSnapshot(customerAddress);

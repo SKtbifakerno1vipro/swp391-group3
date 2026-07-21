@@ -458,8 +458,14 @@ public class RealtimeNotificationServlet extends HttpServlet {
                 }
             }
 
+            // Gửi heartbeat SSE comment để phát hiện ngắt kết nối ngay khi người dùng chuyển trang
+            writer.write(": ping\n\n");
             writer.flush();
             response.flushBuffer();
+            if (writer.checkError()) {
+                break;
+            }
+
             try {
                 Thread.sleep(4000);
             } catch (InterruptedException e) {

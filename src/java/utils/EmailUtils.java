@@ -88,7 +88,7 @@ public class EmailUtils {
         return true;
     }
 
-    public static void sendEmailAsync(final String toEmail, final String subject, final String content) {
+    public static void sendEmailAsync(final String toEmail, final String subject, final String content, final Integer userId) {
         executor.submit(() -> {
             int maxRetries = 3;
             int attempt = 0;
@@ -101,7 +101,7 @@ public class EmailUtils {
                     if (sent) {
                         System.out.println("[SUCCESS] Async email sent successfully to: " + toEmail);
                         try {
-                            emailLogDAO.insertLog(toEmail, subject, content, "SUCCESS");
+                            emailLogDAO.insertLog(toEmail, subject, content, "SUCCESS", userId);
                         } catch (Exception ex) {
                             System.out.println("[WARNING] Failed to write email log: " + ex.getMessage());
                         }
@@ -111,7 +111,7 @@ public class EmailUtils {
                     if (attempt >= maxRetries) {
                         System.out.println("[SEVERE] Async email failed permanently after " + maxRetries + " attempts to: " + toEmail);
                         try {
-                            emailLogDAO.insertLog(toEmail, subject, content, "FAILED");
+                            emailLogDAO.insertLog(toEmail, subject, content, "FAILED", userId);
                         } catch (Exception ex) {
                             System.out.println("[WARNING] Failed to write email log: " + ex.getMessage());
                         }

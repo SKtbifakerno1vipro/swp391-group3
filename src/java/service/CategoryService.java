@@ -12,6 +12,22 @@ public class CategoryService {
         return categoryDAO.getAllCategories();
     }
 
+    public List<Category> searchCategoriesWithPaging(String searchName, int pageIndex, int pageSize) {
+        return categoryDAO.searchCategoriesWithPaging(searchName, pageIndex, pageSize);
+    }
+
+    public List<Category> searchCategoriesWithPaging(String searchName, Integer statusFilter, int pageIndex, int pageSize) {
+        return categoryDAO.searchCategoriesWithPaging(searchName, statusFilter, pageIndex, pageSize);
+    }
+
+    public int getTotalCategoriesCount(String searchName) {
+        return categoryDAO.getTotalCategoriesCount(searchName);
+    }
+
+    public int getTotalCategoriesCount(String searchName, Integer statusFilter) {
+        return categoryDAO.getTotalCategoriesCount(searchName, statusFilter);
+    }
+
     public Category getCategoryById(int categoryId) {
         return categoryDAO.getCategoryById(categoryId);
     }
@@ -26,6 +42,10 @@ public class CategoryService {
 
     public boolean deleteCategory(int categoryId) {
         return categoryDAO.deleteCategory(categoryId);
+    }
+
+    public boolean restoreCategory(int categoryId) {
+        return categoryDAO.restoreCategory(categoryId);
     }
 
     public boolean isCategoryNameExists(String categoryName) {
