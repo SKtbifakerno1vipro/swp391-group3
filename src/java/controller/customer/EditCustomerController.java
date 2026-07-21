@@ -1,7 +1,7 @@
 package controller.customer;
 
-import service.CustomerService;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -12,12 +12,13 @@ import jakarta.servlet.http.HttpSession;
 import model.*;
 import dto.*;
 import service.*;
+import utils.*;
 
 @WebServlet(name = "EditCustomerController", urlPatterns = {"/customer/edit"})
 public class EditCustomerController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
-    private final RoleService roleService = new service.RoleService();
+    private final RoleService roleService = new RoleService();
     private final UserService userService = new UserService();
 
     @Override
@@ -105,6 +106,20 @@ public class EditCustomerController extends HttpServlet {
             String companyName = request.getParameter("companyName");
             String customerType = request.getParameter("customerType");
             String assignedToUserIdValue = request.getParameter("assignedToUserId");
+            String gender = request.getParameter("gender");
+            String address = request.getParameter("address");
+            String dateBirthStr = request.getParameter("dateBirth");
+
+            String errorMsg = null;
+            if ((errorMsg = Validation.validateGender(gender)) != null
+                    || (errorMsg = Validation.validateAddress(address)) != null
+                    || (errorMsg = Validation.validateDateBirth(dateBirthStr)) != null) {
+                request.setAttribute("error", errorMsg);
+                CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(customerId);
+                request.setAttribute("cusDTO", cusDTO);
+                request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
+                return;
+            }
 
             User u = new User();
             u.setUserId(userId);
@@ -115,6 +130,20 @@ public class EditCustomerController extends HttpServlet {
             u.setStatus(status);
             if (roleIdStr != null && !roleIdStr.isBlank()) {
                 u.setRoleId(Integer.parseInt(roleIdStr));
+            }
+            if (gender != null && !gender.isBlank()) {
+                u.setGender(gender.trim());
+            }
+            if (address != null && !address.isBlank()) {
+                u.setAddress(address.trim());
+            }
+            if (dateBirthStr != null && !dateBirthStr.isBlank()) {
+                try {
+                    u.setDateBirth(Date.valueOf(dateBirthStr.trim()));
+                } catch (Exception e) {
+                    System.out.println("Error parsing dateBirth: " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
 
             Customer c = new Customer();

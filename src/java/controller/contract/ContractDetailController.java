@@ -175,12 +175,12 @@ public class ContractDetailController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        
         HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
+        User currentUser = (User) session.getAttribute("user");
 
         //user not login then return to login page
-        if (user == null) {
+        if (currentUser == null) {
             response.sendRedirect("login");
             return;
         }
@@ -198,7 +198,7 @@ public class ContractDetailController extends HttpServlet {
 
         //solve all of action request edit
         if ("request_edit".equals(action)) {// when manager and customer request edit 
-            if (user.getRoleId() != 2 && user.getRoleId() != 3 && user.getRoleId() != 1) {
+            if (currentUser.getRoleId() != 2 && currentUser.getRoleId() != 3 && currentUser.getRoleId() != 1) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Manager or Customer can request edit.");
                 return;
             }
@@ -217,7 +217,7 @@ public class ContractDetailController extends HttpServlet {
             h.setFromStatus(currentStatus);
             h.setToStatus("PENDING_REVIEW");
             h.setNote("Customer/Manager yêu cầu officer sửa đổi lại hợp đồng.");
-            h.setChangedBy(user.getUserId());
+            h.setChangedBy(currentUser.getUserId());
             int historyId = contractService.insertHistory(h);
 
             //if manager or customer request edit then must insert revision item
@@ -235,7 +235,7 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("approve".equals(action)) { //when manager approve that contract
-            if (user.getRoleId() != 2 && user.getRoleId() != 1) { // 2 = Manager, 1 = SystemAdmin
+            if (currentUser.getRoleId() != 2 && currentUser.getRoleId() != 1) { // 2 = Manager, 1 = SystemAdmin
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Manager can approve contracts.");
                 return;
             }
@@ -256,13 +256,13 @@ public class ContractDetailController extends HttpServlet {
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("CUSTOMER_CHECK");
             h.setNote("Manager vừa phê duyệt hợp đồng. Đang chờ customer kiểm tra hợp đồng.");
-            h.setChangedBy(user.getUserId());
+            h.setChangedBy(currentUser.getUserId());
             contractService.insertHistory(h);
 
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("customer_approve".equals(action)) { // if customer approve contract
-            if (user.getRoleId() != 3 && user.getRoleId() != 1) { 
+            if (currentUser.getRoleId() != 3 && currentUser.getRoleId() != 1) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Customer can approve this contract.");
                 return;
             }
@@ -281,13 +281,13 @@ public class ContractDetailController extends HttpServlet {
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("APPROVED");
             h.setNote("Customer approved the contract.");
-            h.setChangedBy(user.getUserId());
+            h.setChangedBy(currentUser.getUserId());
             contractService.insertHistory(h);
 
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("send_to_manager".equals(action)) { //if officier send to manager
-            if (user.getRoleId() != 5 && user.getRoleId() != 1) {
+            if (currentUser.getRoleId() != 5 && currentUser.getRoleId() != 1) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Officer can send to manager.");
                 return;
             }
@@ -308,13 +308,13 @@ public class ContractDetailController extends HttpServlet {
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("PENDING_REVIEW");
             h.setNote("Nhân viên hành chính vừa chỉnh sửa hợp đồng. Quản lý cần kiểm tra hợp đồng.");
-            h.setChangedBy(user.getUserId());
+            h.setChangedBy(currentUser.getUserId());
             contractService.insertHistory(h);
 
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("send_final_contract".equals(action)) {// send customer final contract for storage their contract
-            if (user.getRoleId() != 5 && user.getRoleId() != 1) {
+            if (currentUser.getRoleId() != 5 && currentUser.getRoleId() != 1) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Officer can send final contract.");
                 return;
             }

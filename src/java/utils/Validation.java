@@ -184,4 +184,40 @@ public class Validation {
         }
         return null;
     }
+
+    public static String validateAddress(String address) {
+        if (address == null || address.isBlank()) {
+            return null; // cho phép bỏ trống
+        }
+        if (address.trim().length() > 255) {
+            return "Địa chỉ tối đa chỉ được 255 kí tự!";
+        }
+        return null;
+    }
+
+    public static String validateGender(String gender) {
+        if (gender == null || gender.isBlank()) {
+            return null; // cho phép bỏ trống
+        }
+        String g = gender.trim().toUpperCase();
+        if (!g.equals("M") && !g.equals("F") && !g.equals("O")) {
+            return "Giới tính không hợp lệ (Phải là M, F hoặc O)!";
+        }
+        return null;
+    }
+
+    public static String validateDateBirth(String dateStr) {
+        if (dateStr == null || dateStr.isBlank()) {
+            return null; // cho phép bỏ trống
+        }
+        try {
+            java.time.LocalDate birthDate = java.time.LocalDate.parse(dateStr.trim());
+            if (birthDate.isAfter(java.time.LocalDate.now())) {
+                return "Ngày sinh không được lớn hơn ngày hiện tại!";
+            }
+        } catch (java.time.format.DateTimeParseException e) {
+            return "Định dạng ngày sinh không hợp lệ!";
+        }
+        return null;
+    }
 }

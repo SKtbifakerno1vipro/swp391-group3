@@ -1,5 +1,6 @@
 package filter;
 
+import dal.ContractDAO;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -38,8 +39,7 @@ public class SecurityFilter implements Filter {
             "/auth/forgot",
             "/user/password/change",
             "/payment/ipn",
-            "/payment/return",
-            "/export-pdf"
+            "/payment/return"
     );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
@@ -51,8 +51,8 @@ public class SecurityFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        chain.doFilter(request, response);
-        return;
+chain.doFilter(request, response);
+//                return;
 //        HttpServletRequest req = (HttpServletRequest) request;
 //        HttpServletResponse res = (HttpServletResponse) response;
 //
@@ -92,13 +92,13 @@ public class SecurityFilter implements Filter {
 //            return;
 //        }
 //
-//        if ("/contract-detail".equals(path)) {
+//        if ("/contract-detail".equals(path) || "/export-pdf".equals(path)) {
 //            String token = req.getParameter("token");
 //            String idStr = req.getParameter("id");
 //            if (token != null && idStr != null) {
 //                try {
 //                    int contractId = Integer.parseInt(idStr);
-//                    dal.ContractDAO cDAO = new dal.ContractDAO();
+//                    ContractDAO cDAO = new ContractDAO();
 //                    if (cDAO.validateToken(contractId, token)) {
 //                        chain.doFilter(request, response);
 //                        return;

@@ -9,9 +9,16 @@ import java.util.Properties;
 
 public class DBContext {
     protected Connection connection;
+    private static ThreadLocal<Connection> threadLocalConn = new ThreadLocal<>();
 
     public DBContext() {
         try {
+            Connection conn = threadLocalConn.get();
+            if (conn != null && !conn.isClosed() && conn.isValid(2)) {
+                this.connection = conn;
+                return;
+            }
+
             Properties props = new Properties();
             InputStream input = findConfigInputStream();
 
@@ -30,7 +37,10 @@ public class DBContext {
             Properties dbProps = new Properties();
             if (username != null) dbProps.put("user", username);
             if (password != null) dbProps.put("password", password);
-            connection = driver.connect(url, dbProps);
+            
+            conn = driver.connect(url, dbProps);
+            threadLocalConn.set(conn);
+            this.connection = conn;
         } catch (Exception e) {
             e.printStackTrace();
         }
