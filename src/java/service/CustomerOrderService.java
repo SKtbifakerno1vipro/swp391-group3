@@ -11,7 +11,7 @@ public class CustomerOrderService {
 
     private final CustomerOrderDAO customerOrderDAO = new CustomerOrderDAO();
     private final CustomerService customerService = new CustomerService();
-
+    private final PaymentService paymentService = new PaymentService();
     
 
 //    public List<CustomerOrderDTO> getAllCustomerOrders() {
@@ -42,14 +42,15 @@ public class CustomerOrderService {
         boolean success = customerOrderDAO.createOrder(order, details);
         // Xhieu - tu dong tao payment
         if (success) {
+            System.out.println("Order created successfully. Triggering auto-payment creation.");
             try {
-                int contractId = order.getCustomerContractId();
-                PaymentService paymentService = new PaymentService();
-                paymentService.createPendingPaymentForContractIfNotExists(contractId);
+                paymentService.createPendingPaymentForOrder(order);
             } catch (Exception e) {
-                System.err.println("Failed to automatically create pending payment for contract: " + e.getMessage());
+                System.err.println("Failed to automatically create pending payment for order: " + e.getMessage());
                 e.printStackTrace();
             }
+        } else {
+            System.err.println("Failed to create order in database.");
         }
         return success;
     }

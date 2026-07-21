@@ -35,7 +35,7 @@ public class QuotationDAO extends DBContext {
             sql += " AND quotation.quotation_date <= ? ";
         }
         if (saleId != null) {
-            sql += " AND customer.assigned_to_user_id = ? ";
+            sql += " AND (customer.assigned_to_user_id = ? OR quotation.created_by = ?) ";
         }
         if (userId != null && roleId != null && roleId == 3) {
             sql += " AND customer.user_id = ? ";
@@ -58,6 +58,7 @@ public class QuotationDAO extends DBContext {
                 ps.setString(paramIndex++, toDate + " 23:59:59");
             }
             if (saleId != null) {
+                ps.setInt(paramIndex++, saleId);
                 ps.setInt(paramIndex++, saleId);
             }
             if (userId != null && roleId != null && roleId == 3) {
@@ -106,7 +107,7 @@ public class QuotationDAO extends DBContext {
 
 
         if (saleId != null) {
-            sql += " AND customer.assigned_to_user_id = ? ";
+            sql += " AND (customer.assigned_to_user_id = ? OR quotation.created_by = ?) ";
         }
         if (userId != null && roleId != null && roleId == 3) {
             sql += " AND customer.user_id = ? ";
@@ -132,6 +133,7 @@ public class QuotationDAO extends DBContext {
             }
 
             if (saleId != null) {
+                ps.setInt(paramIndex++, saleId);
                 ps.setInt(paramIndex++, saleId);
             }
             if (userId != null && roleId != null && roleId == 3) {

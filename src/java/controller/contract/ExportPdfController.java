@@ -17,7 +17,7 @@ import model.Signature;
 import java.util.List;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
-import  java.net.URLEncoder;
+import java.net.URLEncoder;
 @WebServlet(name = "ExportPdfController", urlPatterns = {"/export-pdf"})
 public class ExportPdfController extends HttpServlet {
 
@@ -29,7 +29,7 @@ public class ExportPdfController extends HttpServlet {
             throws ServletException, IOException {
 
         String idParam = request.getParameter("id");
-        
+
         String tokenParam = request.getParameter("token");// need to guest download contract
         Contract contract = null;
 

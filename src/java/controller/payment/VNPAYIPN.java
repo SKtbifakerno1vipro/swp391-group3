@@ -24,7 +24,7 @@ import model.Contract;
 import service.PaymentService;
 import dal.ContractDAO;
 import utils.PaymentConfig;
-
+//Instant Payment Notification (Thông báo thanh toán tức thời)
 @WebServlet(name = "VNPAYIPN", urlPatterns = {"/payment/ipn"})
 public class VNPAYIPN extends HttpServlet {
 
@@ -41,11 +41,12 @@ public class VNPAYIPN extends HttpServlet {
                 String fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII.toString());
                 if ((fieldValue != null) && (fieldValue.length() > 0)) {
                     fields.put(fieldName, fieldValue);
+                    System.out.println("Field " + fieldName + ": " + fieldValue);
                 }
             }
-
+            // phải xóa vì tính hash của vnpay ko bao gồm chính nó
             String vnp_SecureHash = request.getParameter("vnp_SecureHash");
-            fields.remove("vnp_SecureHashType");
+            fields.remove("vnp_SecureHashType"); //thuật toán mã hóa
             fields.remove("vnp_SecureHash");
 
             // Build hashData

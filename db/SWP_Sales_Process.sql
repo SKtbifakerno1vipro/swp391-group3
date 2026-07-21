@@ -357,16 +357,25 @@ GO
 CREATE TABLE payment (
     payment_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_contract_id INT NOT NULL,
+    customer_order_id INT NOT NULL,
     invoice_id INT,
     amount DECIMAL(18,2) CHECK (amount > 0),
     payment_type VARCHAR(50),
     payment_status VARCHAR(20),
     paid_at DATETIME2(6),
-    created_by INT,
+    user_id INT,
+    customer_name_snapshot NVARCHAR(255),
+    customer_phone_snapshot VARCHAR(20),
+    customer_address_snapshot NVARCHAR(500),
+    customer_tax_code_snapshot VARCHAR(20),
+    company_name_snapshot NVARCHAR(255),
+    customer_email_snapshot NVARCHAR(255),
+    created_by_name_snapshot NVARCHAR(255),
     created_at DATETIME2(6) DEFAULT SYSDATETIME(),
     FOREIGN KEY (customer_contract_id) REFERENCES customer_contract(customer_contract_id),
+    FOREIGN KEY (customer_order_id) REFERENCES customer_order(customer_order_id),
     FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id),
-    FOREIGN KEY (created_by) REFERENCES [user](user_id)
+    FOREIGN KEY (user_id) REFERENCES [user](user_id)
 );
 GO
 
@@ -444,11 +453,15 @@ GO
 -- 2. TAO TAI KHOAN NHAN VIEN
 INSERT INTO [user] (user_name, password_hash, email, gender, full_name, phone, account_status, role_id, created_by, updated_by) VALUES 
 ('admin_01', '123', 'admin@bakery.com', 'M', N'Trần Quản Trị', '0901000001', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'System Admin'), 1, 1),
+('admin_02', '123', 'admin2@bakery.com', 'F', N'Nguyễn Quản Trị Hai', '0901000011', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'System Admin'), 1, 1),
 ('manager_01', '1234', 'manager@bakery.com', 'F', N'Lê Quản Lý', '0901000002', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Manager'), 1, 1),
+('manager_02', '1234', 'manager2@bakery.com', 'M', N'Hoàng Quản Lý Hai', '0901000012', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Manager'), 1, 1),
 ('sale_01', '1234', 'sale1@bakery.com', 'M', N'Nguyễn Sale Một', '0901000003', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Sale Staff'), 1, 1),
 ('sale_02', '1234', 'sale2@bakery.com', 'F', N'Phạm Sale Hai', '0901000004', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Sale Staff'), 1, 1),
 ('officer_01', '1234', 'officer1@bakery.com', 'F', N'Võ Chứng Từ', '0901000005', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Admin Officer'), 1, 1),
-('warehouse_01', '1234', 'warehouse@bakery.com', 'M', N'Đinh Thủ Kho', '0901000006', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Warehouse Staff'), 1, 1);
+('officer_02', '1234', 'officer2@bakery.com', 'M', N'Đặng Chứng Từ Hai', '0901000015', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Admin Officer'), 1, 1),
+('warehouse_01', '1234', 'warehouse@bakery.com', 'M', N'Đinh Thủ Kho', '0901000006', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Warehouse Staff'), 1, 1),
+('warehouse_02', '1234', 'warehouse2@bakery.com', 'F', N'Bùi Thủ Kho Hai', '0901000016', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Warehouse Staff'), 1, 1);
 GO
 
 -- 3. TAO TAI KHOAN KHACH HANG
@@ -716,10 +729,12 @@ SELECT 2, permission_id FROM permission WHERE permission_name IN (
 -- 3. Customer (role_id = 3)
 INSERT INTO role_permission (role_id, permission_id)
 SELECT 3, permission_id FROM permission WHERE permission_name IN (
+
     N'Dashboard', N'Profile', N'Customer Detail', N'Customer Edit', N'Order List', N'Order Detail', N'Category List',
     N'Product List', N'Quotation List', N'Quotation Detail', N'Contract List', N'Contract Detail(Edit)', N'Signature Contract',
     N'Invoice List', N'Invoice Detail', N'Preview Invoice', N'Payment List', N'Payment Detail'
 );
+
 
 -- 4. Sale Staff (role_id = 4)
 INSERT INTO role_permission (role_id, permission_id)

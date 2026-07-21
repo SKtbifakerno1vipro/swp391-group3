@@ -376,6 +376,25 @@
                                              'N/A'}</div>
                                     </div>
                                     <div class="info-row">
+                                        <div class="info-label">Giới tính:</div>
+                                        <div class="info-value">
+                                            <c:choose>
+                                                <c:when test="${cusDTO.user.gender == 'M'}">Nam</c:when>
+                                                <c:when test="${cusDTO.user.gender == 'F'}">Nữ</c:when>
+                                                <c:when test="${cusDTO.user.gender == 'O'}">Khác</c:when>
+                                                <c:otherwise>N/A</c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Ngày sinh:</div>
+                                        <div class="info-value">${not empty cusDTO.user.dateBirth ? cusDTO.user.dateBirth : 'N/A'}</div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Địa chỉ:</div>
+                                        <div class="info-value">${not empty cusDTO.user.address ? cusDTO.user.address : 'N/A'}</div>
+                                    </div>
+                                    <div class="info-row">
                                         <div class="info-label">Vai trò hệ thống:</div>
                                         <div class="info-value"><span class="badge badge-role">Khách hàng</span></div>
                                     </div>

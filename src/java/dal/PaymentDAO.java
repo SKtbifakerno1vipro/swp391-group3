@@ -3,8 +3,10 @@ package dal;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import model.Payment;
@@ -12,24 +14,33 @@ import model.Payment;
 public class PaymentDAO extends DBContext {
 
     public int insertPayment(Payment payment) {
-        String sql = "INSERT INTO payment (customer_contract_id, invoice_id, amount, payment_type, payment_status, paid_at, created_by, created_at) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE())";
+        String sql = "INSERT INTO payment "
+                + "(customer_contract_id, customer_order_id, invoice_id, amount, payment_type, payment_status, paid_at, user_id, created_at, "
+                + "customer_name_snapshot, customer_phone_snapshot, customer_address_snapshot, customer_email_snapshot, customer_tax_code_snapshot, company_name_snapshot) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, payment.getCustomerContractId());
+            ps.setInt(2, payment.getCustomerOrderId());
             if (payment.getInvoiceId() != null) {
-                ps.setInt(2, payment.getInvoiceId());
+                ps.setInt(3, payment.getInvoiceId());
             } else {
-                ps.setNull(2, java.sql.Types.INTEGER);
+                ps.setNull(3, Types.INTEGER);
             }
-            ps.setBigDecimal(3, payment.getAmount());
-            ps.setString(4, payment.getPaymentType());
-            ps.setString(5, payment.getPaymentStatus());
-            ps.setTimestamp(6, payment.getPaidAt() != null ? Timestamp.valueOf(payment.getPaidAt()) : null);
-            if (payment.getCreatedBy() != null) {
-                ps.setInt(7, payment.getCreatedBy());
+            ps.setBigDecimal(4, payment.getAmount());
+            ps.setString(5, payment.getPaymentType());
+            ps.setString(6, payment.getPaymentStatus());
+            ps.setTimestamp(7, payment.getPaidAt() != null ? Timestamp.valueOf(payment.getPaidAt()) : null);
+            if (payment.getUserId() != null) {
+                ps.setInt(8, payment.getUserId());
             } else {
-                ps.setNull(7, java.sql.Types.INTEGER);
+                ps.setNull(8, Types.INTEGER);
             }
+            ps.setString(9, payment.getCustomerNameSnapshot());
+            ps.setString(10, payment.getCustomerPhoneSnapshot());
+            ps.setString(11, payment.getCustomerAddressSnapshot());
+            ps.setString(12, payment.getCustomerEmailSnapshot());
+            ps.setString(13, payment.getCustomerTaxCodeSnapshot());
+            ps.setString(14, payment.getCompanyNameSnapshot());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -47,31 +58,15 @@ public class PaymentDAO extends DBContext {
 
     public List<Payment> getAllPayments() {
         List<Payment> list = new ArrayList<>();
-        String sql = "SELECT p.*, c.contract_number, u.full_name as customer_name "
+        String sql = "SELECT p.*, c.contract_number, p.customer_name_snapshot as customer_name "
                 + "FROM payment p "
                 + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
-                + "LEFT JOIN [user] u ON p.created_by = u.user_id "
+                + "LEFT JOIN [user] u ON p.user_id = u.user_id "
                 + "ORDER BY p.payment_id DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Payment p = new Payment();
-                p.setPaymentId(rs.getInt("payment_id"));
-                p.setCustomerContractId(rs.getInt("customer_contract_id"));
-                p.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
-                p.setAmount(rs.getBigDecimal("amount"));
-                p.setPaymentType(rs.getString("payment_type"));
-                p.setPaymentStatus(rs.getString("payment_status"));
-                if (rs.getTimestamp("paid_at") != null) {
-                    p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
-                }
-                p.setCreatedBy(rs.getObject("created_by") != null ? rs.getInt("created_by") : null);
-                if (rs.getTimestamp("created_at") != null) {
-                    p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                }
-                p.setContractNumber(rs.getString("contract_number"));
-                p.setCustomerName(rs.getString("customer_name"));
-                list.add(p);
+                list.add(mapResultSetToPayment(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -81,33 +76,17 @@ public class PaymentDAO extends DBContext {
 
     public List<Payment> getPaymentsByCustomerId(int userId) {
         List<Payment> list = new ArrayList<>();
-        String sql = "SELECT p.*, c.contract_number, u.full_name as customer_name "
+        String sql = "SELECT p.*, c.contract_number, p.customer_name_snapshot as customer_name "
                 + "FROM payment p "
                 + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
-                + "LEFT JOIN [user] u ON p.created_by = u.user_id "
-                + "WHERE p.created_by = ? "
+                + "LEFT JOIN [user] u ON p.user_id = u.user_id "
+                + "WHERE p.user_id = ? "
                 + "ORDER BY p.payment_id DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Payment p = new Payment();
-                p.setPaymentId(rs.getInt("payment_id"));
-                p.setCustomerContractId(rs.getInt("customer_contract_id"));
-                p.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
-                p.setAmount(rs.getBigDecimal("amount"));
-                p.setPaymentType(rs.getString("payment_type"));
-                p.setPaymentStatus(rs.getString("payment_status"));
-                if (rs.getTimestamp("paid_at") != null) {
-                    p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
-                }
-                p.setCreatedBy(rs.getObject("created_by") != null ? rs.getInt("created_by") : null);
-                if (rs.getTimestamp("created_at") != null) {
-                    p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                }
-                p.setContractNumber(rs.getString("contract_number"));
-                p.setCustomerName(rs.getString("customer_name"));
-                list.add(p);
+                list.add(mapResultSetToPayment(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,32 +95,16 @@ public class PaymentDAO extends DBContext {
     }
 
     public Payment getPaymentById(int paymentId) {
-        String sql = "SELECT p.*, c.contract_number, u.full_name as customer_name "
+        String sql = "SELECT p.*, c.contract_number, p.customer_name_snapshot as customer_name "
                 + "FROM payment p "
                 + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
-                + "LEFT JOIN [user] u ON p.created_by = u.user_id "
+                + "LEFT JOIN [user] u ON p.user_id = u.user_id "
                 + "WHERE p.payment_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, paymentId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                Payment p = new Payment();
-                p.setPaymentId(rs.getInt("payment_id"));
-                p.setCustomerContractId(rs.getInt("customer_contract_id"));
-                p.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
-                p.setAmount(rs.getBigDecimal("amount"));
-                p.setPaymentType(rs.getString("payment_type"));
-                p.setPaymentStatus(rs.getString("payment_status"));
-                if (rs.getTimestamp("paid_at") != null) {
-                    p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
-                }
-                p.setCreatedBy(rs.getObject("created_by") != null ? rs.getInt("created_by") : null);
-                if (rs.getTimestamp("created_at") != null) {
-                    p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                }
-                p.setContractNumber(rs.getString("contract_number"));
-                p.setCustomerName(rs.getString("customer_name"));
-                return p;
+                return mapResultSetToPayment(rs);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,29 +112,16 @@ public class PaymentDAO extends DBContext {
         return null;
     }
 
-    public int getAnyContractId() {
-        String sql = "SELECT TOP 1 customer_contract_id FROM customer_contract ORDER BY customer_contract_id DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("customer_contract_id");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 1; // absolute fallback
-    }
-
     public boolean updatePaymentStatus(int paymentId, String status) {
-        String sql = "UPDATE payment SET payment_status = ?, paid_at = ? WHERE payment_id = ?";
+        String sql;
+        if ("COMPLETED".equals(status)) {
+            sql = "UPDATE payment SET payment_status = ?, paid_at = GETDATE() WHERE payment_id = ?";
+        } else {
+            sql = "UPDATE payment SET payment_status = ?, paid_at = NULL WHERE payment_id = ?";
+        }
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
-            if ("COMPLETED".equals(status)) {
-                ps.setTimestamp(2, new java.sql.Timestamp(System.currentTimeMillis()));
-            } else {
-                ps.setNull(2, java.sql.Types.TIMESTAMP);
-            }
-            ps.setInt(3, paymentId);
+            ps.setInt(2, paymentId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -194,27 +144,43 @@ public class PaymentDAO extends DBContext {
         return false;
     }
 
+    public boolean hasPaymentForOrder(int orderId) {
+        String sql = "SELECT COUNT(*) FROM payment WHERE customer_order_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Payment getPaymentByOrderId(int orderId) {
+        String sql = "SELECT TOP 1 * FROM payment WHERE customer_order_id = ? ORDER BY payment_id DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToPayment(rs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public Payment getPaymentByContractId(int contractId) {
         String sql = "SELECT TOP 1 * FROM payment WHERE customer_contract_id = ? ORDER BY payment_id DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Payment p = new Payment();
-                    p.setPaymentId(rs.getInt("payment_id"));
-                    p.setCustomerContractId(rs.getInt("customer_contract_id"));
-                    p.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
-                    p.setAmount(rs.getBigDecimal("amount"));
-                    p.setPaymentType(rs.getString("payment_type"));
-                    p.setPaymentStatus(rs.getString("payment_status"));
-                    if (rs.getTimestamp("paid_at") != null) {
-                        p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
-                    }
-                    p.setCreatedBy(rs.getObject("created_by") != null ? rs.getInt("created_by") : null);
-                    if (rs.getTimestamp("created_at") != null) {
-                        p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                    }
-                    return p;
+                    return mapResultSetToPayment(rs);
                 }
             }
         } catch (Exception e) {
@@ -237,10 +203,10 @@ public class PaymentDAO extends DBContext {
     ) {
         List<Payment> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT p.*, c.contract_number, u.full_name as customer_name "
+                "SELECT p.*, c.contract_number, p.customer_name_snapshot as customer_name "
                 + "FROM payment p "
                 + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
-                + "LEFT JOIN [user] u ON p.created_by = u.user_id "
+                + "LEFT JOIN [user] u ON p.user_id = u.user_id "
                 + "WHERE 1=1 "
         );
 
@@ -254,10 +220,10 @@ public class PaymentDAO extends DBContext {
         boolean hasMaxAmount = (maxAmount != null);
 
         if (hasCustomerUser) {
-            sql.append("AND p.created_by = ? ");
+            sql.append("AND p.user_id = ? ");
         }
         if (hasCustomerName) {
-            sql.append("AND u.full_name LIKE ? ");
+            sql.append("AND (p.customer_name_snapshot LIKE ? OR u.full_name LIKE ?) ");
         }
         if (hasContractNumber) {
             sql.append("AND c.contract_number LIKE ? ");
@@ -288,7 +254,9 @@ public class PaymentDAO extends DBContext {
                 ps.setInt(index++, customerUserId);
             }
             if (hasCustomerName) {
-                ps.setString(index++, "%" + customerName.trim() + "%");
+                String pattern = "%" + customerName.trim() + "%";
+                ps.setString(index++, pattern);
+                ps.setString(index++, pattern);
             }
             if (hasContractNumber) {
                 ps.setString(index++, "%" + contractNumber.trim() + "%");
@@ -313,23 +281,7 @@ public class PaymentDAO extends DBContext {
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Payment p = new Payment();
-                p.setPaymentId(rs.getInt("payment_id"));
-                p.setCustomerContractId(rs.getInt("customer_contract_id"));
-                p.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
-                p.setAmount(rs.getBigDecimal("amount"));
-                p.setPaymentType(rs.getString("payment_type"));
-                p.setPaymentStatus(rs.getString("payment_status"));
-                if (rs.getTimestamp("paid_at") != null) {
-                    p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
-                }
-                p.setCreatedBy(rs.getObject("created_by") != null ? rs.getInt("created_by") : null);
-                if (rs.getTimestamp("created_at") != null) {
-                    p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                }
-                p.setContractNumber(rs.getString("contract_number"));
-                p.setCustomerName(rs.getString("customer_name"));
-                list.add(p);
+                list.add(mapResultSetToPayment(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -351,7 +303,7 @@ public class PaymentDAO extends DBContext {
                 "SELECT COUNT(*) "
                 + "FROM payment p "
                 + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
-                + "LEFT JOIN [user] u ON p.created_by = u.user_id "
+                + "LEFT JOIN [user] u ON p.user_id = u.user_id "
                 + "WHERE 1=1 "
         );
 
@@ -365,10 +317,10 @@ public class PaymentDAO extends DBContext {
         boolean hasMaxAmount = (maxAmount != null);
 
         if (hasCustomerUser) {
-            sql.append("AND p.created_by = ? ");
+            sql.append("AND p.user_id = ? ");
         }
         if (hasCustomerName) {
-            sql.append("AND u.full_name LIKE ? ");
+            sql.append("AND (p.customer_name_snapshot LIKE ? OR u.full_name LIKE ?) ");
         }
         if (hasContractNumber) {
             sql.append("AND c.contract_number LIKE ? ");
@@ -395,7 +347,9 @@ public class PaymentDAO extends DBContext {
                 ps.setInt(index++, customerUserId);
             }
             if (hasCustomerName) {
-                ps.setString(index++, "%" + customerName.trim() + "%");
+                String pattern = "%" + customerName.trim() + "%";
+                ps.setString(index++, pattern);
+                ps.setString(index++, pattern);
             }
             if (hasContractNumber) {
                 ps.setString(index++, "%" + contractNumber.trim() + "%");
@@ -430,7 +384,7 @@ public class PaymentDAO extends DBContext {
     public List<Payment> getPaymentsSince(Timestamp sinceTime, Integer customerUserId) {
         List<Payment> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT p.*, c.contract_number, u.full_name as customer_name "
+                "SELECT p.*, c.contract_number, p.customer_name_snapshot as customer_name "
                 + "FROM payment p "
                 + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
                 + "JOIN customer cust ON c.customer_id = cust.customer_id "
@@ -438,7 +392,7 @@ public class PaymentDAO extends DBContext {
                 + "WHERE (p.created_at > ? OR p.paid_at > ?) "
         );
         if (customerUserId != null) {
-            sql.append("AND p.created_by = ? ");
+            sql.append("AND p.user_id = ? ");
         }
         sql.append("ORDER BY p.created_at ASC, p.paid_at ASC");
 
@@ -450,23 +404,7 @@ public class PaymentDAO extends DBContext {
             }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Payment p = new Payment();
-                    p.setPaymentId(rs.getInt("payment_id"));
-                    p.setCustomerContractId(rs.getInt("customer_contract_id"));
-                    p.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
-                    p.setAmount(rs.getBigDecimal("amount"));
-                    p.setPaymentType(rs.getString("payment_type"));
-                    p.setPaymentStatus(rs.getString("payment_status"));
-                    if (rs.getTimestamp("paid_at") != null) {
-                        p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
-                    }
-                    p.setCreatedBy(rs.getObject("created_by") != null ? rs.getInt("created_by") : null);
-                    if (rs.getTimestamp("created_at") != null) {
-                        p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                    }
-                    p.setContractNumber(rs.getString("contract_number"));
-                    p.setCustomerName(rs.getString("customer_name"));
-                    list.add(p);
+                    list.add(mapResultSetToPayment(rs));
                 }
             }
         } catch (Exception e) {
@@ -495,5 +433,37 @@ public class PaymentDAO extends DBContext {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private Payment mapResultSetToPayment(ResultSet rs) {
+        Payment p = new Payment();
+        try {
+            p.setPaymentId(rs.getInt("payment_id"));
+            p.setCustomerContractId(rs.getInt("customer_contract_id"));
+            p.setCustomerOrderId(rs.getInt("customer_order_id"));
+            p.setInvoiceId(rs.getObject("invoice_id") != null ? rs.getInt("invoice_id") : null);
+            p.setAmount(rs.getBigDecimal("amount"));
+            p.setPaymentType(rs.getString("payment_type"));
+            p.setPaymentStatus(rs.getString("payment_status"));
+            if (rs.getTimestamp("paid_at") != null) {
+                p.setPaidAt(rs.getTimestamp("paid_at").toLocalDateTime());
+            }
+            p.setUserId(rs.getObject("user_id") != null ? rs.getInt("user_id") : null);
+            if (rs.getTimestamp("created_at") != null) {
+                p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+            }
+            p.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
+            p.setCustomerPhoneSnapshot(rs.getString("customer_phone_snapshot"));
+            p.setCustomerAddressSnapshot(rs.getString("customer_address_snapshot"));
+            p.setCustomerTaxCodeSnapshot(rs.getString("customer_tax_code_snapshot"));
+            p.setCompanyNameSnapshot(rs.getString("company_name_snapshot"));
+            p.setCustomerEmailSnapshot(rs.getString("customer_email_snapshot"));
+            p.setCreatedByNameSnapshot(rs.getString("created_by_name_snapshot"));
+            p.setContractNumber(rs.getString("contract_number"));
+            p.setCustomerName(rs.getString("customer_name"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return p;
     }
 }
