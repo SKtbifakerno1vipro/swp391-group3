@@ -271,7 +271,20 @@
                                 <div class="field"><label>Họ và tên</label><input type="text" name="searchName" value="${searchName}" placeholder="Tìm tên"></div>
                                 <div class="field"><label>Số điện thoại</label><input type="text" name="searchPhone" value="${searchPhone}" placeholder="Tìm SĐT"></div>
                                 <div class="field"><label>Email</label><input type="text" name="searchEmail" value="${searchEmail}" placeholder="Tìm email"></div>
-                                <div class="field"><label>Vai trò</label><select name="roleId"><option value="0">Tất cả vai trò</option><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${r.roleId == roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select></div>
+                                <div class="field"><label>Vai trò</label><select name="roleId"><option value="0">Tất cả vai trò</option>
+                                        <c:forEach var="r" items="${roles}">
+                                            <option value="${r.roleId}" ${r.roleId == roleId ? 'selected' : ''}>
+                                                <c:choose>
+                                                    <c:when test="${r.roleId == 1}">Quản trị hệ thống</c:when>
+                                                    <c:when test="${r.roleId == 2}">Quản lý</c:when><c:when test="${r.roleId == 3}">Khách hàng</c:when>
+                                                    <c:when test="${r.roleId == 4}">Nhân viên Sale</c:when>
+                                                    <c:when test="${r.roleId == 5}">Nhân viên Officer</c:when>
+                                                    <c:when test="${r.roleId == 6}">Thủ kho</c:when>
+                                                </c:choose>
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
                                 <div class="field"><label>Trạng thái</label><select name="status"><option value="" ${empty status ? 'selected' : ''}>Tất cả trạng thái</option><option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option><option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>Khóa</option></select></div>
                                 <div class="actions"><button class="button primary" type="submit"><span class="material-symbols-outlined">search</span>Tìm kiếm</button><a class="button" href="${pageContext.request.contextPath}/user-list">Đặt lại</a></div>
                             </div>
@@ -289,20 +302,29 @@
                                         <td style="color:var(--muted);">@<c:out value="${u.userName}"/></td>
                                         <td style="color:var(--text-light, #6b7280);"><c:out value="${u.email}"/></td>
                                         <td style="color:var(--text-light, #6b7280);"><c:out value="${u.phone}"/></td>
-                                        <td style="font-weight:700;"><c:out value="${u.roleName}"/></td>
+                                        <td style="font-weight:700;">
+                                            <c:choose>
+                                                <c:when test="${u.roleId == 1}">Quản trị hệ thống</c:when>
+                                                <c:when test="${u.roleId == 2}">Quản lý</c:when>
+                                                <c:when test="${u.roleId == 3}">Khách hàng</c:when>
+                                                <c:when test="${u.roleId == 4}">Nhân viên Sale</c:when>
+                                                <c:when test="${u.roleId == 5}">Nhân viên Officer</c:when>
+                                                <c:when test="${u.roleId == 6}">Thủ kho</c:when>
+                                            </c:choose>
+                                        </td>
                                         <td><span class="status-pill ${u.status == 'ACTIVE' ? 'status-active' : 'status-inactive'}"><c:out value="${u.status == 'ACTIVE' ? 'Hoạt động' : 'Khóa'}"/></span></td>
                                         <td><div class="row-actions">
-                                            <c:choose>
-                                                <c:when test="${sessionScope.user.roleId == 1}">
-                                                    <a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">edit</span>Sửa</a>
-                                                    <a class="chip ${u.status == 'ACTIVE' ? 'danger' : 'primary'}" href="javascript:void(0);" onclick="document.getElementById('form_status_${u.userId}').submit();"><span class="material-symbols-outlined">${u.status == 'ACTIVE' ? 'lock' : 'lock_open'}</span>${u.status == 'ACTIVE' ? 'Khóa' : 'Mở Khóa'}</a>
-                                                    <form id="form_status_${u.userId}" action="${pageContext.request.contextPath}/user-list" method="post" style="display:none;"><input type="hidden" name="userId" value="${u.userId}"><input type="hidden" name="status" value="${u.status}"></form>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">visibility</span>Xem</a>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div></td>
+                                                <c:choose>
+                                                    <c:when test="${sessionScope.user.roleId == 1}">
+                                                        <a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">edit</span>Sửa</a>
+                                                        <a class="chip ${u.status == 'ACTIVE' ? 'danger' : 'primary'}" href="javascript:void(0);" onclick="document.getElementById('form_status_${u.userId}').submit();"><span class="material-symbols-outlined">${u.status == 'ACTIVE' ? 'lock' : 'lock_open'}</span>${u.status == 'ACTIVE' ? 'Khóa' : 'Mở Khóa'}</a>
+                                                        <form id="form_status_${u.userId}" action="${pageContext.request.contextPath}/user-list" method="post" style="display:none;"><input type="hidden" name="userId" value="${u.userId}"><input type="hidden" name="status" value="${u.status}"></form>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                        <a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">visibility</span>Xem</a>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div></td>
                                     </tr>
                                 </c:forEach>
                             </tbody>

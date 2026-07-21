@@ -735,7 +735,7 @@ public class DashboardDAO extends DBContext {
         InvoiceSummaryDTO summary = new InvoiceSummaryDTO();
         String sql = """
                    SELECT 
-                       COUNT(DISTINCT i.invoice_id) as total_invoices, 
+                       COUNT( i.invoice_id) as total_invoices, 
                        SUM(CASE WHEN p.payment_status = 'COMPLETED' THEN i.total_amount ELSE 0 END) as paid_amount, 
                        SUM(CASE WHEN p.payment_status !='COMPLETED' THEN i.total_amount ELSE 0 END) as unpaid_amount 
                    FROM invoice i 
