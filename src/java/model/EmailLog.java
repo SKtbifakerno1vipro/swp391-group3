@@ -10,7 +10,6 @@ public class EmailLog {
     private String content;
     private Timestamp sentAt;
     private String status;
-    private String userName;
     private Integer userId;
 
     public EmailLog() {
