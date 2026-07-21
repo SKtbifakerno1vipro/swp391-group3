@@ -1,5 +1,6 @@
 package controller.customer;
 
+import java.sql.Date;
 import service.CustomerService;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -44,6 +45,9 @@ public class CreateCustomerController extends HttpServlet {
         String customerType = request.getParameter("customerType");
         String assignedToUserIdValue = request.getParameter("assignedToUserId");
         String roleIdValue = request.getParameter("roleId");
+        String gender = request.getParameter("gender");
+        String address = request.getParameter("address");
+        String dateBirthStr = request.getParameter("dateBirth");
 
         request.setAttribute("users", customerService.getAllSalesExecutiveUsers());
         request.setAttribute("listTypeCus", customerService.getCusTypeList());
@@ -63,6 +67,12 @@ public class CreateCustomerController extends HttpServlet {
             
         } else if ((errorMsg = Validation.validateCompanyName(companyName)) != null) {
             
+        } else if ((errorMsg = Validation.validateGender(gender)) != null) {
+
+        } else if ((errorMsg = Validation.validateAddress(address)) != null) {
+
+        } else if ((errorMsg = Validation.validateDateBirth(dateBirthStr)) != null) {
+
         } else if (customerType == null || customerType.trim().isEmpty()) {
             errorMsg = "Please select customer type.";
         }
@@ -79,13 +89,28 @@ public class CreateCustomerController extends HttpServlet {
                 roleId = Integer.parseInt(roleIdValue);
             }
 
-            User u = new model.User();
+            User u = new User();
             u.setUserName(userName);
             u.setEmail(email);
             u.setFullName(fullName);
             u.setPhone(phone);
             u.setStatus(status);
             u.setRoleId(roleId);
+            if (gender != null && !gender.isBlank()) {
+                u.setGender(gender.trim());
+            }
+            if (address != null && !address.isBlank()) {
+                u.setAddress(address.trim());
+            }
+            if (dateBirthStr != null && !dateBirthStr.isBlank()) {
+                try {
+                    u.setDateBirth(Date.valueOf(dateBirthStr.trim()));
+                } catch (Exception e) {
+                    System.out.println("Error parsing dateBirth: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+
             Customer c = new Customer();
             c.setTaxCode(taxCode);
             c.setCompanyName(companyName);

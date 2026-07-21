@@ -259,7 +259,7 @@
                         <th>Số hợp đồng</th>
                         <th>Tên khách hàng</th>
                         <th>Số tiền</th>
-                        <th>Phương thức thanh toán</th>
+                        <th>Mã đơn hàng</th>
                         <th>Trạng thái</th>
                         <th>Ngày tạo</th>
                         <th>Ngày thanh toán</th>
@@ -298,7 +298,7 @@
                                         <fmt:formatNumber value="${p.amount}" type="number"/> VNĐ
                                     </strong>
                                 </td>
-                                <td>${p.paymentType}</td>
+                                <td>${p.customerOrderId}</td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${p.paymentStatus == 'PENDING'}">

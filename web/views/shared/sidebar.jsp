@@ -113,9 +113,6 @@
                             <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}" href="${pageContext.request.contextPath}/product-list" title="Quản lý Sản phẩm"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">inventory_2</span></div><span class="sidebar-text">Quản lý Sản phẩm</span></a>
                             <a class="nav-link ${param.activeMenu == 'contracts' ? 'active' : ''}" href="${pageContext.request.contextPath}/contract-list" title="Quản lý Hợp đồng"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">contract</span></div><span class="sidebar-text">Quản lý Hợp đồng</span></a>
                             <a class="nav-link ${param.activeMenu == 'reviews' ? 'active' : ''}" href="${pageContext.request.contextPath}/product-review" title="Quản lý Đánh giá & Phản hồi"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">reviews</span></div><span class="sidebar-text">Quản lý Đánh giá</span></a>
-                            <a class="nav-link ${param.activeMenu == 'import-requests' ? 'active' : ''}" href="${pageContext.request.contextPath}/import-request-list" title="Quản lý Yêu cầu nhập kho">
-
-                            <a class="nav-link ${param.activeMenu == 'profile' ? 'active' : ''}" href="${pageContext.request.contextPath}/edit-user?id=${sessionScope.user.userId}" title="Hồ sơ của tôi"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">account_circle</span></div><span class="sidebar-text">Hồ sơ của tôi</span></a>
                             <a class="nav-link ${param.activeMenu == 'import-requests' ? 'active' : ''}" href="${pageContext.request.contextPath}/import-request-list" title="Yêu cầu nhập kho">
                                 <div class="sidebar-icon-wrap"><span class="material-symbols-outlined">unarchive</span></div>
                                 <span class="sidebar-text">
@@ -147,12 +144,12 @@
                                 <small>@
                                     <c:out value="${sessionScope.user.userName}" /><br>
                                     <c:choose>
-                                        <c:when test="${sessionScope.user.roleId == 1}">Admin</c:when>
-                                        <c:when test="${sessionScope.user.roleId == 2}">Manager</c:when>
-                                        <c:when test="${sessionScope.user.roleId == 3}">Customer</c:when>
-                                        <c:when test="${sessionScope.user.roleId == 4}">Sale</c:when>
-                                        <c:when test="${sessionScope.user.roleId == 5}">Admin Officer</c:when>
-                                        <c:when test="${sessionScope.user.roleId == 6}">Warehouse</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 1}">Quản trị hệ thống</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 2}">Quản lý</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 3}">Khách hàng</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 4}">Nhân viên Sale</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 5}">Nhân viên Chứng từ</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 6}">Thủ kho</c:when>
                                         <c:otherwise>Role
                                             <c:out value="${sessionScope.user.roleId}" />
                                         </c:otherwise>

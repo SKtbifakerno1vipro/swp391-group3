@@ -8,7 +8,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Quotation;
+import model.Role;
+import model.User;
 import service.QuotationService;
+import service.RoleService;
 
 @WebServlet(name = "QuotationListController", urlPatterns = {"/quotation-list"})
 public class QuotationListController extends HttpServlet {
@@ -28,15 +31,15 @@ public class QuotationListController extends HttpServlet {
         String toDate = request.getParameter("toDate");
 
         jakarta.servlet.http.HttpSession session = request.getSession(false);
-        model.User user = (session != null) ? (model.User) session.getAttribute("user") : null;
+        User user = (session != null) ? (model.User) session.getAttribute("user") : null;
 
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        service.RoleService roleService = new service.RoleService();
-        model.Role userRole = roleService.getRoleById(user.getRoleId());
+        RoleService roleService = new service.RoleService();
+        Role userRole = roleService.getRoleById(user.getRoleId());
         String roleName = userRole != null ? userRole.getRoleName().toLowerCase() : "";
 
         Integer saleId = null;

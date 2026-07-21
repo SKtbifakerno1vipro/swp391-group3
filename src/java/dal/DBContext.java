@@ -4,14 +4,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.Properties;
 
 public class DBContext {
+
     protected Connection connection;
+    private static ThreadLocal<Connection> threadLocalConn = new ThreadLocal<>();
 
     public DBContext() {
         try {
+            Connection conn = threadLocalConn.get();
+            if (conn != null && !conn.isClosed() && conn.isValid(2)) {
+                this.connection = conn;
+                return;
+            }
+
             Properties props = new Properties();
             InputStream input = findConfigInputStream();
 
@@ -28,9 +35,16 @@ public class DBContext {
             Class<?> driverClass = Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             java.sql.Driver driver = (java.sql.Driver) driverClass.getDeclaredConstructor().newInstance();
             Properties dbProps = new Properties();
-            if (username != null) dbProps.put("user", username);
-            if (password != null) dbProps.put("password", password);
-            connection = driver.connect(url, dbProps);
+            if (username != null) {
+                dbProps.put("user", username);
+            }
+            if (password != null) {
+                dbProps.put("password", password);
+            }
+
+            conn = driver.connect(url, dbProps);
+            threadLocalConn.set(conn);
+            this.connection = conn;
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -124,22 +124,34 @@ public class EditUserController extends HttpServlet {
         }
 
         String rawUserName = request.getParameter("userName");
-        if (rawUserName != null) u.setUserName(rawUserName.trim());
+        if (rawUserName != null) {
+            u.setUserName(rawUserName.trim());
+        }
 
         String rawEmail = request.getParameter("email");
-        if (rawEmail != null) u.setEmail(rawEmail.trim());
+        if (rawEmail != null) {
+            u.setEmail(rawEmail.trim());
+        }
 
         String rawFullName = request.getParameter("fullName");
-        if (rawFullName != null) u.setFullName(rawFullName.trim());
+        if (rawFullName != null) {
+            u.setFullName(rawFullName.trim());
+        }
 
         String rawPhone = request.getParameter("phone");
-        if (rawPhone != null) u.setPhone(rawPhone.trim());
+        if (rawPhone != null) {
+            u.setPhone(rawPhone.trim());
+        }
 
         String rawGender = request.getParameter("gender");
-        if (rawGender != null && !rawGender.trim().isEmpty()) u.setGender(rawGender.trim());
+        if (rawGender != null && !rawGender.trim().isEmpty()) {
+            u.setGender(rawGender.trim());
+        }
 
         String rawAddress = request.getParameter("address");
-        if (rawAddress != null) u.setAddress(rawAddress.trim());
+        if (rawAddress != null) {
+            u.setAddress(rawAddress.trim());
+        }
 
         String rawDob = request.getParameter("dateBirth");
         if (rawDob != null && !rawDob.trim().isEmpty()) {
@@ -152,7 +164,9 @@ public class EditUserController extends HttpServlet {
         // Security Check: Only Admin can change Status and Role
         if (currentUser.getRoleId() == 1) {
             String rawStatus = request.getParameter("status");
-            if (rawStatus != null && !rawStatus.trim().isEmpty()) u.setStatus(rawStatus.trim());
+            if (rawStatus != null && !rawStatus.trim().isEmpty()) {
+                u.setStatus(rawStatus.trim());
+            }
 
             String rawRoleId = request.getParameter("roleId");
             if (rawRoleId != null && !rawRoleId.trim().isEmpty()) {
@@ -195,7 +209,7 @@ public class EditUserController extends HttpServlet {
                 u.setPassword(password);
             }
         }
-
+        
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("u", u);

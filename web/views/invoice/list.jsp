@@ -188,7 +188,7 @@
                                         <td style="white-space: nowrap; vertical-align: middle;">
                                             <div style="display: inline-flex; gap: 8px; align-items: center;">
                                                 <a href="${pageContext.request.contextPath}/invoice?invoiceId=${i.invoiceId}" style="text-decoration: none; padding: 4px 10px; background-color: var(--primary-soft); color: var(--primary); border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;">Chi tiết</a>
-                                                <c:if test="${i.invoiceStatus != 'CANCELED'}">
+                                                <c:if test="${i.invoiceStatus != 'CANCELED' && i.invoiceStatus != 'RELEASED'}">
                                                     <form action="${pageContext.request.contextPath}/invoice-list" method="post" style="display: inline; margin: 0; padding: 0; background: none; border: none; box-shadow: none;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy hóa đơn này không?');">
                                                         <input type="hidden" name="action" value="cancel">
                                                         <input type="hidden" name="invoiceId" value="${i.invoiceId}">

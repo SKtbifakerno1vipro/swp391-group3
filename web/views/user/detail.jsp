@@ -162,7 +162,7 @@
             <jsp:include page="/views/shared/sidebar.jsp"><jsp:param name="activeMenu" value="users"/></jsp:include>
                 <main class="main legacy-page">
                     <section class="page-top"><div><p class="eyebrow">Quản lý Truy cập</p><h1>Cập Nhật Profile</h1><p>Cập nhật thông tin tài khoản, vai trò và trạng thái.</p></div>
-                    <div class="actions">
+                        <div class="actions">
                         <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
                             <a class="button" href="${pageContext.request.contextPath}/user-list"><span class="material-symbols-outlined">arrow_back</span>Trở lại danh sách</a>
                         </c:if>
@@ -174,17 +174,43 @@
                     <div class="panel-body">
                         <c:if test="${not empty error}"><div class="alert"><c:out value="${error}"/></div></c:if>
                         <c:if test="${not empty successMsg}"><div class="alert-success"><c:out value="${successMsg}"/></div></c:if>
-                            <c:set var="canEdit" value="${sessionScope.user.roleId == 1 || sessionScope.user.userId == u.userId}" />
-                            <div class="form-grid">
-                                <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" readonly=""></div>
+                        <c:set var="canEdit" value="${sessionScope.user.roleId == 1 || sessionScope.user.userId == u.userId}" />
+                        <div class="form-grid">
+                            <div class="field"><label>Tài khoản</label><input type="text" name="userName" value="${u.userName}" readonly=""></div>
                             <div class="field"><label>Họ và tên</label><input type="text" name="fullName" value="${u.fullName}" required ${not canEdit ? 'disabled' : ''}></div>
                             <div class="field"><label>Email</label><input type="email" name="email" value="${u.email}" required ${not canEdit ? 'disabled' : ''}></div>
                             <div class="field"><label>Số điện thoại</label><input type="text" name="phone" value="${u.phone}" required ${not canEdit ? 'disabled' : ''}></div>
-                            <fmt:formatDate value="${u.dateBirth}" pattern="yyyy-MM-dd" var="dobStr" />
+                                <fmt:formatDate value="${u.dateBirth}" pattern="yyyy-MM-dd" var="dobStr" />
                             <div class="field"><label>Ngày sinh</label><input type="date" name="dateBirth" value="${dobStr}" ${not canEdit ? 'disabled' : ''}></div>
                             <div class="field"><label>Địa chỉ</label><input type="text" name="address" value="${u.address}" ${not canEdit ? 'disabled' : ''}></div>
                             <div class="field"><label>Giới tính</label><select name="gender" ${not canEdit ? 'disabled' : ''}><option value="M" ${u.gender == 'M' ? 'selected' : ''}>Nam</option><option value="F" ${u.gender == 'F' ? 'selected' : ''}>Nữ</option><option value="O" ${u.gender == 'O' ? 'selected' : ''}>Khác</option></select></div>
-                            <div class="field"><label>Vai trò</label><select name="roleId" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}><c:forEach var="r" items="${roles}"><option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>${r.roleName}</option></c:forEach></select><c:if test="${sessionScope.user.roleId != 1}"><input type="hidden" name="roleId" value="${u.roleId}"></c:if></div>
+                            <div class="field"><label>Vai trò</label>
+                                <c:choose>
+                                    <c:when test="${u.roleId == 3}">
+                                        <span class="readonly-value">Khách hàng</span>
+                                        <input type="hidden" name="roleId" value="3">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <select name="roleId" required ${sessionScope.user.roleId != 1 ? 'disabled' : ''}>
+                                            <c:forEach var="r" items="${roles}">
+                                                <option value="${r.roleId}" ${u.roleId == r.roleId ? 'selected' : ''}>
+                                                    <c:choose>
+                                                        <c:when test="${r.roleId == 1}">Quản trị hệ thống</c:when>
+                                                        <c:when test="${r.roleId == 2}">Quản lý</c:when>
+                                                        <c:when test="${r.roleId == 4}">Nhân viên Sale</c:when>
+                                                        <c:when test="${r.roleId == 5}">Nhân viên Officer</c:when>
+                                                        <c:when test="${r.roleId == 6}">Thủ kho</c:when>
+                                                        <c:otherwise>${r.roleName}</c:otherwise>
+                                                    </c:choose>
+                                                </option>
+                                            </c:forEach>
+                                        </select>
+                                        <c:if test="${sessionScope.user.roleId != 1}">
+                                            <input type="hidden" name="roleId" value="${u.roleId}">
+                                        </c:if>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                             <div class="field"><label>Trạng thái</label><select name="status" ${sessionScope.user.roleId != 1 ? 'disabled' : ''}><option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option><option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>Khóa</option></select><c:if test="${sessionScope.user.roleId != 1}"><input type="hidden" name="status" value="${u.status}"></c:if></div>
                             <div class="field"><label>Người tạo</label><span class="readonly-value"><c:set var="creator" value="${userService.getUserById(u.createdBy)}" /><c:out value="${creator != null ? creator.userName : (u.createdBy == 0 ? 'N/A' : u.createdBy)}"/></span></div>
                             <div class="field"><label>Ngày tạo</label><span class="readonly-value"><c:out value="${u.createTimeString}"/></span></div>

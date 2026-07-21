@@ -26,11 +26,9 @@ public class LoginController extends HttpServlet {
         // If user already logged in, redirect to dashboard
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
-            if (user.getRoleId() == 6) {
-                response.sendRedirect(request.getContextPath() + "/product-list");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/dashboard");
-            }
+
+            response.sendRedirect(request.getContextPath() + "/dashboard");
+
             return;
         }
 
@@ -40,7 +38,6 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         HttpSession session = request.getSession();

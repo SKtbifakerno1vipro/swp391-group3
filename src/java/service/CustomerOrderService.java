@@ -12,8 +12,6 @@ public class CustomerOrderService {
     private final CustomerOrderDAO customerOrderDAO = new CustomerOrderDAO();
     private final CustomerService customerService = new CustomerService();
 
-    
-
 //    public List<CustomerOrderDTO> getAllCustomerOrders() {
 //        return customerOrderDAO.getAllCustomerOrders();
 //    }
@@ -26,11 +24,11 @@ public class CustomerOrderService {
 //        return customerOrderDAO.getOrderByContractId(contractId);
 //    }
 
-//    public List<dto.CustomerOrderDTO> getOrderDetails(int orderId) {
+//    public List<CustomerOrderDTO> getOrderDetails(int orderId) {
 //        return customerOrderDAO.getDetailsByOrderId(orderId);
 //    }
 
-    public List<dto.CustomerOrderDTO> getOrderDetails(int orderId) {
+    public List<CustomerOrderDTO> getOrderDetails(int orderId) {
         return customerOrderDAO.getDetailsByOrderId(orderId);
     }
 
@@ -38,18 +36,20 @@ public class CustomerOrderService {
         return customerOrderDAO.getTotalPriceFromQuotationByOrderId(orderId);
     }
 
-    public boolean createOrder(model.CustomerOrder order, List<model.CustomerOrderDetail> details) {
+    public boolean createOrder(CustomerOrder order, List<CustomerOrderDetail> details) {
         boolean success = customerOrderDAO.createOrder(order, details);
         // Xhieu - tu dong tao payment
         if (success) {
+            System.out.println("Order created successfully. Triggering auto-payment creation.");
             try {
-                int contractId = order.getCustomerContractId();
                 PaymentService paymentService = new PaymentService();
-                paymentService.createPendingPaymentForContractIfNotExists(contractId);
+                paymentService.createPendingPaymentForOrder(order);
             } catch (Exception e) {
-                System.err.println("Failed to automatically create pending payment for contract: " + e.getMessage());
+                System.err.println("Failed to automatically create pending payment for order: " + e.getMessage());
                 e.printStackTrace();
             }
+        } else {
+            System.err.println("Failed to create order in database.");
         }
         return success;
     }

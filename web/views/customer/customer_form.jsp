@@ -254,6 +254,31 @@
                                                 value="${isEdit ? cusDTO.user.phone : ''}">
                                         </div>
 
+                                        <%-- Gender --%>
+                                        <div class="form-group">
+                                            <label for="gender">Giới tính</label>
+                                            <select id="gender" name="gender" class="form-control">
+                                                <option value="">-- Chọn giới tính --</option>
+                                                <option value="M" ${isEdit && cusDTO.user.gender == 'M' ? 'selected' : ''}>Nam</option>
+                                                <option value="F" ${isEdit && cusDTO.user.gender == 'F' ? 'selected' : ''}>Nữ</option>
+                                                <option value="O" ${isEdit && cusDTO.user.gender == 'O' ? 'selected' : ''}>Khác</option>
+                                            </select>
+                                        </div>
+
+                                        <%-- Date of Birth --%>
+                                        <div class="form-group">
+                                            <label for="dateBirth">Ngày sinh</label>
+                                            <input type="date" id="dateBirth" name="dateBirth" class="form-control"
+                                                value="${isEdit ? cusDTO.user.dateBirth : ''}">
+                                        </div>
+
+                                        <%-- Address --%>
+                                        <div class="form-group">
+                                            <label for="address">Địa chỉ</label>
+                                            <input type="text" id="address" name="address" class="form-control"
+                                                value="${isEdit ? cusDTO.user.address : ''}" placeholder="Nhập địa chỉ">
+                                        </div>
+
                                         <%-- Status --%>
                                             <c:choose>
                                                 <c:when test="${sessionScope.user.roleId == 3}">
