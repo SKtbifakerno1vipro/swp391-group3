@@ -84,10 +84,17 @@ CREATE TABLE system_audit_log (
 );
 GO
 
+-- 4c. Foreign key for Email Log
+ALTER TABLE email_log ADD user_id INT NULL;
+ALTER TABLE email_log ADD CONSTRAINT fk_email_log_user FOREIGN KEY (user_id) REFERENCES [user](user_id) ON DELETE SET NULL;
+GO
+
 -- 5. Category
 CREATE TABLE category (
     category_id INT IDENTITY(1,1) PRIMARY KEY,
-    category_name NVARCHAR(255) NOT NULL
+    category_name NVARCHAR(255) NOT NULL,
+    total_product INT NOT NULL DEFAULT 0,
+    status INT NOT NULL DEFAULT 1
 );
 GO
 

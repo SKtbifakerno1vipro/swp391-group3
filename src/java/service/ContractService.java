@@ -150,7 +150,7 @@ public class ContractService {
                 + "    </div>"
                 + "</body>"
                 + "</html>";
-        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
+        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content, customer.getUser().getUserId());
     }
 
     public void noticeSendFinalContractPdf(int contractId, String token, String baseUrl) {
@@ -163,7 +163,7 @@ public class ContractService {
                 + "<html>"
                 + "<head>"
                 + "    <meta charset=\"UTF-8\">"
-                + "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+                + "    <meta name=\"viewport\" content=\"width=size=device-width, initial-scale=1.0\">"
                 + "</head>"
                 + "<body style=\"margin: 0; padding: 20px; background-color: #f4f5f7;\">"
                 + "    <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e0e0e0; border-radius: 16px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);\">"
@@ -187,7 +187,7 @@ public class ContractService {
                 + "    </div>"
                 + "</body>"
                 + "</html>";
-        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content);
+        EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content, customer.getUser().getUserId());
     }
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,

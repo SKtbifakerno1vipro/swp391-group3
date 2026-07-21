@@ -207,7 +207,7 @@ public class CustomerService {
                                      + "    </div>"
                                      + "</div>";
 
-        EmailUtils.sendEmailAsync(user.getEmail(), emailSubject, emailBody);
+        EmailUtils.sendEmailAsync(user.getEmail(), emailSubject, emailBody, user.getUserId());
     }
 
     public String getLastError() {
