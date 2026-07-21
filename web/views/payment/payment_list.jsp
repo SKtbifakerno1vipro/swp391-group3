@@ -187,6 +187,13 @@
             <main class="main legacy-page">
                 <h2>Quản lý thanh toán</h2>
 
+                <c:if test="${not empty sessionScope.successInvoice}">
+                    <div style="color: #065f46; background-color: #d1fae5; border: 1px solid #10b981; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
+                        ${sessionScope.successInvoice}
+                        <% session.removeAttribute("successInvoice"); %>
+                    </div>
+                </c:if>
                 <c:if test="${not empty sessionScope.successMessage}">
                     <div style="color: #065f46; background-color: #d1fae5; border: 1px solid #10b981; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
@@ -194,11 +201,12 @@
                         <% session.removeAttribute("successMessage"); %>
                     </div>
                 </c:if>
-                <c:if test="${not empty sessionScope.errorMessage}">
+
+                <c:if test="${not empty sessionScope.errorPaymentInvoice}">
                     <div style="color: #991b1b; background-color: #fee2e2; border: 1px solid #ef4444; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
-                        ${sessionScope.errorMessage}
-                        <% session.removeAttribute("errorMessage"); %>
+                        ${sessionScope.errorPaymentInvoice}
+                        <% session.removeAttribute("errorPaymentInvoice"); %>
                     </div>
                 </c:if>                <form action="${pageContext.request.contextPath}/payment/list" method="GET" class="search-form-responsive">
                     <!-- Row 1: Basic search (Contract, Customer Name, Status) -->
