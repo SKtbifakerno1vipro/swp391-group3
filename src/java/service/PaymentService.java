@@ -15,7 +15,6 @@ import java.util.List;
 
 public class PaymentService {
     private final PaymentDAO paymentDAO = new PaymentDAO();
-    private final CustomerOrderService customerOrderService = new CustomerOrderService();
 
     public int insertPayment(Payment payment) {
         return paymentDAO.insertPayment(payment);
@@ -84,6 +83,7 @@ public class PaymentService {
         }
         
         try {
+            CustomerOrderService customerOrderService = new CustomerOrderService();
             double calculatedTotal = customerOrderService.getTotalPriceFromQuotationByOrderId(orderId);
             BigDecimal totalAmount = BigDecimal.valueOf(calculatedTotal);
             

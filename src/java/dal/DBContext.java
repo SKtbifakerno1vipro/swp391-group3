@@ -9,24 +9,44 @@ import java.util.Properties;
 
 public class DBContext {
     protected Connection connection;
-    private static Properties props;
+    private static ThreadLocal<Connection> threadLocalConn = new ThreadLocal<>();
 
-    static { // chỉ chạy 1 lần duy nhất lúc khởi tạo
+    public DBContext() {
         try {
-            props = new Properties();
-            InputStream input = findConfigInputStreamStatic();
+            Connection conn = threadLocalConn.get();
+            if (conn != null && !conn.isClosed() && conn.isValid(2)) {
+                this.connection = conn;
+                return;
+            }
+
+            Properties props = new Properties();
+            InputStream input = findConfigInputStream();
+
             if (input == null) {
                 throw new java.io.FileNotFoundException("Cannot find ConnectDB.properties");
             }
+
             props.load(input);
-            input.close(); // đóng lại File Handle
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+            String url = props.getProperty("url") != null ? props.getProperty("url").trim() : null;
+            String username = props.getProperty("userID") != null ? props.getProperty("userID").trim() : null;
+            String password = props.getProperty("password") != null ? props.getProperty("password").trim() : null;
+
+            Class<?> driverClass = Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            java.sql.Driver driver = (java.sql.Driver) driverClass.getDeclaredConstructor().newInstance();
+            Properties dbProps = new Properties();
+            if (username != null) dbProps.put("user", username);
+            if (password != null) dbProps.put("password", password);
+            
+            conn = driver.connect(url, dbProps);
+            threadLocalConn.set(conn);
+            this.connection = conn;
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static InputStream findConfigInputStreamStatic() {
+    private InputStream findConfigInputStream() {
         try {
             File classesDir = new File(DBContext.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             File webInfDir = classesDir.getParentFile();
@@ -35,17 +55,6 @@ public class DBContext {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    public DBContext() {
-        try {
-            String url = props.getProperty("url");
-            String username = props.getProperty("userID");
-            String password = props.getProperty("password");
-            connection = DriverManager.getConnection(url, username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
