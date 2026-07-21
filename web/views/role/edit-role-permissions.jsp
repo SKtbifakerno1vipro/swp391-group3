@@ -444,7 +444,11 @@
                 <!-- request về edit role -->
                 <form class="panel" action="${pageContext.request.contextPath}/edit-role-permissions" method="post">
                     <input type="hidden" name="roleId" value="${role.roleId}">
-                    <div class="panel-head"><h2>Quyền của <c:out value="${role.roleName}"/></h2><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu quyền hạn</button></div>
+                    <div class="panel-head"><h2>Quyền của <c:out value="${role.roleName}"/></h2>
+                        <c:if test="${role.roleId != 1}">
+                            <button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu quyền hạn</button>
+                        </c:if>
+                    </div>
                     <div class="panel-body">
                         <div class="info-grid">
                             <div class="info-card"><p class="info-label">Mã vai trò</p><p class="info-value">R-<c:out value="${role.roleId}"/></p></div>
@@ -457,12 +461,17 @@
                             <c:otherwise>
                                 <div class="permission-grid">
                                     <c:forEach var="permission" items="${permissionList}">
-                                        <label class="permission-card"><input class="terra-checkbox" type="checkbox" name="permissionIds" value="${permission.permissionId}" <c:if test="${selectedPermissionIds.contains(permission.permissionId)}">checked</c:if>><span><c:out value="${permission.permissionName}"/></span></label>
+                                        <label class="permission-card"><input class="terra-checkbox" type="checkbox" name="permissionIds" value="${permission.permissionId}" <c:if test="${selectedPermissionIds.contains(permission.permissionId)}">checked</c:if> <c:if test="${role.roleId == 1}">disabled</c:if>><span><c:out value="${permission.permissionName}"/></span></label>
                                         </c:forEach>
                                 </div>
                             </c:otherwise>
                         </c:choose>
-                        <div class="actions" style="margin-top:24px; justify-content:flex-start;"><button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu quyền hạn</button><a class="button danger" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">close</span>Hủy bỏ</a></div>
+                        <div class="actions" style="margin-top:24px; justify-content:flex-start;">
+                            <c:if test="${role.roleId != 1}">
+                                <button class="button primary" type="submit"><span class="material-symbols-outlined">save</span>Lưu quyền hạn</button>
+                            </c:if>
+                            <a class="button danger" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">close</span>Hủy bỏ</a>
+                        </div>
                     </div>
                 </form>
             </main>
