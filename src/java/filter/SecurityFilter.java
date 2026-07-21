@@ -45,7 +45,8 @@ public class SecurityFilter implements Filter {
     private static final List<String> LOGGED_IN_URLS = List.of(
             "/user/password/change",
             "/realtime/notifications",
-            "/File"
+            "/File",
+            "/tool/auto-generate"
     );
 
     @Override
@@ -267,7 +268,6 @@ public class SecurityFilter implements Filter {
                 return "Category List";
             case "/category/create":
             case "/category/edit":
-            case "/category/delete":
                 return "Category edit";
             case "/product-list":
                 return "Product List";

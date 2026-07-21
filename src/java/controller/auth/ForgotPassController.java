@@ -71,7 +71,7 @@ public class ForgotPassController extends HttpServlet {
                                  + "</div>";
 
                 //4. Gửi email chứa mã OTP cho người dùng (bất đồng bộ)
-                EmailUtils.sendEmailAsync(email, emailSubject, emailBody);
+                EmailUtils.sendEmailAsync(email, emailSubject, emailBody, u.getUserId());
                 response.getWriter().write("SUCCESS");
             } else {
                 response.getWriter().write("Email or Username does not match our records!");
