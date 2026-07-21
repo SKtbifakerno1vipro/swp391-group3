@@ -10,13 +10,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.annotation.WebServlet;
+import service.AuditLogService;
 
 @WebServlet(name = "UserListController", urlPatterns = {"/user-list"})
 public class UserListController extends HttpServlet {
 
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
-
+    private final AuditLogService AuditLogService = new AuditLogService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -102,7 +103,7 @@ public class UserListController extends HttpServlet {
             User targetUser = userService.getUserById(userId);
             String targetUsername = targetUser != null ? targetUser.getUserName() : String.valueOf(userId);
             String action = "ACTIVE".equals(newStatus) ? "Mở khóa tài khoản" : "Khóa tài khoản";
-            service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", action + ": " + targetUsername + " (ID: " + userId + ")");
+            AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", action + ": " + targetUsername + " (ID: " + userId + ")");
         } catch (NumberFormatException e) {
 
         }

@@ -112,17 +112,54 @@ public class CustomerOrderDAO extends DBContext {
         return 0;
     }
 
-    public boolean createOrder(CustomerOrder order, List<model.CustomerOrderDetail> details) {
+    public boolean createOrder(CustomerOrder order, List<CustomerOrderDetail> details) {
         lastError = "";
         if (details == null || details.isEmpty()) {
             lastError = "Danh sách sản phẩm không được để trống.";
             return false;
         }
 
-        // 1. Kiểm tra tồn kho cho tất cả sản phẩm trong đơn trước khi tạo đơn
+        // 1. Kiểm tra tồn kho & Tự động tạo Yêu cầu nhập kho nếu thiếu
+        if (!checkStockAndHandleImport(order, details)) {
+            return false;
+        }
+
+        // 2. Tất cả sản phẩm đủ tồn kho -> Tiến hành tạo đơn hàng và cập nhật kho trong Transaction
+        boolean originalAutoCommit = true;
+        try {
+            originalAutoCommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
+
+            // 2.1 Insert Order and get generated ID
+            int orderId = insertOrderHeader(order);
+            if (orderId <= 0) {
+                connection.rollback();
+                lastError = "Tạo đơn hàng thất bại (không lấy được ID đơn hàng).";
+                return false;
+            }
+
+            // 2.2 Insert Order Details
+            insertOrderDetails(orderId, details);
+
+            // 2.3 Trừ quantity_available và quantity_reserve tương ứng cho từng sản phẩm
+            updateProductStock(details);
+
+            connection.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackQuietly();
+            e.printStackTrace();
+            lastError = e.getMessage();
+            return false;
+        } finally {
+            resetAutoCommitQuietly(originalAutoCommit);
+        }
+    }
+
+    private boolean checkStockAndHandleImport(CustomerOrder order, List<CustomerOrderDetail> details) {
         String checkStockSql = "SELECT product_name, quantity_available FROM product WHERE product_id = ?";
         List<String> insufficientProducts = new ArrayList<>();
-        List<int[]> importRequestsToCreate = new ArrayList<>(); // [productId, deficitQuantity]
+        List<int[]> importRequestsToCreate = new ArrayList<>();
 
         for (CustomerOrderDetail detail : details) {
             try (PreparedStatement psCheck = connection.prepareStatement(checkStockSql)) {
@@ -145,109 +182,98 @@ public class CustomerOrderDAO extends DBContext {
             }
         }
 
-        // Nếu có sản phẩm không đủ tồn kho
         if (!insufficientProducts.isEmpty()) {
-            // Tự động tạo Yêu cầu nhập kho (Import Request) cho các sản phẩm bị thiếu
-            int userId = (order.getCreatedBy() != null && order.getCreatedBy() > 0) ? order.getCreatedBy() : 1;
-            String insertImportSql = "INSERT INTO import_request (product_id, quantity, status, created_by, created_date, note) VALUES (?, ?, 1, ?, GETDATE(), ?)";
-            try (PreparedStatement psImport = connection.prepareStatement(insertImportSql)) {
-                for (int[] req : importRequestsToCreate) {
-                    psImport.setInt(1, req[0]);
-                    psImport.setInt(2, req[1]);
-                    psImport.setInt(3, userId);
-                    psImport.setString(4, "Tự động tạo do thiếu hàng khi tạo đơn hàng (Thiếu " + req[1] + ")");
-                    psImport.addBatch();
-                }
-                psImport.executeBatch();
-            } catch (Exception eImp) {
-                System.err.println("Failed to auto-create import request: " + eImp.getMessage());
-                eImp.printStackTrace();
-            }
-
+            autoCreateImportRequests(order, importRequestsToCreate);
             lastError = "Sản phẩm [" + String.join("; ", insufficientProducts) + "] không đủ tồn kho. Hệ thống đã tự động gửi Yêu cầu nhập kho (Import Request). Vui lòng hoàn tất nhập kho trước khi tạo đơn hàng.";
             return false;
         }
+        return true;
+    }
 
-        // 2. Tất cả sản phẩm đủ tồn kho -> Tiến hành tạo đơn hàng và cập nhật kho trong Transaction
+    private void autoCreateImportRequests(CustomerOrder order, List<int[]> importRequests) {
+        int userId = (order.getCreatedBy() != null && order.getCreatedBy() > 0) ? order.getCreatedBy() : 1;
+        String insertImportSql = "INSERT INTO import_request (product_id, quantity, status, created_by, created_date, note) VALUES (?, ?, 1, ?, GETDATE(), ?)";
+        try (PreparedStatement psImport = connection.prepareStatement(insertImportSql)) {
+            for (int[] req : importRequests) {
+                psImport.setInt(1, req[0]);
+                psImport.setInt(2, req[1]);
+                psImport.setInt(3, userId);
+                psImport.setString(4, "Tự động tạo do thiếu hàng khi tạo đơn hàng (Thiếu " + req[1] + ")");
+                psImport.addBatch();
+            }
+            psImport.executeBatch();
+        } catch (Exception eImp) {
+            System.err.println("Failed to auto-create import request: " + eImp.getMessage());
+            eImp.printStackTrace();
+        }
+    }
+
+    private int insertOrderHeader(CustomerOrder order) throws Exception {
         String insertOrderSql = "INSERT INTO customer_order (customer_id, customer_contract_id, order_status, created_by, created_at) VALUES (?, ?, ?, ?, GETDATE())";
-        String insertDetailSql = "INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (?, ?, ?, ?, ?)";
-        String updateStockSql = "UPDATE product SET quantity_available = quantity_available - ?, "
-                + "quantity_reserve = CASE WHEN ISNULL(quantity_reserve, 0) - ? >= 0 THEN quantity_reserve - ? ELSE 0 END "
-                + "WHERE product_id = ?";
+        try (PreparedStatement psOrder = connection.prepareStatement(insertOrderSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            psOrder.setInt(1, order.getCustomerId());
+            psOrder.setInt(2, order.getCustomerContractId());
+            psOrder.setString(3, order.getOrderStatus());
+            psOrder.setObject(4, order.getCreatedBy());
 
-        boolean originalAutoCommit = true;
-        try {
-            originalAutoCommit = connection.getAutoCommit();
-            connection.setAutoCommit(false);
-
-            // 2.1 Insert Order and get generated ID
-            int orderId;
-            try (PreparedStatement psOrder = connection.prepareStatement(insertOrderSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                psOrder.setInt(1, order.getCustomerId());
-                psOrder.setInt(2, order.getCustomerContractId());
-                psOrder.setString(3, order.getOrderStatus());
-                psOrder.setObject(4, order.getCreatedBy());
-
-                int affectedRows = psOrder.executeUpdate();
-                if (affectedRows == 0) {
-                    connection.rollback();
-                    lastError = "Tạo đơn hàng thất bại (0 dòng được tạo).";
-                    return false;
-                }
-
+            int affectedRows = psOrder.executeUpdate();
+            if (affectedRows > 0) {
                 try (ResultSet generatedKeys = psOrder.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        orderId = generatedKeys.getInt(1);
-                    } else {
-                        connection.rollback();
-                        lastError = "Tạo đơn hàng thất bại (không lấy được ID đơn hàng).";
-                        return false;
+                        return generatedKeys.getInt(1);
                     }
                 }
             }
+        }
+        return -1;
+    }
 
-            // 2.2 Insert Order Details
-            try (PreparedStatement psDetail = connection.prepareStatement(insertDetailSql)) {
-                for (CustomerOrderDetail detail : details) {
-                    psDetail.setInt(1, orderId);
-                    psDetail.setInt(2, detail.getQuotationDetailId());
-                    psDetail.setInt(3, detail.getQuantity());
-                    psDetail.setDouble(4, detail.getCostPrice());
-                    psDetail.setDouble(5, detail.getSellingPrice());
-                    psDetail.addBatch();
-                }
-                psDetail.executeBatch();
+    private void insertOrderDetails(int orderId, List<CustomerOrderDetail> details) throws Exception {
+        String insertDetailSql = "INSERT INTO customer_order_detail (customer_order_id, quotation_detail_id, quantity, cost_price, selling_price) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement psDetail = connection.prepareStatement(insertDetailSql)) {
+            for (CustomerOrderDetail detail : details) {
+                psDetail.setInt(1, orderId);
+                psDetail.setInt(2, detail.getQuotationDetailId());
+                psDetail.setInt(3, detail.getQuantity());
+                psDetail.setDouble(4, detail.getCostPrice());
+                psDetail.setDouble(5, detail.getSellingPrice());
+                psDetail.addBatch();
             }
+            psDetail.executeBatch();
+        }
+    }
 
-            // 2.3 Trừ quantity_available và trừ quantity_reserve tương ứng cho từng sản phẩm
-            try (PreparedStatement psStock = connection.prepareStatement(updateStockSql)) {
-                for (CustomerOrderDetail detail : details) {
-                    psStock.setInt(1, detail.getQuantity());
-                    psStock.setInt(2, detail.getQuantity());
-                    psStock.setInt(3, detail.getQuantity());
-                    psStock.setInt(4, detail.getProductId());
-                    psStock.addBatch();
-                }
-                psStock.executeBatch();
+    private void updateProductStock(List<CustomerOrderDetail> details) throws Exception {
+        String updateStockSql = "UPDATE product SET quantity_available = quantity_available - ?, "
+                + "quantity_reserve = CASE WHEN ISNULL(quantity_reserve, 0) - ? >= 0 THEN quantity_reserve - ? ELSE 0 END "
+                + "WHERE product_id = ?";
+        try (PreparedStatement psStock = connection.prepareStatement(updateStockSql)) {
+            for (CustomerOrderDetail detail : details) {
+                psStock.setInt(1, detail.getQuantity());
+                psStock.setInt(2, detail.getQuantity());
+                psStock.setInt(3, detail.getQuantity());
+                psStock.setInt(4, detail.getProductId());
+                psStock.addBatch();
             }
+            psStock.executeBatch();
+        }
+    }
 
-            connection.commit();
-            return true;
-        } catch (Exception e) {
-            try {
+    private void rollbackQuietly() {
+        try {
+            if (connection != null) {
                 connection.rollback();
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
-            e.printStackTrace();
-            lastError = e.getMessage();
-            return false;
-        } finally {
-            try {
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void resetAutoCommitQuietly(boolean originalAutoCommit) {
+        try {
+            if (connection != null) {
                 connection.setAutoCommit(originalAutoCommit);
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception ignored) {
         }
     }
 
