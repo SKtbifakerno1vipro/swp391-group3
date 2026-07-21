@@ -139,7 +139,7 @@ public class EditProductController extends HttpServlet {
                 request.setAttribute("categories", categories);
                 request.setAttribute("statusList", statusList);
                 request.setAttribute("update_at", p.getUpdatedAt());
-                request.setAttribute("update_by", userService.getUserById(p.getUpdatedBy()).getFullName());
+                request.setAttribute("update_by", p.getUpdatedBy() != null ? userService.getUserById(p.getUpdatedBy()).getFullName(): "chưa có");
                 request.setAttribute("action", action);
                 request.getRequestDispatcher("/views/product/detail.jsp").forward(request,
                         response);

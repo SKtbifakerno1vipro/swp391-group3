@@ -86,19 +86,6 @@ public class InvoiceDAO extends DBContext {
     }
 
     public boolean insertInvoice(Invoice invoice) {
-        String type = invoice.getInvoiceType();
-        int year = (invoice.getIssueDate() != null) ? invoice.getIssueDate().getYear() : java.time.LocalDate.now().getYear();
-        String yy = String.format("%02d", year % 100);
-        String symbol = ("VAT".equalsIgnoreCase(type) ? "1K" : "2K") + yy + "TYY";
-        invoice.setInvoiceSymbol(symbol);
-
-        if (!"UNRELEASED".equals(invoice.getInvoiceStatus())) {
-            if (invoice.getInvoiceNo() == null || invoice.getInvoiceNo().trim().isEmpty()
-                    || invoice.getInvoiceNo().equals("0")
-                    || !invoice.getInvoiceNo().matches("^\\d{8}$")) {
-                invoice.setInvoiceNo(getNextInvoiceNo(year));
-            }
-        }
         String sql = "INSERT INTO invoice (customer_contract_id, customer_order_id, invoice_no, issue_date, invoice_status, "
                 + "invoice_type, invoice_symbol, seller_name, seller_tax_code, seller_address, seller_phone, "
                 + "buyer_name, buyer_tax_code, buyer_address, buyer_phone, total_amount, customer_note, internal_note, created_by, created_at, updated_at) "
@@ -111,44 +98,37 @@ public class InvoiceDAO extends DBContext {
             ps.setString(5, invoice.getInvoiceStatus());
             ps.setString(6, invoice.getInvoiceType());
             ps.setString(7, invoice.getInvoiceSymbol());
-
             ps.setString(8, invoice.getSellerName());
             ps.setString(9, invoice.getSellerTaxCode());
             ps.setString(10, invoice.getSellerAddress());
             ps.setString(11, invoice.getSellerPhone());
-
             ps.setString(12, invoice.getBuyerName());
             ps.setString(13, invoice.getBuyerTaxCode());
             ps.setString(14, invoice.getBuyerAddress());
             ps.setString(15, invoice.getBuyerPhone());
-
             ps.setDouble(16, invoice.getTotalAmount());
-
             ps.setString(17, invoice.getCustomerNote());
             ps.setString(18, invoice.getInternalNote());
-
             if (invoice.getCreatedBy() != null) {
                 ps.setInt(19, invoice.getCreatedBy());
             } else {
                 ps.setNull(19, Types.INTEGER);
             }
-
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        invoice.setInvoiceId(generatedKeys.getInt(1));
-                        return true;
+                        invoice.setInvoiceId(generatedKeys.getInt(1)); // Gán lại ID tự tăng cho đối tượng
                     }
                 }
                 return true;
             }
         } catch (Exception e) {
+            System.out.println("insertInvoice error: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
-
     public List<Invoice> getInvoices(String searchBuyerName, String status, String type, LocalDateTime startDate, LocalDateTime endDate, int totalRow, int page, int totalPage, int pageSize, boolean forCustomer, int userId) {
         List<Invoice> list = new ArrayList<>();
         try {
@@ -310,7 +290,7 @@ public class InvoiceDAO extends DBContext {
     }
 
     public Invoice getInvoiceByOrderId(int orderId) {
-        String sql = "SELECT * FROM invoice WHERE customer_order_id = ?";
+        String sql = "SELECT * FROM invoice WHERE customer_order_id = ? and invoice_status != 'CANCELED' ";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, orderId);
             ResultSet rs = ps.executeQuery();

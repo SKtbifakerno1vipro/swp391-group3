@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" import="java.time.LocalDate"%>
+L<%@page contentType="text/html" pageEncoding="UTF-8" import="java.time.LocalDate"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
@@ -334,14 +334,13 @@
                                 <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'READY'}">Sẵn sàng phát hành</c:when>
                                 <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'UNRELEASED'}">Chưa phát hành</c:when>
                                 <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'CANCELED'}">Đã hủy</c:when>
-                                <c:otherwise>${not empty invoice ? invoice.invoiceStatus : 'UNRELEASED'}</c:otherwise>
                             </c:choose>
                         </span> 
                         | Người tạo: <span style="font-weight: bold; color: var(--primary);">${not empty creatorName ? creatorName : 'N/A'}</span>
                     </div>
 
-                    <div class="invoice-title" id="dynamicTitle">
-                        ${(not empty invoice ? invoice.invoiceType : (empty invoiceType ? 'VAT' : invoiceType)) == 'VAT' ? 'HÓA ĐƠN GIÁ TRỊ GIA TĂNG' : 'HÓA ĐƠN BÁN HÀNG'}
+                    <div class="invoice-title">
+                        ${(not empty invoice ? invoice.invoiceType : (isVAT ? 'VAT' : 'SALES')) == 'VAT' ? 'HÓA ĐƠN GIÁ TRỊ GIA TĂNG' : 'HÓA ĐƠN BÁN HÀNG'}
                     </div>
 
                     <c:if test="${error != null}">
@@ -359,6 +358,7 @@
                     <input type="hidden" name="sellerAddress" value="${not empty invoice ? invoice.sellerAddress : companyAddress}">
                     <input type="hidden" name="sellerPhone" id="sellerPhone" value="${not empty invoice ? invoice.sellerPhone : companyPhone}">
                     <input type="hidden" name="invoiceStatus" id="invoiceStatus" value="${not empty invoice ? invoice.invoiceStatus : 'UNRELEASED'}">
+                    <input type="hidden" name="invoiceType" value="${not empty invoice ? invoice.invoiceType : (isVAT ? 'VAT' : 'SALES')}">
 
                     <div class="buyer-info-grid">
                         <div>
@@ -391,19 +391,16 @@
                             <div class="buyer-group form-group">
                                 <label for="invoiceType">* Mẫu hóa đơn</label>
                                 <div class="input-wrapper">
-                                    <select name="invoiceType" id="invoiceType" onchange="onInvoiceTypeChange()" ${isReadOnly ? 'disabled' : ''}>
-                                        <option value="VAT" ${(not empty invoice ? invoice.invoiceType : (empty invoiceType ? 'VAT' : invoiceType)) == 'VAT' ? 'selected' : ''}>1 - Hóa đơn GTGT</option>
-                                        <option value="SALES" ${(not empty invoice ? invoice.invoiceType : (empty invoiceType ? 'VAT' : invoiceType)) == 'SALES' ? 'selected' : ''}>2 - Hóa đơn bán hàng</option>
+                                    <select name="invoiceType" id="invoiceType" disabled>
+                                        <option value="VAT" ${(not empty invoice ? invoice.invoiceType : (isVAT ? 'VAT' : 'SALES')) == 'VAT' ? 'selected' : ''}>1 - Hóa đơn GTGT</option>
+                                        <option value="SALES" ${(not empty invoice ? invoice.invoiceType : (isVAT ? 'VAT' : 'SALES')) == 'SALES' ? 'selected' : ''}>2 - Hóa đơn bán hàng</option>
                                     </select>
-                                    <c:if test="${isReadOnly}">
-                                        <input type="hidden" name="invoiceType" value="${not empty invoice ? invoice.invoiceType : 'VAT'}">
-                                    </c:if>
                                 </div>
                             </div>
                             <div class="buyer-group form-group" style="margin-top: 15px;">
                                 <label>Ký hiệu hóa đơn</label>
                                 <div class="input-wrapper">
-                                    <input type="text" name="invoiceSymbol" id="invoiceSymbol" value="${not empty invoice ? invoice.invoiceSymbol : (empty invoiceSymbol ? defaultSymbol : invoiceSymbol)}" required maxlength="10" ${isReadOnly ? 'readonly' : ''}>
+                                    <input type="text" name="invoiceSymbol" id="invoiceSymbol" value="${not empty invoice.invoiceSymbol ? invoice.invoiceSymbol : (isVAT ? defaultSymbol : '2K'.concat(defaultSymbol.substring(2)))}" required maxlength="10" readonly>
                                 </div>
                             </div>
                             <div class="buyer-group form-group" style="margin-top: 15px;">
@@ -564,9 +561,8 @@
                             <c:choose>
                                 <c:when test="${empty invoice}">
                                     <c:if test="${sessionScope.user.roleId != 3}">
-                                        <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Lưu nháp</button>
+                                        <button type="submit" name="action" value="create" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Tạo nháp</button>
                                     </c:if>
-                                    <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Lưu nháp</button>
                                 </c:when>
                                 <c:otherwise>
                                     <c:if test="${invoice.invoiceStatus == 'UNRELEASED'}">
@@ -588,27 +584,8 @@
 
         <script>
             window.onload = function () {
-                onInvoiceTypeChange();
                 updateMoneyInWords();
             };
-
-
-            function onInvoiceTypeChange() {
-                var type = document.getElementById('invoiceType').value;
-                var titleDiv = document.getElementById('dynamicTitle');
-                var symbolInput = document.getElementById('invoiceSymbol');
-
-                var currentSymbol = symbolInput.value || '';
-                var remainingSymbol = currentSymbol.length > 1 ? currentSymbol.substring(1) : '';
-
-                if (type === 'VAT') {
-                    titleDiv.innerHTML = "HÓA ĐƠN GIÁ TRỊ GIA TĂNG";
-                    symbolInput.value = '1' + remainingSymbol;
-                } else {
-                    titleDiv.innerHTML = "HÓA ĐƠN BÁN HÀNG";
-                    symbolInput.value = '2' + remainingSymbol;
-                }
-            }
 
             function updateMoneyInWords() {
                 var totalAmountVal = document.getElementById('totalAmount').value || '0';
