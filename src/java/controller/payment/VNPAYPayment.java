@@ -29,9 +29,9 @@ public class VNPAYPayment extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (!PaymentConfig.isValidConfig) {
             String errorMsg = URLEncoder.encode("Payment service is temporarily misconfigured. Please contact support", StandardCharsets.UTF_8.toString());
-            String orderId = req.getParameter("orderId");
-            if (orderId != null && !orderId.isEmpty()) {
-                resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + orderId + "&error=" + errorMsg);
+            String pidStr = req.getParameter("paymentId");
+            if (pidStr != null && !pidStr.isEmpty()) {
+                resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + pidStr + "&error=" + errorMsg);
             } else {
                 resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + errorMsg);
             }
@@ -44,29 +44,40 @@ public class VNPAYPayment extends HttpServlet {
         String vnp_IpAddr = PaymentConfig.getIpAddress(req);
         String vnp_CurrCode = "VND";
         
-        String vnp_TxnRef = req.getParameter("orderId"); 
-        if (vnp_TxnRef == null || vnp_TxnRef.isEmpty()) {
-            vnp_TxnRef = req.getParameter("vnp_TxnRef");
-        }
-        if (vnp_TxnRef == null || vnp_TxnRef.isEmpty()) {
-            vnp_TxnRef = String.valueOf(System.currentTimeMillis());
+        String paymentIdStr = req.getParameter("paymentId"); 
+        if (paymentIdStr == null || paymentIdStr.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + 
+            URLEncoder.encode("Mã thanh toán không hợp lệ!", StandardCharsets.UTF_8.toString()));
+            return;
         }
 
         int paymentId = -1;
         try {
-            paymentId = Integer.parseInt(vnp_TxnRef);
-        } catch (NumberFormatException ignored) {}
-
-        if (paymentId > 0) {
-            PaymentService paymentService = new PaymentService();
-            Payment p = paymentService.getPaymentById(paymentId);
-            if (p != null && ("FAILED".equals(p.getPaymentStatus()) || "CANCELLED".equals(p.getPaymentStatus()))) {
-                paymentService.updatePaymentStatus(paymentId, "PENDING");
-            }
-            vnp_TxnRef = paymentId + "_" + System.currentTimeMillis();
+            paymentId = Integer.parseInt(paymentIdStr.trim());
+        } catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + 
+            URLEncoder.encode("Mã thanh toán không hợp lệ!", StandardCharsets.UTF_8.toString()));
+            return;
         }
 
-        long amountValue = Long.parseLong(req.getParameter("amount"));
+        PaymentService paymentService = new PaymentService();
+        Payment p = paymentService.getPaymentById(paymentId);
+        if (p == null) {
+            resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + 
+            URLEncoder.encode("Không tìm thấy thông tin thanh toán!", StandardCharsets.UTF_8.toString()));
+            return;
+        }
+        if ("COMPLETED".equals(p.getPaymentStatus())) {
+            resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId + "&error=" + 
+            URLEncoder.encode("Khoản thanh toán này đã hoàn tất từ trước!", StandardCharsets.UTF_8.toString()));
+            return;
+        }
+        if ("FAILED".equals(p.getPaymentStatus()) || "CANCELLED".equals(p.getPaymentStatus())) {
+            paymentService.updatePaymentStatus(paymentId, "PENDING");
+        }
+        String vnp_TxnRef = paymentId + "_" + System.currentTimeMillis();
+
+        long amountValue = (p.getAmount() != null) ? p.getAmount().longValue() : 0L;
         long amount = amountValue * 100; 
         String vnp_OrderInfo = "Thanh toan don hang " + vnp_TxnRef; 
         String orderType = "other"; 

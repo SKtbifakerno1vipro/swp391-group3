@@ -84,8 +84,9 @@ public class RealtimeNotificationServlet extends HttpServlet {
                 if ("PENDING".equals(p.getPaymentStatus())) {
                     if (roleId == 3) {
                         shouldNotify = true;
-                        title = "Ký hợp đồng thành công";
-                        msg = String.format("Hợp đồng số %s trị giá %,.0f VNĐ vừa được ký.<br>Hãy nhấn vào 'Thanh toán' để hoàn tất thủ tục.", contractNo, amt);
+                        title = "Thông báo thanh toán";
+                        String codeStr = (contractNo != null && !contractNo.isEmpty()) ? contractNo : ("#" + p.getPaymentId());
+                        msg = String.format("Payment đã được tạo cho mã đơn hàng %s, giá trị %,.0f VNĐ, click vào thanh toán để hoàn tất thanh toán.", codeStr, amt);
                         btnText = "Thanh toán";
                     }
 

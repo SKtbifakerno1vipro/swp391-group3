@@ -198,6 +198,7 @@ public class CustomerOrderDAO extends DBContext {
                 try (ResultSet generatedKeys = psOrder.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         orderId = generatedKeys.getInt(1);
+                        order.setCustomerOrderId(orderId);
                     } else {
                         connection.rollback();
                         lastError = "Tạo đơn hàng thất bại (không lấy được ID đơn hàng).";
