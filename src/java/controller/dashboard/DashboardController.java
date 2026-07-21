@@ -96,10 +96,10 @@ public class DashboardController extends HttpServlet {
             return;
         }
 
-        service.DashboardService dashboardService = new service.DashboardService();
+        DashboardService dashboardService = new DashboardService();
 
-        service.RoleService roleService = new service.RoleService();
-        model.Role userRole = roleService.getRoleById(user.getRoleId());
+        RoleService roleService = new RoleService();
+        Role userRole = roleService.getRoleById(user.getRoleId());
         String roleName = userRole != null ? userRole.getRoleName().toLowerCase() : "";
 
         Integer saleId = null;

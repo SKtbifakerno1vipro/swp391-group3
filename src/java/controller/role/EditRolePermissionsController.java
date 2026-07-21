@@ -13,12 +13,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import service.AuditLogService;
 
 @WebServlet(name = "EditRolePermissionsController", urlPatterns = {"/edit-role-permissions"})
 public class EditRolePermissionsController extends HttpServlet {
 
     private final RoleService roleService = new RoleService();
-
+    private final AuditLogService AuditLogService = new AuditLogService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -75,7 +76,7 @@ public class EditRolePermissionsController extends HttpServlet {
 
         roleService.updateRolePermissions(roleId, permissionIds);
         request.getSession().removeAttribute("userPermissions"); // Xóa cache quyền của tài khoản hiện tại để cập nhật mới lập tức
-        service.AuditLogService.log(currentUserId, "UPDATE", "Role", "Chỉnh sửa danh sách quyền cho vai trò: " + roleName + " (ID: " + roleId + ")");
+        AuditLogService.log(currentUserId, "UPDATE", "Role", "Chỉnh sửa danh sách quyền cho vai trò: " + roleName + " (ID: " + roleId + ")");
         response.sendRedirect(request.getContextPath() + "/role-detail?roleId=" + roleId + "&status=success");
     }
 }

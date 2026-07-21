@@ -144,12 +144,12 @@
                                 <small>@
                                     <c:out value="${sessionScope.user.userName}" /><br>
                                     <c:choose>
-                                        <c:when test="${sessionScope.user.roleId == 1}">Admin</c:when>
-                                        <c:when test="${sessionScope.user.roleId == 2}">Manager</c:when>
-                                        <c:when test="${sessionScope.user.roleId == 3}">Customer</c:when>
-                                        <c:when test="${sessionScope.user.roleId == 4}">Sale</c:when>
-                                        <c:when test="${sessionScope.user.roleId == 5}">Admin Officer</c:when>
-                                        <c:when test="${sessionScope.user.roleId == 6}">Warehouse</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 1}">Quản trị hệ thống</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 2}">Quản lý</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 3}">Khách hàng</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 4}">Nhân viên Sale</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 5}">Nhân viên Chứng từ</c:when>
+                                        <c:when test="${sessionScope.user.roleId == 6}">Thủ kho</c:when>
                                         <c:otherwise>Role
                                             <c:out value="${sessionScope.user.roleId}" />
                                         </c:otherwise>

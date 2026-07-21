@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 
 import model.Invoice;
 import model.User;
+import service.AuditLogService;
 import service.InvoiceService;
 import service.ProductService;
 
@@ -21,6 +22,7 @@ public class InvoiceList extends HttpServlet {
     private final InvoiceService invoiceService = new InvoiceService();
     private final ProductService productService = new ProductService();
     private final int PAGE_SIZE = 5;
+    private final AuditLogService AuditLogService = new AuditLogService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -142,7 +144,7 @@ public class InvoiceList extends HttpServlet {
                       updated =  invoiceService.updateInvoiceStatus(invoiceId, "CANCELED");
                     }
                     if (updated) {
-                        service.AuditLogService.log(user.getUserId(), "CANCEL", "Invoice", "Hủy bỏ hóa đơn ID: " + invoiceId);
+                        AuditLogService.log(user.getUserId(), "CANCEL", "Invoice", "Hủy bỏ hóa đơn ID: " + invoiceId);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

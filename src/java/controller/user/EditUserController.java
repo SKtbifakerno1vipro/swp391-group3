@@ -104,7 +104,7 @@ public class EditUserController extends HttpServlet {
                 User changePassUser = userService.getUserById(Integer.parseInt(idStr));
                 String newPassword = "123456";
                 userService.changePassword(changePassUser.getUserId(), null, newPassword);
-                service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", "Reset password for User ID: " + idStr);
+                AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", "Reset password for User ID: " + idStr);
                 request.setAttribute("successMsg", "Đã khôi phục mật khẩu về mặc định!");
                 userService.notificationForStaff(changePassUser, newPassword);
                 request.setAttribute("u", changePassUser);
@@ -230,7 +230,7 @@ public class EditUserController extends HttpServlet {
 
         if (success) {
             if (isEdit) {
-                service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", "Cập nhật thông tin tài khoản: " + u.getUserName() + " (ID: " + u.getUserId() + ", Tên: " + u.getFullName() + ")");
+                AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", "Cập nhật thông tin tài khoản: " + u.getUserName() + " (ID: " + u.getUserId() + ", Tên: " + u.getFullName() + ")");
                 //validate when change role ID for yourself to other role
                 if (currentUser.getUserId() == u.getUserId()) {
                     User freshUser = userService.getUserById(u.getUserId());
@@ -238,7 +238,7 @@ public class EditUserController extends HttpServlet {
                 }
                 response.sendRedirect(request.getContextPath() + "/edit-user?id=" + u.getUserId() + "&success=1");
             } else {
-                service.AuditLogService.log(currentUser.getUserId(), "CREATE", "User", "Tạo tài khoản mới: " + u.getUserName() + " (Email: " + u.getEmail() + ", Tên: " + u.getFullName() + ")");
+                AuditLogService.log(currentUser.getUserId(), "CREATE", "User", "Tạo tài khoản mới: " + u.getUserName() + " (Email: " + u.getEmail() + ", Tên: " + u.getFullName() + ")");
                 userService.notificationForStaff(u, password);
                 response.sendRedirect(request.getContextPath() + "/user-list");
             }

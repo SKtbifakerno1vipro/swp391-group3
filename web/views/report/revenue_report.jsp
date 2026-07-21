@@ -86,6 +86,10 @@
                 color: var(--muted);
                 cursor: pointer;
                 transition: var(--transition);
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .filter-btn.active {
@@ -378,7 +382,7 @@
     </head>
     <body>
         <div class="dashboard-shell">
-            <jsp:include page="shared/sidebar.jsp">
+            <jsp:include page="/views/shared/sidebar.jsp">
                 <jsp:param name="activeMenu" value="revenue"/>
             </jsp:include>
 
@@ -387,72 +391,198 @@
                     <div>
                         <p class="eyebrow">Dashboard / Tài chính</p>
                         <h1>Tổng quan tài chính</h1>
-                        <p>Tổng quan doanh thu, chi phí và lợi nhuận của tuần/tháng.</p>
+                        <p>Báo cáo doanh thu phân theo thời gian thực (Hôm nay, Tuần này, Tháng này).</p>
                     </div>
-                    <div class="filter-group">
-                        <button class="filter-btn">Hôm nay</button>
-                        <button class="filter-btn">Tuần này</button>
-                        <button class="filter-btn active">Tháng này</button>
-                    </div>
-                </section>
-
-                <section class="summary-grid">
-                    <div class="kpi-card" style="--card-color: #3b82f6; --card-soft-color: #dbeafe;">
-                        <div class="kpi-icon"><span class="material-symbols-outlined">payments</span></div>
-                        <div class="kpi-info">
-                            <h4><fmt:formatNumber value="${totalRevenue}" type="number" maxFractionDigits="0"/> đ</h4>
-                            <p>Tổng doanh thu</p>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card" style="--card-color: var(--primary); --card-soft-color: var(--primary-soft);">
-                        <div class="kpi-icon"><span class="material-symbols-outlined">shopping_cart</span></div>
-                        <div class="kpi-info">
-                            <h4><c:out value="${totalOrders}"/></h4>
-                            <p>Total Orders</p>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card" style="--card-color: var(--tertiary); --card-soft-color: #fef3c7;">
-                        <div class="kpi-icon"><span class="material-symbols-outlined">request_quote</span></div>
-                        <div class="kpi-info">
-                            <h4><c:out value="${totalQuotations}"/></h4>
-                            <p>Total Quotations</p>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card" style="--card-color: var(--secondary); --card-soft-color: #f5e8db;">
-                        <div class="kpi-icon"><span class="material-symbols-outlined">description</span></div>
-                        <div class="kpi-info">
-                            <h4><c:out value="${totalContracts}"/></h4>
-                            <p>Total Contracts</p>
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <a href="${pageContext.request.contextPath}/product-sales-report" class="filter-btn" style="background: var(--primary); color: #fff;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">analytics</span>
+                            Báo cáo sản phẩm
+                        </a>
+                        <div class="filter-group">
+                            <a href="${pageContext.request.contextPath}/revenue-report?period=today" class="filter-btn ${period == 'today' ? 'active' : ''}">Hôm nay</a>
+                            <a href="${pageContext.request.contextPath}/revenue-report?period=week" class="filter-btn ${period == 'week' ? 'active' : ''}">Tuần này</a>
+                            <a href="${pageContext.request.contextPath}/revenue-report?period=month" class="filter-btn ${empty period || period == 'month' ? 'active' : ''}">Tháng này</a>
+                            <a href="${pageContext.request.contextPath}/revenue-report?period=all" class="filter-btn ${period == 'all' ? 'active' : ''}">Tất cả</a>
                         </div>
                     </div>
                 </section>
-                <section class="bottom-split">
-                    <!-- Left Column: Chart -->
-                    <div class="section-card">
-                        <h3>Hiệu suất khách hàng</h3>
-                        <div class="stat-list">
+
+                <!-- Revenue Breakdown Section -->
+                
+
+                <!-- Period Specific Summary -->
+                <section style="margin-bottom: 30px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                        <h3 style="font-family: 'Literata', Georgia, serif; font-size: 20px; margin: 0; color: var(--text); display: flex; align-items: center; gap: 8px;">
+                            <span class="material-symbols-outlined" style="color: var(--secondary);">filter_alt</span>
+                            Thống kê chi tiết: 
+                            <span style="color: var(--danger); font-weight: 800;">
+                                <c:choose>
+                                    <c:when test="${period == 'today'}">Hôm nay</c:when>
+                                    <c:when test="${period == 'week'}">Tuần này</c:when>
+                                    <c:when test="${period == 'month'}">Tháng này</c:when>
+                                    <c:otherwise>Tất cả thời gian</c:otherwise>
+                                </c:choose>
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="kpi-card" style="--card-color: #3b82f6; --card-soft-color: #dbeafe;">
+                            <div class="kpi-icon"><span class="material-symbols-outlined">payments</span></div>
+                            <div class="kpi-info">
+                                <h4><fmt:formatNumber value="${totalRevenue}" type="number" maxFractionDigits="0"/> đ</h4>
+                                <p>Doanh thu kỳ chọn</p>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" style="--card-color: var(--primary); --card-soft-color: var(--primary-soft);">
+                            <div class="kpi-icon"><span class="material-symbols-outlined">shopping_cart</span></div>
+                            <div class="kpi-info">
+                                <h4><c:out value="${totalOrders}"/></h4>
+                                <p>Đơn hàng kỳ chọn</p>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" style="--card-color: var(--tertiary); --card-soft-color: #fef3c7;">
+                            <div class="kpi-icon"><span class="material-symbols-outlined">request_quote</span></div>
+                            <div class="kpi-info">
+                                <h4><c:out value="${totalQuotations}"/></h4>
+                                <p>Báo giá kỳ chọn</p>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" style="--card-color: var(--secondary); --card-soft-color: #f5e8db;">
+                            <div class="kpi-icon"><span class="material-symbols-outlined">description</span></div>
+                            <div class="kpi-info">
+                                <h4><c:out value="${totalContracts}"/></h4>
+                                <p>Hợp đồng kỳ chọn</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- BÁO CÁO ĐƠN HÀNG -->
+                <section style="margin-bottom: 30px;">
+                    <h3 style="font-family: 'Literata', Georgia, serif; font-size: 22px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: var(--primary);">shopping_cart</span>
+                        Thống Kê
+                    </h3>
+                    <div class="bottom-split">
+                        <!-- Left: Status Breakdown -->
+                        <div class="section-card">
+                            <h3>Trạng thái Đơn hàng</h3>
+                            <c:choose>
+                                <c:when test="${empty orderStatusCounts}">
+                                    <div class="empty-state">
+                                        <span class="material-symbols-outlined">pie_chart</span>
+                                        <p>Chưa có dữ liệu trạng thái đơn hàng</p>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="chart-container" style="height: 220px;">
+                                        <canvas id="orderStatusChart"></canvas>
+                                    </div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; justify-content: center;">
+                                        <c:forEach items="${orderStatusCounts}" var="st">
+                                            <span class="badge-status" style="background: var(--surface-soft); color: var(--text);">
+                                                ${st.status}: <strong>${st.total}</strong>
+                                            </span>
+                                        </c:forEach>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+
+                        <!-- Right: Recent Orders Table -->
+                        <div class="data-table-wrapper">
+                            <h3>Đơn hàng gần đây</h3>
+                            <c:choose>
+                                <c:when test="${empty recentOrders}">
+                                    <div class="empty-state">
+                                        <span class="material-symbols-outlined">receipt</span>
+                                        <p>Không có đơn hàng nào trong kỳ này</p>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Mã ĐH</th>
+                                                <th>Khách hàng</th>
+                                                <th>Ngày tạo</th>
+                                                <th>Trạng thái</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach var="ord" items="${recentOrders}">
+                                                <tr>
+                                                    <td style="font-weight:700;">#<c:out value="${ord.id}"/></td>
+                                                    <td><c:out value="${not empty ord.companyName ? ord.companyName : ord.customerName}"/></td>
+                                                    <td><fmt:formatDate value="${ord.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
+                                                    <td>
+                                                        <span class="badge-status" style="background:var(--primary-soft); color:var(--primary);"><c:out value="${ord.status}"/></span>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </tbody>
+                                    </table>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- BÁO CÁO SẢN PHẨM & KHÁCH HÀNG -->
+                <section style="margin-bottom: 30px;">
+                    <h3 style="font-family: 'Literata', Georgia, serif; font-size: 22px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: var(--tertiary);">inventory_2</span>
+                        Báo cáo Sản phẩm & Khách hàng
+                    </h3>
+                    <div class="bottom-split">
+                        <!-- Left: Top Selling Products -->
+                        <div class="section-card">
+                            <h3>Top Sản phẩm bán chạy</h3>
+                            <c:choose>
+                                <c:when test="${empty topSellingProducts}">
+                                    <div class="empty-state">
+                                        <span class="material-symbols-outlined">package_2</span>
+                                        <p>Không có dữ liệu sản phẩm</p>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="chart-container" style="height: 220px;">
+                                        <canvas id="productsChart"></canvas>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+
+                        <!-- Right: Top Customers -->
+                        <div class="section-card">
+                            <h3>Hiệu suất Khách hàng</h3>
                             <c:choose>
                                 <c:when test="${empty topCustomers}">
                                     <div class="empty-state">
                                         <span class="material-symbols-outlined">groups</span>
-                                        <p>No customer data available</p>
+                                        <p>Không có dữ liệu khách hàng</p>
                                     </div>
                                 </c:when>
                                 <c:otherwise>
-                                    <div class="chart-container">
+                                    <div class="chart-container" style="height: 220px;">
                                         <canvas id="customersChart"></canvas>
                                     </div>
                                 </c:otherwise>
                             </c:choose>
                         </div>
                     </div>
+                </section>
 
-                    <!-- Right Column: Data Table -->
+                <!-- BÁO CÁO HÓA ĐƠN DOANH THU -->
+                <section style="margin-bottom: 30px;">
+                    <h3 style="font-family: 'Literata', Georgia, serif; font-size: 22px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: var(--secondary);">receipt_long</span>
+                        Báo cáo Hóa đơn Doanh thu
+                    </h3>
                     <div class="data-table-wrapper">
-                    <h3>Recent Revenue (Invoices)</h3>
                     <c:choose>
                         <c:when test="${empty recentInvoices}">
                             <div class="empty-state">
@@ -524,7 +654,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } }
+                    legend: { position: 'bottom', labels: { padding: 15, usePointStyle: true } }
                 }
             };
             const barOptions = {
@@ -533,6 +663,48 @@
                 plugins: { legend: { display: false } },
                 scales: { y: { beginAtZero: true } }
             };
+
+            // Order Status Doughnut Chart
+            <c:if test="${not empty orderStatusCounts}">
+            new Chart(document.getElementById('orderStatusChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        <c:forEach items="${orderStatusCounts}" var="s">"${s.status}",</c:forEach>
+                    ],
+                    datasets: [{
+                        data: [
+                            <c:forEach items="${orderStatusCounts}" var="s">${s.total},</c:forEach>
+                        ],
+                        backgroundColor: ['#4a7c59', '#3b82f6', '#b1812f', '#b83230', '#7a6148', '#646b66', '#0284c7'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: chartOptions
+            });
+            </c:if>
+
+            // Top Products Bar Chart
+            <c:if test="${not empty topSellingProducts}">
+            new Chart(document.getElementById('productsChart'), {
+                type: 'bar',
+                data: {
+                    labels: [
+                        <c:forEach items="${topSellingProducts}" var="p">"${p.productName}",</c:forEach>
+                    ],
+                    datasets: [{
+                        label: 'Số lượng bán',
+                        data: [
+                            <c:forEach items="${topSellingProducts}" var="p">${p.totalSold},</c:forEach>
+                        ],
+                        backgroundColor: '#4a7c59',
+                        borderRadius: 6
+                    }]
+                },
+                options: barOptions
+            });
+            </c:if>
 
             // Top Customers Bar Chart
             <c:if test="${not empty topCustomers}">
@@ -543,7 +715,7 @@
                         <c:forEach items="${topCustomers}" var="c">"${c.companyName}",</c:forEach>
                     ],
                     datasets: [{
-                        label: 'Orders',
+                        label: 'Số đơn hàng',
                         data: [
                             <c:forEach items="${topCustomers}" var="c">${c.totalOrders},</c:forEach>
                         ],

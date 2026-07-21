@@ -7,17 +7,20 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import model.Invoice;
+import model.Role;
 import service.InvoiceService;
+import service.RoleService;
 
 @WebServlet(name = "CustomerOrderListController", urlPatterns = {"/customer-order-list"})
 public class CustomerOrderListController extends HttpServlet {
 
     private final CustomerOrderService customerOrderService = new CustomerOrderService();
     private final InvoiceService invoiceService = new InvoiceService();
-
+    private final RoleService RoleService = new RoleService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -41,15 +44,15 @@ public class CustomerOrderListController extends HttpServlet {
         List<CustomerOrderDTO> listOrder;
         int totalRecords;
         
-        jakarta.servlet.http.HttpSession session = request.getSession();
+        HttpSession session = request.getSession();
         model.User currentUser = (model.User) session.getAttribute("user");
         int userId = 0;
         String roleName = "";
         if (currentUser != null) {
             userId = currentUser.getUserId();
             int roleId = currentUser.getRoleId();
-            service.RoleService roleService = new service.RoleService();
-            model.Role userRole = roleService.getRoleById(roleId);
+            RoleService roleService = new RoleService();
+            Role userRole = roleService.getRoleById(roleId);
             roleName = userRole != null ? userRole.getRoleName() : "";
         }
 

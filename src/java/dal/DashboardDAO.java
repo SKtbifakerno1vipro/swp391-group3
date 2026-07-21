@@ -62,12 +62,20 @@ public class DashboardDAO extends DBContext {
     }
 
     public List<StatusStatisticDTO> countByStatus(String tableName, String statusColumn, Integer saleId) {
+        return countByStatus(tableName, statusColumn, saleId, null);
+    }
+
+    public List<StatusStatisticDTO> countByStatus(String tableName, String statusColumn, Integer saleId, String period) {
         List<StatusStatisticDTO> statusCounts = new ArrayList<>();
         String sql = "SELECT " + tableName + "." + statusColumn + ", COUNT(*) AS total FROM " + tableName + " ";
         if (saleId != null) {
             sql += " LEFT JOIN customer c ON " + tableName + ".customer_id = c.customer_id ";
-            sql += " WHERE c.assigned_to_user_id = ? ";
         }
+        sql += " WHERE 1=1 ";
+        if (saleId != null) {
+            sql += " AND c.assigned_to_user_id = ? ";
+        }
+        sql += getPeriodSqlCondition(tableName + ".created_at", period);
         sql += " GROUP BY " + tableName + "." + statusColumn;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -128,25 +136,31 @@ public class DashboardDAO extends DBContext {
     }
 
     public List<Map<String, Object>> getRecentOrders(int limit) {
-        return getRecentOrders(limit, null);
+        return getRecentOrders(limit, null, null);
     }
 
     public List<Map<String, Object>> getRecentOrders(int limit, Integer saleId) {
+        return getRecentOrders(limit, saleId, null);
+    }
+
+    public List<Map<String, Object>> getRecentOrders(int limit, Integer saleId, String period) {
         List<Map<String, Object>> orders = new ArrayList<>();
         String sql = "SELECT TOP (?) co.customer_order_id, co.order_status, co.created_at, "
                 + "c.company_name, u.full_name "
                 + "FROM customer_order co "
                 + "LEFT JOIN customer c ON co.customer_id = c.customer_id "
-                + "LEFT JOIN [user] u ON c.user_id = u.user_id ";
+                + "LEFT JOIN [user] u ON c.user_id = u.user_id WHERE 1=1 ";
         if (saleId != null) {
-            sql += "WHERE c.assigned_to_user_id = ? ";
+            sql += "AND c.assigned_to_user_id = ? ";
         }
+        sql += getPeriodSqlCondition("co.created_at", period);
         sql += "ORDER BY co.created_at DESC, co.customer_order_id DESC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, limit);
+            int idx = 1;
+            ps.setInt(idx++, limit);
             if (saleId != null) {
-                ps.setInt(2, saleId);
+                ps.setInt(idx++, saleId);
             }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -165,11 +179,26 @@ public class DashboardDAO extends DBContext {
         return orders;
     }
 
+    private String getPeriodSqlCondition(String dateColumn, String period) {
+        if ("today".equalsIgnoreCase(period)) {
+            return " AND CAST(" + dateColumn + " AS DATE) = CAST(GETDATE() AS DATE) ";
+        } else if ("week".equalsIgnoreCase(period)) {
+            return " AND " + dateColumn + " >= DATEADD(wk, DATEDIFF(wk, 0, GETDATE()), 0) ";
+        } else if ("month".equalsIgnoreCase(period)) {
+            return " AND " + dateColumn + " >= DATEADD(mm, DATEDIFF(mm, 0, GETDATE()), 0) ";
+        }
+        return "";
+    }
+
     public double getTotalRevenue() {
-        return getTotalRevenue(null);
+        return getTotalRevenue(null, null);
     }
 
     public double getTotalRevenue(Integer saleId) {
+        return getTotalRevenue(saleId, null);
+    }
+
+    public double getTotalRevenue(Integer saleId, String period) {
         String sql = "SELECT SUM(cod.quantity * cod.selling_price * (1 - COALESCE(qd.discount_percent, 0) / 100.0)) as total_revenue "
                 + "FROM customer_order_detail cod "
                 + "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id "
@@ -179,6 +208,7 @@ public class DashboardDAO extends DBContext {
         if (saleId != null) {
             sql += "AND c.assigned_to_user_id = ? ";
         }
+        sql += getPeriodSqlCondition("co.created_at", period);
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             if (saleId != null) {
                 ps.setInt(1, saleId);
@@ -194,14 +224,19 @@ public class DashboardDAO extends DBContext {
     }
 
     public int getTotalOrders() {
-        return getTotalOrders(null);
+        return getTotalOrders(null, null);
     }
 
     public int getTotalOrders(Integer saleId) {
-        String sql = "SELECT COUNT(*) as total_orders FROM customer_order co LEFT JOIN customer c ON co.customer_id = c.customer_id ";
+        return getTotalOrders(saleId, null);
+    }
+
+    public int getTotalOrders(Integer saleId, String period) {
+        String sql = "SELECT COUNT(*) as total_orders FROM customer_order co LEFT JOIN customer c ON co.customer_id = c.customer_id WHERE 1=1 ";
         if (saleId != null) {
-            sql += "WHERE c.assigned_to_user_id = ? ";
+            sql += "AND c.assigned_to_user_id = ? ";
         }
+        sql += getPeriodSqlCondition("co.created_at", period);
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             if (saleId != null) {
                 ps.setInt(1, saleId);
@@ -253,10 +288,15 @@ public class DashboardDAO extends DBContext {
     }
 
     public int getTotalQuotations(Integer saleId) {
-        String sql = "SELECT COUNT(*) FROM quotation q LEFT JOIN customer c ON q.customer_id = c.customer_id ";
+        return getTotalQuotations(saleId, null);
+    }
+
+    public int getTotalQuotations(Integer saleId, String period) {
+        String sql = "SELECT COUNT(*) FROM quotation q LEFT JOIN customer c ON q.customer_id = c.customer_id WHERE 1=1 ";
         if (saleId != null) {
-            sql += "WHERE c.assigned_to_user_id = ? ";
+            sql += "AND c.assigned_to_user_id = ? ";
         }
+        sql += getPeriodSqlCondition("q.created_at", period);
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             if (saleId != null) {
                 ps.setInt(1, saleId);
@@ -272,10 +312,15 @@ public class DashboardDAO extends DBContext {
     }
 
     public int getTotalContracts(Integer saleId) {
-        String sql = "SELECT COUNT(*) FROM customer_contract cc LEFT JOIN customer c ON cc.customer_id = c.customer_id ";
+        return getTotalContracts(saleId, null);
+    }
+
+    public int getTotalContracts(Integer saleId, String period) {
+        String sql = "SELECT COUNT(*) FROM customer_contract cc LEFT JOIN customer c ON cc.customer_id = c.customer_id WHERE 1=1 ";
         if (saleId != null) {
-            sql += "WHERE c.assigned_to_user_id = ? ";
+            sql += "AND c.assigned_to_user_id = ? ";
         }
+        sql += getPeriodSqlCondition("cc.created_at", period);
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             if (saleId != null) {
                 ps.setInt(1, saleId);
@@ -325,10 +370,14 @@ public class DashboardDAO extends DBContext {
     }
 
     public List<TopProductDTO> getTopSellingProducts(int limit) {
-        return getTopSellingProducts(limit, null);
+        return getTopSellingProducts(limit, null, null);
     }
 
     public List<TopProductDTO> getTopSellingProducts(int limit, Integer saleId) {
+        return getTopSellingProducts(limit, saleId, null);
+    }
+
+    public List<TopProductDTO> getTopSellingProducts(int limit, Integer saleId, String period) {
         List<TopProductDTO> list = new ArrayList<>();
         String sql = "SELECT TOP (?) p.product_name, SUM(cod.quantity) as total_sold "
                 + "FROM customer_order_detail cod "
@@ -342,12 +391,14 @@ public class DashboardDAO extends DBContext {
         if (saleId != null) {
             sql += "AND c.assigned_to_user_id = ? ";
         }
+        sql += getPeriodSqlCondition("co.created_at", period);
         sql += "GROUP BY p.product_name "
                 + "ORDER BY total_sold DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, limit);
+            int idx = 1;
+            ps.setInt(idx++, limit);
             if (saleId != null) {
-                ps.setInt(2, saleId);
+                ps.setInt(idx++, saleId);
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -367,20 +418,26 @@ public class DashboardDAO extends DBContext {
     }
 
     public List<TopCustomerDTO> getTopCustomersByOrderCount(int limit, Integer saleId) {
+        return getTopCustomersByOrderCount(limit, saleId, null);
+    }
+
+    public List<TopCustomerDTO> getTopCustomersByOrderCount(int limit, Integer saleId, String period) {
         List<TopCustomerDTO> list = new ArrayList<>();
         String sql = "SELECT TOP (?) c.company_name, COUNT(co.customer_order_id) as total_orders "
                 + "FROM customer_order co "
-                + "JOIN customer c ON co.customer_id = c.customer_id ";
+                + "JOIN customer c ON co.customer_id = c.customer_id WHERE 1=1 ";
         if (saleId != null) {
-            sql += "WHERE c.assigned_to_user_id = ? ";
+            sql += "AND c.assigned_to_user_id = ? ";
         }
+        sql += getPeriodSqlCondition("co.created_at", period);
         sql += "GROUP BY c.company_name "
                 + "ORDER BY total_orders DESC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, limit);
+            int idx = 1;
+            ps.setInt(idx++, limit);
             if (saleId != null) {
-                ps.setInt(2, saleId);
+                ps.setInt(idx++, saleId);
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -735,7 +792,7 @@ public class DashboardDAO extends DBContext {
         InvoiceSummaryDTO summary = new InvoiceSummaryDTO();
         String sql = """
                    SELECT 
-                       COUNT(DISTINCT i.invoice_id) as total_invoices, 
+                       COUNT( i.invoice_id) as total_invoices, 
                        SUM(CASE WHEN p.payment_status = 'COMPLETED' THEN i.total_amount ELSE 0 END) as paid_amount, 
                        SUM(CASE WHEN p.payment_status !='COMPLETED' THEN i.total_amount ELSE 0 END) as unpaid_amount 
                    FROM invoice i 
@@ -760,6 +817,10 @@ public class DashboardDAO extends DBContext {
      * @return the list recent invoice
      */
     public List<RecentInvoiceDTO> getRecentInvoicesForOfficer(int limit, String startDate, String endDate) {
+        return getRecentInvoicesForOfficer(limit, startDate, endDate, null);
+    }
+
+    public List<RecentInvoiceDTO> getRecentInvoicesForOfficer(int limit, String startDate, String endDate, String period) {
         List<RecentInvoiceDTO> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT TOP (?) i.invoice_id, i.invoice_no, i.issue_date, i.total_amount, i.invoice_status, "
                 + "c.contract_number, cu.company_name, o.customer_order_id "
@@ -775,6 +836,7 @@ public class DashboardDAO extends DBContext {
         if (endDate != null && !endDate.isEmpty()) {
             sql.append(" AND i.issue_date <= ? ");
         }
+        sql.append(getPeriodSqlCondition("i.issue_date", period));
         sql.append(" ORDER BY i.issue_date DESC, i.invoice_id DESC");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
@@ -928,6 +990,86 @@ public class DashboardDAO extends DBContext {
             }
         } catch (Exception e) {
             System.out.println("getRecentOrdersList error: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<ProductSalesItemDTO> getProductSalesReport(String startDate, String endDate, Integer staffId) {
+        List<ProductSalesItemDTO> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT p.product_name, "
+          + "       SUM(cod.quantity) as total_quantity, "
+          + "       AVG(cod.selling_price) as avg_price, "
+          + "       SUM(cod.quantity * cod.selling_price * (1 - COALESCE(qd.discount_percent, 0) / 100.0)) as total_amount "
+          + "FROM customer_order_detail cod "
+          + "JOIN customer_order co ON cod.customer_order_id = co.customer_order_id "
+          + "JOIN quotation_detail qd ON cod.quotation_detail_id = qd.quotation_detail_id "
+          + "JOIN product p ON qd.product_id = p.product_id "
+          + "LEFT JOIN quotation q ON qd.quotation_id = q.quotation_id "
+          + "LEFT JOIN customer c ON co.customer_id = c.customer_id "
+          + "WHERE co.order_status IN ('COMPLETED', 'Completed', 'DELIVERED', 'SHIPPING') "
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            sql.append(" AND co.created_at >= ? ");
+            params.add(startDate + " 00:00:00");
+        }
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            sql.append(" AND co.created_at <= ? ");
+            params.add(endDate + " 23:59:59");
+        }
+        if (staffId != null && staffId > 0) {
+            sql.append(" AND (c.assigned_to_user_id = ? OR co.created_by = ? OR q.created_by = ?) ");
+            params.add(staffId);
+            params.add(staffId);
+            params.add(staffId);
+        }
+
+        sql.append(" GROUP BY p.product_name ORDER BY total_amount DESC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ProductSalesItemDTO item = new ProductSalesItemDTO();
+                    item.setProductName(rs.getString("product_name"));
+                    item.setQuantity(rs.getInt("total_quantity"));
+                    item.setPrice(rs.getDouble("avg_price"));
+                    item.setAmount(rs.getDouble("total_amount"));
+                    list.add(item);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getProductSalesReport Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Map<String, Object>> getAllStaffUsers() {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT u.user_id, u.full_name, u.user_name "
+                   + "FROM [user] u "
+                   + "LEFT JOIN role r ON u.role_id = r.role_id "
+                   + "WHERE u.account_status = 'ACTIVE' "
+                   + "  AND (u.role_id = 4 OR LOWER(r.role_name) LIKE '%sale%') "
+                   + "ORDER BY u.full_name ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("userId", rs.getInt("user_id"));
+                    map.put("fullName", rs.getString("full_name"));
+                    map.put("userName", rs.getString("user_name"));
+                    list.add(map);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return list;
     }

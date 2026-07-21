@@ -28,6 +28,11 @@ public class QuotationService {
             Integer saleId, Integer userId, Integer roleId, int pageIndex, int pageSize) {
         return quotationDAO.searchQuotations(search, status, fromDate, toDate, saleId, userId, roleId, pageIndex, pageSize);
     }
+    
+    public List<Quotation> searchQuotations(String search, String status, String fromDate, String toDate,
+             Integer userId, Integer roleId, int pageIndex, int pageSize) {
+        return quotationDAO.searchQuotations(search, status, fromDate, toDate, null, userId, roleId, pageIndex, pageSize);
+    }
 
     public List<CustomerDTO> getAllCustomers() {
         return customerService.getAllCustomerDTOs();

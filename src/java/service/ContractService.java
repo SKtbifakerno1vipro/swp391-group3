@@ -111,11 +111,9 @@ public class ContractService {
         return contractDAO.refreshContractToken(contractId);
     }
 
-    public void noticeCustomerCheckContract(int contractId) {
+    public void noticeCustomerCheckContract(int contractId, String baseUrl) {
         Contract contract = contractDAO.getContractById(contractId);
         CustomerDTO customer = contractDAO.getCustomerDTOByContractId(contractId);
-
-        String baseUrl = "http://localhost:9999/SWP391_GROUP3/";
 
         String secureUrl = baseUrl + "contract-detail?id=" + contractId + "&token=" + contract.getToken();
 
@@ -155,10 +153,10 @@ public class ContractService {
         EmailUtils.sendEmailAsync(customer.getUser().getEmail(), subject, content, customer.getUser().getUserId());
     }
 
-    public void noticeSendFinalContractPdf(int contractId, String token) {
+    public void noticeSendFinalContractPdf(int contractId, String token, String baseUrl) {
         Contract contract = contractDAO.getContractById(contractId);
         CustomerDTO customer = contractDAO.getCustomerDTOByContractId(contractId);
-        String secureUrl = "http://localhost:9999/SWP391_GROUP3/export-pdf?token=" + token;
+        String secureUrl = baseUrl + "export-pdf?token=" + token;
         String subject = "Công Ty TNHH Pơ Bread - Gửi bản sao Hợp đồng (Đã Ký) cho Quý khách lưu trữ";
 
         String content = "<!DOCTYPE html>"
