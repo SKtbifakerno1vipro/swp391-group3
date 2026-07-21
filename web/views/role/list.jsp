@@ -532,7 +532,7 @@
                                         </td>
                                         <!-- nut actions -->
                                         <td><div class="row-actions">
-                                                <a class="chip" href="${pageContext.request.contextPath}/edit-role-permissions?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Chỉnh sửa</a></div></td>
+                                                <a class="chip" href="${pageContext.request.contextPath}/role-detail?roleId=${role.roleId}"><span class="material-symbols-outlined">tune</span>Chi tiết</a></div></td>
                                     </tr>
                                 </c:forEach>
                             </tbody>

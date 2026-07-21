@@ -132,6 +132,7 @@ CREATE TABLE import_request (
     imported_by INT NULL,
     imported_date DATETIME NULL,
     note NVARCHAR(MAX) NULL,
+	warehouse_note NVARCHAR(MAX) NULL,
     FOREIGN KEY (product_id) REFERENCES product(product_id),
     FOREIGN KEY (created_by) REFERENCES [user](user_id),
     FOREIGN KEY (imported_by) REFERENCES [user](user_id)

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class EmailLog {
     private int logId;
     private String recipient;
+    private String userName;
     private String subject;
     private String content;
     private Timestamp sentAt;

@@ -37,7 +37,7 @@ public class SecurityFilter implements Filter {
             "/product-review", "/contract-list", "/contract-detail", "/export-pdf", "/File",
             "/Signature", "/invoice-list", "/invoice/create", "/invoice", "/preview",
             "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail",
-            "/revenue-report", "/revenue"
+            "/revenue-report", "/revenue","/import-request-create", "/import-request-list", "/import-request-detail"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
@@ -54,7 +54,7 @@ public class SecurityFilter implements Filter {
             "/category/create", "/category/edit", "/category/delete", "/product-list", "/edit-product",
             "/product-delete", "/product-review", "/quotation-list", "/quotation-create", "/quotation-detail",
             "/invoice/create", "/invoice", "/preview", "/payment/list", "/payment", "/payment/return",
-            "/payment/ipn", "/payment/detail", "/import-request-list", "/import-request-detail"
+            "/payment/ipn", "/payment/detail", "/import-request-list", "/import-request-detail","/import-request-create"
     );
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
@@ -62,14 +62,14 @@ public class SecurityFilter implements Filter {
             "/customer-order", "/AcceptanceRecordController", "/product-review", "/quotation-list",
             "/quotation-detail", "/contract-list", "/contract-create", "/contract-save", "/contract-detail",
             "/export-pdf", "/File", "/invoice-list", "/invoice/create", "/invoice", "/preview",
-            "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail"
+            "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail", "/import-request-create", "/import-request-list"
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
             "/dashboard", "/admin-dashboard", "/customer-order-list", "/customer-order", "/AcceptanceRecordController",
             "/category/list", "/category/create", "/category/edit", "/category/delete", "/product-list",
             "/create-product", "/edit-product", "/product-delete", "/product-review", "/contract-list",
-            "/import-request-list", "/import-request-create", "/import-request-detail"
+            "/import-request-list", "/import-request-create", "/import-request-detail", "/warehouse-dashboard"
     );
 
     private static final List<String> PUBLIC_URLS = List.of(
@@ -93,6 +93,7 @@ public class SecurityFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
+        
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 

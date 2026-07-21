@@ -104,16 +104,33 @@ public class ImportRequestDAO extends DBContext {
         return false;
     }
 
-    // Hủy yêu cầu nhập kho (Status chuyển sang 3: Cancelled, chỉ cho phép nếu đang Pending - 1)
-    public boolean cancelImportRequest(int id) {
-        String sql = "UPDATE import_request SET status = 3 WHERE import_id = ? AND status = 1";
+    // Hủy yêu cầu nhập kho (Status chuyển sang 3: Cancelled, lưu ghi chú kho và người hủy, chỉ cho phép nếu đang Pending - 1)
+    public boolean cancelImportRequest(int id, String wareHousenote, int userId) {
+        // Thử cập nhật với 'ware_housenote' trước, nếu DB dùng 'warehouse_note' thì tự động fallback
+        String sql = "UPDATE import_request SET status = 3, ware_housenote = ?, imported_by = ?, imported_date = GETDATE() WHERE import_id = ? AND status = 1";
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setInt(1, id);
-            return stm.executeUpdate() > 0;
+            stm.setString(1, wareHousenote);
+            stm.setInt(2, userId);
+            stm.setInt(3, id);
+            int rows = stm.executeUpdate();
+            stm.close();
+            return rows > 0;
         } catch (Exception e) {
-            System.out.println("ImportRequestDAO cancelImportRequest error: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("ImportRequestDAO cancelImportRequest note column fallback triggered: " + e.getMessage());
+            try {
+                String sqlFallback = "UPDATE import_request SET status = 3, warehouse_note = ?, imported_by = ?, imported_date = GETDATE() WHERE import_id = ? AND status = 1";
+                PreparedStatement stmFallback = connection.prepareStatement(sqlFallback);
+                stmFallback.setString(1, wareHousenote);
+                stmFallback.setInt(2, userId);
+                stmFallback.setInt(3, id);
+                int rows = stmFallback.executeUpdate();
+                stmFallback.close();
+                return rows > 0;
+            } catch (Exception ex) {
+                System.out.println("ImportRequestDAO cancelImportRequest error: " + ex.getMessage());
+                ex.printStackTrace();
+            }
         }
         return false;
     }
@@ -248,6 +265,21 @@ public class ImportRequestDAO extends DBContext {
         }
         
         ir.setNote(rs.getString("note"));
+        
+        // Lấy an toàn ghi chú từ tên cột 'ware_housenote' hoặc 'warehouse_note' mà không làm treo câu lệnh SQL
+        String whNote = null;
+        try {
+            whNote = rs.getString("ware_housenote");
+        } catch (SQLException ignored) {
+        }
+        if (whNote == null) {
+            try {
+                whNote = rs.getString("warehouse_note");
+            } catch (SQLException ignored) {
+            }
+        }
+        ir.setWareHousenote(whNote);
+        
         return ir;
     }
 }

@@ -84,12 +84,9 @@ public class LoginController extends HttpServlet {
             session.removeAttribute("userPermissions"); // Xóa cache quyền cũ trong session (nếu có)
             session.setAttribute("user", authenticatedUser);
             AuditLogService.log(user.getUserId(), "LOGIN", "Auth", authenticatedUser.getUserName() + " vừa đăng nhập  vào hệ thống");
-            if (authenticatedUser.getRoleId() == 6) {
-                response.sendRedirect(request.getContextPath() + "/product-list");
-            } else {
+            
                 response.sendRedirect(request.getContextPath() + "/dashboard");
-            }
-            return;
+            
         } else {
             // Login Failed: Increment attempts
             failedAttempts++;

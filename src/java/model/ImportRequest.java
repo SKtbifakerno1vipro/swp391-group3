@@ -15,6 +15,7 @@ public class ImportRequest {
     private String importedByName; // Dùng để hiển thị tên người nhập kho
     private Timestamp importedDate;
     private String note;
+    private String wareHousenote; // Ghi chú khi hủy yêu cầu nhập kho của Warehouse
 
     public ImportRequest() {
     }
@@ -113,5 +114,13 @@ public class ImportRequest {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getWareHousenote() {
+        return wareHousenote;
+    }
+
+    public void setWareHousenote(String wareHousenote) {
+        this.wareHousenote = wareHousenote;
     }
 }

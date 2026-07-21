@@ -455,9 +455,9 @@
                                         <td>Trạng thái sản phẩm</td>
                                         <td>
                                             <select name="status" ${action != 'detail' ? ' ' : 'disabled'}>
-                                                <option value="ACTIVE" ${product.productStatus == 'ACTIVE' || product.productStatus == 'Active' ? 'selected' : ''}>Hoạt động</option>
-                                                <option value="OUT_OF_STOCK" ${product.productStatus == 'OUT_OF_STOCK' || product.productStatus == 'OUT OF STOCK' || product.productStatus == 'Out of stock' ? 'selected' : ''}>Hết hàng</option>
-                                                <option value="INACTIVE" ${product.productStatus == 'INACTIVE' || product.productStatus == 'Inactive' ? 'selected' : ''}>Không hoạt động</option>
+                                                <option value="ACTIVE" ${product.productStatus == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option>
+                                                <option value="OUT_OF_STOCK" ${product.productStatus == 'OUT_OF_STOCK' ? 'selected' : ''}>Hết hàng</option>
+                                                <option value="INACTIVE" ${product.productStatus == 'INACTIVE' ? 'selected' : ''}>Không hoạt động</option>
                                             </select>
                                         </td>
                                     </tr>
@@ -465,7 +465,7 @@
 
                                     <tr>
                                         <td>Số lượng</td>
-                                        <td><input type="number" name="quantity" value="${product.quantityAvailable}" min="0" ${action != 'detail' ? ' ' : 'readonly'} required></td>
+                                        <td><input type="number" name="quantity" value="${product.quantityAvailable}" min="0" readonly></td>
                                     </tr>
                                     <tr>
                                         <td>Số lượng đặt trước</td>
