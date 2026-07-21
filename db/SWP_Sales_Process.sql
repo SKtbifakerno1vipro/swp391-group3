@@ -729,10 +729,12 @@ SELECT 2, permission_id FROM permission WHERE permission_name IN (
 -- 3. Customer (role_id = 3)
 INSERT INTO role_permission (role_id, permission_id)
 SELECT 3, permission_id FROM permission WHERE permission_name IN (
+
     N'Dashboard', N'Profile', N'Customer Detail', N'Customer Edit', N'Order List', N'Order Detail', N'Category List',
     N'Product List', N'Quotation List', N'Quotation Detail', N'Contract List', N'Contract Detail(Edit)', N'Signature Contract',
     N'Invoice List', N'Invoice Detail', N'Preview Invoice', N'Payment List', N'Payment Detail'
 );
+
 
 -- 4. Sale Staff (role_id = 4)
 INSERT INTO role_permission (role_id, permission_id)
