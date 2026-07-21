@@ -276,7 +276,7 @@
                                             <option value="${r.roleId}" ${r.roleId == roleId ? 'selected' : ''}>
                                                 <c:choose>
                                                     <c:when test="${r.roleId == 1}">Quản trị hệ thống</c:when>
-                                                    <c:when test="${r.roleId == 2}">Quản lý</c:when><c:when test="${r.roleId == 3}">Khách hàng</c:when>
+                                                    <c:when test="${r.roleId == 2}">Quản lý</c:when>
                                                     <c:when test="${r.roleId == 4}">Nhân viên Sale</c:when>
                                                     <c:when test="${r.roleId == 5}">Nhân viên Officer</c:when>
                                                     <c:when test="${r.roleId == 6}">Thủ kho</c:when>
@@ -306,7 +306,6 @@
                                             <c:choose>
                                                 <c:when test="${u.roleId == 1}">Quản trị hệ thống</c:when>
                                                 <c:when test="${u.roleId == 2}">Quản lý</c:when>
-                                                <c:when test="${u.roleId == 3}">Khách hàng</c:when>
                                                 <c:when test="${u.roleId == 4}">Nhân viên Sale</c:when>
                                                 <c:when test="${u.roleId == 5}">Nhân viên Officer</c:when>
                                                 <c:when test="${u.roleId == 6}">Thủ kho</c:when>

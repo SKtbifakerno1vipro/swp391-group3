@@ -27,7 +27,7 @@ public class UserListController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-        
+
         String roleIdString = request.getParameter("roleId");
         String status = request.getParameter("status");
         String searchEmail = request.getParameter("searchEmail") != null ? request.getParameter("searchEmail").trim().replaceAll("\\s+", "") : null;
@@ -65,7 +65,7 @@ public class UserListController extends HttpServlet {
         request.setAttribute("roleId", roleId);
         request.setAttribute("status", status);
         request.setAttribute("users", userService.searchUsers(roleId, status, searchName, searchPhone, searchEmail, pageIndex, pageSize));
-        request.setAttribute("roles", roleService.getAllRoles());
+        request.setAttribute("roles", roleService.getAllRolesForCreateUser());
         request.setAttribute("searchEmail", searchEmail);
         request.setAttribute("searchPhone", searchPhone);
         request.setAttribute("searchName", searchName);
