@@ -63,7 +63,7 @@ public class UserDAO extends DBContext {
     public List<UserRoleDTO> searchUsers(int roleId, String status, String searchName, String searchPhone, String searchEmail, int pageIndex, int pageSize) {
         List<UserRoleDTO> list = new ArrayList<>();
         // Tim dong nay trong UserDAO.java
-        String sql = "SELECT u.*, r.role_name FROM [user] u  JOIN dbo.role r ON u.role_id = r.role_id WHERE 1=1";
+        String sql = "SELECT u.*, r.role_name FROM [user] u  JOIN dbo.role r ON u.role_id = r.role_id WHERE 1=1 and u.role_id != 3";
         if (roleId > 0) {
             sql += " AND u.role_id = ?";
         }

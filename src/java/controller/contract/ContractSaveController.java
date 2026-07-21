@@ -27,6 +27,7 @@ public class ContractSaveController extends HttpServlet {
     private final ContractService contractService = new ContractService();
     private final QuotationService quotationService = new QuotationService();
     private final CustomerService customerService = new CustomerService();
+    private final AuditLogService AuditLogService = new AuditLogService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -153,13 +154,13 @@ public class ContractSaveController extends HttpServlet {
                     if ("DRAFT".equals(c.getContractStatus()) || "PENDING_REVIEW".equals(c.getContractStatus())) {
                         contractService.updateStatus(contractId, "PENDING_REVIEW");
                         insertHistoryForOfficier(c, "PENDING_REVIEW", "Admin officer vừa cập nhật lại hợp đồng và đã gửi cho manager kiểm tra.", user.getUserId());
-                        service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + c.getContractNumber() + " (ID: " + contractId + ")");
+                        AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + c.getContractNumber() + " (ID: " + contractId + ")");
                     } else {
                         System.out.println("Status not DRAFT or PENDING_REVIEW, cannot submit");
                     }
                 } else {
                     insertHistoryForOfficier(c, c.getContractStatus(), "Officer vừa lưu lại hợp đồng.", user.getUserId());
-                    service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Lưu nội dung hợp đồng số: " + c.getContractNumber() + " (ID: " + contractId + ")");
+                    AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Lưu nội dung hợp đồng số: " + c.getContractNumber() + " (ID: " + contractId + ")");
                 }
                 response.sendRedirect("contract-detail?id=" + contractId);
             } else {
@@ -199,14 +200,14 @@ public class ContractSaveController extends HttpServlet {
         if (newId > 0) {
             c.setContractId(newId);
             insertHistoryForOfficier(c, "DRAFT", "Hợp đồng vừa mới được tạo mới.", user.getUserId());
-            service.AuditLogService.log(user.getUserId(), "CREATE", "Contract", "Tạo dự thảo hợp đồng mới: " + newContractNumber + " (ID: " + newId + ")");// from giang
+            AuditLogService.log(user.getUserId(), "CREATE", "Contract", "Tạo dự thảo hợp đồng mới: " + newContractNumber + " (ID: " + newId + ")");// from giang
 
             if ("submit_for_review".equals(action)) {
                 // only DRAFT or PENDING_REVIEW can submit for manager review (officier -> manager)
                 if ("DRAFT".equals(c.getContractStatus()) || "PENDING_REVIEW".equals(c.getContractStatus())) {
                     contractService.updateStatus(newId, "PENDING_REVIEW");
                     insertHistoryForOfficier(c, "PENDING_REVIEW", "Admin officer vừa cập nhật lại hợp đồng và đã gửi cho manager kiểm tra.", user.getUserId());
-                    service.AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + newContractNumber + " (ID: " + newId + ")");//from giang
+                    AuditLogService.log(user.getUserId(), "UPDATE", "Contract", "Gửi duyệt hợp đồng số: " + newContractNumber + " (ID: " + newId + ")");//from giang
                 }
             }
             response.sendRedirect("contract-detail?id=" + newId);

@@ -10,13 +10,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.annotation.WebServlet;
+import service.AuditLogService;
 
 @WebServlet(name = "UserListController", urlPatterns = {"/user-list"})
 public class UserListController extends HttpServlet {
 
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
-
+    private final AuditLogService AuditLogService = new AuditLogService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -27,7 +28,7 @@ public class UserListController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-        
+
         String roleIdString = request.getParameter("roleId");
         String status = request.getParameter("status");
         String searchEmail = request.getParameter("searchEmail") != null ? request.getParameter("searchEmail").trim().replaceAll("\\s+", "") : null;
@@ -65,7 +66,7 @@ public class UserListController extends HttpServlet {
         request.setAttribute("roleId", roleId);
         request.setAttribute("status", status);
         request.setAttribute("users", userService.searchUsers(roleId, status, searchName, searchPhone, searchEmail, pageIndex, pageSize));
-        request.setAttribute("roles", roleService.getAllRoles());
+        request.setAttribute("roles", roleService.getAllRolesForCreateUser());
         request.setAttribute("searchEmail", searchEmail);
         request.setAttribute("searchPhone", searchPhone);
         request.setAttribute("searchName", searchName);
@@ -102,7 +103,7 @@ public class UserListController extends HttpServlet {
             User targetUser = userService.getUserById(userId);
             String targetUsername = targetUser != null ? targetUser.getUserName() : String.valueOf(userId);
             String action = "ACTIVE".equals(newStatus) ? "Mở khóa tài khoản" : "Khóa tài khoản";
-            service.AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", action + ": " + targetUsername + " (ID: " + userId + ")");
+            AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", action + ": " + targetUsername + " (ID: " + userId + ")");
         } catch (NumberFormatException e) {
 
         }

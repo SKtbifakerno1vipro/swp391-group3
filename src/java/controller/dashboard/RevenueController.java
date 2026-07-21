@@ -34,24 +34,43 @@ public class RevenueController extends HttpServlet {
             filterUserId = user.getUserId();
         }
 
+        String period = request.getParameter("period");
+        if (period == null || period.trim().isEmpty()) {
+            period = "month";
+        }
+
         DashboardDAO dao = new DashboardDAO();
 
+        // Revenue breakdown amounts for Today, This Week, This Month, and All Time
+        double revenueToday = dao.getTotalRevenue(filterUserId, "today");
+        double revenueThisWeek = dao.getTotalRevenue(filterUserId, "week");
+        double revenueThisMonth = dao.getTotalRevenue(filterUserId, "month");
+        double totalRevenueAllTime = dao.getTotalRevenue(filterUserId, "all");
+
+        // Period-filtered statistics
         int totalProducts = dao.getTotalProducts();
-        int totalOrders = dao.getTotalOrders(filterUserId);
-        int totalQuotations = dao.getTotalQuotations(filterUserId);
-        int totalContracts = dao.getTotalContracts(filterUserId);
-        double totalRevenue = dao.getTotalRevenue(filterUserId);
+        int totalOrders = dao.getTotalOrders(filterUserId, period);
+        int totalQuotations = dao.getTotalQuotations(filterUserId, period);
+        int totalContracts = dao.getTotalContracts(filterUserId, period);
+        double totalRevenue = dao.getTotalRevenue(filterUserId, period);
 
-        List<StatusStatisticDTO> orderStatusCounts = dao.countByStatus("customer_order", "order_status", filterUserId);
-        List<StatusStatisticDTO> quotationStatusCounts = dao.countByStatus("quotation", "quotation_status", filterUserId);
-        List<StatusStatisticDTO> contractStatusCounts = dao.countByStatus("customer_contract", "contract_status", filterUserId);
+        List<StatusStatisticDTO> orderStatusCounts = dao.countByStatus("customer_order", "order_status", filterUserId, period);
+        List<StatusStatisticDTO> quotationStatusCounts = dao.countByStatus("quotation", "quotation_status", filterUserId, period);
+        List<StatusStatisticDTO> contractStatusCounts = dao.countByStatus("customer_contract", "contract_status", filterUserId, period);
         
-        List<TopCustomerDTO> topCustomers = dao.getTopCustomersByOrderCount(5, filterUserId);
+        List<TopCustomerDTO> topCustomers = dao.getTopCustomersByOrderCount(5, filterUserId, period);
         
-        List<TopProductDTO> topSellingProducts = dao.getTopSellingProducts(5, filterUserId);
+        List<TopProductDTO> topSellingProducts = dao.getTopSellingProducts(5, filterUserId, period);
 
-        // Fetch recent invoices for the table
-        List<dto.RecentInvoiceDTO> recentInvoices = dao.getRecentInvoicesForOfficer(10, null, null);
+        // Fetch recent orders & invoices for the tables
+        List<Map<String, Object>> recentOrders = dao.getRecentOrders(5, filterUserId, period);
+        List<dto.RecentInvoiceDTO> recentInvoices = dao.getRecentInvoicesForOfficer(10, null, null, period);
+
+        request.setAttribute("period", period);
+        request.setAttribute("revenueToday", revenueToday);
+        request.setAttribute("revenueThisWeek", revenueThisWeek);
+        request.setAttribute("revenueThisMonth", revenueThisMonth);
+        request.setAttribute("totalRevenueAllTime", totalRevenueAllTime);
 
         request.setAttribute("totalProducts", totalProducts);
         request.setAttribute("totalOrders", totalOrders);
@@ -65,8 +84,9 @@ public class RevenueController extends HttpServlet {
         
         request.setAttribute("topCustomers", topCustomers);
         request.setAttribute("topSellingProducts", topSellingProducts);
+        request.setAttribute("recentOrders", recentOrders);
         request.setAttribute("recentInvoices", recentInvoices);
         
-        request.getRequestDispatcher("/views/revenue_report.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/report/revenue_report.jsp").forward(request, response);
     }
 }

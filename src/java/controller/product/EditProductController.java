@@ -20,6 +20,7 @@ import service.ProductService;
 import service.ProductReviewService;
 import model.ProductReview;
 import dto.CustomerDTO;
+import service.AuditLogService;
 import service.CustomerService;
 import service.UserService;
 import utils.Validation;
@@ -35,7 +36,7 @@ public class EditProductController extends HttpServlet {
     private final ProductReviewService reviewService = new ProductReviewService();
     private final CustomerService customerService = new CustomerService();
     private final UserService userService = new UserService();
-    
+    private final AuditLogService AuditLogService = new AuditLogService();
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -283,7 +284,7 @@ public class EditProductController extends HttpServlet {
             if ("create".equals(action)) {
                 boolean isCreated = pService.createProduct(product);
                 if (isCreated) {
-                    service.AuditLogService.log(user.getUserId(), "CREATE", "Product", "Tạo sản phẩm: " + name);
+                    AuditLogService.log(user.getUserId(), "CREATE", "Product", "Tạo sản phẩm: " + name);
                     response.sendRedirect(request.getContextPath() + "/product-list");
                 } else {
                     session.setAttribute("errorProduct", "Tạo sản phẩm thất bại.");
@@ -294,7 +295,7 @@ public class EditProductController extends HttpServlet {
 
                 boolean isUpdated = pService.updateProduct(product);
                 if (isUpdated) {
-                    service.AuditLogService.log(user.getUserId(), "UPDATE", "Product", "Chỉnh sửa sản phẩm ID: " + id);
+                    AuditLogService.log(user.getUserId(), "UPDATE", "Product", "Chỉnh sửa sản phẩm ID: " + id);
                     response.sendRedirect(request.getContextPath() + "/edit-product?id=" + id + "&action=detail");
                 } else {
                     session.setAttribute("errorProduct", "Cập nhật sản phẩm thất bại.");

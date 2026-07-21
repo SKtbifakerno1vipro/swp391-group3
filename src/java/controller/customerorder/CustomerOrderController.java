@@ -54,7 +54,7 @@ public class CustomerOrderController extends HttpServlet {
 
         String action = request.getParameter("action");
         if ("delete_order".equals(action)) {
-            if (currentUser.getRoleId() == 3) {
+            if (currentUser.getRoleId() != 2) {
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
                 return;
             }
@@ -73,7 +73,7 @@ public class CustomerOrderController extends HttpServlet {
 
         String idParam = request.getParameter("id");
         if (idParam != null && !idParam.isBlank()) {
-            handleDetailView(request, response, idParam);
+            DetailView(request, response, idParam);
         } else {
             if (currentUser.getRoleId() == 3) {
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
@@ -115,7 +115,7 @@ public class CustomerOrderController extends HttpServlet {
     }
 
     // --- VIEW HANDLERS ---
-    private void handleDetailView(HttpServletRequest request, HttpServletResponse response, String idParam)
+    private void DetailView(HttpServletRequest request, HttpServletResponse response, String idParam)
             throws ServletException, IOException {
         try {
             int orderId = Integer.parseInt(idParam);

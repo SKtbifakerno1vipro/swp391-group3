@@ -44,7 +44,7 @@ public class QuotationListController extends HttpServlet {
 
         Integer saleId = null;
         if (roleName.contains("sale")) {
-            saleId = user.getUserId();
+            saleId = 4;
         }
 
         QuotationService quotationService = new QuotationService();
@@ -68,7 +68,7 @@ public class QuotationListController extends HttpServlet {
             pageIndex = 1;
         }
 
-        List<Quotation> quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate, saleId, user.getUserId(), user.getRoleId(), pageIndex, pageSize);
+        List<Quotation> quotationList = quotationService.searchQuotations(searchText, status, fromDate, toDate, user.getUserId(), user.getRoleId(), pageIndex, pageSize);
 
         request.setAttribute("endPage", endPage);
         request.setAttribute("currentPage", pageIndex);

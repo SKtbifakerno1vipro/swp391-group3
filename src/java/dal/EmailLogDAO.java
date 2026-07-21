@@ -14,14 +14,26 @@ public class EmailLogDAO extends DBContext {
     }
 
     public synchronized void insertLog(String recipient, String subject, String content, String status) {
-        String sql = "INSERT INTO email_log (recipient, subject, content, status) VALUES (?, ?, ?, ?)";
+        insertLog(recipient, subject, content, status, null);
+    }
+
+    public synchronized void insertLog(String recipient, String subject, String content, String status, Integer userId) {
+        String sql = "INSERT INTO email_log (recipient, subject, content, status, user_id) VALUES (?, ?, ?, ?, ?)";
         try {
             if (connection != null) {
+                if (userId == null && recipient != null) {
+                    userId = findUserIdByEmail(recipient);
+                }
                 try (PreparedStatement st = connection.prepareStatement(sql)) {
                     st.setString(1, recipient);
                     st.setString(2, subject);
                     st.setString(3, content);
                     st.setString(4, status);
+                    if (userId != null) {
+                        st.setInt(5, userId);
+                    } else {
+                        st.setNull(5, java.sql.Types.INTEGER);
+                    }
                     st.executeUpdate();
                 }
             }
@@ -30,14 +42,30 @@ public class EmailLogDAO extends DBContext {
         }
     }
 
+    private Integer findUserIdByEmail(String email) {
+        if (email == null || email.isBlank()) return null;
+        String sql = "SELECT user_id FROM [user] WHERE email = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("user_id");
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return null;
+    }
+
     public List<EmailLog> getAllLogs() {
         List<EmailLog> list = new ArrayList<>();
-        String sql = "SELECT el.*, u.user_name FROM email_log el LEFT JOIN [user] u ON el.recipient = u.email ORDER BY el.sent_at DESC";
+        String sql = "SELECT el.*, u.user_name FROM email_log el LEFT JOIN [user] u ON (el.user_id = u.user_id OR (el.user_id IS NULL AND el.recipient = u.email)) ORDER BY el.sent_at DESC";
         try {
             if (connection != null) {
                 try (PreparedStatement st = connection.prepareStatement(sql);
                      ResultSet rs = st.executeQuery()) {
                     while (rs.next()) {
+                        Integer uId = (Integer) rs.getObject("user_id");
                         EmailLog log = new EmailLog(
                             rs.getInt("log_id"),
                             rs.getString("recipient"),
@@ -45,7 +73,8 @@ public class EmailLogDAO extends DBContext {
                             rs.getString("content"),
                             rs.getTimestamp("sent_at"),
                             rs.getString("status"),
-                            rs.getString("user_name")
+                            rs.getString("user_name"),
+                            uId
                         );
                         list.add(log);
                     }
@@ -59,7 +88,7 @@ public class EmailLogDAO extends DBContext {
 
     public List<EmailLog> searchAndPaginateLogs(String searchEmail, String searchUsername, Timestamp startTimestamp, Timestamp endTimestamp, int page, int pageSize) {
         List<EmailLog> list = new ArrayList<>();
-        String sql = "SELECT el.*, u.user_name FROM email_log el LEFT JOIN [user] u ON el.recipient = u.email WHERE 1=1";
+        String sql = "SELECT el.*, u.user_name FROM email_log el LEFT JOIN [user] u ON (el.user_id = u.user_id OR (el.user_id IS NULL AND el.recipient = u.email)) WHERE 1=1";
         
         if (searchEmail != null && !searchEmail.trim().isEmpty()) {
             sql += " AND el.recipient LIKE ?";
@@ -97,6 +126,7 @@ public class EmailLogDAO extends DBContext {
                     
                     try (ResultSet rs = ps.executeQuery()) {
                         while (rs.next()) {
+                            Integer uId = (Integer) rs.getObject("user_id");
                             EmailLog log = new EmailLog(
                                 rs.getInt("log_id"),
                                 rs.getString("recipient"),
@@ -104,7 +134,8 @@ public class EmailLogDAO extends DBContext {
                                 rs.getString("content"),
                                 rs.getTimestamp("sent_at"),
                                 rs.getString("status"),
-                                rs.getString("user_name")
+                                rs.getString("user_name"),
+                                uId
                             );
                             list.add(log);
                         }
@@ -118,7 +149,7 @@ public class EmailLogDAO extends DBContext {
     }
 
     public int getTotalLogsCount(String searchEmail, String searchUsername, Timestamp startTimestamp, Timestamp endTimestamp) {
-        String sql = "SELECT COUNT(*) FROM email_log el LEFT JOIN [user] u ON el.recipient = u.email WHERE 1=1";
+        String sql = "SELECT COUNT(*) FROM email_log el LEFT JOIN [user] u ON (el.user_id = u.user_id OR (el.user_id IS NULL AND el.recipient = u.email)) WHERE 1=1";
         
         if (searchEmail != null && !searchEmail.trim().isEmpty()) {
             sql += " AND el.recipient LIKE ?";

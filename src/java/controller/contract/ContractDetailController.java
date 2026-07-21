@@ -175,7 +175,7 @@ public class ContractDetailController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
 
@@ -188,6 +188,8 @@ public class ContractDetailController extends HttpServlet {
         String action = request.getParameter("action");
 
         int contractId = Integer.parseInt(request.getParameter("contractId"));
+
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
 
         // take contract with the id
         Contract contract = contractService.getContractById(contractId);
@@ -248,7 +250,8 @@ public class ContractDetailController extends HttpServlet {
             // Manager Approve then will give to customer check
             contractService.updateStatus(contractId, "CUSTOMER_CHECK");
             contractService.refreshContractToken(contractId); // Gen new token + 30m expire
-            contractService.noticeCustomerCheckContract(contractId);
+
+            contractService.noticeCustomerCheckContract(contractId, baseUrl);
 
             // Save history work for manager approve contract
             ContractHistory h = new ContractHistory();
@@ -324,8 +327,7 @@ public class ContractDetailController extends HttpServlet {
                 return;
             }
             String token = contractService.refreshContractToken(contractId); // refresh token when send to customer
-            contractService.noticeSendFinalContractPdf(contractId, token);
-
+            contractService.noticeSendFinalContractPdf(contractId, token, baseUrl);
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else {

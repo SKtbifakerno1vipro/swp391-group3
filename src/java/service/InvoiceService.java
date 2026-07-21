@@ -200,6 +200,6 @@ public class InvoiceService {
                 + "</body>"
                 + "</html>";
 
-        EmailUtils.sendEmailAsync("maytinhasus2@gmail.com", subject, content);
+        EmailUtils.sendEmailAsync("maytinhasus2@gmail.com", subject, content, customerDTO.getUser().getUserId());
     }
 }
