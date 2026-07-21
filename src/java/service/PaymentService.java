@@ -15,6 +15,7 @@ import java.util.List;
 
 public class PaymentService {
     private final PaymentDAO paymentDAO = new PaymentDAO();
+    private final CustomerOrderService customerOrderService = new CustomerOrderService();
 
     public int insertPayment(Payment payment) {
         return paymentDAO.insertPayment(payment);
@@ -83,8 +84,8 @@ public class PaymentService {
         }
         
         try {
-            // Tạm thời đặt số tiền cứng là 100,000 VND để thử nghiệm thanh toán
-            BigDecimal totalAmount = BigDecimal.valueOf(100000);
+            double calculatedTotal = customerOrderService.getTotalPriceFromQuotationByOrderId(orderId);
+            BigDecimal totalAmount = BigDecimal.valueOf(calculatedTotal);
             
             CustomerService customerService = new CustomerService();
             CustomerDTO customer = customerService.getCustomerDTOById(order.getCustomerId());

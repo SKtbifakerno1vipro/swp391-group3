@@ -453,11 +453,15 @@ GO
 -- 2. TAO TAI KHOAN NHAN VIEN
 INSERT INTO [user] (user_name, password_hash, email, gender, full_name, phone, account_status, role_id, created_by, updated_by) VALUES 
 ('admin_01', '123', 'admin@bakery.com', 'M', N'Trần Quản Trị', '0901000001', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'System Admin'), 1, 1),
+('admin_02', '123', 'admin2@bakery.com', 'F', N'Nguyễn Quản Trị Hai', '0901000011', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'System Admin'), 1, 1),
 ('manager_01', '1234', 'manager@bakery.com', 'F', N'Lê Quản Lý', '0901000002', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Manager'), 1, 1),
+('manager_02', '1234', 'manager2@bakery.com', 'M', N'Hoàng Quản Lý Hai', '0901000012', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Manager'), 1, 1),
 ('sale_01', '1234', 'sale1@bakery.com', 'M', N'Nguyễn Sale Một', '0901000003', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Sale Staff'), 1, 1),
 ('sale_02', '1234', 'sale2@bakery.com', 'F', N'Phạm Sale Hai', '0901000004', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Sale Staff'), 1, 1),
 ('officer_01', '1234', 'officer1@bakery.com', 'F', N'Võ Chứng Từ', '0901000005', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Admin Officer'), 1, 1),
-('warehouse_01', '1234', 'warehouse@bakery.com', 'M', N'Đinh Thủ Kho', '0901000006', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Warehouse Staff'), 1, 1);
+('officer_02', '1234', 'officer2@bakery.com', 'M', N'Đặng Chứng Từ Hai', '0901000015', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Admin Officer'), 1, 1),
+('warehouse_01', '1234', 'warehouse@bakery.com', 'M', N'Đinh Thủ Kho', '0901000006', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Warehouse Staff'), 1, 1),
+('warehouse_02', '1234', 'warehouse2@bakery.com', 'F', N'Bùi Thủ Kho Hai', '0901000016', 'ACTIVE', (SELECT role_id FROM role WHERE role_name = N'Warehouse Staff'), 1, 1);
 GO
 
 -- 3. TAO TAI KHOAN KHACH HANG

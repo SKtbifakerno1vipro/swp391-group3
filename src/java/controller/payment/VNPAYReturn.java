@@ -26,10 +26,11 @@ public class VNPAYReturn extends HttpServlet {
             }
         } catch (NumberFormatException ignored) {}
 
-        if (paymentId > 0) {
-            resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId);
-        } else {
-            resp.sendRedirect(req.getContextPath() + "/payment/list");
-        }
+        String vnp_ResponseCode = req.getParameter("vnp_ResponseCode");
+
+        req.setAttribute("paymentId", paymentId);
+        req.setAttribute("vnp_ResponseCode", vnp_ResponseCode);
+
+        req.getRequestDispatcher("/views/payment/payment_processing.jsp").forward(req, resp);
     }
 }

@@ -46,7 +46,8 @@ public class VNPAYPayment extends HttpServlet {
         
         String paymentIdStr = req.getParameter("paymentId"); 
         if (paymentIdStr == null || paymentIdStr.trim().isEmpty()) {
-            resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + URLEncoder.encode("Mã thanh toán không hợp lệ!", StandardCharsets.UTF_8.toString()));
+            resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + 
+            URLEncoder.encode("Mã thanh toán không hợp lệ!", StandardCharsets.UTF_8.toString()));
             return;
         }
 
@@ -54,18 +55,21 @@ public class VNPAYPayment extends HttpServlet {
         try {
             paymentId = Integer.parseInt(paymentIdStr.trim());
         } catch (NumberFormatException e) {
-            resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + URLEncoder.encode("Mã thanh toán không hợp lệ!", StandardCharsets.UTF_8.toString()));
+            resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + 
+            URLEncoder.encode("Mã thanh toán không hợp lệ!", StandardCharsets.UTF_8.toString()));
             return;
         }
 
         PaymentService paymentService = new PaymentService();
         Payment p = paymentService.getPaymentById(paymentId);
         if (p == null) {
-            resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + URLEncoder.encode("Không tìm thấy thông tin thanh toán!", StandardCharsets.UTF_8.toString()));
+            resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + 
+            URLEncoder.encode("Không tìm thấy thông tin thanh toán!", StandardCharsets.UTF_8.toString()));
             return;
         }
         if ("COMPLETED".equals(p.getPaymentStatus())) {
-            resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId + "&error=" + URLEncoder.encode("Khoản thanh toán này đã hoàn tất từ trước!", StandardCharsets.UTF_8.toString()));
+            resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId + "&error=" + 
+            URLEncoder.encode("Khoản thanh toán này đã hoàn tất từ trước!", StandardCharsets.UTF_8.toString()));
             return;
         }
         if ("FAILED".equals(p.getPaymentStatus()) || "CANCELLED".equals(p.getPaymentStatus())) {
@@ -73,7 +77,7 @@ public class VNPAYPayment extends HttpServlet {
         }
         String vnp_TxnRef = paymentId + "_" + System.currentTimeMillis();
 
-        long amountValue = Long.parseLong(req.getParameter("amount"));
+        long amountValue = (p.getAmount() != null) ? p.getAmount().longValue() : 0L;
         long amount = amountValue * 100; 
         String vnp_OrderInfo = "Thanh toan don hang " + vnp_TxnRef; 
         String orderType = "other"; 
