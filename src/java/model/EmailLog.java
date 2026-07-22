@@ -12,7 +12,6 @@ public class EmailLog {
     private Timestamp sentAt;
     private String status;
     private Integer userId;
-    private String userName;
 
     public EmailLog() {
     }
