@@ -1,6 +1,6 @@
 package controller.dashboard;
 
-import dal.DashboardDAO;
+import service.DashboardService;
 import dto.DashboardSummaryDTO;
 import dto.RoleStatisticDTO;
 import dto.StatusStatisticDTO;
@@ -40,15 +40,15 @@ public class AdminDashboardController extends HttpServlet {
             return;
         }
 
-        DashboardDAO dashboardDAO = new DashboardDAO();
+        DashboardService DashboardService = new DashboardService();
 
         // Section 1: Summary Cards
-        int totalUsers = dashboardDAO.getTotalUsers();
-        int totalCustomers = dashboardDAO.getTotalCustomers(null);
-        int totalProducts = dashboardDAO.getTotalProducts();
-        int totalContracts = dashboardDAO.getTotalContracts();
-        int totalOrders = dashboardDAO.getTotalOrders(null);
-        int totalInvoices = dashboardDAO.getTotalInvoices();
+        int totalUsers = DashboardService.getTotalUsers();
+        int totalCustomers = DashboardService.getTotalCustomers(null);
+        int totalProducts = DashboardService.getTotalProducts();
+        int totalContracts = DashboardService.getTotalContracts();
+        int totalOrders = DashboardService.getTotalOrders(null);
+        int totalInvoices = DashboardService.getTotalInvoices();
 
         DashboardSummaryDTO summary = new DashboardSummaryDTO(
             totalUsers, totalCustomers, totalProducts, totalContracts, totalOrders, totalInvoices
@@ -56,16 +56,16 @@ public class AdminDashboardController extends HttpServlet {
         request.setAttribute("summary", summary);
 
         // Section 2: Charts data
-        List<RoleStatisticDTO> usersByRole = dashboardDAO.getUsersByRole();
-        List<StatusStatisticDTO> contractsByStatus = dashboardDAO.getContractsByStatus();
-        List<StatusStatisticDTO> ordersByStatus = dashboardDAO.getOrdersByStatus();
+        List<RoleStatisticDTO> usersByRole = DashboardService.getUsersByRole();
+        List<StatusStatisticDTO> contractsByStatus = DashboardService.getContractsByStatus();
+        List<StatusStatisticDTO> ordersByStatus = DashboardService.getOrdersByStatus();
 
         request.setAttribute("usersByRole", usersByRole);
         request.setAttribute("contractsByStatus", contractsByStatus);
         request.setAttribute("ordersByStatus", ordersByStatus);
 
         // Section 3: Recent Activities (Audit Log)
-        List<ActivityDTO> recentActivities = dashboardDAO.getRecentActivities();
+        List<ActivityDTO> recentActivities = DashboardService.getRecentActivities();
         request.setAttribute("recentActivities", recentActivities);
 
         // Section 4: Quick Info
@@ -73,10 +73,10 @@ public class AdminDashboardController extends HttpServlet {
         String dbName = "Unknown";
         try {
             // Get database name from connection properties
-            // DashboardDAO extends DBContext which has connection field
+            // DashboardService extends DBContext which has connection field
             java.lang.reflect.Field field = dal.DBContext.class.getDeclaredField("connection");
             field.setAccessible(true);
-            Connection conn = (Connection) field.get(dashboardDAO);
+            Connection conn = (Connection) field.get(DashboardService);
             if (conn != null) {
                 dbName = conn.getCatalog();
             }

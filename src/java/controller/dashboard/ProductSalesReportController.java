@@ -1,6 +1,6 @@
 package controller.dashboard;
 
-import dal.DashboardDAO;
+import service.DashboardService;
 import dto.ProductSalesItemDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -41,7 +41,7 @@ public class ProductSalesReportController extends HttpServlet {
             } catch (NumberFormatException ignored) {}
         }
 
-        DashboardDAO dao = new DashboardDAO();
+        DashboardService dao = new DashboardService();
 
         // Get report items
         List<ProductSalesItemDTO> reportList = dao.getProductSalesReport(startDate, endDate, staffId);

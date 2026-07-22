@@ -5,7 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import dal.DashboardDAO;
+import service.DashboardService;
 import model.User;
 import dto.TopProductDTO;
 import dto.TopCustomerDTO;
@@ -39,7 +39,7 @@ public class RevenueController extends HttpServlet {
             period = "month";
         }
 
-        DashboardDAO dao = new DashboardDAO();
+        DashboardService dao = new DashboardService();
 
         // Revenue breakdown amounts for Today, This Week, This Month, and All Time
         double revenueToday = dao.getTotalRevenue(filterUserId, "today");

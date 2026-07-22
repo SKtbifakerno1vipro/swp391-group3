@@ -107,7 +107,6 @@
                         <%-- ROLE 6: WAREHOUSE --%>
                         <c:when test="${sessionScope.user.roleId == 6}">
 
-                            <a class="nav-link ${param.activeMenu == 'dashboard' ? 'active' : ''}" href="${pageContext.request.contextPath}/dashboard" title="Bảng điều khiển"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">dashboard</span></div><span class="sidebar-text">Bảng điều khiển</span></a>
                             <a class="nav-link ${param.activeMenu == 'orders' ? 'active' : ''}" href="${pageContext.request.contextPath}/customer-order-list" title="Quản lý Đơn hàng"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">receipt_long</span></div><span class="sidebar-text">Quản lý Đơn hàng</span></a>
                             <a class="nav-link ${param.activeMenu == 'categories' ? 'active' : ''}" href="${pageContext.request.contextPath}/category/list" title="Quản lý Danh mục"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">category</span></div><span class="sidebar-text">Quản lý Danh mục</span></a>
                             <a class="nav-link ${param.activeMenu == 'products' ? 'active' : ''}" href="${pageContext.request.contextPath}/product-list" title="Quản lý Sản phẩm"><div class="sidebar-icon-wrap"><span class="material-symbols-outlined">inventory_2</span></div><span class="sidebar-text">Quản lý Sản phẩm</span></a>
