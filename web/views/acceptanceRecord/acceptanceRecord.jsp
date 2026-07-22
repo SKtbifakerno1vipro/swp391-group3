@@ -140,6 +140,7 @@
             </head>
 
             <body>
+                
                 <div class="no-print"
                     style="display: flex; justify-content: space-between; align-items: center; margin: 20px auto; max-width: 800px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                     <div>
@@ -147,7 +148,7 @@
                             <c:when test="${acceptanceRecord.acceptanceStatus == 'CANCELLED' || order.customerOrder.orderStatus == 'CANCELLED'}">
                                 <span
                                     style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: #FF4500; color: white; border-radius: 20px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(40,167,69,0.15);">
-                                    ✖ Đơn hàng đã hủy
+                                     Đơn hàng đã hủy
                                 </span>
                             </c:when>
                             <c:when test="${acceptanceRecord.acceptanceStatus == 'COMPLETED' || order.customerOrder.orderStatus == 'COMPLETED'}">
@@ -158,6 +159,8 @@
                             </c:when>
                             <c:when
                                 test="${(acceptanceRecord.acceptanceStatus == 'SHIPPING' || order.customerOrder.orderStatus == 'SHIPPING') && sessionScope.user.roleId == 3}">
+                                
+                                
                                 <form action="${pageContext.request.contextPath}/AcceptanceRecordController"
                                     method="POST"
                                     onsubmit="return confirm('Bạn có chắc chắn xác nhận đã nhận bàn giao hàng hóa thành công? Thao tác này sẽ cập nhật trạng thái đơn hàng thành hoàn thành.');"
