@@ -53,35 +53,6 @@ public class EmailLogDAO extends DBContext {
         return null;
     }
 
-    public List<EmailLog> getAllLogs() {
-        List<EmailLog> list = new ArrayList<>();
-        String sql = "SELECT el.*, u.user_name FROM email_log el LEFT JOIN [user] u ON (el.user_id = u.user_id OR (el.user_id IS NULL AND el.recipient = u.email)) ORDER BY el.sent_at DESC";
-        try {
-            if (connection != null) {
-                try (PreparedStatement st = connection.prepareStatement(sql);
-                     ResultSet rs = st.executeQuery()) {
-                    while (rs.next()) {
-                        Integer uId = (Integer) rs.getObject("user_id");
-                        EmailLog log = new EmailLog(
-                            rs.getInt("log_id"),
-                            rs.getString("recipient"),
-                            rs.getString("subject"),
-                            rs.getString("content"),
-                            rs.getTimestamp("sent_at"),
-                            rs.getString("status"),
-                            rs.getString("user_name"),
-                            uId
-                        );
-                        list.add(log);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
     public List<EmailLog> searchAndPaginateLogs(String searchEmail, String searchUsername, Timestamp startTimestamp, Timestamp endTimestamp, int page, int pageSize) {
         List<EmailLog> list = new ArrayList<>();
         String sql = "SELECT el.*, u.user_name FROM email_log el LEFT JOIN [user] u ON (el.user_id = u.user_id OR (el.user_id IS NULL AND el.recipient = u.email)) WHERE 1=1";

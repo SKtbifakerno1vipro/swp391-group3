@@ -56,44 +56,6 @@ public class PaymentDAO extends DBContext {
         return -1;
     }
 
-    public List<Payment> getAllPayments() {
-        List<Payment> list = new ArrayList<>();
-        String sql = "SELECT p.*, c.contract_number, p.customer_name_snapshot as customer_name "
-                + "FROM payment p "
-                + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
-                + "LEFT JOIN [user] u ON p.user_id = u.user_id "
-                + "ORDER BY p.payment_id DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapResultSetToPayment(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Payment> getPaymentsByCustomerId(int userId) {
-        List<Payment> list = new ArrayList<>();
-        String sql = "SELECT p.*, c.contract_number, p.customer_name_snapshot as customer_name "
-                + "FROM payment p "
-                + "JOIN customer_contract c ON p.customer_contract_id = c.customer_contract_id "
-                + "LEFT JOIN [user] u ON p.user_id = u.user_id "
-                + "WHERE p.user_id = ? "
-                + "ORDER BY p.payment_id DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapResultSetToPayment(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
     public Payment getPaymentById(int paymentId) {
         String sql = "SELECT p.*, c.contract_number, p.customer_name_snapshot as customer_name "
                 + "FROM payment p "
@@ -129,21 +91,6 @@ public class PaymentDAO extends DBContext {
         return false;
     }
 
-    public boolean hasPaymentForContract(int contractId) {
-        String sql = "SELECT COUNT(*) FROM payment WHERE customer_contract_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, contractId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public boolean hasPaymentForOrder(int orderId) {
         String sql = "SELECT COUNT(*) FROM payment WHERE customer_order_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -157,21 +104,6 @@ public class PaymentDAO extends DBContext {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public Payment getPaymentByOrderId(int orderId) {
-        String sql = "SELECT TOP 1 * FROM payment WHERE customer_order_id = ? ORDER BY payment_id DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, orderId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapResultSetToPayment(rs);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public Payment getPaymentByContractId(int contractId) {
