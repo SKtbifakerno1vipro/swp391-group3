@@ -47,20 +47,28 @@ public class PaymentConfig {
         }
     }
     public static String hmacSHA512(final String key, final String data) {
+        if (key == null || data == null) {
+            return null;
+        }
         try {
-            if (key == null || data == null) {
-                return null;
-            }
-            final Mac hmac512 = Mac.getInstance("HmacSHA512");
+            // Bước 1: Tạo đối tượng SecretKey từ chuỗi key bí mật
             byte[] hmacKeyBytes = key.getBytes(StandardCharsets.UTF_8);
-            final SecretKeySpec secretKey = new SecretKeySpec(hmacKeyBytes, "HmacSHA512");
+            SecretKeySpec secretKey = new SecretKeySpec(hmacKeyBytes, "HmacSHA512");
+
+            // Bước 2: Khởi tạo máy băm HmacSHA512 với chìa khóa trên
+            Mac hmac512 = Mac.getInstance("HmacSHA512");
             hmac512.init(secretKey);
-            byte[] result = hmac512.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder(2 * result.length);
-            for (byte b : result) {
-                sb.append(String.format("%02x", b & 0xff));
+
+            // Bước 3: Thực hiện băm dữ liệu sang mảng byte nhị phân
+            byte[] rawHash = hmac512.doFinal(data.getBytes(StandardCharsets.UTF_8));
+
+            // Bước 4: Đổi mảng byte nhị phân sang chuỗi Hexadecimal
+            StringBuilder hexResult = new StringBuilder(rawHash.length * 2);
+            for (byte b : rawHash) {
+                hexResult.append(String.format("%02x", b & 0xff));
             }
-            return sb.toString();
+
+            return hexResult.toString();
         } catch (Exception ex) {
             return "";
         }

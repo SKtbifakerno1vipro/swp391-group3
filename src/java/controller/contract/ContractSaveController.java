@@ -39,6 +39,8 @@ public class ContractSaveController extends HttpServlet {
             return;
         }
 
+        session.removeAttribute("error");
+        
         String contractIdRaw = request.getParameter("id");
         String quotationIdStr = request.getParameter("quotationId");
 
@@ -53,16 +55,19 @@ public class ContractSaveController extends HttpServlet {
                 return;
             }
 
-            String status = contract.getContractStatus();
+            String currentStatus = contract.getContractStatus();
 
+            
+            
             // If contract status is customer_approve so can not edit
-            if ("APPROVED".equals(status)) {
+            if ("APPROVED".equals(currentStatus)) {
+                session.setAttribute("error", "cannot update for approved contract");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
 
             //define status to edit contract
-            boolean editable = "DRAFT".equals(status) || "PENDING_REVIEW".equals(status);
+            boolean editable = "DRAFT".equals(currentStatus) || "PENDING_REVIEW".equals(currentStatus);
             request.setAttribute("editable", editable);
             request.setAttribute("contract", contract);
             request.getRequestDispatcher("views/contract/form.jsp").forward(request, response);

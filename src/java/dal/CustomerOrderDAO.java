@@ -145,6 +145,7 @@ public class CustomerOrderDAO extends DBContext {
             updateProductStock(details);
 
             connection.commit();
+            order.setCustomerOrderId(orderId);
             return true;
         } catch (Exception e) {
             rollbackQuietly();

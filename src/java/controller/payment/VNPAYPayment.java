@@ -37,7 +37,7 @@ public class VNPAYPayment extends HttpServlet {
             }
             return;
         }
-
+        // hmacSHA512
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TmnCode = PaymentConfig.vnp_TmnCode; 
@@ -92,7 +92,8 @@ public class VNPAYPayment extends HttpServlet {
         vnp_Params.put("vnp_OrderInfo", vnp_OrderInfo);
         vnp_Params.put("vnp_OrderType", orderType);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
-        vnp_Params.put("vnp_Locale", "en"); 
+        vnp_Params.put("vnp_Locale", "vi"); 
+
 
         
         String contextPath = req.getContextPath();
@@ -105,25 +106,32 @@ public class VNPAYPayment extends HttpServlet {
         String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
         
+        // set hết hạn trong 15 phút
         cld.add(Calendar.MINUTE, 15);
         String vnp_ExpireDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
+        // tạo 1 list để sort
         List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
         Collections.sort(fieldNames);
         
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
+        // hash data để tính key, còn query để tạo url chuyển tới VNpay
         Iterator<String> itr = fieldNames.iterator();
         while (itr.hasNext()) {
             String fieldName = itr.next();
             String fieldValue = vnp_Params.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString())).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+            if (fieldValue != null && !fieldValue.isEmpty()) {
+                String encodedKey = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII);
+                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII);
+
+                hashData.append(fieldName).append('=').append(encodedValue);
+                query.append(encodedKey).append('=').append(encodedValue);
+
                 if (itr.hasNext()) {
-                    query.append('&');
                     hashData.append('&');
+                    query.append('&');
                 }
             }
         }

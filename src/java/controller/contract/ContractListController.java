@@ -16,6 +16,7 @@ import model.*;
 import service.*;
 import dto.*;
 import jakarta.servlet.http.HttpSession;
+import utils.Validation;
 
 @WebServlet("/contract-list")
 public class ContractListController extends HttpServlet {
@@ -48,7 +49,14 @@ public class ContractListController extends HttpServlet {
         String phone = request.getParameter("customerPhone") != null ? request.getParameter("customerPhone").trim().replaceAll("\\s+", "") : null;
         String email = request.getParameter("customerEmail") != null ? request.getParameter("customerEmail").trim().replaceAll("\\s+", "") : null;
         String customerType = request.getParameter("customerType");
+
+        String error = Validation.validateFromAndToDate(fromDate, toDate);
         
+        
+        if (error != null) {
+            session.setAttribute("errorSig", error);
+        }
+
         // 2. validate page index
         int pageIndex = 1;
         try {

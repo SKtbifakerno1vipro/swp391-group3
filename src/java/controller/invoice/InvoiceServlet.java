@@ -167,7 +167,7 @@ public class InvoiceServlet extends HttpServlet {
                     if (payment != null && "COMPLETED".equals(payment.getPaymentStatus())) {
                         Invoice invoice = iService.getInvoiceByContractId(contractId);
                         if (invoice != null && "RELEASED".equals(invoice.getInvoiceStatus())) {
-                            session.setAttribute("errorMessage", "Hóa đơn đã được phát hành.");
+                            session.setAttribute("errorPaymentInvoice", "Hóa đơn đã được phát hành.");
                         } else if (invoice != null && "READY".equals(invoice.getInvoiceStatus())) {
                             invoice.setInvoiceStatus("RELEASED");
                             invoice.setIssueDate(LocalDateTime.now());
@@ -181,26 +181,26 @@ public class InvoiceServlet extends HttpServlet {
 //                                String serverName = request.getServerName();
 //                                int serverPort = request.getServerPort();
 //                                String contextPath = request.getContextPath();
-                                String baseUrl = "http://localhost:9999/SWP391_GROUP3/";
+                                String baseUrl = "http://localhost:8080/SWP391_GROUP3/";
 
                                 iService.emailIssueInvoice(invoice.getInvoiceId(), baseUrl);
                                 AuditLogService.log(user.getUserId(), "RELEASE", "Invoice", "Phát hành hóa đơn điện tử số: " + invoice.getInvoiceNo() + " (Hợp đồng ID: " + contractId + ")");
-                                session.setAttribute("successMessage", "Phát hành hóa đơn thành công!");
+                                session.setAttribute("successInvoice", "Phát hành hóa đơn thành công!");
                             } else {
-                                session.setAttribute("errorMessage", "Cập nhật trạng thái hóa đơn thất bại.");
+                                session.setAttribute("errorPaymentInvoice", "Cập nhật trạng thái hóa đơn thất bại.");
                             }
                         } else {
-                            session.setAttribute("errorMessage", "Hóa đơn phải ở trạng thái READY mới có thể phát hành.");
+                            session.setAttribute("errorPaymentInvoice", "Hóa đơn phải ở trạng thái READY mới có thể phát hành.");
                         }
                     } else {
-                        session.setAttribute("errorMessage", "Thanh toán chưa hoàn tất.");
+                        session.setAttribute("errorPaymentInvoice", "Thanh toán chưa hoàn tất.");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    session.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
+                    session.setAttribute("errorPaymentInvoice", "Lỗi: " + e.getMessage());
                 }
             } else {
-                session.setAttribute("errorMessage", "Thiếu thông tin hợp đồng.");
+                session.setAttribute("errorPaymentInvoice", "Thiếu thông tin hợp đồng.");
             }
 
             response.sendRedirect(request.getContextPath() + "/payment/list");

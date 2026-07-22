@@ -3,18 +3,25 @@ package model;
 import java.sql.Timestamp;
 
 public class EmailLog {
+
     private int logId;
     private String recipient;
+    private String userName;
     private String subject;
     private String content;
     private Timestamp sentAt;
     private String status;
-    private String userName;
+    private Integer userId;
+    
 
     public EmailLog() {
     }
 
     public EmailLog(int logId, String recipient, String subject, String content, Timestamp sentAt, String status, String userName) {
+        this(logId, recipient, subject, content, sentAt, status, userName, null);
+    }
+
+    public EmailLog(int logId, String recipient, String subject, String content, Timestamp sentAt, String status, String userName, Integer userId) {
         this.logId = logId;
         this.recipient = recipient;
         this.subject = subject;
@@ -22,6 +29,15 @@ public class EmailLog {
         this.sentAt = sentAt;
         this.status = status;
         this.userName = userName;
+        this.userId = userId;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getUserName() {

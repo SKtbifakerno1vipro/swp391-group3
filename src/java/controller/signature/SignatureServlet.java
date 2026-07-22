@@ -67,21 +67,69 @@ public class SignatureServlet extends HttpServlet {
                 session.setAttribute("errorSig", "ID phải khác 0");
                 response.sendRedirect("contract-list");
                 return;
-            } else if (ctrService.getContractById(contractId) == null || uService.getUserById(signerId) == null) {
+            }
+            Contract ctr = ctrService.getContractById(contractId);
+            if (ctr == null || uService.getUserById(signerId) == null) {
                 session.setAttribute("errorSig", "Không tìm thấy Contract hoặc Signer");
                 response.sendRedirect("contract-list");
                 return;
             }
 
+            if ("SIGNED".equalsIgnoreCase(ctr.getContractStatus()) || "CANCELLED".equalsIgnoreCase(ctr.getContractStatus())) {
+                session.setAttribute("errorSig", "Hợp đồng đã hoàn tất ký hoặc bị hủy, không thể thực hiện ký.");
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+
+            Signature sigUser = sService.getSignatureByContractIdAndSignerId(contractId, user.getUserId());
+            if (sigUser != null) {
+                session.setAttribute("errorSig", "Bạn đã ký hợp đồng này rồi, vui lòng không ký lại.");
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+
+            int managerRoleId = rService.getRoleIdByName("Manager");
+            int customerRoleId = rService.getRoleIdByName("Customer");
+            List<Signature> existingSigs = sService.getSignaturesByContractId(contractId);
+            boolean managerSignedBefore = false;
+            boolean customerSignedBefore = false;
+
+            if (existingSigs != null) {
+                for (Signature sig : existingSigs) {
+                    if (sig != null && sig.getSignerUserId() != null) {
+                        User signer = uService.getUserById(sig.getSignerUserId());
+                        if (signer != null) {
+                            if (signer.getRoleId() == managerRoleId) {
+                                managerSignedBefore = true;
+                            } else if (signer.getRoleId() == customerRoleId) {
+                                customerSignedBefore = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (user.getRoleId() == managerRoleId && managerSignedBefore) {
+                session.setAttribute("errorSig", "Hợp đồng này đã được Quản lý (Manager) ký trước đó rồi.");
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+
+            if (user.getRoleId() == customerRoleId && customerSignedBefore) {
+                session.setAttribute("errorSig", "Hợp đồng này đã được Khách hàng ký trước đó rồi.");
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+
             String signerName = "";
-            boolean isCustomer = (user.getRoleId() == rService.getRoleIdByName("Customer"));
-            boolean isManager = (user.getRoleId() == rService.getRoleIdByName("Manager"));
+            boolean isCustomer = (user.getRoleId() == customerRoleId);
+            boolean isManager = (user.getRoleId() == managerRoleId);
 
             if (isManager) {
                 signerName = user.getFullName();
             } else if (isCustomer) {
                 CustomerDTO c = cService.getCustomerDTOByUserId(signerId);
-                if (c != null && ctrService.getContractById(contractId).getCustomerId() == c.getCustomer().getCustomerId()) {
+                if (c != null && ctr.getCustomerId() == c.getCustomer().getCustomerId()) {
                     signerName = c.getCustomer().getCompanyName();
                 }
             } else {
@@ -99,6 +147,7 @@ public class SignatureServlet extends HttpServlet {
             session.setAttribute("errorSig", "Sai định dạng ID");
             response.sendRedirect("contract-list");
         }
+
     }
 
     /**
@@ -147,6 +196,42 @@ public class SignatureServlet extends HttpServlet {
                 return;
             }
 
+            if ("SIGNED".equalsIgnoreCase(ctr.getContractStatus()) || "CANCELLED".equalsIgnoreCase(ctr.getContractStatus())) {
+                session.setAttribute("errorSig", "Hợp đồng đã hoàn tất ký hoặc bị hủy, không thể ký thêm.");
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+
+            Signature sigUser = sService.getSignatureByContractIdAndSignerId(contractId, user.getUserId());
+            if (sigUser != null) {
+                session.setAttribute("errorSig", "Bạn đã ký hợp đồng này rồi, vui lòng không ký lại.");
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
+
+            int managerRoleId = rService.getRoleIdByName("Manager");
+            int customerRoleId = rService.getRoleIdByName("Customer");
+            List<Signature> checkSigList = sService.getSignaturesByContractId(contractId);
+            if (checkSigList != null) {
+                for (Signature sig : checkSigList) {
+                    if (sig != null && sig.getSignerUserId() != null) {
+                        User signer = uService.getUserById(sig.getSignerUserId());
+                        if (signer != null) {
+                            if (user.getRoleId() == managerRoleId && signer.getRoleId() == managerRoleId) {
+                                session.setAttribute("errorSig", "Hợp đồng này đã được Quản lý (Manager) ký rồi, không thể ký thêm.");
+                                response.sendRedirect("contract-detail?id=" + contractId);
+                                return;
+                            }
+                            if (user.getRoleId() == customerRoleId && signer.getRoleId() == customerRoleId) {
+                                session.setAttribute("errorSig", "Hợp đồng này đã được Khách hàng ký rồi, không thể ký thêm.");
+                                response.sendRedirect("contract-detail?id=" + contractId);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
             String uploadBuild = getServletContext().getRealPath("/uploads");
             File uploadBuildFile = new File(uploadBuild);
             if (!uploadBuildFile.exists()) {
@@ -165,8 +250,8 @@ public class SignatureServlet extends HttpServlet {
             s.setUploadedBy(user.getUserId());
 
             String fileName = "";
-            boolean isCustomer = (user.getRoleId() == rService.getRoleIdByName("Customer"));
-            boolean isManager = (user.getRoleId() == rService.getRoleIdByName("Manager"));
+            boolean isCustomer = (user.getRoleId() == customerRoleId);
+            boolean isManager = (user.getRoleId() == managerRoleId);
 
             if (isCustomer) {
                 CustomerDTO c = cService.getCustomerDTOByUserId(signerId);
@@ -199,12 +284,14 @@ public class SignatureServlet extends HttpServlet {
             sService.insertSignature(s);
             List<Signature> sigList = sService.getSignaturesByContractId(contractId);
             for (Signature signature : sigList) {
-                if (signature.getSignerUserId() != null) {
+                if (signature != null && signature.getSignerUserId() != null) {
                     User signer = uService.getUserById(signature.getSignerUserId());
-                    if (signer.getRoleId() == rService.getRoleIdByName("Manager")) {
-                        managerSigned = true;
-                    } else if (signer.getRoleId() == rService.getRoleIdByName("Customer")) {
-                        customerSigned = true;
+                    if (signer != null) {
+                        if (signer.getRoleId() == managerRoleId) {
+                            managerSigned = true;
+                        } else if (signer.getRoleId() == customerRoleId) {
+                            customerSigned = true;
+                        }
                     }
                 }
             }

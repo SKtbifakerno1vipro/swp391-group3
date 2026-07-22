@@ -10,16 +10,6 @@ GO
 --USE SWP_Sales_Process;
 --GO
 
-CREATE TABLE email_log (
-    log_id INT IDENTITY(1,1) PRIMARY KEY,
-    recipient NVARCHAR(255) NOT NULL,
-    subject NVARCHAR(255) NOT NULL,
-    content NVARCHAR(MAX) NOT NULL,
-    sent_at DATETIME DEFAULT GETDATE(),
-    status VARCHAR(20) NOT NULL
-);
-
-
 -- 1. Role
 CREATE TABLE role (
     role_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -84,10 +74,25 @@ CREATE TABLE system_audit_log (
 );
 GO
 
+-- 4c. Email Log
+CREATE TABLE email_log (
+    log_id INT IDENTITY(1,1) PRIMARY KEY,
+    recipient NVARCHAR(255) NOT NULL,
+    subject NVARCHAR(255) NOT NULL,
+    content NVARCHAR(MAX) NOT NULL,
+    sent_at DATETIME DEFAULT GETDATE(),
+    status VARCHAR(20) NOT NULL,
+    user_id INT NULL,
+    CONSTRAINT fk_email_log_user FOREIGN KEY (user_id) REFERENCES [user](user_id) ON DELETE SET NULL
+);
+GO
+
 -- 5. Category
 CREATE TABLE category (
     category_id INT IDENTITY(1,1) PRIMARY KEY,
-    category_name NVARCHAR(255) NOT NULL
+    category_name NVARCHAR(255) NOT NULL,
+    total_product INT NOT NULL DEFAULT 0,
+    status INT NOT NULL DEFAULT 1
 );
 GO
 
@@ -127,6 +132,7 @@ CREATE TABLE import_request (
     imported_by INT NULL,
     imported_date DATETIME NULL,
     note NVARCHAR(MAX) NULL,
+	warehouse_note NVARCHAR(MAX) NULL,
     FOREIGN KEY (product_id) REFERENCES product(product_id),
     FOREIGN KEY (created_by) REFERENCES [user](user_id),
     FOREIGN KEY (imported_by) REFERENCES [user](user_id)

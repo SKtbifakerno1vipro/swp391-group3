@@ -198,6 +198,11 @@ public class ContractDetailController extends HttpServlet {
             return;
         }
 
+        if (currentUser.getRoleId() == 3 && !contractService.checkOwnContractByCustomer(contract, currentUser)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to view this contract.");
+            return;
+        }
+
         //solve all of action request edit
         if ("request_edit".equals(action)) {// when manager and customer request edit 
             if (currentUser.getRoleId() != 2 && currentUser.getRoleId() != 3 && currentUser.getRoleId() != 1) {

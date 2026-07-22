@@ -37,8 +37,7 @@ public class SecurityFilter implements Filter {
             "/product-review", "/contract-list", "/contract-detail", "/export-pdf", "/File",
             "/Signature", "/invoice-list", "/invoice/create", "/invoice", "/preview",
             "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail",
-            "/revenue-report", "/revenue",
-            "/product-sales-report"
+            "/revenue-report", "/revenue","/import-request-create", "/import-request-list", "/import-request-detail","/product-sales-report"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
@@ -55,7 +54,7 @@ public class SecurityFilter implements Filter {
             "/category/create", "/category/edit", "/category/delete", "/product-list", "/edit-product",
             "/product-delete", "/product-review", "/quotation-list", "/quotation-create", "/quotation-detail",
             "/invoice/create", "/invoice", "/preview", "/payment/list", "/payment", "/payment/return",
-            "/payment/ipn", "/payment/detail", "/import-request-list", "/import-request-detail"
+            "/payment/ipn", "/payment/detail", "/import-request-list", "/import-request-detail","/import-request-create"
     );
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
@@ -63,14 +62,14 @@ public class SecurityFilter implements Filter {
             "/customer-order", "/AcceptanceRecordController", "/product-review", "/quotation-list",
             "/quotation-detail", "/contract-list", "/contract-create", "/contract-save", "/contract-detail",
             "/export-pdf", "/File", "/invoice-list", "/invoice/create", "/invoice", "/preview",
-            "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail"
+            "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail", "/import-request-create", "/import-request-list"
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
             "/dashboard", "/admin-dashboard", "/customer-order-list", "/customer-order", "/AcceptanceRecordController",
             "/category/list", "/category/create", "/category/edit", "/category/delete", "/product-list",
             "/create-product", "/edit-product", "/product-delete", "/product-review", "/contract-list",
-            "/import-request-list", "/import-request-create", "/import-request-detail"
+            "/import-request-list", "/import-request-create", "/import-request-detail", "/warehouse-dashboard"
     );
 
     private static final List<String> PUBLIC_URLS = List.of(
@@ -86,106 +85,108 @@ public class SecurityFilter implements Filter {
     private static final List<String> LOGGED_IN_URLS = List.of(
             "/user/password/change",
             "/realtime/notifications",
-            "/File"
+            "/File",
+            "/tool/auto-generate"
     );
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-chain.doFilter(request, response);
-//        HttpServletRequest req = (HttpServletRequest) request;
-//        HttpServletResponse res = (HttpServletResponse) response;
-//
-//        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-//        res.setHeader("Pragma", "no-cache");
-//        res.setDateHeader("Expires", 0);
-//
-//        HttpSession session = req.getSession(false);
-//        User user = (session != null) ? (User) session.getAttribute("user") : null;
-//
-//        if (user != null) {
-//            dal.ImportRequestDAO importRequestDAOForCount = new dal.ImportRequestDAO();
-//            int pendingImportsCount = importRequestDAOForCount.countPendingRequests();
-//            req.setAttribute("pendingImportsCount", pendingImportsCount);
-//
-//            if (userDAO.checkBanUser(user)) { //check user banned by admin, if that is true, cannot do anything
-//                session.invalidate();
-//                ((HttpServletResponse) response).sendRedirect("login.jsp");
-//                return;
-//            }
-//            if (user.getRoleId() == 1) {
-//                chain.doFilter(request, response);
-//                return;
-//            }
-//        }
-//
-//        String path = req.getServletPath();
-//
-//        if (isStaticResource(path)) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if ("/contract-detail".equals(path) || "/export-pdf".equals(path)) {
-//            String token = req.getParameter("token");
-//            String idStr = req.getParameter("id");
-//            if (token != null && idStr != null) {
-//                try {
-//                    int contractId = Integer.parseInt(idStr);
-//                    ContractDAO cDAO = new ContractDAO();
-//                    if (cDAO.validateToken(contractId, token)) {
-//                        chain.doFilter(request, response);
-//                        return;
-//                    }
-//                } catch (Exception e) {
-//                    res.sendRedirect(req.getContextPath() + "/login");
-//                }
-//            }
-//        }
-//
-//        if (user == null) {
-//            res.sendRedirect(req.getContextPath() + "/login");
-//            return;
-//        }
-//
-//        // Check if user has been banned/deactivated (INACTIVE status)
-//        User dbUser = userDAO.getUserById(user.getUserId());
-//        if (dbUser == null || "INACTIVE".equalsIgnoreCase(dbUser.getStatus())) {
-//            if (session != null) {
-//                session.invalidate();
-//            }
-//            res.sendRedirect(req.getContextPath() + "/login");
-//            return;
-//        }
-//
-//        if (LOGGED_IN_URLS.contains(path)) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (path.startsWith("/views/")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-//
-//        String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
-//
-//        if (hasPermission(user.getRoleId(), cleanPath, req)) {
-//            chain.doFilter(request, response);
-//            return;
-//        } else {
-//            System.out.println("Access Denied: Role "
-//                    + user.getRoleId()
-//                    + " tried to access "
-//                    + path);
-//            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
-//            return;
-//        }
+
+        
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setDateHeader("Expires", 0);
+
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
+        if (user != null) {
+            dal.ImportRequestDAO importRequestDAOForCount = new dal.ImportRequestDAO();
+            int pendingImportsCount = importRequestDAOForCount.countPendingRequests();
+            req.setAttribute("pendingImportsCount", pendingImportsCount);
+
+            if (userDAO.checkBanUser(user)) { //check user banned by admin, if that is true, cannot do anything
+                session.invalidate();
+                ((HttpServletResponse) response).sendRedirect("login.jsp");
+                return;
+            }
+            if (user.getRoleId() == 1) {
+                chain.doFilter(request, response);
+                return;
+            }
+        }
+
+        String path = req.getServletPath();
+
+        if (isStaticResource(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (PUBLIC_URLS.contains(path) || path.equals("/") || path.equals("") || path.equals("/index.jsp")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if ("/contract-detail".equals(path) || "/export-pdf".equals(path)) {
+            String token = req.getParameter("token");
+            String idStr = req.getParameter("id");
+            if (token != null && idStr != null) {
+                try {
+                    int contractId = Integer.parseInt(idStr);
+                    ContractDAO cDAO = new ContractDAO();
+                    if (cDAO.validateToken(contractId, token)) {
+                        chain.doFilter(request, response);
+                        return;
+                    }
+                } catch (Exception e) {
+                    res.sendRedirect(req.getContextPath() + "/login");
+                }
+            }
+        }
+
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        // Check if user has been banned/deactivated (INACTIVE status)
+        User dbUser = userDAO.getUserById(user.getUserId());
+        if (dbUser == null || "INACTIVE".equalsIgnoreCase(dbUser.getStatus())) {
+            if (session != null) {
+                session.invalidate();
+            }
+            res.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        if (LOGGED_IN_URLS.contains(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (path.startsWith("/views/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String cleanPath = path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path;
+
+        if (hasPermission(user.getRoleId(), cleanPath, req)) {
+            chain.doFilter(request, response);
+            return;
+        } else {
+            System.out.println("Access Denied: Role "
+                    + user.getRoleId()
+                    + " tried to access "
+                    + path);
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+            return;
+        }
     }
 
     private boolean hasPermission(int roleId, String cleanPath, HttpServletRequest req) {
