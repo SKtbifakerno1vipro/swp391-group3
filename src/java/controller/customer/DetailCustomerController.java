@@ -103,16 +103,16 @@ public class DetailCustomerController extends HttpServlet {
                 }
                 return;
             }
-            List<CustomerOrderDTO> listOrdersCus = customerOrderService.getListCustomerOrderDTOByCusId(idCus);
-            List<Quotation> listQuotationsForCus = quotationService.getQuotationsByCustomerId(idCus);
-            List<ContractCustomerDTO> listContractsForCus = contractService.searchContracts(
-                    null, null, null, null, 1, 1000, cusDTO.getUser().getUserId(), 3,
+            int totalOrders = customerOrderService.getTotalSearchCount(null, cusDTO.getUser().getUserId(), "Customer");
+            int totalQuotations = quotationService.getTotalQuotations(null, null, null, null, null, cusDTO.getUser().getUserId(), 3);
+            int totalContracts = contractService.getTotalContracts(
+                    null, null, null, null, 1, 10, cusDTO.getUser().getUserId(), 3,
                     null, null, null, null, null, null
             );
             
-            request.setAttribute("listOrdersForCus", listOrdersCus);
-            request.setAttribute("listQuotationsForCus", listQuotationsForCus);
-            request.setAttribute("listContractsForCus", listContractsForCus);
+            request.setAttribute("totalOrders", totalOrders);
+            request.setAttribute("totalQuotations", totalQuotations);
+            request.setAttribute("totalContracts", totalContracts);
             request.setAttribute("cusDTO", cusDTO);
             request.setAttribute("listSales", customerService.getAllSalesExecutiveUsers());
             request.getRequestDispatcher("/views/customer/customer_detail.jsp").forward(request, response);

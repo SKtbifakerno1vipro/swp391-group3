@@ -43,18 +43,26 @@
                     /* KPI Container & Cards */
                     .kpi-container {
                         display: grid;
-                        grid-template-columns: repeat(3, 1fr);
-                        gap: 20px;
+                        grid-template-columns: repeat(5, 1fr);
+                        gap: 16px;
                         margin-bottom: 30px;
                     }
 
                     .kpi-card {
                         background: var(--surface);
-                        padding: 20px;
+                        padding: 18px 16px;
                         border-radius: 18px;
                         border: 1px solid rgba(221, 213, 201, 0.85);
                         border-left: 6px solid var(--secondary);
                         box-shadow: var(--shadow);
+                    }
+
+                    .kpi-card.info {
+                        border-left-color: #2b7fff;
+                    }
+
+                    .kpi-card.primary {
+                        border-left-color: #8b5cf6;
                     }
 
                     .kpi-card.success {
@@ -63,6 +71,18 @@
 
                     .kpi-card.warning {
                         border-left-color: var(--tertiary);
+                    }
+
+                    @media (max-width: 1024px) {
+                        .kpi-container {
+                            grid-template-columns: repeat(3, 1fr);
+                        }
+                    }
+
+                    @media (max-width: 600px) {
+                        .kpi-container {
+                            grid-template-columns: 1fr;
+                        }
                     }
 
                     .kpi-title {
@@ -150,61 +170,7 @@
                         border: 1px solid var(--line);
                     }
 
-                    /* Tabs Handling */
-                    .tabs-container {
-                        margin-top: 30px;
-                    }
 
-                    .tab-menu {
-                        display: flex;
-                        border-bottom: 1px solid var(--line);
-                        margin-bottom: 20px;
-                        padding: 0;
-                        list-style: none;
-                    }
-
-                    .tab-item {
-                        padding: 12px 24px;
-                        cursor: pointer;
-                        font-weight: 800;
-                        font-size: 14px;
-                        color: var(--muted);
-                        border: 1px solid transparent;
-                        border-bottom: none;
-                        margin-bottom: -1px;
-                        border-radius: 16px 16px 0 0;
-                        transition: all 0.2s ease;
-                    }
-
-                    .tab-item:hover {
-                        color: var(--primary);
-                        background-color: var(--primary-soft);
-                    }
-
-                    .tab-item.active {
-                        color: var(--primary);
-                        background-color: var(--surface);
-                        border-color: rgba(221, 213, 201, 0.85) rgba(221, 213, 201, 0.85) var(--bg);
-                    }
-
-                    .tab-content {
-                        display: none;
-                    }
-
-                    .tab-content.active {
-                        display: block;
-                    }
-
-                    .text-right {
-                        text-align: right;
-                    }
-
-                    .no-data {
-                        text-align: center;
-                        color: var(--muted);
-                        padding: 30px !important;
-                        font-style: italic;
-                    }
 
                     /* Action buttons & links */
                     .btn-action-sm {
@@ -322,24 +288,26 @@
                                         ${cusDTO.customer.customerId} |
                                         User ID: ${cusDTO.user.userId}</span>
                                 </div>
-                                <div>
-                                    <%-- THEM BAO VE NGHIEP VU: Neu la Sale Staff thi cho phep bam nut tao bao gia nhanh
-                                        cho rieng khach nay --%>
-                                         <c:if test="${(sessionScope.user.roleId == 1 || sessionScope.user.roleId == 4)}">
-                                             <a href="${pageContext.request.contextPath}/quotation/create?customerId=${cusDTO.customer.customerId}"
-                                                 class="btn-edit">+ Báo giá nhanh</a>
-                                         </c:if>
-                                </div>
                             </div>
 
                             <div class="kpi-container">
                                 <div class="kpi-card">
                                     <div class="kpi-title">Tổng số đơn hàng</div>
-                                    <div class="kpi-value">${listOrdersForCus != null ? listOrdersForCus.size() : 0}
+                                    <div class="kpi-value">${not empty totalOrders ? totalOrders : 0}
                                         Đơn hàng</div>
                                 </div>
+                                <div class="kpi-card info">
+                                    <div class="kpi-title">Số lượng báo giá</div>
+                                    <div class="kpi-value">${not empty totalQuotations ? totalQuotations : 0}
+                                        Báo giá</div>
+                                </div>
+                                <div class="kpi-card primary">
+                                    <div class="kpi-title">Số lượng hợp đồng</div>
+                                    <div class="kpi-value">${not empty totalContracts ? totalContracts : 0}
+                                        Hợp đồng</div>
+                                </div>
                                 <div class="kpi-card success">
-                                    <div class="kpi-title">Tổng số tiền đã thanh toán</div>
+                                    <div class="kpi-title">Tổng tiền thanh toán</div>
                                     <div class="kpi-value">
                                         <fmt:formatNumber value="${totalPaid != null ? totalPaid : 0}" type="currency"
                                             currencySymbol="VND" maxFractionDigits="0" />
@@ -394,10 +362,10 @@
                                         <div class="info-label">Địa chỉ:</div>
                                         <div class="info-value">${not empty cusDTO.user.address ? cusDTO.user.address : 'N/A'}</div>
                                     </div>
-                                    <div class="info-row">
-                                        <div class="info-label">Vai trò hệ thống:</div>
-                                        <div class="info-value"><span class="badge badge-role">Khách hàng</span></div>
-                                    </div>
+                                     <div class="info-row">
+                                         <div class="info-label">Vai trò hệ thống:</div>
+                                         <div class="info-value">Khách hàng</div>
+                                     </div>
                                 </div>
 
                                 <div class="info-section">
@@ -434,162 +402,7 @@
                                 </div>
                             </div>
 
-                            <div class="tabs-container">
-                                <ul class="tab-menu">
-                                    <li class="tab-item active" onclick="switchTab(event, 'quotationsTab')">Báo giá
-                                        (${listQuotationsForCus != null ? listQuotationsForCus.size() : 0})</li>
-                                    <li class="tab-item" onclick="switchTab(event, 'contractsTab')">Hợp đồng &
-                                        Chữ ký (${listContractsForCus != null ? listContractsForCus.size() : 0})
-                                    </li>
-                                    <li class="tab-item" onclick="switchTab(event, 'ordersTab')">Tiến độ đơn hàng
-                                        (${listOrdersForCus != null ? listOrdersForCus.size() : 0})</li>
-                                    <li class="tab-item" onclick="switchTab(event, 'billingTab')">Hóa đơn & Thanh toán
-                                    </li>
-                                </ul>
 
-                                <div id="quotationsTab" class="tab-content active">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Mã báo giá</th>
-                                                <th>Ngày báo giá</th>
-                                                <th>Trạng thái</th>
-                                                <th>Tạo bởi</th>
-                                                <th>Hành động</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <c:choose>
-                                                <c:when test="${not empty listQuotationsForCus}">
-                                                    <c:forEach var="q" items="${listQuotationsForCus}">
-                                                        <tr>
-                                                            <td>#${q.quotationId}</td>
-                                                            <td>${q.formattedQuotationDate}</td>
-                                                            <td><span class="badge"
-                                                                    style="background-color: #e2e3e5; color: #383d41;">${q.quotationStatus}</span>
-                                                            </td>
-                                                            <td>${not empty q.createdByName ? q.createdByName : 'N/A'}
-                                                            </td>
-                                                            <td><a href="${pageContext.request.contextPath}/quotation-detail?id=${q.quotationId}"
-                                                                    class="btn-action-sm">Xem chi tiết</a></td>
-                                                        </tr>
-                                                    </c:forEach>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <tr>
-                                                        <td colspan="5" class="no-data">Chưa có báo giá nào được ghi nhận cho khách hàng này.
-                                                        </td>
-                                                    </tr>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div id="contractsTab" class="tab-content">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Số hợp đồng</th>
-                                                <th>Trạng thái</th>
-                                                <th>Ngày tạo</th>
-                                                <th>Hành động</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <c:choose>
-                                                <c:when test="${not empty listContractsForCus}">
-                                                    <c:forEach var="c" items="${listContractsForCus}">
-                                                        <tr>
-                                                            <td>
-                                                                <a
-                                                                    href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">
-                                                                    ${c.contractNumber}
-                                                                </a>
-                                                            </td>
-                                                            <td><span class="badge"
-                                                                    style="background-color: #e2e3e5; color: #383d41;">${c.contractStatus}</span>
-                                                            </td>
-                                                            <td>${c.formattedCreatedAtDate}</td>
-                                                            <td>
-                                                                <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}" class="btn-action-sm">Xem chi tiết</a>
-                                                            </td>
-                                                        </tr>
-                                                    </c:forEach>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <tr>
-                                                        <td colspan="4" class="no-data">Chưa có hợp đồng nào được khởi tạo.
-                                                        </td>
-                                                    </tr>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div id="ordersTab" class="tab-content">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Mã đơn hàng</th>
-                                                <th>Ngày tạo</th>
-                                                <th>Trạng thái hiện tại</th>
-                                                <th>Hành động</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <c:choose>
-                                                <c:when test="${not empty listOrdersForCus}">
-                                                    <c:forEach var="o" items="${listOrdersForCus}">
-                                                        <tr>
-                                                            <td>#${o.customerOrder.customerOrderId}</td>
-                                                            <td>${o.customerOrder.formattedCreatedAt}</td>
-                                                            <td><span class="badge"
-                                                                    style="background-color: #e2e3e5; color: #383d41;">${o.customerOrder.orderStatus}</span>
-                                                            </td>
-                                                            <td><a href="${pageContext.request.contextPath}/customer-order?id=${o.customerOrder.customerOrderId}"
-                                                                    class="btn-action-sm">Xem chi tiết</a></td>
-                                                        </tr>
-                                                    </c:forEach>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <tr>
-                                                        <td colspan="4" class="no-data">Chưa có đơn hàng nào được thực hiện.
-                                                        </td>
-                                                    </tr>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div id="billingTab" class="tab-content">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Số hóa đơn</th>
-                                                <th>Ngày phát hành</th>
-                                                <th>Số tiền đã thanh toán</th>
-                                                <th>Phương thức thanh toán</th>
-                                                <th>Trạng thái thanh toán</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody style="background: none;">
-                                            <c:choose>
-                                                <c:when test="${not empty listBillings}">
-                                                    <!-- not yet available -->
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <tr>
-                                                        <td colspan="5" class="no-data">Không tìm thấy báo cáo tài chính hoặc khoản thanh toán nào.</td>
-                                                    </tr>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
 
                             <div class="btn-group">
                                 <a href="${pageContext.request.contextPath}/customer/edit?id=${cusDTO.customer.customerId}"
@@ -612,25 +425,7 @@
                             </div>
                         </div>
 
-                        <script>
-                            function switchTab(event, tabId) {
-                                // 1. Hide all tab contents currently displayed
-                                const tabContents = document.getElementsByClassName("tab-content");
-                                for (let i = 0; i < tabContents.length; i++) {
-                                    tabContents[i].classList.remove("active");
-                                }
 
-                                // 2. Remove active state from old tab items
-                                const tabItems = document.getElementsByClassName("tab-item");
-                                for (let i = 0; i < tabItems.length; i++) {
-                                    tabItems[i].classList.remove("active");
-                                }
-
-                                // 3. Show clicked tab content and activate corresponding tab item
-                                document.getElementById(tabId).classList.add("active");
-                                event.currentTarget.classList.add("active");
-                            }
-                        </script>
 
                     </main>
                 </div>
