@@ -15,6 +15,13 @@ public class Validation {
         return null;
     }
 
+    public static String validateInput(String input, String field) {
+        if (input == null || input.trim().isEmpty()) {
+            return "Vui lòng nhập " + field + " !";
+        }
+        return null;
+    }
+
     public static String validateEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             return "Email không được để trống!";

@@ -18,6 +18,8 @@ public class UserListController extends HttpServlet {
     private final UserService userService = new UserService();
     private final RoleService roleService = new RoleService();
     private final AuditLogService AuditLogService = new AuditLogService();
+    private final int PAGE_SIZE = 10;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -43,29 +45,29 @@ public class UserListController extends HttpServlet {
             }
         }
 
-        int pageSize = 10;
         int pageIndex = 1;
 
         String page = request.getParameter("page");
-        if (page != null) {
-            try {
-                pageIndex = Integer.parseInt(page);
-            } catch (NumberFormatException e) {
+        try {
+            pageIndex = Integer.parseInt(page);
+            if (pageIndex < 1) {
                 pageIndex = 1;
             }
+        } catch (NumberFormatException e) {
+            pageIndex = 1;
         }
 
         int totalRecord = userService.getTotalUsers(roleId, status, searchName, searchPhone, searchEmail);
-        int endPage = (int) Math.ceil((double) totalRecord / pageSize);
 
-        // Prevent page out of range
+        int endPage = (int) (Math.ceil((double) totalRecord / PAGE_SIZE));
+
         if (pageIndex > endPage && endPage > 0) {
             pageIndex = endPage;
         }
 
         request.setAttribute("roleId", roleId);
         request.setAttribute("status", status);
-        request.setAttribute("users", userService.searchUsers(roleId, status, searchName, searchPhone, searchEmail, pageIndex, pageSize));
+        request.setAttribute("users", userService.searchUsers(roleId, status, searchName, searchPhone, searchEmail, pageIndex, PAGE_SIZE));
         request.setAttribute("roles", roleService.getAllRolesForCreateUser());
         request.setAttribute("searchEmail", searchEmail);
         request.setAttribute("searchPhone", searchPhone);

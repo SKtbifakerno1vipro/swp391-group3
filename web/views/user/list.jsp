@@ -290,8 +290,17 @@
                                         </c:forEach>
                                     </select>
                                 </div>
-                                <div class="field"><label>Trạng thái</label><select name="status"><option value="" ${empty status ? 'selected' : ''}>Tất cả trạng thái</option><option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option><option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>Khóa</option></select></div>
-                                <div class="actions"><button class="button primary" type="submit"><span class="material-symbols-outlined">search</span>Tìm kiếm</button><a class="button" href="${pageContext.request.contextPath}/user-list">Đặt lại</a></div>
+                                <div class="field">
+                                    <label>Trạng thái</label>
+                                    <select name="status">
+                                        <option value="" ${empty status ? 'selected' : ''}>Tất cả trạng thái</option>
+                                        <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option>
+                                        <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>Khóa</option>
+                                    </select>
+                                </div>
+                                <div class="actions">
+                                    <button class="button primary" type="submit"><span class="material-symbols-outlined">search</span>Tìm kiếm</button>
+                                    <a class="button" href="${pageContext.request.contextPath}/user-list">Đặt lại</a></div>
                             </div>
                         </form>
                     </div>
