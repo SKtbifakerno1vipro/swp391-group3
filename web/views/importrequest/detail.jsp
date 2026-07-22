@@ -235,7 +235,7 @@
                                     <div><strong>Người hủy yêu cầu:</strong> <c:out value="${ir.importedByName != null ? ir.importedByName : '(Bộ phận Kho)'}"/></div>
                                     <div style="margin-top: 4px;"><strong>Thời gian hủy:</strong> <fmt:formatDate value="${ir.importedDate}" pattern="dd/MM/yyyy HH:mm:ss"/></div>
                                     <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ef9a9a;">
-                                        <strong>Lý do hủy từ Kho:</strong> <c:out value="${ir.warehouseNote != null && not empty ir.warehouseNote ? ir.warehouseNote : '(Không có lý do)'}"/>
+                                        <strong>Lý do hủy từ Kho:</strong> <c:out value="${ir.wareHousenote != null && not empty ir.wareHousenote ? ir.wareHousenote : (ir.warehouseNote != null && not empty ir.warehouseNote ? ir.warehouseNote : '(Không có ghi chú lý do)')}"/>
                                     </div>
                                 </div>
                             </div>
