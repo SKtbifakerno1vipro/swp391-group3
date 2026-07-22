@@ -1,6 +1,6 @@
 package controller.dashboard;
 
-import dal.DashboardDAO;
+import service.DashboardService;
 import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,35 +34,35 @@ public class WarehouseDashboardController extends HttpServlet {
             return;
         }
 
-        DashboardDAO dashboardDAO = new DashboardDAO();
+        DashboardService DashboardService = new DashboardService();
         request.setAttribute("user", user);
 
         // 1. Thống kê số lượng yêu cầu nhập kho Pending
-        int pendingImports = dashboardDAO.getPendingImportRequestsCount();
+        int pendingImports = DashboardService.getPendingImportRequestsCount();
         request.setAttribute("pendingImports", pendingImports);
 
         // 2. Thống kê số lượng đơn hàng chưa hoàn thành
-        int pendingOrders = dashboardDAO.getPendingOrdersCount();
+        int pendingOrders = DashboardService.getPendingOrdersCount();
         request.setAttribute("pendingOrders", pendingOrders);
 
         // 3. Tổng số sản phẩm
-        int totalProducts = dashboardDAO.getTotalProducts();
+        int totalProducts = DashboardService.getTotalProducts();
         request.setAttribute("totalProducts", totalProducts);
 
         // 4. Số lượng sản phẩm sắp hết hàng (Low Stock Products)
-        int lowStockCount = dashboardDAO.getLowStockProductsCount();
+        int lowStockCount = DashboardService.getLowStockProductsCount();
         request.setAttribute("lowStockCount", lowStockCount);
 
         // 5. Danh sách sản phẩm sắp hết hàng (Low Stock Products)
-        List<Map<String, Object>> lowStockProductsList = dashboardDAO.getLowStockProductsList();
+        List<Map<String, Object>> lowStockProductsList = DashboardService.getLowStockProductsList();
         request.setAttribute("lowStockProductsList", lowStockProductsList);
 
         // 6. Danh sách 5 yêu cầu nhập kho Pending mới nhất
-        List<Map<String, Object>> pendingImportRequestsList = dashboardDAO.getPendingImportRequestsList(5);
+        List<Map<String, Object>> pendingImportRequestsList = DashboardService.getPendingImportRequestsList(5);
         request.setAttribute("pendingImportRequestsList", pendingImportRequestsList);
 
         // 7. Danh sách 5 đơn hàng mới nhất
-        List<Map<String, Object>> recentOrdersList = dashboardDAO.getRecentOrdersList(5);
+        List<Map<String, Object>> recentOrdersList = DashboardService.getRecentOrdersList(5);
         request.setAttribute("recentOrdersList", recentOrdersList);
 
         request.getRequestDispatcher("/views/dashboard/warehouse-dashboard.jsp").forward(request, response);
