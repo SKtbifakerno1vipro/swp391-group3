@@ -13,6 +13,7 @@ import model.*;
 import service.*;
 import dto.*;
 import dto.StatusStatisticDTO; // Force recompile after DAO signature change
+import utils.Validation;
 
 @WebServlet(name = "DashboardController", urlPatterns = {"/dashboard"})
 public class DashboardController extends HttpServlet {
@@ -22,6 +23,8 @@ public class DashboardController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession(false);
+        session.removeAttribute("errorSig");
+        
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -77,7 +80,11 @@ public class DashboardController extends HttpServlet {
 
             request.setAttribute("startDate", startDate);
             request.setAttribute("endDate", endDate);
+            String error = Validation.validateFromAndToDate(startDate, endDate);
 
+            if (error != null) {
+                session.setAttribute("errorSig", error);
+            }
             request.setAttribute("awaitingQuotations", dashboardDAO.countQuotationAwaitingContract());
             request.setAttribute("contractsInProgress", dashboardDAO.countContractInProgress());
             request.setAttribute("activeContracts", dashboardDAO.countActiveContracts());
