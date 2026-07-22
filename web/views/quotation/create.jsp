@@ -85,7 +85,7 @@
                                                     <br><br>
                                                     <label>Chiết khấu %:</label>
                                                     <input type="number" id="bulkDiscount" min="0" max="100" step="0.01"
-                                                        value="0">
+                                                        value="0" >
 
                                                     <label style="margin-left: 15px;">Thuế %:</label>
                                                     <input type="number" id="bulkTax" min="0" max="100" step="0.01"

@@ -536,6 +536,9 @@ public class DashboardDAO extends DBContext {
                     q.setQuotationId(rs.getInt("quotation_id"));
                     q.setCustomerName(rs.getString("company_name"));
                     q.setQuotationStatus(rs.getString("quotation_status"));
+                    if (rs.getTimestamp("created_at") != null) {
+                        q.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    }
                     list.add(q);
                 }
             }
@@ -798,7 +801,7 @@ public class DashboardDAO extends DBContext {
                    FROM invoice i 
                    JOIN payment p ON i.invoice_id = p.invoice_id 
                    WHERE i.invoice_status != 'UNRELEASED'
-                     '""";
+                   """;
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 summary.setTotalInvoices(rs.getInt("total_invoices"));

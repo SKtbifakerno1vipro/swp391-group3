@@ -88,7 +88,7 @@ public class DashboardController extends HttpServlet {
             request.setAttribute("contractsInProgress", DashboardService.countContractInProgress());
             request.setAttribute("activeContracts", DashboardService.countActiveContracts());
             request.setAttribute("draftContracts", DashboardService.countDraftContracts());
-            request.setAttribute("contractStatusCounts", DashboardService.countContractStatusForOfficer()); // circle
+            request.setAttribute("pendingImportRequests", DashboardService.getPendingImportRequestsList(5));
             request.setAttribute("contractsNeedingAction", DashboardService.getContractNeedingAction(5, startDate, endDate));
             request.setAttribute("quotationsNeedingAction", DashboardService.getQuotationsAwaitingContract(5, startDate, endDate));
             request.setAttribute("recentInvoices", DashboardService.getRecentInvoicesForOfficer(10, startDate, endDate));
@@ -98,7 +98,7 @@ public class DashboardController extends HttpServlet {
         }
 
         if (user.getRoleId() == 6) { // ROLE_WAREHOUSE_STAFF
-            response.sendRedirect(request.getContextPath() + "/product-list");
+            response.sendRedirect(request.getContextPath() + "/warehouse-dashboard");
             return;
         }
 
