@@ -123,4 +123,12 @@ public class ImportRequest {
     public void setWareHousenote(String wareHousenote) {
         this.wareHousenote = wareHousenote;
     }
+
+    public String getWarehouseNote() {
+        return wareHousenote;
+    }
+
+    public void setWarehouseNote(String warehouseNote) {
+        this.wareHousenote = warehouseNote;
+    }
 }
