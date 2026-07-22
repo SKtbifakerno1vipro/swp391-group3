@@ -118,6 +118,8 @@ public class EditUserController extends HttpServlet {
             }
         }
 
+        String error = null;
+
         User u = isEdit ? userService.getUserById(Integer.parseInt(idStr)) : new User();
         if (isEdit) {
             u.setUserId(Integer.parseInt(idStr));
@@ -157,6 +159,7 @@ public class EditUserController extends HttpServlet {
         if (rawDob != null && !rawDob.trim().isEmpty()) {
             try {
                 u.setDateBirth(Date.valueOf(rawDob.trim()));
+
             } catch (Exception e) {
             }
         }
@@ -172,13 +175,14 @@ public class EditUserController extends HttpServlet {
             if (rawRoleId != null && !rawRoleId.trim().isEmpty()) {
                 try {
                     u.setRoleId(Integer.parseInt(rawRoleId.trim()));
-                } catch (Exception e) {
+                } catch (NumberFormatException e) {
+                    error = "Please select valid role!";
                 }
             }
         }
 
         // 3. Validation Logic
-        String error = Validation.validateEmpty(u.getFullName(), "Full Name");
+        error = Validation.validateEmpty(u.getFullName(), "Full Name");
         if (error == null) {
             error = Validation.validateUsername(u.getUserName());
         }
@@ -187,6 +191,9 @@ public class EditUserController extends HttpServlet {
         }
         if (error == null) {
             error = Validation.validatePhone(u.getPhone());
+        }
+        if (error == null) {
+            error = Validation.validateDateBirth(rawDob);
         }
 
         if (error == null) {

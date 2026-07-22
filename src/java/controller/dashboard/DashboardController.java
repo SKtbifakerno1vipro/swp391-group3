@@ -1,6 +1,6 @@
 package controller.dashboard;
 
-import dal.DashboardDAO;
+import service.DashboardService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +12,6 @@ import java.util.List;
 import model.*;
 import service.*;
 import dto.*;
-import dto.StatusStatisticDTO; // Force recompile after DAO signature change
 import utils.Validation;
 
 @WebServlet(name = "DashboardController", urlPatterns = {"/dashboard"})
@@ -24,7 +23,7 @@ public class DashboardController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession(false);
         session.removeAttribute("errorSig");
-        
+
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -35,7 +34,7 @@ public class DashboardController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/admin-dashboard");
             return;
         }
-        DashboardDAO dashboardDAO = new DashboardDAO();
+        DashboardService DashboardService = new DashboardService();
         QuotationService quotationService = new QuotationService();
         CustomerService customerService = new CustomerService();
         ContractService contractService = new ContractService();
@@ -85,15 +84,15 @@ public class DashboardController extends HttpServlet {
             if (error != null) {
                 session.setAttribute("errorSig", error);
             }
-            request.setAttribute("awaitingQuotations", dashboardDAO.countQuotationAwaitingContract());
-            request.setAttribute("contractsInProgress", dashboardDAO.countContractInProgress());
-            request.setAttribute("activeContracts", dashboardDAO.countActiveContracts());
-            request.setAttribute("draftContracts", dashboardDAO.countDraftContracts());
-            request.setAttribute("contractStatusCounts", dashboardDAO.countContractStatusForOfficer()); // circle
-            request.setAttribute("contractsNeedingAction", dashboardDAO.getContractNeedingAction(5, startDate, endDate));
-            request.setAttribute("quotationsNeedingAction", dashboardDAO.getQuotationsAwaitingContract(5, startDate, endDate));
-            request.setAttribute("recentInvoices", dashboardDAO.getRecentInvoicesForOfficer(10, startDate, endDate));
-            request.setAttribute("invoiceSummary", dashboardDAO.getInvoiceSummaryForOfficer());
+            request.setAttribute("awaitingQuotations", DashboardService.countQuotationAwaitingContract());
+            request.setAttribute("contractsInProgress", DashboardService.countContractInProgress());
+            request.setAttribute("activeContracts", DashboardService.countActiveContracts());
+            request.setAttribute("draftContracts", DashboardService.countDraftContracts());
+            request.setAttribute("pendingImportRequests", DashboardService.getPendingImportRequestsList(5));
+            request.setAttribute("contractsNeedingAction", DashboardService.getContractNeedingAction(5, startDate, endDate));
+            request.setAttribute("quotationsNeedingAction", DashboardService.getQuotationsAwaitingContract(5, startDate, endDate));
+            request.setAttribute("recentInvoices", DashboardService.getRecentInvoicesForOfficer(10, startDate, endDate));
+            request.setAttribute("invoiceSummary", DashboardService.getInvoiceSummaryForOfficer());
             request.getRequestDispatcher("/views/dashboard/admin-officier-dashboard.jsp").forward(request, response);
             return;
         }
@@ -117,17 +116,17 @@ public class DashboardController extends HttpServlet {
         request.setAttribute("user", user);
         request.setAttribute("totalCustomers", dashboardService.getTotalCustomers(saleId));
         request.setAttribute("totalProducts", dashboardService.getTotalProducts());
-        request.setAttribute("totalQuotations", dashboardDAO.getTotalQuotations(saleId));
-        request.setAttribute("totalContracts", dashboardDAO.getTotalContracts(saleId));
+        request.setAttribute("totalQuotations", DashboardService.getTotalQuotations(saleId));
+        request.setAttribute("totalContracts", DashboardService.getTotalContracts(saleId));
         request.setAttribute("totalOrders", dashboardService.getTotalOrders(saleId));
         request.setAttribute("totalRevenue", dashboardService.getTotalRevenue(saleId));
 
-        request.setAttribute("quotationStatusCounts", dashboardDAO.countByStatus("quotation", "quotation_status", saleId));
-        request.setAttribute("contractStatusCounts", dashboardDAO.countByStatus("customer_contract", "contract_status", saleId));
+        request.setAttribute("quotationStatusCounts", DashboardService.countByStatus("quotation", "quotation_status", saleId));
+        request.setAttribute("contractStatusCounts", DashboardService.countByStatus("customer_contract", "contract_status", saleId));
         request.setAttribute("orderStatusCounts", dashboardService.getOrderStatusStats());
 
-        request.setAttribute("recentContracts", dashboardDAO.getRecentContracts(5, saleId));
-        request.setAttribute("recentOrders", dashboardDAO.getRecentOrders(5, saleId));
+        request.setAttribute("recentContracts", DashboardService.getRecentContracts(5, saleId));
+        request.setAttribute("recentOrders", DashboardService.getRecentOrders(5, saleId));
         request.getRequestDispatcher("/views/dashboard/manager-dashboard.jsp").forward(request, response);
     }
 
