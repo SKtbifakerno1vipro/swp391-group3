@@ -19,7 +19,8 @@
             </jsp:include>
             <main class="main legacy-page">
                 <h2>Quản lý Hợp đồng</h2>
-                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5}">
+                <c:if test="${sessionScope.errorSig != null}">
+                    <div style="color: red; margin-bottom: 10px;">${sessionScope.errorSig}</div>
                 </c:if>
                 <form action="contract-list" method="GET">
                     <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Mã hợp đồng">

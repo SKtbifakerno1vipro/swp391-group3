@@ -92,6 +92,9 @@
                         <p class="eyebrow">Tổng quan</p>
                         <h1>Bảng điều khiển Admin Officer</h1>
                         <p>Quản lý hợp đồng và tình trạng phê duyệt</p>
+                        <c:if test="${sessionScope.errorSig != null}">
+                            <div style="color: red; margin-bottom: 10px;">${sessionScope.errorSig}</div>
+                        </c:if>
                     </div>
                     <div>
                         <form action="${pageContext.request.contextPath}/dashboard" method="GET" style="display:flex; gap:10px; align-items:center;">

@@ -3,6 +3,7 @@ package model;
 import java.sql.Timestamp;
 
 public class EmailLog {
+
     private int logId;
     private String recipient;
     private String subject;
@@ -10,6 +11,7 @@ public class EmailLog {
     private Timestamp sentAt;
     private String status;
     private Integer userId;
+    private String userName;
 
     public EmailLog() {
     }
