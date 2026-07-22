@@ -209,7 +209,7 @@ public class EditUserController extends HttpServlet {
                 u.setPassword(password);
             }
         }
-        
+
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("u", u);

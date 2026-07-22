@@ -354,7 +354,7 @@ public class ContractDAO extends DBContext {
         return false;
     }
 
-    public boolean checkOwnContractByCustomer(Contract contract, User user) {
+    public boolean checkOwnContractByCustomer(int contractID, int userID) {
         String sql = """
                     select count(1) from dbo.customer_contract c
                     join dbo.customer cust on c.customer_id = cust.customer_id
@@ -362,8 +362,8 @@ public class ContractDAO extends DBContext {
                      and cust.customer_id >0 
                     """;
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, contract.getContractId());
-            ps.setInt(2, user.getUserId());
+            ps.setInt(1, contractID);
+            ps.setInt(2, userID);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;

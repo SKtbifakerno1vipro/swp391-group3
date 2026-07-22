@@ -99,8 +99,8 @@ public class ContractService {
         return template;
     }
 
-    public boolean checkOwnContractByCustomer(Contract contract, User user) {
-        return contractDAO.checkOwnContractByCustomer(contract, user);
+    public boolean checkOwnContractByCustomer(int contractID, int userID) {
+        return contractDAO.checkOwnContractByCustomer(contractID, userID);
     }
 
     public boolean validateToken(int contractId, String token) {
