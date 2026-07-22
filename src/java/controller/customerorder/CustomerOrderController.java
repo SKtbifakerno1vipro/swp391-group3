@@ -1,6 +1,8 @@
 package controller.customerorder;
 
 import dal.ContractDAO;
+import dal.CustomerOrderDAO;
+import dal.QuotationDAO;
 import dto.CustomerDTO;
 import dto.CustomerOrderDTO;
 import model.CustomerOrder;
@@ -26,6 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import model.Invoice;
+import model.QuotationDetail;
 import service.InvoiceService;
 import service.AuditLogService;
 import service.RoleService;
@@ -79,7 +82,7 @@ public class CustomerOrderController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
                 return;
             }
-            handleCreateView(request, response);
+            CreateView(request, response);
         }
     }
 
@@ -200,7 +203,7 @@ public class CustomerOrderController extends HttpServlet {
         }
     }
 
-    private void handleCreateView(HttpServletRequest request, HttpServletResponse response)
+    private void CreateView(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String customerIdParam = request.getParameter("customerId");
         int customerId = -1;
@@ -268,8 +271,8 @@ public class CustomerOrderController extends HttpServlet {
                     Contract selectedContract = contractDao.getContractById(contractId);
                     if (selectedContract != null) {
                         request.setAttribute("selectedContract", selectedContract);
-                        dal.QuotationDAO quotationDao = new dal.QuotationDAO();
-                        List<model.QuotationDetail> quotationDetails = quotationDao.getQuotationDetailsByQuotationId(selectedContract.getQuotationId());
+                        QuotationDAO quotationDao = new QuotationDAO();
+                        List<QuotationDetail> quotationDetails = quotationDao.getQuotationDetailsByQuotationId(selectedContract.getQuotationId());
                         request.setAttribute("quotationDetails", quotationDetails);
                     }
                 } catch (Exception e) {
@@ -293,7 +296,7 @@ public class CustomerOrderController extends HttpServlet {
 
         if (customerIdStr == null || customerIdStr.isBlank() || contractIdStr == null || contractIdStr.isBlank()) {
             request.setAttribute("error", "Khách hàng và Hợp đồng là bắt buộc.");
-            handleCreateView(request, response);
+            CreateView(request, response);
             return;
         }
 
@@ -303,18 +306,18 @@ public class CustomerOrderController extends HttpServlet {
 
             if (qdIds == null || qdIds.length == 0) {
                 request.setAttribute("error", "Vui lòng chọn ít nhất một sản phẩm.");
-                handleCreateView(request, response);
+                CreateView(request, response);
                 return;
             }
 
             dal.QuotationDAO quotationDao = new dal.QuotationDAO();
             Contract selectedContract = contractDao.getContractById(contractId);
-            List<model.QuotationDetail> quotationDetails = new ArrayList<>();
+            List<QuotationDetail> quotationDetails = new ArrayList<>();
             if (selectedContract != null) {
                 quotationDetails = quotationDao.getQuotationDetailsByQuotationId(selectedContract.getQuotationId());
             }
-            Map<Integer, model.QuotationDetail> qdMap = quotationDetails.stream()
-                    .collect(Collectors.toMap(model.QuotationDetail::getQuotationDetailId, qd -> qd));
+            Map<Integer, QuotationDetail> qdMap = quotationDetails.stream()
+                    .collect(Collectors.toMap(QuotationDetail::getQuotationDetailId, qd -> qd));
 
             CustomerOrder order = new CustomerOrder();
             order.setCustomerId(customerId);
@@ -345,7 +348,7 @@ public class CustomerOrderController extends HttpServlet {
 
             if (details.isEmpty()) {
                 request.setAttribute("error", "Không có sản phẩm hoặc số lượng hợp lệ nào được chọn.");
-                handleCreateView(request, response);
+                CreateView(request, response);
                 return;
             }
 
@@ -353,12 +356,12 @@ public class CustomerOrderController extends HttpServlet {
                 AuditLogService.log(currentUser.getUserId(), "CREATE", "Order", "Tạo đơn hàng mới cho khách hàng ID: " + customerId + " (Số mặt hàng: " + details.size() + ")");
                 response.sendRedirect(request.getContextPath() + "/customer-order-list");
             } else {
-                request.setAttribute("error", "Tạo đơn hàng thất bại. " + dal.CustomerOrderDAO.lastError);
-                handleCreateView(request, response);
+                request.setAttribute("error", "Tạo đơn hàng thất bại. " + CustomerOrderDAO.lastError);
+                CreateView(request, response);
             }
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Định dạng dữ liệu không hợp lệ.");
-            handleCreateView(request, response);
+            CreateView(request, response);
         }
     }
 

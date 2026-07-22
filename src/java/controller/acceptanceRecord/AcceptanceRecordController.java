@@ -177,7 +177,13 @@ public class AcceptanceRecordController extends HttpServlet {
                 return;
             }
 
-            boolean updated = customerOrderService.updateOrderStatus(orderId, "COMPLETED");
+            boolean updated =false;
+            if(!order.getCustomerOrder().getOrderStatus().equals("CANCELLED")){
+                updated = customerOrderService.updateOrderStatus(orderId, "COMPLETED");
+            }else{
+                response.sendRedirect(request.getContextPath() + "/customer-order?id=" + orderId);
+                return;
+            }           
             if (updated) {
                 LocalDateTime now = LocalDateTime.now();
                 AcceptanceRecord record = acceptanceRecordDAO.getAcceptanceRecordByOrderId(orderId);
