@@ -153,9 +153,9 @@ public class CustomerOrderController extends HttpServlet {
                 }
             }
             if (order.getCustomerOrder() != null) {
+                order.getCustomerOrder().setInvoice(invoice);
                 order.getCustomerOrder().setHasInvoice(isExistInvoice);
             }
-            request.setAttribute("invOfOrder", invoice);
 
             HttpSession session = request.getSession();
             User currentUser = (User) session.getAttribute("user");

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import model.Invoice;
 import model.Role;
@@ -62,6 +63,7 @@ public class CustomerOrderListController extends HttpServlet {
 
         listOrder = customerOrderService.searchOrdersByPage(keyword, pageIndex, pageSize, sortBy, sortOrder, userId, roleName);
         totalRecords = customerOrderService.getTotalSearchCount(keyword, userId, roleName); 
+        List<Invoice> listInvoice = new ArrayList<>();
         for (CustomerOrderDTO customerOrderDTO : listOrder) {
             Invoice invoice = null;
             boolean isExistInvoice = false;
@@ -72,6 +74,7 @@ public class CustomerOrderListController extends HttpServlet {
                     isExistInvoice = false;
                 }
             } 
+            customerOrderDTO.getCustomerOrder().setInvoice(invoice);
             customerOrderDTO.getCustomerOrder().setHasInvoice(isExistInvoice);
         }
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);

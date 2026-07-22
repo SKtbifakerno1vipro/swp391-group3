@@ -323,7 +323,13 @@ L<%@page contentType="text/html" pageEncoding="UTF-8" import="java.time.LocalDat
             <jsp:include page="/views/shared/sidebar.jsp">
                 <jsp:param name="activeMenu" value="invoices"/>
             </jsp:include>
-
+            <c:if test="${not empty sessionScope.errorInvoice}">
+                    <div style="color: #991b1b; background-color: #fee2e2; border: 1px solid #ef4444; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
+                        ${sessionScope.errorInvoice}
+                        <% session.removeAttribute("errorInvoice"); %>
+                    </div>
+                </c:if>   
             <main class="main legacy-page">
                 <form id="invoiceForm" action="${pageContext.request.contextPath}/invoice" method="post">
 
