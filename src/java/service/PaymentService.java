@@ -114,4 +114,12 @@ public class PaymentService {
             e.printStackTrace();
         }
     }
+
+    public BigDecimal getTotalPendingAmountByUserId(int userId) {
+        return paymentDAO.getTotalPendingAmountByUserId(userId);
+    }
+
+    public BigDecimal getTotalPaidAmountByUserId(int userId) {
+        return paymentDAO.getTotalPaidAmountByUserId(userId);
+    }
 }

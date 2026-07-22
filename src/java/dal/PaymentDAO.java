@@ -398,4 +398,34 @@ public class PaymentDAO extends DBContext {
         }
         return p;
     }
+
+    public BigDecimal getTotalPendingAmountByUserId(int userId) {
+        String sql = "SELECT COALESCE(SUM(amount), 0) FROM payment WHERE user_id = ? AND UPPER(payment_status) = 'PENDING'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal(1);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("getTotalPendingAmountByUserId error: " + e.getMessage());
+        }
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal getTotalPaidAmountByUserId(int userId) {
+        String sql = "SELECT COALESCE(SUM(amount), 0) FROM payment WHERE user_id = ? AND UPPER(payment_status) IN ('COMPLETED', 'SUCCESS')";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal(1);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("getTotalPaidAmountByUserId error: " + e.getMessage());
+        }
+        return BigDecimal.ZERO;
+    }
 }

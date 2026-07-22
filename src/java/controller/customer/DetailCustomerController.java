@@ -4,6 +4,7 @@
  */
 package controller.customer;
 import java.io.IOException;
+import java.math.BigDecimal;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -109,10 +110,13 @@ public class DetailCustomerController extends HttpServlet {
                     null, null, null, null, 1, 10, cusDTO.getUser().getUserId(), 3,
                     null, null, null, null, null, null
             );
+            PaymentService paymentService = new PaymentService();
+            BigDecimal totalPaid = paymentService.getTotalPaidAmountByUserId(cusDTO.getUser().getUserId());
             
             request.setAttribute("totalOrders", totalOrders);
             request.setAttribute("totalQuotations", totalQuotations);
             request.setAttribute("totalContracts", totalContracts);
+            request.setAttribute("totalPaid", totalPaid);
             request.setAttribute("cusDTO", cusDTO);
             request.setAttribute("listSales", customerService.getAllSalesExecutiveUsers());
             request.getRequestDispatcher("/views/customer/customer_detail.jsp").forward(request, response);

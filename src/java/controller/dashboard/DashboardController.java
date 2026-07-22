@@ -39,7 +39,7 @@ public class DashboardController extends HttpServlet {
         request.setAttribute("user", user);
 
         if (user.getRoleId() == 3) { // ROLE_CUSTOMER
-            response.sendRedirect(request.getContextPath() + "/customer-dashboard");
+            response.sendRedirect(request.getContextPath() + "/customer/dashboard");
             return;
         }
         if (user.getRoleId() == 5) { // ROLE IS ADMIN OFFICER

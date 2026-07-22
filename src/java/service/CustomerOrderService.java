@@ -37,21 +37,11 @@ public class CustomerOrderService {
     }
 
     public boolean createOrder(CustomerOrder order, List<CustomerOrderDetail> details) {
-        boolean success = customerOrderDAO.createOrder(order, details);
-        // Xhieu - tu dong tao payment
-        if (success) {
-            System.out.println("Order created successfully. Triggering auto-payment creation.");
-            try {
-                PaymentService paymentService = new PaymentService();
-                paymentService.createPendingPaymentForOrder(order);
-            } catch (Exception e) {
-                System.err.println("Failed to automatically create pending payment for order: " + e.getMessage());
-                e.printStackTrace();
-            }
-        } else {
-            System.err.println("Failed to create order in database.");
-        }
-        return success;
+        return customerOrderDAO.createOrder(order, details);
+    }
+
+    public CustomerOrderDTO getCustomerOrderDTOById(int id) {
+        return customerOrderDAO.getCustomerOrderDTOById(id);
     }
 
     public int getTotalSearchCount(String keyword, int userId, String roleName) {
@@ -61,8 +51,23 @@ public class CustomerOrderService {
     public List<CustomerOrderDTO> searchOrdersByPage(String kw, int p, int s, String sortBy, String sortOrder, int userId, String roleName) {
         return customerOrderDAO.searchOrdersWithPaging(kw, p, s, sortBy, sortOrder, userId, roleName);
     }
+
     public boolean updateOrderStatus(int orderId, String status) {
-        return customerOrderDAO.updateOrderStatus(orderId, status);
+        boolean updated = customerOrderDAO.updateOrderStatus(orderId, status);
+        if (updated && "SHIPPING".equalsIgnoreCase(status)) {
+            System.out.println("Order status updated to SHIPPING for Order ID: " + orderId + ". Triggering auto-payment creation.");
+            try {
+                CustomerOrderDTO orderDto = customerOrderDAO.getCustomerOrderDTOById(orderId);
+                if (orderDto != null && orderDto.getCustomerOrder() != null) {
+                    PaymentService paymentService = new PaymentService();
+                    paymentService.createPendingPaymentForOrder(orderDto.getCustomerOrder());
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to automatically create pending payment on SHIPPING status: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return updated;
     }
 
     public boolean isValidStatusTransition(String currentStatus, String newStatus) {
@@ -93,12 +98,4 @@ public class CustomerOrderService {
     public boolean deleteCustomerOrder(int orderId) {
         return customerOrderDAO.deleteCustomerOrder(orderId);
     }
-    
-    // -xoa thi nho bao xhieu
-    public List<CustomerOrderDTO> getListCustomerOrderDTOByCusId(int cusId) {
-        // Chuyen tiep (forward) tham so va xu ly logic xuong tang DAO
-        return customerOrderDAO.getListCustomerOrderDTOByCusId(cusId);
-    }
-    // end
-    
 }

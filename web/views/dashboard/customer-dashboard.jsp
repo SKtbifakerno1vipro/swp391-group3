@@ -298,6 +298,64 @@
                 font-size: 13px;
                 line-height: 1.5;
             }
+            /* KPI Container & Cards */
+            .kpi-container {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 16px;
+                margin-bottom: 30px;
+            }
+            .kpi-card {
+                background: var(--surface);
+                padding: 18px 16px;
+                border-radius: 18px;
+                border: 1px solid rgba(221, 213, 201, 0.85);
+                border-left: 6px solid var(--secondary);
+                box-shadow: var(--shadow);
+            }
+            .kpi-card.info {
+                border-left-color: #2b7fff;
+            }
+            .kpi-card.primary {
+                border-left-color: #8b5cf6;
+            }
+            .kpi-card.success {
+                border-left-color: var(--primary);
+            }
+            .kpi-card.warning {
+                border-left-color: var(--tertiary);
+            }
+            .kpi-title {
+                font-size: 11px;
+                text-transform: uppercase;
+                color: var(--muted);
+                font-weight: 800;
+                letter-spacing: 0.05em;
+                margin-bottom: 8px;
+            }
+            .kpi-value {
+                font-size: 22px;
+                font-weight: 800;
+                color: var(--text);
+            }
+            .badge-active {
+                background-color: var(--primary-soft);
+                color: var(--primary);
+            }
+            .badge-inactive {
+                background-color: #fce8e6;
+                color: var(--danger);
+            }
+            @media (max-width: 1024px) {
+                .kpi-container {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+            }
+            @media (max-width: 600px) {
+                .kpi-container {
+                    grid-template-columns: 1fr;
+                }
+            }
             @keyframes sidebarFadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
             @media (max-width: 1180px) { 
                 .hero { grid-template-columns: 1fr; } 
@@ -305,7 +363,7 @@
             @media (max-width: 820px) { 
                 .dashboard-shell { grid-template-columns: 1fr; } 
                 .main { padding: 22px 16px; } 
-                .metric-grid, .quick-grid { grid-template-columns: 1fr; } 
+                .quick-grid { grid-template-columns: 1fr; } 
             }
         </style>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-layout.css">
@@ -338,6 +396,10 @@
                         <h2>Cổng thông tin khách hàng Po Bread</h2>
                         <p>Theo dõi các báo giá, trạng thái hợp đồng, đơn hàng của bạn một cách nhanh chóng và chính xác nhất.</p>
                         <div class="quick-grid">
+                            <a class="quick-link" href="${pageContext.request.contextPath}/customer-order-list" id="link-orders">
+                                Danh sách đơn hàng
+                                <span>Theo dõi tiến độ & lịch sử đặt hàng</span>
+                            </a>
                             <a class="quick-link" href="${pageContext.request.contextPath}/quotation-list" id="link-quotations">
                                 Danh sách báo giá
                                 <span>Kiểm tra báo giá & yêu cầu sửa đổi</span>
@@ -345,6 +407,10 @@
                             <a class="quick-link" href="${pageContext.request.contextPath}/contract-list" id="link-contracts">
                                 Danh sách hợp đồng
                                 <span>Xem & duyệt hợp đồng đã soạn thảo</span>
+                            </a>
+                            <a class="quick-link" href="${pageContext.request.contextPath}/payment/list" id="link-payments">
+                                Lịch sử thanh toán
+                                <span>Theo dõi hóa đơn & lịch sử thanh toán</span>
                             </a>
                             <a class="quick-link" href="${pageContext.request.contextPath}/tool/auto-generate?customerId=${customer.customer.customerId}" id="link-auto-generate" style="border-left-color: var(--tertiary);">
                                 <strong style="color: var(--tertiary);">Auto-Generate Tool</strong>
@@ -364,21 +430,31 @@
                     </div>
                 </section>
 
-                <section class="metric-grid" aria-label="Chỉ số tổng quan">
-                    <a class="metric-card" href="${pageContext.request.contextPath}/quotation-list" id="card-quotations">
-                        <div class="metric-icon"><span class="material-symbols-outlined">request_quote</span></div>
-                        <div class="metric-info">
-                            <h3 id="val-quotations"><c:out value="${totalQuotations}" default="0"/></h3>
-                            <p>Báo giá của bạn</p>
+                <section class="kpi-container" aria-label="Chỉ số tổng quan" style="margin-top: 24px;">
+                    <div class="kpi-card">
+                        <div class="kpi-title">Tổng số đơn hàng</div>
+                        <div class="kpi-value">${not empty totalOrders ? totalOrders : 0} Đơn hàng</div>
+                    </div>
+                    <div class="kpi-card info">
+                        <div class="kpi-title">Số lượng báo giá</div>
+                        <div class="kpi-value">${not empty totalQuotations ? totalQuotations : 0} Báo giá</div>
+                    </div>
+                    <div class="kpi-card primary">
+                        <div class="kpi-title">Số lượng hợp đồng</div>
+                        <div class="kpi-value">${not empty totalContracts ? totalContracts : 0} Hợp đồng</div>
+                    </div>
+                    <div class="kpi-card success">
+                        <div class="kpi-title">Số tiền cần thanh toán</div>
+                        <div class="kpi-value">
+                            <fmt:formatNumber value="${totalPaid != null ? totalPaid : 0}" type="currency" currencySymbol="VND" maxFractionDigits="0" />
                         </div>
-                    </a>
-                    <a class="metric-card secondary" href="${pageContext.request.contextPath}/contract-list" id="card-contracts">
-                        <div class="metric-icon"><span class="material-symbols-outlined">contract</span></div>
-                        <div class="metric-info">
-                            <h3 id="val-contracts"><c:out value="${totalContracts}" default="0"/></h3>
-                            <p>Hợp đồng của bạn</p>
+                    </div>
+                    <div class="kpi-card warning">
+                        <div class="kpi-title">Trạng thái tài khoản</div>
+                        <div class="kpi-value" style="font-size: 18px; padding-top: 2px;">
+                             <span class="badge ${user.status == 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">${user.status}</span>
                         </div>
-                    </a>
+                    </div>
                 </section>
 
                 <section class="content-grid">

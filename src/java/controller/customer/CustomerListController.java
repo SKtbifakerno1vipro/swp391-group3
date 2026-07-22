@@ -14,6 +14,8 @@ import utils.*;
 
 import jakarta.servlet.annotation.WebServlet;
 
+//COALESCE
+
 @WebServlet(name = "CustomerListController", urlPatterns = {"/customer/list"})
 public class CustomerListController extends HttpServlet {
     private static final int ROLE_SYSTEM_ADMIN = 1;

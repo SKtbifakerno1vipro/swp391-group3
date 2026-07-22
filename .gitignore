@@ -45,4 +45,7 @@ nbproject/private/
 *.iml
 out/
 .smarttomcat/
+
+# Agents configuration
+.agents/
 

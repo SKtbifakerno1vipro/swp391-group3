@@ -200,12 +200,6 @@ public class QuotationService {
         quotationDAO.addQuotationHistory(quotationId, userId, "Cap nhat trang thai thanh: " + status);
     }
 
-    // XHieu-begin - delete contact me
-    public List<Quotation> getQuotationsByCustomerId(int customerId) {
-        return quotationDAO.getQuotationsByCustomerId(customerId);
-    }
-    // Xhieu - end
-
     public boolean hasDraftQuotation(int customerId) {
         return quotationDAO.hasDraftQuotation(customerId);
     }
