@@ -22,6 +22,9 @@
                 <c:if test="${sessionScope.errorSig != null}">
                     <div style="color: red; margin-bottom: 10px;">${sessionScope.errorSig}</div>
                 </c:if>
+                <c:if test="${errorSig != null}">
+                    <div style="color: red; margin-bottom: 10px;">${errorSig}</div>
+                </c:if>
                 <form action="contract-list" method="GET">
                     <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Mã hợp đồng">
                     <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng">

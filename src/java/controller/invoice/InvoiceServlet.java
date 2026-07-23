@@ -406,10 +406,6 @@ public class InvoiceServlet extends HttpServlet {
             }
 
             if (success) {
-                if ("notice".equalsIgnoreCase(action)) {
-                    int targetInvoiceId = invoiceId > 0 ? invoiceId : invoice.getInvoiceId();
-                    iService.emailIssueInvoice(targetInvoiceId, "http://localhost:9999/SWP391_GROUP3/");
-                }
                 response.sendRedirect(request.getContextPath() + "/invoice-list");
             } else {
                 request.setAttribute("error", "Không thể lưu hóa đơn. Đã có lỗi xảy ra trong quá trình lưu trữ.");
