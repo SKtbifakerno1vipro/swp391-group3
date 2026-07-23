@@ -492,56 +492,6 @@ public class QuotationDAO extends DBContext {
             e.printStackTrace();
         }
     }
-
-    // XHieu-begin - delete contact me
-    public List<Quotation> getQuotationsByCustomerId(int customerId) {
-        List<Quotation> list = new ArrayList<>();
-        String sql = "SELECT quotation.quotation_id, quotation.customer_id, quotation.quotation_date, "
-                + "quotation.quotation_status, quotation.created_by, quotation.created_at, quotation.total_price, "
-                + "customer.company_name, [user].user_name, "
-                + "CAST(CASE WHEN customer_contract.quotation_id IS NOT NULL THEN 1 ELSE 0 END AS BIT) as has_contract, "
-                + "customer_contract.customer_contract_id AS contract_id "
-                + "FROM quotation "
-                + "LEFT JOIN customer ON quotation.customer_id = customer.customer_id "
-                + "LEFT JOIN [user] ON quotation.created_by = [user].user_id "
-                + "LEFT JOIN customer_contract ON quotation.quotation_id = customer_contract.quotation_id "
-                + "WHERE quotation.customer_id = ? "
-                + "ORDER BY quotation.quotation_id ASC";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, customerId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Quotation quotation = new Quotation();
-                quotation.setQuotationId(rs.getInt("quotation_id"));
-                quotation.setCustomerId(rs.getInt("customer_id"));
-                if (rs.getTimestamp("quotation_date") != null) {
-                    quotation.setQuotationDate(rs.getTimestamp("quotation_date").toLocalDateTime());
-                }
-                quotation.setQuotationStatus(rs.getString("quotation_status"));
-                quotation.setCreatedBy(rs.getInt("created_by"));
-                if (rs.getTimestamp("created_at") != null) {
-                    quotation.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                }
-                quotation.setCustomerName(rs.getString("company_name"));
-                quotation.setCreatedByName(rs.getString("user_name"));
-                quotation.setHasContract(rs.getBoolean("has_contract"));
-                quotation.setTotalPrice(rs.getBigDecimal("total_price"));
-                
-                int contractId = rs.getInt("contract_id");
-                if (!rs.wasNull()) {
-                    quotation.setContractId(contractId);
-                }
-                
-                list.add(quotation);
-            }
-        } catch (Exception e) {
-            System.out.println("getQuotationsByCustomerId error: " + e.getMessage());
-        }
-        return list;
-    }
-
-    // Xhieu - end
     /*
      * Xoa 1 dong san pham khoi quotation_detail.
      */
@@ -578,7 +528,7 @@ public class QuotationDAO extends DBContext {
 
     public void updateQuotationTotalPrice(int quotationId) {
         String sql = "UPDATE q "
-                + "SET q.total_price = COALESCE(("
+                + "SET total_price = COALESCE(("
                 + "    SELECT SUM("
                 + "        qd.quantity * qd.selling_price * (1.0 - COALESCE(qd.discount_percent, 0.0) / 100.0) * (1.0 + COALESCE(qd.tax_percent, 0.0) / 100.0)"
                 + "    ) "

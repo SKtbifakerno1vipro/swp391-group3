@@ -8,21 +8,11 @@ public class CategoryService {
 
     private final CategoryDAO categoryDAO = new CategoryDAO();
 
-    public List<Category> getAllCategories() {
-        return categoryDAO.getAllCategories();
-    }
-
-    public List<Category> searchCategoriesWithPaging(String searchName, int pageIndex, int pageSize) {
-        return categoryDAO.searchCategoriesWithPaging(searchName, pageIndex, pageSize);
-    }
 
     public List<Category> searchCategoriesWithPaging(String searchName, Integer statusFilter, int pageIndex, int pageSize) {
         return categoryDAO.searchCategoriesWithPaging(searchName, statusFilter, pageIndex, pageSize);
     }
 
-    public int getTotalCategoriesCount(String searchName) {
-        return categoryDAO.getTotalCategoriesCount(searchName);
-    }
 
     public int getTotalCategoriesCount(String searchName, Integer statusFilter) {
         return categoryDAO.getTotalCategoriesCount(searchName, statusFilter);
@@ -56,7 +46,4 @@ public class CategoryService {
         return categoryDAO.isCategoryNameExists(categoryName, excludeCategoryId);
     }
 
-    public int countProductsByCategoryId(int categoryId) {
-        return categoryDAO.countProductsByCategoryId(categoryId);
-    }
 }

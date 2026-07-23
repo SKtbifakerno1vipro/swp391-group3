@@ -41,36 +41,7 @@ public class DashboardController extends HttpServlet {
         request.setAttribute("user", user);
 
         if (user.getRoleId() == 3) { // ROLE_CUSTOMER
-
-            CustomerDTO customer = customerService.getCustomerDTOByUserId(user.getUserId());
-            if (customer == null) {
-                response.sendRedirect(request.getContextPath() + "/login?error=customer_not_found");
-                return;
-            }
-            int customerId = customer.getCustomer().getCustomerId();
-            session.setAttribute("customerId", customerId);
-            request.setAttribute("customer", customer);
-
-            List<Quotation> quotations = quotationService.getQuotationsByCustomerId(customerId);
-            request.setAttribute("totalQuotations", quotations.size());
-            List<Quotation> recentQuotations = quotations;
-            if (recentQuotations.size() > 5) {
-                recentQuotations = recentQuotations.subList(recentQuotations.size() - 5, recentQuotations.size());
-            }
-            request.setAttribute("recentQuotations", recentQuotations);
-
-            List<ContractCustomerDTO> recentContracts = contractService.searchContracts(
-                    null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
-                    null, null, null, null, null, null
-            );
-            int totalContracts = contractService.getTotalContracts(
-                    null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
-                    null, null, null, null, null, null
-            );
-            request.setAttribute("totalContracts", totalContracts);
-            request.setAttribute("recentContracts", recentContracts);
-
-            request.getRequestDispatcher("/views/dashboard/customer-dashboard.jsp").forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/customer/dashboard");
             return;
         }
         if (user.getRoleId() == 5) { // ROLE IS ADMIN OFFICER

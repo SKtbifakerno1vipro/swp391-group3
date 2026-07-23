@@ -10,28 +10,6 @@ import model.Category;
 
 public class CategoryDAO extends DBContext {
 
-    public List<Category> getAllCategories() {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT c.category_id, c.category_name, c.status, "
-                   + "(SELECT COUNT(*) FROM product p WHERE p.category_id = c.category_id) AS total_product "
-                   + "FROM category c WHERE c.status = 1 ORDER BY c.category_id";
-        try {
-            PreparedStatement stm = connection.prepareStatement(sql);
-            ResultSet rs = stm.executeQuery();
-            while (rs.next()) {
-                list.add(mapCategory(rs));
-            }
-        } catch (Exception e) {
-            System.out.println("CategoryDAO getAllCategories error: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> searchCategoriesWithPaging(String searchName, int pageIndex, int pageSize) {
-        return searchCategoriesWithPaging(searchName, 1, pageIndex, pageSize);
-    }
-
     public List<Category> searchCategoriesWithPaging(String searchName, Integer statusFilter, int pageIndex, int pageSize) {
         List<Category> list = new ArrayList<>();
         String sql = "SELECT c.category_id, c.category_name, c.status, "
@@ -66,10 +44,6 @@ public class CategoryDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
-    }
-
-    public int getTotalCategoriesCount(String searchName) {
-        return getTotalCategoriesCount(searchName, 1);
     }
 
     public int getTotalCategoriesCount(String searchName, Integer statusFilter) {
@@ -200,22 +174,6 @@ public class CategoryDAO extends DBContext {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public int countProductsByCategoryId(int categoryId) {
-        String sql = "SELECT COUNT(*) FROM product WHERE category_id = ?";
-        try {
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setInt(1, categoryId);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            System.out.println("CategoryDAO countProductsByCategoryId error: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return 0;
     }
 
     private Category mapCategory(ResultSet rs) throws SQLException {
