@@ -37,7 +37,7 @@ public class SecurityFilter implements Filter {
             "/product-review", "/contract-list", "/contract-detail", "/export-pdf", "/File",
             "/Signature", "/invoice-list", "/invoice/create", "/invoice", "/preview",
             "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail",
-            "/revenue-report", "/revenue","/import-request-create", "/import-request-list", "/import-request-detail","/product-sales-report"
+            "/revenue-report", "/revenue", "/import-request-create", "/import-request-list", "/import-request-detail", "/product-sales-report"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
@@ -54,7 +54,7 @@ public class SecurityFilter implements Filter {
             "/category/create", "/category/edit", "/category/delete", "/product-list", "/edit-product",
             "/product-delete", "/product-review", "/quotation-list", "/quotation-create", "/quotation-detail",
             "/invoice/create", "/invoice", "/preview", "/payment/list", "/payment", "/payment/return",
-            "/payment/ipn", "/payment/detail", "/import-request-list", "/import-request-detail","/import-request-create"
+            "/payment/ipn", "/payment/detail", "/import-request-list", "/import-request-detail", "/import-request-create"
     );
 
     private static final List<String> ADMIN_OFFICER_URLS = List.of(
@@ -79,7 +79,8 @@ public class SecurityFilter implements Filter {
             "/auth/forgot",
             "/user/password/change",
             "/payment/ipn",
-            "/payment/return"
+            "/payment/return", 
+            "/export-pdf"
     );
 
     private static final List<String> LOGGED_IN_URLS = List.of(
@@ -93,7 +94,6 @@ public class SecurityFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
@@ -196,7 +196,9 @@ public class SecurityFilter implements Filter {
                 HttpSession session = req.getSession(false);
                 User user = session != null ? (model.User) session.getAttribute("user") : null;
                 if (user != null && String.valueOf(user.getUserId()).equals(idParam)) {
-                    if (roleId != ROLE_CUSTOMER) return true;
+                    if (roleId != ROLE_CUSTOMER) {
+                        return true;
+                    }
                 }
             }
         }
@@ -206,12 +208,18 @@ public class SecurityFilter implements Filter {
         }
 
         switch (roleId) {
-            case ROLE_MANAGER: return MANAGER_URLS.contains(cleanPath);
-            case ROLE_CUSTOMER: return CUSTOMER_URLS.contains(cleanPath);
-            case ROLE_SALE_STAFF: return SALE_STAFF_URLS.contains(cleanPath);
-            case ROLE_ADMIN_OFFICER: return ADMIN_OFFICER_URLS.contains(cleanPath);
-            case ROLE_WAREHOUSE_STAFF: return WAREHOUSE_STAFF_URLS.contains(cleanPath);
-            default: return false;
+            case ROLE_MANAGER:
+                return MANAGER_URLS.contains(cleanPath);
+            case ROLE_CUSTOMER:
+                return CUSTOMER_URLS.contains(cleanPath);
+            case ROLE_SALE_STAFF:
+                return SALE_STAFF_URLS.contains(cleanPath);
+            case ROLE_ADMIN_OFFICER:
+                return ADMIN_OFFICER_URLS.contains(cleanPath);
+            case ROLE_WAREHOUSE_STAFF:
+                return WAREHOUSE_STAFF_URLS.contains(cleanPath);
+            default:
+                return false;
         }
     }
 

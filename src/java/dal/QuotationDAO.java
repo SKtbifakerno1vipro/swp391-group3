@@ -528,7 +528,7 @@ public class QuotationDAO extends DBContext {
 
     public void updateQuotationTotalPrice(int quotationId) {
         String sql = "UPDATE q "
-                + "SET q.total_price = COALESCE(("
+                + "SET total_price = COALESCE(("
                 + "    SELECT SUM("
                 + "        qd.quantity * qd.selling_price * (1.0 - COALESCE(qd.discount_percent, 0.0) / 100.0) * (1.0 + COALESCE(qd.tax_percent, 0.0) / 100.0)"
                 + "    ) "

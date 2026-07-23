@@ -165,10 +165,6 @@
                                 <strong><c:out value="${adminName}"/></strong>
                             </div>
                             <div class="status-item">
-                                <span>Tên cơ sở dữ liệu</span>
-                                <strong><c:out value="${dbName}"/></strong>
-                            </div>
-                            <div class="status-item">
                                 <span>Phiên bản ứng dụng</span>
                                 <strong><c:out value="${appVersion}"/></strong>
                             </div>
