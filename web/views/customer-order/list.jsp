@@ -123,7 +123,7 @@
                                             <c:when test="${item.customerOrder.hasInvoice == false}">
                                                 <c:if test="${sessionScope.user.roleId != 3}">
                                                     |
-                                                    <a href="${pageContext.request.contextPath}/invoice?orderId=${item.customerOrder.customerOrderId}"
+                                                    <a href="${pageContext.request.contextPath}/invoice?orderId=${item.customerOrder.customerOrderId}&action=create"
                                                        style="color: #16a34a; font-weight: bold; text-decoration: none;">Tạo Hóa đơn</a>
                                                 </c:if>
                                             </c:when>

@@ -124,8 +124,9 @@ public class InvoiceDAO extends DBContext {
                 return true;
             }
         } catch (Exception e) {
-            System.out.println("insertInvoice error: " + e.getMessage());
             e.printStackTrace();
+            System.out.println("insertInvoice error: " + e.getMessage());
+            
         }
         return false;
     }
@@ -386,7 +387,7 @@ public class InvoiceDAO extends DBContext {
                 invoice.setUpdatedAt(rs.getTimestamp(colIdx).toLocalDateTime());
             }
         } catch (SQLException e) {
-            System.out.println("error getInvoice: updateAt column");
+            // updated_at is optional and may not be in the ResultSet
         }
         try {
             int colIdx = rs.findColumn("contract_number");
@@ -394,7 +395,7 @@ public class InvoiceDAO extends DBContext {
                 invoice.setContractNo(rs.getString(colIdx));
             }
         } catch (SQLException e) {
-            System.out.println("error getInvoice: contract_number column");
+            // contract_number is optional and may not be in the ResultSet
         }
 
         return invoice;
@@ -403,7 +404,7 @@ public class InvoiceDAO extends DBContext {
     public boolean updateInvoice(Invoice invoice) {
         String sql = "UPDATE invoice SET "
                 + "invoice_no = ?, issue_date = ?, invoice_status = ?, invoice_type = ?, invoice_symbol = ?, "
-                + "buyer_name = ?, buyer_tax_code = ?, buyer_address = ?, "
+                + "buyer_name = ?, buyer_tax_code = ?, buyer_address = ?, buyer_phone = ?, total_amount = ?, "
                 + "customer_note = ?, internal_note = ?, seller_phone = ?, "
                 + "updated_at = GETDATE() "
                 + "WHERE invoice_id = ?";
@@ -417,15 +418,18 @@ public class InvoiceDAO extends DBContext {
             ps.setString(6, invoice.getBuyerName());
             ps.setString(7, invoice.getBuyerTaxCode());
             ps.setString(8, invoice.getBuyerAddress());
+            ps.setString(9, invoice.getBuyerPhone());
+            ps.setDouble(10, invoice.getTotalAmount());
 
-            ps.setString(9, invoice.getCustomerNote());
-            ps.setString(10, invoice.getInternalNote());
-            ps.setString(11, invoice.getSellerPhone());
-            ps.setInt(12, invoice.getInvoiceId());
+            ps.setString(11, invoice.getCustomerNote());
+            ps.setString(12, invoice.getInternalNote());
+            ps.setString(13, invoice.getSellerPhone());
+            ps.setInt(14, invoice.getInvoiceId());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("updateInvoice: " + e.getMessage());
         }
         return false;
     }
