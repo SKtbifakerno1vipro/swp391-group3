@@ -79,7 +79,7 @@ public class SecurityFilter implements Filter {
             "/auth/forgot",
             "/user/password/change",
             "/payment/ipn",
-            "/payment/return", 
+            "/payment/return",
             "/export-pdf"
     );
 
@@ -114,7 +114,7 @@ public class SecurityFilter implements Filter {
                 ((HttpServletResponse) response).sendRedirect("login.jsp");
                 return;
             }
-            if (user.getRoleId() == 1) {
+            if (user.getRoleId() == ROLE_SYSTEM_ADMIN) {
                 chain.doFilter(request, response);
                 return;
             }
