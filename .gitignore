@@ -38,11 +38,11 @@ Thumbs.db
 nbproject/
 nbproject/private/
 
-
 # intellij
 .idea
 .smarttomcat
 *.iml
 out/
 .smarttomcat/
-
+
+

@@ -196,7 +196,7 @@
                             <span class="search-label">Tùy chọn:</span>
                             
                             <select name="type" class="input-small">
-                                <option value="">-- Tất cả phân loại --</option>
+                                <option value="">- Phân khúc khách -</option>
                                 <c:forEach var="typeCus" items="${listTypeCus}">
                                     <option value="${typeCus}" ${type eq typeCus ? 'selected' : '' }>${typeCus}
                                     </option>
@@ -204,7 +204,7 @@
                             </select>
                             <c:if test="${sessionScope.user.roleId != 4}">
                                 <select name="assignedToUserId" class="input-small">
-                                    <option value="">-- Tất cả nhân viên Sale --</option>
+                                    <option value="">- Tư vấn viên -</option>
                                     <c:forEach var="sale" items="${listSales}">
                                         <option value="${sale.userId}" ${assignedToUserId eq sale.userId
                                             ? 'selected' : '' }>${sale.fullName}</option>

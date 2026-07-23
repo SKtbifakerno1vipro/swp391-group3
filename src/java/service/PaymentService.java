@@ -19,15 +19,7 @@ public class PaymentService {
     public int insertPayment(Payment payment) {
         return paymentDAO.insertPayment(payment);
     }
-
-    public List<Payment> getAllPayments() {
-        return paymentDAO.getAllPayments();
-    }
-
-    public List<Payment> getPaymentsByCustomerId(int userId) {
-        return paymentDAO.getPaymentsByCustomerId(userId);
-    }
-
+    
     public List<Payment> searchPayments(
             Integer customerUserId,
             String customerName,
@@ -68,9 +60,6 @@ public class PaymentService {
         return paymentDAO.getPaymentByContractId(contractId);
     }
 
-    public boolean hasPaymentForContract(int contractId) {
-        return paymentDAO.hasPaymentForContract(contractId);
-    }
 
     public synchronized void createPendingPaymentForOrder(CustomerOrder order) {
         int orderId = order.getCustomerOrderId();
@@ -124,5 +113,13 @@ public class PaymentService {
             System.err.println("[PaymentService] Failed to create pending payment for order ID " + orderId + ": " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public BigDecimal getTotalPendingAmountByUserId(int userId) {
+        return paymentDAO.getTotalPendingAmountByUserId(userId);
+    }
+
+    public BigDecimal getTotalPaidAmountByUserId(int userId) {
+        return paymentDAO.getTotalPaidAmountByUserId(userId);
     }
 }

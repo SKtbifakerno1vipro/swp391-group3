@@ -41,7 +41,7 @@ public class SecurityFilter implements Filter {
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
-            "/dashboard", "/admin-dashboard", "/customer/detail", "/customer/edit", "/customer-order-list",
+            "/dashboard", "/customer/dashboard", "/admin-dashboard", "/customer/detail", "/customer/edit", "/customer-order-list",
             "/customer-order", "/AcceptanceRecordController", "/category/list", "/product-list",
             "/quotation-list", "/quotation-detail", "/contract-list", "/contract-detail", "/export-pdf", "/File",
             "/Signature", "/invoice-list", "/invoice", "/preview", "/payment/list", "/payment",

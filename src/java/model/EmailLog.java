@@ -16,10 +16,6 @@ public class EmailLog {
     public EmailLog() {
     }
 
-    public EmailLog(int logId, String recipient, String subject, String content, Timestamp sentAt, String status, String userName) {
-        this(logId, recipient, subject, content, sentAt, status, userName, null);
-    }
-
     public EmailLog(int logId, String recipient, String subject, String content, Timestamp sentAt, String status, String userName, Integer userId) {
         this.logId = logId;
         this.recipient = recipient;
