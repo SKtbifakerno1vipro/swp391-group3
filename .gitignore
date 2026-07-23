@@ -38,7 +38,6 @@ Thumbs.db
 nbproject/
 nbproject/private/
 
-
 # intellij
 .idea
 .smarttomcat
@@ -46,6 +45,4 @@ nbproject/private/
 out/
 .smarttomcat/
 
-# Agents configuration
-.agents/
-
+
