@@ -16,11 +16,13 @@ import model.*;
 import service.*;
 import dto.*;
 import jakarta.servlet.http.HttpSession;
+import utils.Validation;
 
 @WebServlet("/contract-list")
 public class ContractListController extends HttpServlet {
 
     private ContractService contractService = new ContractService();
+    private final int PAGE_SIZE = 10;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -48,7 +50,13 @@ public class ContractListController extends HttpServlet {
         String phone = request.getParameter("customerPhone") != null ? request.getParameter("customerPhone").trim().replaceAll("\\s+", "") : null;
         String email = request.getParameter("customerEmail") != null ? request.getParameter("customerEmail").trim().replaceAll("\\s+", "") : null;
         String customerType = request.getParameter("customerType");
-        
+
+        String error = Validation.validateFromAndToDate(fromDate, toDate);
+
+        if (error != null) {
+            session.setAttribute("errorSig", error);
+        }
+
         // 2. validate page index
         int pageIndex = 1;
         try {
@@ -62,22 +70,19 @@ public class ContractListController extends HttpServlet {
         } catch (NumberFormatException e) {
             pageIndex = 1;
         }
-        //defaul page size is 10
-        int pageSize = 10;
-
         int totalRecord = contractService.getTotalContracts(contractNumber, customerName, status, storageType, pageIndex,
-                pageSize, currentUser.getUserId(), currentUser.getRoleId(),
+                PAGE_SIZE, currentUser.getUserId(), currentUser.getRoleId(),
                 fromDate, toDate, taxcode, phone, email, customerType);
 
         // calculate to the end page
-        int endPage = (int) Math.ceil((double) totalRecord / pageSize);
+        int endPage = (int) Math.ceil((double) totalRecord / PAGE_SIZE);
 
         if (pageIndex > endPage && endPage > 0) {
             pageIndex = endPage;
         }
 
         List<ContractCustomerDTO> list = contractService.searchContracts(contractNumber, customerName, status, storageType, pageIndex,
-                pageSize, currentUser.getUserId(), currentUser.getRoleId(), fromDate, toDate, taxcode, phone, email, customerType);
+                PAGE_SIZE, currentUser.getUserId(), currentUser.getRoleId(), fromDate, toDate, taxcode, phone, email, customerType);
 
         request.setAttribute("list", list);
         request.setAttribute("endPage", endPage);

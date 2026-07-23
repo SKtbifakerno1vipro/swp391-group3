@@ -47,6 +47,7 @@ public class InvoiceServlet extends HttpServlet {
     private final QuotationService qService = new QuotationService();
     private final PaymentService paymentService = new PaymentService();
     private final AuditLogService AuditLogService = new AuditLogService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -86,36 +87,55 @@ public class InvoiceServlet extends HttpServlet {
                     CustomerOrderDTO orderDTO = coService.getCustomerOrderById(invoice.getCustomerOrderId());
                     if (isCustomer && user.getUserId() != orderDTO.getCustomer().getUserId()) {
                         session.setAttribute("errorInvoice", "Bạn không được xem hóa đơn của khách hàng khác");
-                        response.sendRedirect(request.getContextPath() + "/invoice-list");
+                        response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                        return;
+                    } else if (isCustomer && !"RELEASED".equals(invoice.getInvoiceStatus())) {
+                        session.setAttribute("errorInvoice", "Hóa đơn chưa được phát hành");
+                        response.sendRedirect(request.getContextPath() + "/customer-order-list");
                         return;
                     } else {
                         request.setAttribute("invoice", invoice);
                         loadInvoiceCreationData(request, invoice.getCustomerOrderId());
                     }
                 } else {
-                    request.setAttribute("error", "Không tìm thấy hóa đơn này.");
-                     
+                    request.setAttribute("error", "Không tìm thấy hóa đơn này hoặc đã bị hủy.");
+                    request.getRequestDispatcher("/views/invoice/create.jsp").forward(request, response);
+                    return;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                request.setAttribute("error", "Lỗi tải thông tin hóa đơn: " + e.getMessage());
-                 request.getRequestDispatcher("/views/invoice/create.jsp").forward(request, response);
+                session.setAttribute("errorInvoice", "Lỗi tải thông tin hóa đơn!");
+                response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                return;
             }
         } else if (orderIdRaw != null && !orderIdRaw.trim().isEmpty()) {
             try {
 
                 int orderId = Integer.parseInt(orderIdRaw);
                 CustomerOrderDTO orderDTO = coService.getCustomerOrderById(orderId);
+                if (orderDTO == null || orderIdRaw.isEmpty()) {
+                    request.setAttribute("error", "Không tìm thấy hóa đơn này hoặc đã bị hủy.");
+                    request.getRequestDispatcher("/views/invoice/create.jsp").forward(request, response);
+                    return;
+                }
                 if (isCustomer && user.getUserId() != orderDTO.getCustomer().getUserId()) {
                     session.setAttribute("errorInvoice", "Bạn không được xem hóa đơn của khách hàng khác");
-                    response.sendRedirect(request.getContextPath() + "/invoice-list");
+                    response.sendRedirect(request.getContextPath() + "/customer-order-list");
                     return;
                 } else {
+                    Invoice invOfOrd = iService.getInvoiceByOrderId(orderId);
+                    if (invOfOrd != null && isCustomer && !"RELEASED".equals(invOfOrd.getInvoiceStatus())) {
+                        session.setAttribute("errorInvoice", "Hóa đơn chưa được phát hành");
+                        response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                        return;
+                    } 
                     loadInvoiceCreationData(request, orderId);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                request.setAttribute("error", "Lỗi tải thông tin đơn hàng: " + e.getMessage());
+                session.setAttribute("errorInvoice", "Lỗi tải thông tin đơn hàng!");
+                response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                return;
             }
         } else {
             request.setAttribute("error", "Không có thông tin dữ liệu tải lên");
@@ -167,7 +187,7 @@ public class InvoiceServlet extends HttpServlet {
                     if (payment != null && "COMPLETED".equals(payment.getPaymentStatus())) {
                         Invoice invoice = iService.getInvoiceByContractId(contractId);
                         if (invoice != null && "RELEASED".equals(invoice.getInvoiceStatus())) {
-                            session.setAttribute("errorMessage", "Hóa đơn đã được phát hành.");
+                            session.setAttribute("errorPaymentInvoice", "Hóa đơn đã được phát hành.");
                         } else if (invoice != null && "READY".equals(invoice.getInvoiceStatus())) {
                             invoice.setInvoiceStatus("RELEASED");
                             invoice.setIssueDate(LocalDateTime.now());
@@ -181,26 +201,26 @@ public class InvoiceServlet extends HttpServlet {
 //                                String serverName = request.getServerName();
 //                                int serverPort = request.getServerPort();
 //                                String contextPath = request.getContextPath();
-                                String baseUrl = "http://localhost:9999/SWP391_GROUP3/";
+                                String baseUrl = "http://localhost:8080/SWP391_GROUP3/";
 
                                 iService.emailIssueInvoice(invoice.getInvoiceId(), baseUrl);
                                 AuditLogService.log(user.getUserId(), "RELEASE", "Invoice", "Phát hành hóa đơn điện tử số: " + invoice.getInvoiceNo() + " (Hợp đồng ID: " + contractId + ")");
-                                session.setAttribute("successMessage", "Phát hành hóa đơn thành công!");
+                                session.setAttribute("successInvoice", "Phát hành hóa đơn thành công!");
                             } else {
-                                session.setAttribute("errorMessage", "Cập nhật trạng thái hóa đơn thất bại.");
+                                session.setAttribute("errorPaymentInvoice", "Cập nhật trạng thái hóa đơn thất bại.");
                             }
                         } else {
-                            session.setAttribute("errorMessage", "Hóa đơn phải ở trạng thái READY mới có thể phát hành.");
+                            session.setAttribute("errorPaymentInvoice", "Hóa đơn phải ở trạng thái READY mới có thể phát hành.");
                         }
                     } else {
-                        session.setAttribute("errorMessage", "Thanh toán chưa hoàn tất.");
+                        session.setAttribute("errorPaymentInvoice", "Thanh toán chưa hoàn tất.");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    session.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
+                    session.setAttribute("errorPaymentInvoice", "Lỗi: " + e.getMessage());
                 }
             } else {
-                session.setAttribute("errorMessage", "Thiếu thông tin hợp đồng.");
+                session.setAttribute("errorPaymentInvoice", "Thiếu thông tin hợp đồng.");
             }
 
             response.sendRedirect(request.getContextPath() + "/payment/list");
@@ -265,7 +285,7 @@ public class InvoiceServlet extends HttpServlet {
             invoice.setInvoiceId(invoiceId);
             invoice.setCustomerContractId(contractId);
             invoice.setCustomerOrderId(orderId);
-            invoice.setInvoiceType(isVAT?"VAT":"SALES");
+            invoice.setInvoiceType(isVAT ? "VAT" : "SALES");
             invoice.setInvoiceSymbol(invoiceSymbol);
 
             if (iService.getInvoiceByOrderId(orderId) != null) {

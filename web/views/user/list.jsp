@@ -159,6 +159,7 @@
                 border-radius:999px;
                 font-size:12px;
                 font-weight:900;
+                white-space:nowrap;
             }
             .status-active {
                 background:var(--primary-soft);
@@ -172,7 +173,7 @@
                 display:flex;
                 align-items:center;
                 gap:8px;
-                flex-wrap:wrap;
+                flex-wrap:nowrap;
             }
             .chip {
                 display:inline-flex;
@@ -187,6 +188,7 @@
                 text-decoration:none;
                 border:0;
                 cursor:pointer;
+                white-space:nowrap;
             }
             .chip.primary {
                 background:var(--primary-soft);
@@ -255,6 +257,9 @@
                         <p class="eyebrow">Quản lý Truy cập</p>
                         <h1>Quản lý Người dùng</h1>
                         <p>Quản lý tài khoản, vai trò, thông tin liên lạc và trạng thái của người dùng.</p>
+                        <c:if test="${sessionScope.errorSig != null}">
+                            <div style="color: red; margin-bottom: 10px;">${sessionScope.errorSig}</div>
+                        </c:if>
                     </div>
                     <div class="actions">
                         <c:if test="${sessionScope.user.roleId == 1}">
@@ -285,14 +290,23 @@
                                         </c:forEach>
                                     </select>
                                 </div>
-                                <div class="field"><label>Trạng thái</label><select name="status"><option value="" ${empty status ? 'selected' : ''}>Tất cả trạng thái</option><option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option><option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>Khóa</option></select></div>
-                                <div class="actions"><button class="button primary" type="submit"><span class="material-symbols-outlined">search</span>Tìm kiếm</button><a class="button" href="${pageContext.request.contextPath}/user-list">Đặt lại</a></div>
+                                <div class="field">
+                                    <label>Trạng thái</label>
+                                    <select name="status">
+                                        <option value="" ${empty status ? 'selected' : ''}>Tất cả trạng thái</option>
+                                        <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option>
+                                        <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>Khóa</option>
+                                    </select>
+                                </div>
+                                <div class="actions">
+                                    <button class="button primary" type="submit"><span class="material-symbols-outlined">search</span>Tìm kiếm</button>
+                                    <a class="button" href="${pageContext.request.contextPath}/user-list">Đặt lại</a></div>
                             </div>
                         </form>
                     </div>
                     <div class="table-wrap">
                         <table>
-                            <thead><tr><th>ID</th><th>Họ Tên</th><th>Tài khoản</th><th>Email</th><th>Số điện thoại</th><th>Vai trò</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                            <thead><tr><th>ID</th><th>Họ Tên</th><th>Tài khoản</th><th>Email</th><th>Số điện thoại</th><th>Vai trò</th><th style="min-width: 120px;">Trạng thái</th><th style="min-width: 220px;">Thao tác</th></tr></thead>
                             <tbody>
                                 <c:if test="${empty users}"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted);font-weight:600;">Không tìm thấy người dùng.</td></tr></c:if>
                                 <c:forEach var="u" items="${users}">
@@ -312,7 +326,7 @@
                                             </c:choose>
                                         </td>
                                         <td><span class="status-pill ${u.status == 'ACTIVE' ? 'status-active' : 'status-inactive'}"><c:out value="${u.status == 'ACTIVE' ? 'Hoạt động' : 'Khóa'}"/></span></td>
-                                        <td><div class="row-actions">
+                                        <td style="white-space: nowrap;"><div class="row-actions">
                                                 <c:choose>
                                                     <c:when test="${sessionScope.user.roleId == 1}">
                                                         <a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">edit</span>Sửa</a>

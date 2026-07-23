@@ -37,7 +37,7 @@ public class SecurityFilter implements Filter {
             "/product-review", "/contract-list", "/contract-detail", "/export-pdf", "/File",
             "/Signature", "/invoice-list", "/invoice/create", "/invoice", "/preview",
             "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail",
-            "/revenue-report", "/revenue","/import-request-create", "/import-request-list", "/import-request-detail"
+            "/revenue-report", "/revenue","/import-request-create", "/import-request-list", "/import-request-detail","/product-sales-report"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(

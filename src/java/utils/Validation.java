@@ -1,5 +1,8 @@
 package utils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class Validation {
 
     public static String validateInputSearch(String str, int max) {
@@ -11,6 +14,14 @@ public class Validation {
         }
         return null;
     }
+
+    public static String validateInput(String input, String field) {
+        if (input == null || input.trim().isEmpty()) {
+            return "Vui lòng nhập " + field + " !";
+        }
+        return null;
+    }
+
     public static String validateEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             return "Email không được để trống!";
@@ -21,6 +32,8 @@ public class Validation {
         return null; // OK
     }
 
+   
+    
     public static String validatePhone(String phone) {
         if (phone == null || phone.trim().isEmpty()) {
             return "Not be empty";
@@ -114,7 +127,8 @@ public class Validation {
             int q = Integer.parseInt(quantity);
             if (q < 0) {
                 return "Quantity must be greater than or equal to zero";
-            } if (q > Integer.MAX_VALUE) {
+            }
+            if (q > Integer.MAX_VALUE) {
                 return "Quantity exceeds the permitted limit";
             }
         } catch (NumberFormatException e) {
@@ -122,7 +136,7 @@ public class Validation {
         }
         return null;
     }
-    
+
     public static String validatePrice(String price) {
         price = price.trim();
         if (price == null || price.isEmpty()) {
@@ -132,7 +146,8 @@ public class Validation {
             double p = Double.parseDouble(price);
             if (p < 0) {
                 return "Price must be greater than or equal to zero";
-            } if (p > Double.MAX_VALUE) {
+            }
+            if (p > Double.MAX_VALUE) {
                 return "Price exceeds the permitted limit";
             }
         } catch (NumberFormatException e) {
@@ -211,7 +226,7 @@ public class Validation {
             return null; // cho phép bỏ trống
         }
         try {
-            java.time.LocalDate birthDate = java.time.LocalDate.parse(dateStr.trim());
+            LocalDate birthDate = LocalDate.parse(dateStr.trim());
             if (birthDate.isAfter(java.time.LocalDate.now())) {
                 return "Ngày sinh không được lớn hơn ngày hiện tại!";
             }
@@ -220,4 +235,20 @@ public class Validation {
         }
         return null;
     }
+
+    public static String validateFromAndToDate(String from, String to) {
+        if (from == null || from.trim().isEmpty() || to == null || to.trim().isEmpty()) {
+            return null;
+        }
+
+        try {
+            if (java.sql.Date.valueOf(from).after(java.sql.Date.valueOf(to))) {
+                return "Từ ngày không thể lớn hơn Đến ngày!";
+            }
+            return null;
+        } catch (IllegalArgumentException e) {
+            return "Định dạng ngày không hợp lệ!";
+        }
+    }
+
 }

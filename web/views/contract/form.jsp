@@ -105,9 +105,13 @@
 
             <main class="main legacy-page">
                 <c:if test="${not empty errorMsg}">
-                    <div style="color: var(--danger); border: 1px solid var(--danger); padding: 10px; margin-bottom: 15px; border-radius: 12px; background: var(--danger-soft);">${errorMsg}</div>
+                    <div style="color: var(--danger); border: 1px solid var(--danger); padding: 10px; margin-bottom: 15px;
+                         border-radius: 12px; background: var(--danger-soft);">${errorMsg}</div>
                 </c:if>
-
+                <c:if test="${not empty sessionScope.error}">
+                    <div style="color: var(--danger); border: 1px solid var(--danger); padding: 10px; margin-bottom: 15px; 
+                         border-radius: 12px; background: var(--danger-soft);">${sessionScope.error}</div>
+                </c:if>
                 <h2>${contract == null ? 'Tạo mới Hợp đồng' : 'Chỉnh sửa Hợp đồng'}</h2>
 
                 <div class="layout-container">
