@@ -259,6 +259,11 @@ public class CustomerOrderDAO extends DBContext {
             }
             psStock.executeBatch();
         }
+
+        String sqlUpdateStatus = "UPDATE product SET product_status = 'OUT_OF_STOCK' WHERE quantity_available <= 0 AND product_status = 'ACTIVE'";
+        try (PreparedStatement psStatus = connection.prepareStatement(sqlUpdateStatus)) {
+            psStatus.executeUpdate();
+        }
     }
 
     private void rollbackQuietly() {
@@ -282,12 +287,12 @@ public class CustomerOrderDAO extends DBContext {
     public boolean updateOrderStatus(int orderId, String status) {
         String checkStatusSql = "SELECT order_status FROM customer_order WHERE customer_order_id = ?";
         String updateStatusSql = "UPDATE customer_order SET order_status = ? WHERE customer_order_id = ?";
-        
+
         boolean originalAutoCommit = true;
         try {
             originalAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
-            
+
             String currentStatus = null;
             try (PreparedStatement psCheck = connection.prepareStatement(checkStatusSql)) {
                 psCheck.setInt(1, orderId);
@@ -297,14 +302,14 @@ public class CustomerOrderDAO extends DBContext {
                     }
                 }
             }
-            
+
             if (currentStatus == null) {
                 connection.rollback();
                 return false;
             }
-            
+
             // Nếu hủy đơn (CANCELLED) hoặc xóa đơn (DELETED) -> Chỉ hoàn lại số lượng tồn kho khả dụng (quantity_available), KHÔNG cộng lại vào quantity_reserve
-            if (("CANCELLED".equalsIgnoreCase(status) || "DELETED".equalsIgnoreCase(status)) 
+            if (("CANCELLED".equalsIgnoreCase(status) || "DELETED".equalsIgnoreCase(status))
                     && !"CANCELLED".equalsIgnoreCase(currentStatus) && !"DELETED".equalsIgnoreCase(currentStatus)) {
                 String getItemsSql = "SELECT qd.product_id, cod.quantity "
                         + "FROM customer_order_detail cod "
@@ -321,7 +326,7 @@ public class CustomerOrderDAO extends DBContext {
                         }
                     }
                 }
-                
+
                 // Chỉ hoàn lại quantity_available
                 String restoreStockSql = "UPDATE product SET quantity_available = quantity_available + ? WHERE product_id = ?";
                 try (PreparedStatement psRestore = connection.prepareStatement(restoreStockSql)) {
@@ -332,8 +337,17 @@ public class CustomerOrderDAO extends DBContext {
                     }
                     psRestore.executeBatch();
                 }
+                String activeProductSql = "UPDATE product SET product_status = 'ACTIVE' "
+                        + "WHERE product_id = ? AND quantity_available > 0 AND product_status = 'OUT_OF_STOCK'";
+                try (PreparedStatement psActive = connection.prepareStatement(activeProductSql)) {
+                    for (int[] item : items) {
+                        psActive.setInt(1, item[0]); // item[0] là product_id
+                        psActive.addBatch();
+                    }
+                    psActive.executeBatch();
+                }
             }
-            
+
             // Update order status
             try (PreparedStatement psUpdate = connection.prepareStatement(updateStatusSql)) {
                 psUpdate.setString(1, status);
@@ -441,9 +455,9 @@ public class CustomerOrderDAO extends DBContext {
     }
 
     public int getTotalOrders(int userId, String roleName) {
-        String sql = "SELECT COUNT(*) FROM customer_order co " +
-                     "JOIN customer c ON co.customer_id = c.customer_id " +
-                     "WHERE (co.order_status IS NULL OR co.order_status <> 'DELETED') " + getRoleFilter(userId, roleName);
+        String sql = "SELECT COUNT(*) FROM customer_order co "
+                + "JOIN customer c ON co.customer_id = c.customer_id "
+                + "WHERE (co.order_status IS NULL OR co.order_status <> 'DELETED') " + getRoleFilter(userId, roleName);
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -457,15 +471,19 @@ public class CustomerOrderDAO extends DBContext {
 
     private String getOrderByClause(String sortBy, String sortOrder) {
         String col = "co.customer_order_id";
-        if ("orderId".equals(sortBy)) col = "co.customer_order_id";
-        else if ("customerName".equals(sortBy)) col = "u.full_name";
-        else if ("taxCode".equals(sortBy)) col = "c.tax_code";
-        else if ("status".equals(sortBy)) col = "co.order_status";
+        if ("orderId".equals(sortBy)) {
+            col = "co.customer_order_id";
+        } else if ("customerName".equals(sortBy)) {
+            col = "u.full_name";
+        } else if ("taxCode".equals(sortBy)) {
+            col = "c.tax_code";
+        } else if ("status".equals(sortBy)) {
+            col = "co.order_status";
+        }
 
         String dir = "asc".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC";
         return "ORDER BY " + col + " " + dir;
     }
-
 
     public int getTotalOrdersBySearch(String keyword, int userId, String roleName) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM customer_order co ")

@@ -36,8 +36,16 @@
                 <div class="topbar">
                     <div>
                         <p class="eyebrow">QUẢN LÝ KHO HÀNG</p>
-                        <h1>Tạo Yêu cầu Nhập kho Mới</h1>
-                        <p>Đề xuất bổ sung sản phẩm nguyên liệu bánh vào kho hàng.</p>
+                        <c:choose>
+                            <c:when test="${sessionScope.user.roleId == 6}">
+                                <h1>Nhập sản phẩm</h1>
+                                <p>Nhập bổ sung sản phẩm nguyên liệu bánh trực tiếp vào kho hàng.</p>
+                            </c:when>
+                            <c:otherwise>
+                                <h1>Tạo Yêu cầu Nhập kho Mới</h1>
+                                <p>Đề xuất bổ sung sản phẩm nguyên liệu bánh vào kho hàng.</p>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                     <a href="${pageContext.request.contextPath}/import-request-list" class="btn-secondary-action">
                         <span class="material-symbols-outlined">arrow_back</span>
@@ -81,10 +89,20 @@
                             </div>
 
                             <div style="display: flex; gap: 12px; margin-top: 28px;">
-                                <button type="submit" class="btn-primary-action">
-                                    <span class="material-symbols-outlined">send</span>
-                                    Gửi yêu cầu nhập kho
-                                </button>
+                                <c:choose>
+                                    <c:when test="${sessionScope.user.roleId == 6}">
+                                        <button type="submit" class="btn-primary-action">
+                                            <span class="material-symbols-outlined">download</span>
+                                            Nhập sản phẩm
+                                        </button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button type="submit" class="btn-primary-action">
+                                            <span class="material-symbols-outlined">send</span>
+                                            Gửi yêu cầu nhập kho
+                                        </button>
+                                    </c:otherwise>
+                                </c:choose>
                                 <a href="${pageContext.request.contextPath}/import-request-list" class="btn-secondary-action">
                                     Hủy bỏ
                                 </a>

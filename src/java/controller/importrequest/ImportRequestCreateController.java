@@ -32,8 +32,8 @@ public class ImportRequestCreateController extends HttpServlet {
             return;
         }
 
-        // Kiểm tra phân quyền: Chỉ cho phép System Admin (1), Manager (2) và Sales Staff (4)
-        if (user.getRoleId() != 1 && user.getRoleId() != 2 && user.getRoleId() != 4) {
+        // Kiểm tra phân quyền: Chỉ cho phép System Admin (1), Manager (2), Warehouse (6) và Sales Staff (4) 
+        if (user.getRoleId() != 1 && user.getRoleId() != 2 && user.getRoleId() != 4 && user.getRoleId() != 6) {
             response.sendRedirect(request.getContextPath() + "/import-request-list?message=permissionDenied");
             return;
         }
@@ -58,8 +58,8 @@ public class ImportRequestCreateController extends HttpServlet {
             return;
         }
 
-        // Kiểm tra phân quyền: Chỉ cho phép System Admin (1), Manager (2) và Sales Staff (4)
-        if (user.getRoleId() != 1 && user.getRoleId() != 2 && user.getRoleId() != 4) {
+        // Kiểm tra phân quyền: Chỉ cho phép System Admin (1), Manager (2), Warehouse (6) và Sales Staff (4) 
+        if (user.getRoleId() != 1 && user.getRoleId() != 2 && user.getRoleId() != 4 && user.getRoleId() != 6) {
             response.sendRedirect(request.getContextPath() + "/import-request-list?message=permissionDenied");
             return;
         }
@@ -92,7 +92,7 @@ public class ImportRequestCreateController extends HttpServlet {
             redirectWithError(request, response, "Sản phẩm chọn không tồn tại.");
             return;
         }
-        if (!"ACTIVE".equals(product.getProductStatus())) {
+        if ("INACTIVE".equals(product.getProductStatus())) {
             redirectWithError(request, response, "Sản phẩm hiện đang không hoạt động (Inactive).");
             return;
         }
@@ -105,10 +105,21 @@ public class ImportRequestCreateController extends HttpServlet {
         ir.setNote(note);
 
         ImportRequestDAO importRequestDAO = new ImportRequestDAO();
-        boolean success = importRequestDAO.createImportRequest(ir);
+        boolean success;
+        if (user.getRoleId() == 6) { // Warehouse Staff (nhập trực tiếp)
+            ir.setStatus(2); // Imported
+            ir.setImportedBy(user.getUserId());
+            success = importRequestDAO.createAndPerformImport(ir);
+        } else {
+            success = importRequestDAO.createImportRequest(ir);
+        }
 
         if (success) {
-            response.sendRedirect(request.getContextPath() + "/import-request-list?message=addSuccess");
+            if (user.getRoleId() == 6) {
+                response.sendRedirect(request.getContextPath() + "/import-request-list?message=importSuccess");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/import-request-list?message=addSuccess");
+            }
         } else {
             redirectWithError(request, response, "Không thể tạo yêu cầu nhập kho. Lỗi cơ sở dữ liệu.");
         }

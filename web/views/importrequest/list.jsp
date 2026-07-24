@@ -55,6 +55,12 @@
                             Tạo yêu cầu mới
                         </a>
                     </c:if>
+                    <c:if test="${sessionScope.user.roleId == 6}">
+                        <a href="${pageContext.request.contextPath}/import-request-create" class="btn-primary-action">
+                            <span class="material-symbols-outlined">download</span>
+                            Nhập sản phẩm
+                        </a>
+                    </c:if>
                 </div>
 
                 <!-- Thông báo hệ thống -->
