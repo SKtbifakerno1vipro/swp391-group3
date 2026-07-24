@@ -154,6 +154,12 @@
             </div>
 
             <button type="submit" name="action" value="resetPassword" class="btn-submit">Gửi yêu cầu</button>
+            
+            <div style="margin-top: 24px; display: flex; justify-content: center; align-items: center; font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px;">
+                <a href="${pageContext.request.contextPath}/login" style="color: var(--primary); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span> Quay lại Đăng nhập
+                </a>
+            </div>
         </form>
     </div>
 </body>

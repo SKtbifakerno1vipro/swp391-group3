@@ -257,7 +257,7 @@
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input type="email" id="email" name="email" class="form-control"
-                                        value="${isEdit ? cusDTO.user.email : ''}" ${isEdit && sessionScope.user.roleId != 3 ? 'readonly' : '' } required>
+                                        value="${isEdit ? cusDTO.user.email : ''}" required>
                                 </div>
 
                                 <%-- Full Name --%>
@@ -407,10 +407,10 @@
                                         value="${isEdit ? cusDTO.user.address : ''}" placeholder="Nhập địa chỉ">
                                 </div>
 
-                                <div class="btn-group full-width">
+                                <div class="btn-group full-width" style="display: flex; gap: 10px;">
                                     <button type="submit" class="btn-submit">${isEdit ?
                                         'Lưu thay đổi' : 'Tạo mới'}</button>
-                                    <a href="${pageContext.request.contextPath}/${sessionScope.user.roleId == 3 ? 'customer/detail' : 'customer/list'}"
+                                    <a href="${pageContext.request.contextPath}/${sessionScope.user.roleId == 3 ? 'dashboard' : 'customer/list'}"
                                         class="btn-cancel">Hủy</a>
                                 </div>
                             </div>

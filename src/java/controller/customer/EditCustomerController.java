@@ -111,7 +111,8 @@ public class EditCustomerController extends HttpServlet {
             String dateBirthStr = request.getParameter("dateBirth");
 
             String errorMsg = null;
-            if ((errorMsg = Validation.validateGender(gender)) != null
+            if ((errorMsg = Validation.validateEmail(email)) != null
+                    || (errorMsg = Validation.validateGender(gender)) != null
                     || (errorMsg = Validation.validateAddress(address)) != null
                     || (errorMsg = Validation.validateDateBirth(dateBirthStr)) != null) {
                 request.setAttribute("error", errorMsg);
@@ -119,6 +120,20 @@ public class EditCustomerController extends HttpServlet {
                 request.setAttribute("cusDTO", cusDTO);
                 request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
                 return;
+            }
+
+            // Check if email belongs to another user
+            List<User> existingUsersWithEmail = userService.searchUserFieldsByOR(null, null, email, null);
+            if (existingUsersWithEmail != null) {
+                for (User exUser : existingUsersWithEmail) {
+                    if (exUser.getUserId() != userId && email != null && email.trim().equalsIgnoreCase(exUser.getEmail())) {
+                        request.setAttribute("error", "Email '" + email.trim() + "' đã được sử dụng bởi một tài khoản khác trong hệ thống!");
+                        CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(customerId);
+                        request.setAttribute("cusDTO", cusDTO);
+                        request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
+                        return;
+                    }
+                }
             }
 
             User u = new User();
