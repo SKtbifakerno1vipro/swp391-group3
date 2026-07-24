@@ -324,22 +324,36 @@ L<%@page contentType="text/html" pageEncoding="UTF-8" import="java.time.LocalDat
                 <jsp:param name="activeMenu" value="invoices"/>
             </jsp:include>
             <c:if test="${not empty sessionScope.errorInvoice}">
-                    <div style="color: #991b1b; background-color: #fee2e2; border: 1px solid #ef4444; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
-                        ${sessionScope.errorInvoice}
-                        <% session.removeAttribute("errorInvoice"); %>
-                    </div>
-                </c:if>   
+                <div style="color: #991b1b; background-color: #fee2e2; border: 1px solid #ef4444; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
+                    ${sessionScope.errorInvoice}
+                    <% session.removeAttribute("errorInvoice"); %>
+                </div>
+            </c:if>   
             <main class="main legacy-page">
                 <form id="invoiceForm" action="${pageContext.request.contextPath}/invoice" method="post">
 
                     <div class="status-section">
                         Trạng thái: <span class="status-label">
+
                             <c:choose>
-                                <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'RELEASED'}">Đã phát hành</c:when>
-                                <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'READY'}">Sẵn sàng phát hành</c:when>
-                                <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'UNRELEASED'}">Chưa phát hành</c:when>
-                                <c:when test="${(not empty invoice ? invoice.invoiceStatus : 'UNRELEASED') == 'CANCELED'}">Đã hủy</c:when>
+                                <c:when test="${not empty invoice}">
+                                    <c:if test="${invoice.invoiceStatus == 'UNRELEASED'}">
+                                        Chưa phát hành
+                                    </c:if>
+                                    <c:if test="${invoice.invoiceStatus == 'READY'}">
+                                        Sẵn sàng phát hành
+                                    </c:if>
+                                    <c:if test="${invoice.invoiceStatus == 'RELEASED'}">
+                                        Đã phát hành
+                                    </c:if>    
+                                    <c:if test="${invoice.invoiceStatus == 'CANCELED'}">
+                                        Đã hủy
+                                    </c:if>    
+                                </c:when>
+                                <c:otherwise>
+                                    N/A
+                                </c:otherwise>
                             </c:choose>
                         </span> 
                         | Người tạo: <span style="font-weight: bold; color: var(--primary);">${not empty creatorName ? creatorName : 'N/A'}</span>
@@ -577,7 +591,7 @@ L<%@page contentType="text/html" pageEncoding="UTF-8" import="java.time.LocalDat
                                         </c:if>
                                         <button type="submit" name="action" value="draft" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">save</span> Cập nhật bản nháp</button>
                                     </c:if>
-                                     
+
                                 </c:otherwise>
                             </c:choose>
                             <a href="${pageContext.request.contextPath}/invoice-list" class="btn-action"><span class="material-symbols-outlined" style="font-size: 16px;">close</span> Đóng</a>

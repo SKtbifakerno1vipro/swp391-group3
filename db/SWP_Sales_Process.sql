@@ -91,7 +91,7 @@ GO
 CREATE TABLE category (
     category_id INT IDENTITY(1,1) PRIMARY KEY,
     category_name NVARCHAR(255) NOT NULL,
-    total_product INT NOT NULL DEFAULT 0,
+	total_product INT NOT NULL DEFAULT 0,
     status INT NOT NULL DEFAULT 1
 );
 GO

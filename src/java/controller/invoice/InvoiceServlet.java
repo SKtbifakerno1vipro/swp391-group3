@@ -59,6 +59,7 @@ public class InvoiceServlet extends HttpServlet {
         }
         String orderIdRaw = request.getParameter("orderId");
         String invoiceIdRaw = request.getParameter("invoiceId");
+        String action = request.getParameter("action");
         boolean isCustomer = rService.getRoleIdByName("Customer") == user.getRoleId();
 
         Properties config = new Properties();
@@ -110,26 +111,57 @@ public class InvoiceServlet extends HttpServlet {
             }
         } else if (orderIdRaw != null && !orderIdRaw.trim().isEmpty()) {
             try {
-
                 int orderId = Integer.parseInt(orderIdRaw);
                 CustomerOrderDTO orderDTO = coService.getCustomerOrderById(orderId);
-                if (orderDTO == null || orderIdRaw.isEmpty()) {
-                    request.setAttribute("error", "Không tìm thấy hóa đơn này hoặc đã bị hủy.");
-                    request.getRequestDispatcher("/views/invoice/create.jsp").forward(request, response);
-                    return;
-                }
-                if (isCustomer && user.getUserId() != orderDTO.getCustomer().getUserId()) {
-                    session.setAttribute("errorInvoice", "Bạn không được xem hóa đơn của khách hàng khác");
+
+                if (orderDTO == null) {
+                    session.setAttribute("errorInvoice", "Không tìm thấy dữ liệu đơn hàng.");
                     response.sendRedirect(request.getContextPath() + "/customer-order-list");
                     return;
                 } else {
                     Invoice invOfOrd = iService.getInvoiceByOrderId(orderId);
-                    if (invOfOrd != null && isCustomer && !"RELEASED".equals(invOfOrd.getInvoiceStatus())) {
-                        session.setAttribute("errorInvoice", "Hóa đơn chưa được phát hành");
+
+                    if (invOfOrd == null) {
+                        if (action != null && !action.isEmpty()) {
+                            if ("create".equals(action)) {
+                                if (isCustomer) {
+                                    session.setAttribute("errorInvoice", "Quý khách không có tính năng này.");
+                                    response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                                    return;
+                                }
+                                loadInvoiceCreationData(request, orderId);
+                                request.getRequestDispatcher("/views/invoice/create.jsp").forward(request, response);
+                                return;
+                            } else {
+                                session.setAttribute("errorInvoice", "Chức năng không hợp lệ.");
+                                response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                                return;
+                            }
+
+                        }
+                        session.setAttribute("errorInvoice", "Không tìm thấy dữ liệu hóa đơn.");
                         response.sendRedirect(request.getContextPath() + "/customer-order-list");
                         return;
-                    } 
-                    loadInvoiceCreationData(request, orderId);
+                    } else {
+                        if (isCustomer && user.getUserId() != orderDTO.getCustomer().getUserId()) {
+                            session.setAttribute("errorInvoice", "Bạn không được xem hóa đơn của khách hàng khác");
+                            response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                            return;
+                        } else if (isCustomer && !"RELEASED".equals(invOfOrd.getInvoiceStatus())) {
+                            session.setAttribute("errorInvoice", "Hóa đơn chưa được phát hành");
+                            response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                            return;
+                        } else {
+                            Integer createdBy = invOfOrd.getCreatedBy();
+                            if (createdBy == null) {
+                                createdBy = user.getUserId();
+                            }
+                            User creator = uService.getUserById(createdBy);
+                            request.setAttribute("creatorName", creator.getFullName());
+                            request.setAttribute("invoice", invOfOrd);
+                            loadInvoiceCreationData(request, orderId);
+                        }
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -142,23 +174,6 @@ public class InvoiceServlet extends HttpServlet {
             request.getRequestDispatcher("/views/invoice/create.jsp").forward(request, response);
             return;
         }
-
-        Integer createdBy = null;
-        if (invoice != null) {
-            createdBy = invoice.getCreatedBy();
-        }
-        if (createdBy == null) {
-            createdBy = user.getUserId();
-        }
-
-        if (createdBy != null) {
-            UserDAO userDAO = new UserDAO();
-            User creator = userDAO.getUserById(createdBy);
-            if (creator != null) {
-                request.setAttribute("creatorName", creator.getFullName());
-            }
-        }
-
         request.getRequestDispatcher("/views/invoice/create.jsp").forward(request, response);
     }
 
@@ -207,7 +222,7 @@ public class InvoiceServlet extends HttpServlet {
                                 AuditLogService.log(user.getUserId(), "RELEASE", "Invoice", "Phát hành hóa đơn điện tử số: " + invoice.getInvoiceNo() + " (Hợp đồng ID: " + contractId + ")");
                                 session.setAttribute("successInvoice", "Phát hành hóa đơn thành công!");
                             } else {
-                                session.setAttribute("errorPaymentInvoice", "Cập nhật trạng thái hóa đơn thất bại.");
+                                session.setAttribute("errorPaymentInvoice", "Phát hành hóa đơn thất bại.");
                             }
                         } else {
                             session.setAttribute("errorPaymentInvoice", "Hóa đơn phải ở trạng thái READY mới có thể phát hành.");
@@ -217,7 +232,7 @@ public class InvoiceServlet extends HttpServlet {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    session.setAttribute("errorPaymentInvoice", "Lỗi: " + e.getMessage());
+                    session.setAttribute("errorPaymentInvoice", "Lỗi tải dữ liệu.");
                 }
             } else {
                 session.setAttribute("errorPaymentInvoice", "Thiếu thông tin hợp đồng.");
@@ -320,7 +335,6 @@ public class InvoiceServlet extends HttpServlet {
                             return;
                         } else {
                             invoice.setInvoiceStatus("UNRELEASED");
-
                         }
                     } else if ("ready".equals(action)) {
                         invoice.setInvoiceStatus("READY");
@@ -392,10 +406,6 @@ public class InvoiceServlet extends HttpServlet {
             }
 
             if (success) {
-                if ("notice".equalsIgnoreCase(action)) {
-                    int targetInvoiceId = invoiceId > 0 ? invoiceId : invoice.getInvoiceId();
-                    iService.emailIssueInvoice(targetInvoiceId, "http://localhost:9999/SWP391_GROUP3/");
-                }
                 response.sendRedirect(request.getContextPath() + "/invoice-list");
             } else {
                 request.setAttribute("error", "Không thể lưu hóa đơn. Đã có lỗi xảy ra trong quá trình lưu trữ.");

@@ -151,7 +151,7 @@
                                                         </a>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <a href="${pageContext.request.contextPath}/invoice?orderId=${order.customerOrder.customerOrderId}"
+                                                        <a href="${pageContext.request.contextPath}/invoice?orderId=${order.customerOrder.customerOrderId}&action=create"
                                                             style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #15803d; color: white; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 13px; vertical-align: middle; box-shadow: 0 4px 10px rgba(21, 128, 61, 0.2);">
                                                             <span class="material-symbols-outlined"
                                                                 style="font-size: 18px; color: white;">receipt_long</span>

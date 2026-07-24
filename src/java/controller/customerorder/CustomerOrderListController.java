@@ -73,7 +73,9 @@ public class CustomerOrderListController extends HttpServlet {
                 if("CANCELED".equals(invoice.getInvoiceStatus())){
                     isExistInvoice = false;
                 }
-            } 
+            }  else {
+                isExistInvoice = false;
+            }
             customerOrderDTO.getCustomerOrder().setInvoice(invoice);
             customerOrderDTO.getCustomerOrder().setHasInvoice(isExistInvoice);
         }

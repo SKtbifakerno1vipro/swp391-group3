@@ -330,8 +330,14 @@
                                                 <c:choose>
                                                     <c:when test="${sessionScope.user.roleId == 1}">
                                                         <a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">edit</span>Sửa</a>
-                                                        <a class="chip ${u.status == 'ACTIVE' ? 'danger' : 'primary'}" href="javascript:void(0);" onclick="document.getElementById('form_status_${u.userId}').submit();"><span class="material-symbols-outlined">${u.status == 'ACTIVE' ? 'lock' : 'lock_open'}</span>${u.status == 'ACTIVE' ? 'Khóa' : 'Mở Khóa'}</a>
-                                                        <form id="form_status_${u.userId}" action="${pageContext.request.contextPath}/user-list" method="post" style="display:none;"><input type="hidden" name="userId" value="${u.userId}"><input type="hidden" name="status" value="${u.status}"></form>
+                                                        <form action="${pageContext.request.contextPath}/user-list" method="post" style="display: inline-block; margin: 0; padding: 0; border: none; background: transparent; box-shadow: none;">
+                                                            <input type="hidden" name="userId" value="${u.userId}">
+                                                            <input type="hidden" name="status" value="${u.status}">
+                                                            <label class="chip ${u.status == 'ACTIVE' ? 'danger' : 'primary'}" style="cursor: pointer; margin: 0;">
+                                                                <span class="material-symbols-outlined">${u.status == 'ACTIVE' ? 'lock' : 'lock_open'}</span>${u.status == 'ACTIVE' ? 'Khóa' : 'Mở Khóa'}
+                                                                <input type="submit" style="display: none;">
+                                                            </label>
+                                                        </form>
                                                         </c:when>
                                                         <c:otherwise>
                                                         <a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">visibility</span>Xem</a>
@@ -347,12 +353,18 @@
                         <c:set var="windowSize" value="2" />
                         <c:set var="start" value="${currentPage - windowSize > 1 ? currentPage - windowSize : 1}" />
                         <c:set var="end" value="${currentPage + windowSize < endPage ? currentPage + windowSize : endPage}" />
+                        <c:set var="url" value="searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}"/>
                         <div class="pagination">
-                            <a class="page-link ${currentPage == 1 ? 'disabled' : ''}" href="user-list?page=1&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}">&laquo;</a>
-                            <a class="page-link ${currentPage == 1 ? 'disabled' : ''}" href="user-list?page=${currentPage - 1}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}">&lsaquo;</a>
-                            <c:forEach begin="${start}" end="${end}" var="i"><c:choose><c:when test="${currentPage == i}"><span class="page-current">${i}</span></c:when><c:otherwise><a class="page-link" href="user-list?page=${i}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}">${i}</a></c:otherwise></c:choose></c:forEach>
-                            <a class="page-link ${currentPage == endPage ? 'disabled' : ''}" href="user-list?page=${currentPage + 1}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}">&rsaquo;</a>
-                            <a class="page-link ${currentPage == endPage ? 'disabled' : ''}" href="user-list?page=${endPage}&searchName=${searchName}&searchPhone=${searchPhone}&searchEmail=${searchEmail}&roleId=${roleId}&status=${status}">&raquo;</a>
+                            <a class="page-link ${currentPage == 1 ? 'disabled' : ''}" href="user-list?page=1&${url}">&laquo;</a>
+                            <a class="page-link ${currentPage == 1 ? 'disabled' : ''}" href="user-list?page=${currentPage - 1}&${url}">&lsaquo;</a>
+                            <c:forEach begin="${start}" end="${end}" var="i">
+                                <c:choose>
+                                    <c:when test="${currentPage == i}"><span class="page-current">${i}</span></c:when>
+                                    <c:otherwise><a class="page-link" href="user-list?page=${i}&${url}">${i}</a></c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+                            <a class="page-link ${currentPage == endPage ? 'disabled' : ''}" href="user-list?page=${currentPage + 1}&${url}">&rsaquo;</a>
+                            <a class="page-link ${currentPage == endPage ? 'disabled' : ''}" href="user-list?page=${endPage}&${url}">&raquo;</a>
                         </div>
                     </c:if>
                 </section>

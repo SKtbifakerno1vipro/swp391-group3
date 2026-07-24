@@ -15,11 +15,11 @@ public class ImportRequestDAO extends DBContext {
     public List<ImportRequest> getAllImportRequests() {
         List<ImportRequest> list = new ArrayList<>();
         String sql = "SELECT ir.*, p.product_name, u_c.full_name AS creator_name, u_i.full_name AS importer_name "
-                   + "FROM import_request ir "
-                   + "JOIN product p ON ir.product_id = p.product_id "
-                   + "JOIN [user] u_c ON ir.created_by = u_c.user_id "
-                   + "LEFT JOIN [user] u_i ON ir.imported_by = u_i.user_id "
-                   + "ORDER BY ir.created_date DESC, ir.import_id DESC";
+                + "FROM import_request ir "
+                + "JOIN product p ON ir.product_id = p.product_id "
+                + "JOIN [user] u_c ON ir.created_by = u_c.user_id "
+                + "LEFT JOIN [user] u_i ON ir.imported_by = u_i.user_id "
+                + "ORDER BY ir.created_date DESC, ir.import_id DESC";
         try {
             System.out.println("[DEBUG] ImportRequestDAO: getAllImportRequests called");
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -38,12 +38,12 @@ public class ImportRequestDAO extends DBContext {
     public List<ImportRequest> searchImportRequests(String searchText) {
         List<ImportRequest> list = new ArrayList<>();
         String sql = "SELECT ir.*, p.product_name, u_c.full_name AS creator_name, u_i.full_name AS importer_name "
-                   + "FROM import_request ir "
-                   + "JOIN product p ON ir.product_id = p.product_id "
-                   + "JOIN [user] u_c ON ir.created_by = u_c.user_id "
-                   + "LEFT JOIN [user] u_i ON ir.imported_by = u_i.user_id "
-                   + "WHERE p.product_name LIKE ? OR u_c.full_name LIKE ? OR ir.note LIKE ? "
-                   + "ORDER BY ir.created_date DESC, ir.import_id DESC";
+                + "FROM import_request ir "
+                + "JOIN product p ON ir.product_id = p.product_id "
+                + "JOIN [user] u_c ON ir.created_by = u_c.user_id "
+                + "LEFT JOIN [user] u_i ON ir.imported_by = u_i.user_id "
+                + "WHERE p.product_name LIKE ? OR u_c.full_name LIKE ? OR ir.note LIKE ? "
+                + "ORDER BY ir.created_date DESC, ir.import_id DESC";
         try {
             String searchPattern = "%" + searchText + "%";
             System.out.println("[DEBUG] ImportRequestDAO: searchImportRequests called with pattern: " + searchPattern);
@@ -67,11 +67,11 @@ public class ImportRequestDAO extends DBContext {
     // Lấy yêu cầu nhập kho theo ID
     public ImportRequest getImportRequestById(int id) {
         String sql = "SELECT ir.*, p.product_name, u_c.full_name AS creator_name, u_i.full_name AS importer_name "
-                   + "FROM import_request ir "
-                   + "JOIN product p ON ir.product_id = p.product_id "
-                   + "JOIN [user] u_c ON ir.created_by = u_c.user_id "
-                   + "LEFT JOIN [user] u_i ON ir.imported_by = u_i.user_id "
-                   + "WHERE ir.import_id = ?";
+                + "FROM import_request ir "
+                + "JOIN product p ON ir.product_id = p.product_id "
+                + "JOIN [user] u_c ON ir.created_by = u_c.user_id "
+                + "LEFT JOIN [user] u_i ON ir.imported_by = u_i.user_id "
+                + "WHERE ir.import_id = ?";
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, id);
@@ -89,7 +89,7 @@ public class ImportRequestDAO extends DBContext {
     // Tạo yêu cầu nhập kho mới (Mặc định status = 1: Pending)
     public boolean createImportRequest(ImportRequest ir) {
         String sql = "INSERT INTO import_request (product_id, quantity, status, created_by, created_date, note) "
-                   + "VALUES (?, ?, 1, ?, GETDATE(), ?)";
+                + "VALUES (?, ?, 1, ?, GETDATE(), ?)";
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, ir.getProductId());
@@ -100,6 +100,51 @@ public class ImportRequestDAO extends DBContext {
         } catch (Exception e) {
             System.out.println("ImportRequestDAO createImportRequest error: " + e.getMessage());
             e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Tạo và thực hiện nhập kho trực tiếp (DATABASE TRANSACTION) dành cho Warehouse
+    public boolean createAndPerformImport(ImportRequest ir) {
+        String sqlInsert = "INSERT INTO import_request (product_id, quantity, status, created_by, created_date, imported_by, imported_date, note) VALUES (?, ?, 2, ?, GETDATE(), ?, GETDATE(), ?)";
+        String sqlUpdateStock = "UPDATE product SET quantity_available = quantity_available + ? WHERE product_id = ?";
+        try {
+            connection.setAutoCommit(false);
+            try (PreparedStatement psInsert = connection.prepareStatement(sqlInsert); PreparedStatement psUpdateStock = connection.prepareStatement(sqlUpdateStock)) {
+
+                psInsert.setInt(1, ir.getProductId());
+                psInsert.setInt(2, ir.getQuantity());
+                psInsert.setInt(3, ir.getCreatedBy());
+                psInsert.setInt(4, ir.getImportedBy());
+                psInsert.setString(5, ir.getNote());
+
+                psUpdateStock.setInt(1, ir.getQuantity());
+                psUpdateStock.setInt(2, ir.getProductId());
+
+                if (psInsert.executeUpdate() > 0 && psUpdateStock.executeUpdate() > 0) {
+                    connection.commit();
+                    return true;
+                }
+            }
+            connection.rollback();
+        } catch (Exception e) {
+            System.out.println("ImportRequestDAO createAndPerformImport error: " + e.getMessage());
+            e.printStackTrace();
+            try {
+                if (connection != null) {
+                    connection.rollback();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.setAutoCommit(true);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }
@@ -145,7 +190,7 @@ public class ImportRequestDAO extends DBContext {
 
             // 1. Cập nhật trạng thái yêu cầu sang 2: Imported, lưu thông tin người nhập và ngày nhập
             String sqlUpdateStatus = "UPDATE import_request SET status = 2, imported_by = ?, imported_date = GETDATE() "
-                                   + "WHERE import_id = ? AND status = 1";
+                    + "WHERE import_id = ? AND status = 1";
             psUpdateStatus = connection.prepareStatement(sqlUpdateStatus);
             psUpdateStatus.setInt(1, userId);
             psUpdateStatus.setInt(2, importId);
@@ -169,7 +214,12 @@ public class ImportRequestDAO extends DBContext {
                 connection.rollback();
                 return false;
             }
-
+            String updateProductActiveSql = "UPDATE product SET product_status = 'ACTIVE' "
+                    + "WHERE product_id = ? AND quantity_available > 0 AND product_status = 'OUT_OF_STOCK'";
+            try (PreparedStatement psProductActive = connection.prepareStatement(updateProductActiveSql)) {
+                psProductActive.setInt(1, productId);
+                psProductActive.executeUpdate();
+            }
             // Commit transaction thành công
             connection.commit();
             return true;
@@ -185,8 +235,12 @@ public class ImportRequestDAO extends DBContext {
             }
         } finally {
             try {
-                if (psUpdateStatus != null) psUpdateStatus.close();
-                if (psUpdateStock != null) psUpdateStock.close();
+                if (psUpdateStatus != null) {
+                    psUpdateStatus.close();
+                }
+                if (psUpdateStock != null) {
+                    psUpdateStock.close();
+                }
                 // Bật lại auto-commit mặc định
                 connection.setAutoCommit(true);
             } catch (SQLException e) {
@@ -216,11 +270,11 @@ public class ImportRequestDAO extends DBContext {
     public List<ImportRequest> getPendingRequestsSince(Timestamp since) {
         List<ImportRequest> list = new ArrayList<>();
         String sql = "SELECT ir.*, p.product_name, u_c.full_name AS creator_name "
-                   + "FROM import_request ir "
-                   + "JOIN product p ON ir.product_id = p.product_id "
-                   + "JOIN [user] u_c ON ir.created_by = u_c.user_id "
-                   + "WHERE ir.status = 1 AND ir.created_date > ? "
-                   + "ORDER BY ir.import_id ASC";
+                + "FROM import_request ir "
+                + "JOIN product p ON ir.product_id = p.product_id "
+                + "JOIN [user] u_c ON ir.created_by = u_c.user_id "
+                + "WHERE ir.status = 1 AND ir.created_date > ? "
+                + "ORDER BY ir.import_id ASC";
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setTimestamp(1, since);
@@ -256,16 +310,16 @@ public class ImportRequestDAO extends DBContext {
         ir.setCreatedBy(rs.getInt("created_by"));
         ir.setCreatedByName(rs.getString("creator_name"));
         ir.setCreatedDate(rs.getTimestamp("created_date"));
-        
+
         int importedByVal = rs.getInt("imported_by");
         if (!rs.wasNull()) {
             ir.setImportedBy(importedByVal);
             ir.setImportedByName(rs.getString("importer_name"));
             ir.setImportedDate(rs.getTimestamp("imported_date"));
         }
-        
+
         ir.setNote(rs.getString("note"));
-        
+
         // Lấy an toàn ghi chú từ tên cột 'ware_housenote' hoặc 'warehouse_note' mà không làm treo câu lệnh SQL
         String whNote = null;
         try {
@@ -279,7 +333,7 @@ public class ImportRequestDAO extends DBContext {
             }
         }
         ir.setWareHousenote(whNote);
-        
+
         return ir;
     }
 }

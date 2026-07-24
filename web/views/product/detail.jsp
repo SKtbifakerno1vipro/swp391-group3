@@ -454,7 +454,7 @@
                                     <tr>
                                         <td>Trạng thái sản phẩm</td>
                                         <td>
-                                            <select name="status" ${action != 'detail' ? ' ' : 'disabled'}>
+                                            <select name="status" disabled>
                                                 <option value="ACTIVE" ${product.productStatus == 'ACTIVE' ? 'selected' : ''}>Hoạt động</option>
                                                 <option value="OUT_OF_STOCK" ${product.productStatus == 'OUT_OF_STOCK' ? 'selected' : ''}>Hết hàng</option>
                                                 <option value="INACTIVE" ${product.productStatus == 'INACTIVE' ? 'selected' : ''}>Không hoạt động</option>
