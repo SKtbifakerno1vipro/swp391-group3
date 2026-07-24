@@ -113,7 +113,6 @@ public class InvoiceServlet extends HttpServlet {
             try {
                 int orderId = Integer.parseInt(orderIdRaw);
                 CustomerOrderDTO orderDTO = coService.getCustomerOrderById(orderId);
-
                 if (orderDTO == null) {
                     session.setAttribute("errorInvoice", "Không tìm thấy dữ liệu đơn hàng.");
                     response.sendRedirect(request.getContextPath() + "/customer-order-list");
@@ -126,6 +125,10 @@ public class InvoiceServlet extends HttpServlet {
                             if ("create".equals(action)) {
                                 if (isCustomer) {
                                     session.setAttribute("errorInvoice", "Quý khách không có tính năng này.");
+                                    response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                                    return;
+                                } else if (!"COMPLETED".equals(orderDTO.getCustomerOrder().getOrderStatus())) {
+                                    session.setAttribute("errorInvoice", "Không thể tạo hóa đơn do đơn hàng này chưa được giao.");
                                     response.sendRedirect(request.getContextPath() + "/customer-order-list");
                                     return;
                                 }
@@ -143,6 +146,12 @@ public class InvoiceServlet extends HttpServlet {
                         response.sendRedirect(request.getContextPath() + "/customer-order-list");
                         return;
                     } else {
+                        if (action != null && !action.isEmpty()) {
+                            session.setAttribute("errorInvoice", !isCustomer ? "Hóa đơn cho đơn hàng này đã được tạo." : "Quý khách không có tính năng này.");
+                            response.sendRedirect(request.getContextPath() + "/customer-order-list");
+                            return;
+                        }
+
                         if (isCustomer && user.getUserId() != orderDTO.getCustomer().getUserId()) {
                             session.setAttribute("errorInvoice", "Bạn không được xem hóa đơn của khách hàng khác");
                             response.sendRedirect(request.getContextPath() + "/customer-order-list");
@@ -212,12 +221,14 @@ public class InvoiceServlet extends HttpServlet {
 
                             boolean success = iService.updateInvoice(invoice);
                             if (success) {
-//                                String scheme = request.getScheme();
-//                                String serverName = request.getServerName();
-//                                int serverPort = request.getServerPort();
-//                                String contextPath = request.getContextPath();
-                                String baseUrl = "http://localhost:8080/SWP391_GROUP3/";
-
+                                String scheme = request.getScheme();
+                                String serverName = request.getServerName();
+                                int serverPort = request.getServerPort();
+                                String contextPath = request.getContextPath();
+                                String baseUrl = scheme + "://"
+                                        + serverName + ":"
+                                        + serverPort
+                                        + contextPath + "/";
                                 iService.emailIssueInvoice(invoice.getInvoiceId(), baseUrl);
                                 AuditLogService.log(user.getUserId(), "RELEASE", "Invoice", "Phát hành hóa đơn điện tử số: " + invoice.getInvoiceNo() + " (Hợp đồng ID: " + contractId + ")");
                                 session.setAttribute("successInvoice", "Phát hành hóa đơn thành công!");

@@ -92,6 +92,7 @@
                                         <select name="status">
                                             <option value="">Tất cả trạng thái</option>
                                             <option value="RELEASED" ${status == 'RELEASED' ? 'selected' : ''}>Đã phát hành</option>
+                                            <option value="READY" ${status == 'READY' ? 'selected' : ''}>Sắn sàng phát hành</option>
                                             <option value="UNRELEASED" ${status == 'UNRELEASED' ? 'selected' : ''}>Chưa phát hành</option>
                                             <option value="CANCELED" ${status == 'CANCELED' ? 'selected' : ''}>Đã hủy</option>
                                         </select>
@@ -175,11 +176,11 @@
                                         <td><fmt:formatNumber value="${i.totalAmount}" pattern="#,##0.##"/> VND
                                         </td>
                                         <td>
-                                            <span class="status-badge ${i.invoiceStatus == 'RELEASED' ? 'status-released' : (i.invoiceStatus == 'UNRELEASED' ? 'status-unreleased' : (i.invoiceStatus == 'WAIT_FOR_RELEASE' ? 'status-waiting' : 'status-canceled'))}">
+                                            <span class="status-badge ${i.invoiceStatus == 'RELEASED' ? 'status-released' : (i.invoiceStatus == 'UNRELEASED' ? 'status-unreleased' : (i.invoiceStatus == 'READY' ? 'status-waiting' : 'status-canceled'))}">
                                                 <c:choose>
                                                     <c:when test="${i.invoiceStatus == 'RELEASED'}">Đã phát hành</c:when>
                                                     <c:when test="${i.invoiceStatus == 'UNRELEASED'}">Chưa phát hành</c:when>
-                                                    <c:when test="${i.invoiceStatus == 'WAIT_FOR_RELEASE'}">Chờ phát hành</c:when>
+                                                    <c:when test="${i.invoiceStatus == 'READY'}">Sẵn sàng phát hành</c:when>
                                                     <c:when test="${i.invoiceStatus == 'CANCELED'}">Đã hủy</c:when>
                                                     <c:otherwise>${i.invoiceStatus}</c:otherwise>
                                                 </c:choose>
