@@ -41,6 +41,7 @@ public class ContractDetailController extends HttpServlet {
             if (token != null && contractIdRaw != null) {
                 try {
                     int contractid = Integer.parseInt(contractIdRaw);
+                    //check if that valid token with that contract
                     if (contractService.validateToken(contractid, token)) {
                         isGuest = true;
                     } else {
@@ -93,7 +94,8 @@ public class ContractDetailController extends HttpServlet {
                     if (historyPageStr != null && !historyPageStr.trim().isEmpty()) {
                         try {
                             historyPage = Integer.parseInt(historyPageStr);
-                        } catch (Exception e) {
+                        } catch (NumberFormatException e) {
+                            historyPage=1;
                         }
                     }
 
@@ -186,8 +188,14 @@ public class ContractDetailController extends HttpServlet {
         }
 
         String action = request.getParameter("action");
-
-        int contractId = Integer.parseInt(request.getParameter("contractId"));
+        int contractId;
+        try {
+            contractId = Integer.parseInt(request.getParameter("contractId"));
+        } catch (NumberFormatException e) {
+            session.setAttribute("errorSig", "Không tìm thấy contract với ID tương ứng");
+            response.sendRedirect(request.getContextPath() + "/contract-list");
+            return;
+        }
 
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
 
@@ -212,6 +220,7 @@ public class ContractDetailController extends HttpServlet {
             // BR : only PENDING_REVIEW or CUSTOMER_CHECK status  can request edit
             String currentStatus = contract.getContractStatus();
             if (!"PENDING_REVIEW".equals(currentStatus) && !"CUSTOMER_CHECK".equals(currentStatus)) {
+                session.setAttribute("errorSig","Trạng thái hiện tại không thể yêu cầu sửa đổi hợp đồng nữa!" );
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
