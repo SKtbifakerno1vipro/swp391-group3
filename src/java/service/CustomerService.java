@@ -66,24 +66,24 @@ public class CustomerService {
     }
     // new
     public String isDuplicateCusFields(String userName, String phone, String email, String taxCode) {
-        // tim cac custome trung du lieu
+        // tim cac customer trung du lieu
         List<User> cus = userService.searchUserFieldsByOR(userName, phone, email, null);
         Integer id = customerDAO.getCustomerIdByTaxCode(taxCode);
 
         if (id != null) {
-            return "Tax Code is already registered by another customer";
+            return "Email, Số điện thoại hoặc Mã số thuế đã tồn tại trong hệ thống!";
         }
 
         if (cus != null && !cus.isEmpty()) {
             for (User cu : cus) {
                 if (userName != null && userName.trim().equalsIgnoreCase(cu.getUserName())) {
-                    return "Username already exists in the system";
+                    return "Tên đăng nhập đã tồn tại trong hệ thống!";
                 }
                 if (email != null && email.trim().equalsIgnoreCase(cu.getEmail())) {
-                    return "Email address is already registered";
+                    return "Email, Số điện thoại hoặc Mã số thuế đã tồn tại trong hệ thống!";
                 }
                 if (phone != null && phone.trim().equalsIgnoreCase(cu.getPhone())) {
-                    return "Phone number is already in use!";
+                    return "Email, Số điện thoại hoặc Mã số thuế đã tồn tại trong hệ thống!";
                 }
             }
         }
