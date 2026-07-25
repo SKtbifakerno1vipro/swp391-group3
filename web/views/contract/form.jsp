@@ -148,7 +148,8 @@
 
                                 <a href="contract-list" style="margin-left: 10px; color: var(--primary); font-weight: 600;">Quay lại danh sách</a>
                             </div>
-
+                            
+                            
                             <script>
                                 function submitForm(action) {
                                     document.getElementById('contractContentInput').value = document.getElementById('contract-body').innerHTML;

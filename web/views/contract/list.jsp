@@ -21,6 +21,7 @@
                 <h2>Quản lý Hợp đồng</h2>
                 <c:if test="${sessionScope.errorSig != null}">
                     <div style="color: red; margin-bottom: 10px;">${sessionScope.errorSig}</div>
+                    <c:remove var="errorSig" scope="session"/>
                 </c:if>
                 <c:if test="${errorSig != null}">
                     <div style="color: red; margin-bottom: 10px;">${errorSig}</div>

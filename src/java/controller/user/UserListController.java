@@ -91,15 +91,21 @@ public class UserListController extends HttpServlet {
         try {
             int userId = Integer.parseInt(request.getParameter("userId"));
             String currentStatus = request.getParameter("status");
-            String newStatus = "ACTIVE".equals(currentStatus) ? "INACTIVE" : "ACTIVE";
+            String newStatus;
+            if ("ACTIVE".equals(currentStatus)) {
+                newStatus = "INACTIVE";
+            } else if ("INACTIVE".equals(currentStatus)) {
+                newStatus = "ACTIVE";
+            } else {
+                newStatus = currentStatus;
+            }
 
             if ("ACTIVE".equals(currentStatus)) {
-                userService.banUser(userId, "INACTIVE");
+                userService.banUser(userId, newStatus);
             } else if ("INACTIVE".equals(currentStatus)) {
-                userService.banUser(userId, "ACTIVE");
+                userService.banUser(userId, newStatus);
             } else {
-                userService.banUser(userId, currentStatus);
-                newStatus = currentStatus;
+                userService.banUser(userId, newStatus);
             }
 
             User targetUser = userService.getUserById(userId);
@@ -107,7 +113,7 @@ public class UserListController extends HttpServlet {
             String action = "ACTIVE".equals(newStatus) ? "Mở khóa tài khoản" : "Khóa tài khoản";
             AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", action + ": " + targetUsername + " (ID: " + userId + ")");
         } catch (NumberFormatException e) {
-
+            System.out.println("Cannot ban or unban, status invalid!");
         }
 
         response.sendRedirect(request.getContextPath() + "/user-list");
