@@ -73,7 +73,30 @@ public class VNPAYPayment extends HttpServlet {
             return;
         }
         if ("FAILED".equals(p.getPaymentStatus()) || "CANCELLED".equals(p.getPaymentStatus())) {
-            paymentService.updatePaymentStatus(paymentId, "PENDING");
+            Payment newPayment = new Payment();
+            newPayment.setCustomerContractId(p.getCustomerContractId());
+            newPayment.setCustomerOrderId(p.getCustomerOrderId());
+            newPayment.setAmount(p.getAmount());
+            newPayment.setPaymentType(p.getPaymentType());
+            newPayment.setPaymentStatus("PENDING");
+            newPayment.setCreatedAt(java.time.LocalDateTime.now());
+            newPayment.setUserId(p.getUserId());
+            newPayment.setCustomerNameSnapshot(p.getCustomerNameSnapshot());
+            newPayment.setCustomerPhoneSnapshot(p.getCustomerPhoneSnapshot());
+            newPayment.setCustomerAddressSnapshot(p.getCustomerAddressSnapshot());
+            newPayment.setCustomerEmailSnapshot(p.getCustomerEmailSnapshot());
+            newPayment.setCustomerTaxCodeSnapshot(p.getCustomerTaxCodeSnapshot());
+            newPayment.setCompanyNameSnapshot(p.getCompanyNameSnapshot());
+
+            int newPaymentId = paymentService.insertPayment(newPayment);
+            if (newPaymentId > 0) {
+                paymentId = newPaymentId;
+                p = paymentService.getPaymentById(newPaymentId);
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/payment/list?error=" + 
+                URLEncoder.encode("Không thể khởi tạo giao dịch thanh toán mới!", StandardCharsets.UTF_8.toString()));
+                return;
+            }
         }
         String vnp_TxnRef = paymentId + "_" + System.currentTimeMillis();
 

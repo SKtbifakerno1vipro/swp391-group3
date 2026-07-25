@@ -146,10 +146,10 @@
                     </div>
                 </c:if>
 
-                <c:if test="${not empty sessionScope.errorPaymentInvoice}">
+                <c:if test="${not empty sessionScope.errorPaymentInvoice || not empty param.error}">
                     <div style="color: #991b1b; background-color: #fee2e2; border: 1px solid #ef4444; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; max-width: 600px; margin: 0 auto 20px auto;">
                         <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
-                        ${sessionScope.errorPaymentInvoice}
+                        <c:out value="${not empty sessionScope.errorPaymentInvoice ? sessionScope.errorPaymentInvoice : param.error}"/>
                         <% session.removeAttribute("errorPaymentInvoice"); %>
                     </div>
                 </c:if>

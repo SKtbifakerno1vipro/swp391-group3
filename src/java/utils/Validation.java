@@ -10,7 +10,7 @@ public class Validation {
             return null; // cho phép bỏ trống
         }
         if (str.length() > max) {
-            return "Must be at most " + max + " characters long";
+            return "Tối đa " + max + " ký tự";
         }
         return null;
     }
@@ -27,7 +27,7 @@ public class Validation {
             return "Email không được để trống!";
         }
         if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            return "Email format invalid";
+            return "Định dạng Email không hợp lệ!";
         }
         return null; // OK
     }
@@ -36,27 +36,27 @@ public class Validation {
     
     public static String validatePhone(String phone) {
         if (phone == null || phone.trim().isEmpty()) {
-            return "Not be empty";
+            return "Số điện thoại không được để trống!";
         }
         if (!phone.matches("^\\d{10}$")) {
-            return "Phone requires exactly 10 digits";
+            return "Số điện thoại phải có đúng 10 chữ số!";
         }
         return null; // OK
     }
 
     public static String validatePassword(String password) {
         if (password == null || password.trim().isEmpty()) {
-            return "Password cannot be empty!";
+            return "Mật khẩu không được để trống!";
         }
         if (password.length() < 4) {
-            return "Password must have at least 4 characters!";
+            return "Mật khẩu phải có ít nhất 4 ký tự!";
         }
         return null; // OK
     }
 
     public static String validateEmpty(String value, String fieldName) {
         if (value == null || value.trim().isEmpty()) {
-            return fieldName + " Not be empty";
+            return fieldName + " không được để trống!";
         }
         return null; // OK
     }
