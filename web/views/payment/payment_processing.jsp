@@ -142,16 +142,11 @@
     </head>
     <body>
         <div class="processing-card">
-            <div class="icon-wrapper">
-                <div class="spinner-ring"></div>
-                <span class="material-symbols-outlined">hourglass_top</span>
-            </div>
 
             <h1 class="processing-title">Giao dịch đang xử lý</h1>
 
             <p class="processing-message">
-                Giao dịch đang xử lý, vui lòng chờ vài phút.<br>
-                Hệ thống đang đồng bộ kết quả thanh toán từ VNPay.
+                Hãy click vào nút "Chi tiết thanh toán" sau 10 giây, nếu thanh toán chưa được cập nhật sau 2 phút, vui lòng liên hệ với số điện thoại <strong>1900 6000</strong> hoặc Email <strong>support@pobread.com</strong> để được hỗ trợ.<br>Xin cảm ơn!
             </p>
 
             <c:if test="${paymentId > 0}">
@@ -163,7 +158,7 @@
                     <c:when test="${paymentId > 0}">
                         <a href="${pageContext.request.contextPath}/payment/detail?id=${paymentId}" class="btn-primary-custom">
                             <span class="material-symbols-outlined">receipt_long</span>
-                            Xem chi tiết thanh toán
+                            Chi tiết thanh toán
                         </a>
                     </c:when>
                     <c:otherwise>
