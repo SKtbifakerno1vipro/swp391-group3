@@ -200,13 +200,13 @@ public class EditUserController extends HttpServlet {
 
             if (error == null) {
                 if (userService.isEmailDuplicate(u.getEmail(), u.getUserId())) {
-                    error = "Email duplicated!";
+                    error = "Email đã bị trùng lặp!";
                 }
                 if (userService.isPhoneDuplicate(u.getPhone(), u.getUserId())) {
-                    error = "Phone duplicated!";
+                    error = "Phone đã bị trùng lặp!";
                 }
                 if (userService.isUsernameDuplicate(u.getUserName(), u.getUserId())) {
-                    error = "Username duplicated!";
+                    error = "Username đã bị trùng lặp!";
                 }
             }
 
