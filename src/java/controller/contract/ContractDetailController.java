@@ -211,7 +211,7 @@ public class ContractDetailController extends HttpServlet {
             return;
         }
 
-        //solve all of action request edit
+
         if ("request_edit".equals(action)) {// when manager and customer request edit 
             if (currentUser.getRoleId() != 2 && currentUser.getRoleId() != 3 && currentUser.getRoleId() != 1) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Manager or Customer can request edit.");
@@ -297,7 +297,7 @@ public class ContractDetailController extends HttpServlet {
             h.setContractId(contractId);
             h.setFromStatus(contract.getContractStatus());
             h.setToStatus("APPROVED");
-            h.setNote("Customer approved the contract.");
+            h.setNote("Khách hàng đã phê duyệt hợp đồng.");
             h.setChangedBy(currentUser.getUserId());
             contractService.insertHistory(h);
 
