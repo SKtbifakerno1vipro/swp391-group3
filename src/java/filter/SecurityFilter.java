@@ -33,16 +33,16 @@ public class SecurityFilter implements Filter {
     private static final List<String> MANAGER_URLS = List.of(
             "/dashboard", "/admin-dashboard", "/role-list", "/role-detail", "/user-list", "/user-detail",
             "/create-user", "/customer/list", "/customer-order-list", "/create-order", "/customer-order",
-            "/AcceptanceRecordController", "/product-list", "/edit-product", "/product-delete",
+            "/AcceptanceRecordController", "/product-list", "/edit-product",
             "/product-review", "/contract-list", "/contract-detail", "/export-pdf", "/File",
-            "/Signature", "/invoice-list", "/invoice/create", "/invoice", "/preview",
+            "/Signature", "/invoice-list", "/invoice", "/preview",
             "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail",
             "/revenue-report", "/revenue", "/import-request-create", "/import-request-list", "/import-request-detail", "/product-sales-report"
     );
 
     private static final List<String> CUSTOMER_URLS = List.of(
             "/dashboard", "/customer/dashboard", "/admin-dashboard", "/customer/detail", "/customer/edit", "/customer-order-list",
-            "/customer-order", "/AcceptanceRecordController", "/category/list", "/product-list",
+            "/customer-order", "/AcceptanceRecordController", "/category/list", "/product-list", "/edit-product", "/product-review",
             "/quotation-list", "/quotation-detail", "/contract-list", "/contract-detail", "/export-pdf", "/File",
             "/Signature", "/invoice-list", "/invoice", "/preview", "/payment/list", "/payment",
             "/payment/return", "/payment/ipn", "/payment/detail"
@@ -52,7 +52,7 @@ public class SecurityFilter implements Filter {
             "/dashboard", "/admin-dashboard", "/customer/list", "/customer/create", "/customer/detail", "/customer/edit",
             "/customer-order-list", "/create-order", "/customer-order", "/AcceptanceRecordController", "/category/list",
             "/category/create", "/category/edit", "/category/delete", "/product-list", "/edit-product",
-            "/product-delete", "/product-review", "/quotation-list", "/quotation-create", "/quotation-detail",
+            "/product-review", "/quotation-list", "/quotation-create", "/quotation-detail",
             "/invoice/create", "/invoice", "/preview", "/payment/list", "/payment", "/payment/return",
             "/payment/ipn", "/payment/detail", "/import-request-list", "/import-request-detail", "/import-request-create"
     );
@@ -61,14 +61,14 @@ public class SecurityFilter implements Filter {
             "/dashboard", "/admin-dashboard", "/customer/list", "/customer/detail", "/customer-order-list", "/create-order",
             "/customer-order", "/AcceptanceRecordController", "/product-review", "/quotation-list",
             "/quotation-detail", "/contract-list", "/contract-create", "/contract-save", "/contract-detail",
-            "/export-pdf", "/File", "/invoice-list", "/invoice/create", "/invoice", "/preview",
-            "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail", "/import-request-create", "/import-request-list"
+            "/export-pdf", "/File", "/invoice-list", "/invoice", "/preview",
+            "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail"
     );
 
     private static final List<String> WAREHOUSE_STAFF_URLS = List.of(
             "/dashboard", "/admin-dashboard", "/customer-order-list", "/customer-order", "/AcceptanceRecordController",
             "/category/list", "/category/create", "/category/edit", "/category/delete", "/product-list",
-            "/create-product", "/edit-product", "/product-delete", "/product-review", "/contract-list",
+            "/create-product", "/edit-product",  "/product-review", "/contract-list",
             "/import-request-list", "/import-request-create", "/import-request-detail", "/warehouse-dashboard"
     );
 
