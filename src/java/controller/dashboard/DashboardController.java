@@ -54,6 +54,8 @@ public class DashboardController extends HttpServlet {
 
             if (error != null) {
                 session.setAttribute("errorSig", error);
+                response.sendRedirect(request.getContextPath() +"/dashboard");
+                return;
             }
             request.setAttribute("awaitingQuotations", DashboardService.countQuotationAwaitingContract());
             request.setAttribute("contractsInProgress", DashboardService.countContractInProgress());
