@@ -74,7 +74,7 @@ public class CreateCustomerController extends HttpServlet {
         } else if ((errorMsg = Validation.validateDateBirth(dateBirthStr)) != null) {
 
         } else if (customerType == null || customerType.trim().isEmpty()) {
-            errorMsg = "Please select customer type.";
+            errorMsg = "Vui lòng chọn loại khách hàng.";
         }
 
         if (errorMsg != null) {
@@ -124,10 +124,10 @@ public class CreateCustomerController extends HttpServlet {
             if ("SUCCESS".equals(msg)) {
                 request.setAttribute("success", true);
             } else {
-                request.setAttribute("error", "Create failed. " + (msg != null ? msg : (customerService.getLastError() != null ? customerService.getLastError() : "Unknown error")));
+                request.setAttribute("error", "Tạo thất bại. " + (msg != null ? msg : (customerService.getLastError() != null ? customerService.getLastError() : "Lỗi không xác định")));
             }
         } catch (NumberFormatException ex) {
-            request.setAttribute("error", "Create failed");
+            request.setAttribute("error", "Tạo thất bại");
         }
         request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
     }

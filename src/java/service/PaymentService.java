@@ -53,7 +53,74 @@ public class PaymentService {
     }
 
     public boolean updatePaymentStatus(int paymentId, String status) {
-        return paymentDAO.updatePaymentStatus(paymentId, status);
+        boolean updated = paymentDAO.updatePaymentStatus(paymentId, status);
+        if (updated && "COMPLETED".equalsIgnoreCase(status)) {
+            try {
+                Payment payment = getPaymentById(paymentId);
+                if (payment != null) {
+                    sendPaymentSuccessEmail(payment);
+                }
+            } catch (Exception e) {
+                System.err.println("[PaymentService] Failed to trigger payment success email: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return updated;
+    }
+
+    public void sendPaymentSuccessEmail(Payment payment) {
+        if (payment == null) return;
+        String recipientEmail = payment.getCustomerEmailSnapshot();
+        if (recipientEmail == null || recipientEmail.isBlank()) {
+            System.out.println("[PaymentService] No customer email snapshot available for Payment ID: " + payment.getPaymentId() + ". Skipping email.");
+            return;
+        }
+
+        java.text.NumberFormat currencyFormatter = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN"));
+        String formattedAmount = (payment.getAmount() != null) ? currencyFormatter.format(payment.getAmount()) : "0 VNĐ";
+
+        String paidTime = (payment.getPaidAt() != null) 
+            ? payment.getPaidAt().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))
+            : java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+
+        String customerName = (payment.getCustomerNameSnapshot() != null && !payment.getCustomerNameSnapshot().isBlank())
+            ? payment.getCustomerNameSnapshot() : "Quý khách";
+
+        String contractNo = (payment.getContractNumber() != null) ? payment.getContractNumber() : "N/A";
+
+        String subject = "Công Ty TNHH Pơ Bread - Xác nhận Thanh toán Giao dịch #" + payment.getPaymentId() + " Thành Công";
+
+        String content = "<!DOCTYPE html>"
+                + "<html>"
+                + "<head><meta charset=\"UTF-8\"></head>"
+                + "<body style=\"margin: 0; padding: 20px; background-color: #f4f5f7;\">"
+                + "    <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e0e0e0; border-radius: 16px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);\">"
+                + "        <div style=\"text-align: center; margin-bottom: 24px; border-bottom: 2px solid #eaeaea; padding-bottom: 16px;\">"
+                + "            <h2 style=\"color: #4A7C59; margin: 0; font-size: 26px; font-weight: 700; font-family: Georgia, serif;\">Pơ Bread</h2>"
+                + "            <p style=\"color: #888888; margin: 5px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;\">Xác Nhận Thanh Toán Thành Công</p>"
+                + "        </div>"
+                + "        <div style=\"margin-bottom: 24px;\">"
+                + "            <h3 style=\"color: #333333; margin-top: 0;\">Kính chào <span style=\"color: #4A7C59;\">" + customerName + "</span>,</h3>"
+                + "            <p style=\"color: #555555; font-size: 15px;\">Hệ thống Pơ Bread xin thông báo giao dịch thanh toán trực tuyến qua <strong>VNPay</strong> cho hợp đồng/đơn hàng của Quý khách đã hoàn tất thành công.</p>"
+                + "        </div>"
+                + "        <div style=\"background-color: #f9fbf9; border: 1px solid #dcefe1; border-radius: 12px; padding: 20px; margin-bottom: 24px;\">"
+                + "            <h4 style=\"margin: 0 0 12px 0; color: #4A7C59; border-bottom: 1px dashed #c2e2cc; padding-bottom: 8px;\">Chi Tiết Giao Dịch</h4>"
+                + "            <table style=\"width: 100%; border-collapse: collapse; font-size: 14px; color: #444444;\">"
+                + "                <tr><td style=\"padding: 6px 0; font-weight: 600;\">Mã giao dịch:</td><td style=\"padding: 6px 0; text-align: right;\">#" + payment.getPaymentId() + "</td></tr>"
+                + "                <tr><td style=\"padding: 6px 0; font-weight: 600;\">Số hợp đồng:</td><td style=\"padding: 6px 0; text-align: right;\">" + contractNo + "</td></tr>"
+                + "                <tr><td style=\"padding: 6px 0; font-weight: 600;\">Số tiền đã thanh toán:</td><td style=\"padding: 6px 0; text-align: right; color: #4A7C59; font-weight: bold; font-size: 16px;\">" + formattedAmount + "</td></tr>"
+                + "                <tr><td style=\"padding: 6px 0; font-weight: 600;\">Phương thức:</td><td style=\"padding: 6px 0; text-align: right;\">VNPay Gateway</td></tr>"
+                + "                <tr><td style=\"padding: 6px 0; font-weight: 600;\">Thời gian thanh toán:</td><td style=\"padding: 6px 0; text-align: right;\">" + paidTime + "</td></tr>"
+                + "            </table>"
+                + "        </div>"
+                + "        <div style=\"border-top: 1px solid #eaeaea; padding-top: 20px; color: #888888; font-size: 12px; text-align: center;\">"
+                + "            <p style=\"margin: 0;\">Cảm ơn Quý khách đã tin tưởng và sử dụng dịch vụ của Pơ Bread.</p>"
+                + "            <p style=\"margin: 4px 0 0 0;\">Đây là email tự động, vui lòng không phản hồi trực tiếp email này.</p>"
+                + "        </div>"
+                + "    </div>"
+                + "</body></html>";
+
+        utils.EmailUtils.sendEmailAsync(recipientEmail, subject, content, payment.getUserId());
     }
 
     public Payment getPaymentByContractId(int contractId) {

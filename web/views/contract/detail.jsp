@@ -166,8 +166,9 @@
                 <div class="layout-container">
                     <!-- COL 1: CONTENT (Left) -->
                     <div class="content-panel">
-                        <c:if test="${errorSig != null}">
-                            <div style="color: var(--danger); background: var(--danger-soft); padding: 10px; border-radius: 8px; margin-bottom: 15px;">${errorSig}</div>
+                        <c:if test="${sessionScope.errorSig != null}">
+                            <div style="color: var(--danger); background: var(--danger-soft); padding: 10px; border-radius: 8px; margin-bottom: 15px;">${sessionScope.errorSig}</div>
+                            <c:remove var="errorSig" scope="session"/>
                         </c:if>
 
                         <h3 style="margin-top: 0;">Nội dung Hợp đồng</h3>

@@ -27,7 +27,7 @@ public class EditCustomerController extends HttpServlet {
         String customerIdStr = request.getParameter("id");
 
         if (customerIdStr == null || customerIdStr.isBlank()) {
-            request.setAttribute("error", "Edit failed");
+            request.setAttribute("error", "Chỉnh sửa thất bại");
             request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
             return;
         }
@@ -52,13 +52,13 @@ public class EditCustomerController extends HttpServlet {
             request.setAttribute("listTypeCus", customerService.getCusTypeList());
             
             if (cusDTO == null) {
-                request.setAttribute("error", "Edit failed");
-                request.setAttribute("errorDetail", "Customer not found");
+                request.setAttribute("error", "Chỉnh sửa thất bại");
+                request.setAttribute("errorDetail", "Không tìm thấy thông tin khách hàng");
             } else {
                 request.setAttribute("cusDTO", cusDTO);
             }
         } catch (NumberFormatException ex) {
-            request.setAttribute("error", "Edit failed");
+            request.setAttribute("error", "Chỉnh sửa thất bại");
             request.setAttribute("errorDetail", ex.getMessage());
         }
         request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
@@ -72,7 +72,7 @@ public class EditCustomerController extends HttpServlet {
         String userIdStr = request.getParameter("userId");
 
         if (customerIdStr == null || customerIdStr.isBlank() || userIdStr == null || userIdStr.isBlank()) {
-            request.setAttribute("error", "Update failed: missing IDs");
+            request.setAttribute("error", "Cập nhật thất bại: Thiếu ID");
             request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
             return;
         }
@@ -111,7 +111,8 @@ public class EditCustomerController extends HttpServlet {
             String dateBirthStr = request.getParameter("dateBirth");
 
             String errorMsg = null;
-            if ((errorMsg = Validation.validateGender(gender)) != null
+            if ((errorMsg = Validation.validateEmail(email)) != null
+                    || (errorMsg = Validation.validateGender(gender)) != null
                     || (errorMsg = Validation.validateAddress(address)) != null
                     || (errorMsg = Validation.validateDateBirth(dateBirthStr)) != null) {
                 request.setAttribute("error", errorMsg);
@@ -119,6 +120,20 @@ public class EditCustomerController extends HttpServlet {
                 request.setAttribute("cusDTO", cusDTO);
                 request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
                 return;
+            }
+
+            // Check if email belongs to another user
+            List<User> existingUsersWithEmail = userService.searchUserFieldsByOR(null, null, email, null);
+            if (existingUsersWithEmail != null) {
+                for (User exUser : existingUsersWithEmail) {
+                    if (exUser.getUserId() != userId && email != null && email.trim().equalsIgnoreCase(exUser.getEmail())) {
+                        request.setAttribute("error", "Email '" + email.trim() + "' đã được sử dụng bởi một tài khoản khác trong hệ thống!");
+                        CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(customerId);
+                        request.setAttribute("cusDTO", cusDTO);
+                        request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);
+                        return;
+                    }
+                }
             }
 
             User u = new User();
@@ -160,14 +175,14 @@ public class EditCustomerController extends HttpServlet {
             boolean cusDTOUpdated = customerService.updateCustomerDTO(u,c);
             
             if (!cusDTOUpdated) {
-                request.setAttribute("error", "Update failed");
+                request.setAttribute("error", "Cập nhật thất bại");
             }else{
                 CustomerDTO cusDTO = customerService.getCustomerDTOByCusId(customerId);
                 request.setAttribute("cusDTO", cusDTO);
-                request.setAttribute("success", "Updated");
+                request.setAttribute("success", "Cập nhật thành công");
             }
         } catch (NumberFormatException ex) {
-            request.setAttribute("error", "Update failed");
+            request.setAttribute("error", "Cập nhật thất bại");
             request.setAttribute("errorDetail", ex.getMessage());
         }
         request.getRequestDispatcher("/views/customer/customer_form.jsp").forward(request, response);

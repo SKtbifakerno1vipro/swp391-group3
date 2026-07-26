@@ -22,14 +22,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Payment;
 import model.Contract;
 import service.PaymentService;
-import dal.ContractDAO;
 import utils.PaymentConfig;
 //Instant Payment Notification (Thông báo thanh toán tức thời)
 @WebServlet(name = "VNPAYIPN", urlPatterns = {"/payment/ipn"})
 public class VNPAYIPN extends HttpServlet {
 
     private final PaymentService paymentService = new PaymentService();
-    private final ContractDAO contractDAO = new ContractDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

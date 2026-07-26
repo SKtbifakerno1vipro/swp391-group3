@@ -61,29 +61,19 @@ public class LoginController extends HttpServlet {
             return;
         }
 
-        // 3. Check for BAN status
-        User user = userService.findUserByUsername(username);
-        if (user != null) {
-            if ("INACTIVE".equals(user.getStatus())) {
+
+        // 4. Authenticate User
+        User authenticatedUser = userService.login(username, password);
+        if (authenticatedUser != null) {// check ban status
+           if ("INACTIVE".equals(authenticatedUser.getStatus())) {
                 request.setAttribute("error", "Tài khoản của bạn đã bị admin khoá!");
                 request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
                 return;
             }
-        } else {
-            // User does not exist, treat as invalid login
-            request.setAttribute("error", "Invalid username or password.");
-            request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
-            return;
-        }
-
-        // 4. Authenticate User
-        User authenticatedUser = userService.login(username, password);
-        if (authenticatedUser != null) {
             // Login Success: Reset attempts and set user session
             session.setAttribute("failedAttempts", 0);
-            session.removeAttribute("userPermissions"); // Xóa cache quyền cũ trong session (nếu có)
             session.setAttribute("user", authenticatedUser);
-            AuditLogService.log(user.getUserId(), "LOGIN", "Auth", authenticatedUser.getUserName() + " vừa đăng nhập  vào hệ thống");
+            AuditLogService.log(authenticatedUser.getUserId(), "LOGIN", "Auth", authenticatedUser.getUserName() + " vừa đăng nhập  vào hệ thống");
             
                 response.sendRedirect(request.getContextPath() + "/dashboard");
             
