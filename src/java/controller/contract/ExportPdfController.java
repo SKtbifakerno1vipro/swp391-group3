@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Contract;
-import dal.ContractDAO;
+import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import service.SignatureService;
@@ -18,11 +18,14 @@ import java.util.List;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
+import model.User;
+import service.ContractService;
+
 @WebServlet(name = "ExportPdfController", urlPatterns = {"/export-pdf"})
 public class ExportPdfController extends HttpServlet {
 
-    private final ContractDAO contractDAO = new ContractDAO();
     private final SignatureService sService = new SignatureService();
+    private final ContractService contractService = new ContractService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -33,19 +36,29 @@ public class ExportPdfController extends HttpServlet {
         String tokenParam = request.getParameter("token");// need to guest download contract
         Contract contract = null;
 
-        if (tokenParam != null && !tokenParam.isEmpty()) {
-            contract = contractDAO.getContractByToken(tokenParam);
+        if (tokenParam != null && !tokenParam.isEmpty()) {//check if export with token
+            contract = contractService.getContractByToken(tokenParam);
             if (contract != null) {
-                if (!contractDAO.validateToken(contract.getContractId(), tokenParam)) {
+                if (!contractService.validateToken(contract.getContractId(), tokenParam)) {
                     response.setContentType("text/plain;charset=UTF-8");
                     response.getWriter().write("Link tải file đã hết hạn hoặc không hợp lệ!");
                     return;
                 }
             }
-        } else if (idParam != null && !idParam.isEmpty()) {
+        } else if (idParam != null && !idParam.isEmpty()) {//check if contract id exist
             try {
+                HttpSession session = request.getSession();
+                User user = (User) session.getAttribute("user");
+                if (user == null) {
+                    response.sendRedirect("login");
+                    return;
+                }
                 int contractId = Integer.parseInt(idParam);
-                contract = contractDAO.getContractById(contractId);
+                if (user.getRoleId() == 3 && !contractService.checkOwnContractByCustomer(contractId, user.getUserId())) {// check user logined and check that customer can download ?
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: You do not have permission to download that contract.");
+                    return;
+                }
+                contract = contractService.getContractById(contractId);
             } catch (Exception e) {
                 System.out.println("Invalid id");
             }
