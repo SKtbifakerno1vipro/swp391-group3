@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import dto.*;
+import jakarta.servlet.http.HttpSession;
 import model.*;
 import java.util.List;
 import service.*;
@@ -31,7 +32,7 @@ public class DetailCustomerController extends HttpServlet {
         String action = request.getParameter("action");
         // check deactive customer truoc 
         if ("deactivate".equals(action)) {
-            jakarta.servlet.http.HttpSession session = request.getSession(false);
+            HttpSession session = request.getSession(false);
             User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
             if (currentUser == null || (currentUser.getRoleId() != 1 && currentUser.getRoleId() != 2 && currentUser.getRoleId() != 4)) {
                 response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
@@ -47,7 +48,7 @@ public class DetailCustomerController extends HttpServlet {
                 return;
             }
         } else if ("activate".equals(action)) {
-            jakarta.servlet.http.HttpSession session = request.getSession(false);
+            HttpSession session = request.getSession(false);
             User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
             if (currentUser == null || (currentUser.getRoleId() != 1 && currentUser.getRoleId() != 2 && currentUser.getRoleId() != 4)) {
                 response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
@@ -64,7 +65,7 @@ public class DetailCustomerController extends HttpServlet {
             }
         }
 
-        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession(false);
         model.User user = (session != null) ? (model.User) session.getAttribute("user") : null;
 
         try {
@@ -72,7 +73,7 @@ public class DetailCustomerController extends HttpServlet {
             int idCus = -1;
             if (idCusParam == null || idCusParam.trim().isEmpty()) {
                 if (user != null && user.getRoleId() == 3) {
-                    dto.CustomerDTO customer = customerService.getCustomerDTOByUserId(user.getUserId());
+                    CustomerDTO customer = customerService.getCustomerDTOByUserId(user.getUserId());
                     if (customer != null) {
                         idCus = customer.getCustomer().getCustomerId();
                     }
