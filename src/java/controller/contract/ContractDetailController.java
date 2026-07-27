@@ -59,10 +59,7 @@ public class ContractDetailController extends HttpServlet {
         }
         request.setAttribute("isGuest", isGuest);
 
-        if ((String) session.getAttribute("errorSig") != null) {
-            request.setAttribute("errorSig", (String) session.getAttribute("errorSig"));
-            session.removeAttribute("errorSig");
-        }
+
 
         String idStr = request.getParameter("id");
         String quotationIdStr = request.getParameter("quotationId"); //quotation take from quotatuion detail
@@ -94,8 +91,11 @@ public class ContractDetailController extends HttpServlet {
                     if (historyPageStr != null && !historyPageStr.trim().isEmpty()) {
                         try {
                             historyPage = Integer.parseInt(historyPageStr);
+                            if (historyPage < 1) {
+                                historyPage = 1;
+                            }
                         } catch (NumberFormatException e) {
-                            historyPage=1;
+                            historyPage = 1;
                         }
                     }
 
@@ -211,7 +211,6 @@ public class ContractDetailController extends HttpServlet {
             return;
         }
 
-
         if ("request_edit".equals(action)) {// when manager and customer request edit 
             if (currentUser.getRoleId() != 2 && currentUser.getRoleId() != 3 && currentUser.getRoleId() != 1) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Manager or Customer can request edit.");
@@ -220,12 +219,17 @@ public class ContractDetailController extends HttpServlet {
             // BR : only PENDING_REVIEW or CUSTOMER_CHECK status  can request edit
             String currentStatus = contract.getContractStatus();
             if (!"PENDING_REVIEW".equals(currentStatus) && !"CUSTOMER_CHECK".equals(currentStatus)) {
-                session.setAttribute("errorSig","Trạng thái hiện tại không thể yêu cầu sửa đổi hợp đồng nữa!" );
+                session.setAttribute("errorSig", "Trạng thái hiện tại không thể yêu cầu sửa đổi hợp đồng nữa!");
                 response.sendRedirect("contract-detail?id=" + contractId);
                 return;
             }
 
             String note = request.getParameter("revision_note");
+            if (note != null && !note.trim().isEmpty() && note.length() > 1000) {
+                session.setAttribute("errorSig", "Không nhập quá 1000 ký tự !");
+                response.sendRedirect("contract-detail?id=" + contractId);
+                return;
+            }
 
             // save work history  for customer or manager request edit
             ContractHistory h = new ContractHistory();
@@ -331,7 +335,7 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("send_final_contract".equals(action)) {// send customer final contract for storage their contract
-            if (currentUser.getRoleId() != 5 && currentUser.getRoleId() != 1) {
+            if (currentUser.getRoleId() != 2 && currentUser.getRoleId() != 1) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Officer can send final contract.");
                 return;
             }

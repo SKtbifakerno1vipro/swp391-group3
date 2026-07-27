@@ -168,7 +168,7 @@
                     <div class="content-panel">
                         <c:if test="${sessionScope.errorSig != null}">
                             <div style="color: var(--danger); background: var(--danger-soft); padding: 10px; border-radius: 8px; margin-bottom: 15px;">${sessionScope.errorSig}</div>
-                            <c:remove var="errorSig" scope="session"/>
+                            <c:remove scope="session" var="errorSig"/>
                         </c:if>
 
                         <h3 style="margin-top: 0;">Nội dung Hợp đồng</h3>
@@ -251,7 +251,7 @@
 
                                         <c:when test="${contract.contractStatus == 'SIGNED'}">
                                             <p style="color: var(--primary); text-align: center; font-weight: bold; margin: 10px 0;">Hợp đồng đã ký hoàn tất</p>
-                                            <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5}">
+                                            <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
                                                 <form method="POST" action="contract-detail" style="margin-bottom: 10px;">
                                                     <input type="hidden" name="action" value="send_final_contract" />
                                                     <input type="hidden" name="contractId" value="${contract.contractId}" />

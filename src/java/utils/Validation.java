@@ -2,6 +2,7 @@ package utils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Validation {
 
@@ -227,10 +228,10 @@ public class Validation {
         }
         try {
             LocalDate birthDate = LocalDate.parse(dateStr.trim());
-            if (birthDate.isAfter(java.time.LocalDate.now())) {
+            if (birthDate.isAfter(LocalDate.now())) {
                 return "Ngày sinh không được lớn hơn ngày hiện tại!";
             }
-        } catch (java.time.format.DateTimeParseException e) {
+        } catch (DateTimeParseException e) {
             return "Định dạng ngày sinh không hợp lệ!";
         }
         return null;

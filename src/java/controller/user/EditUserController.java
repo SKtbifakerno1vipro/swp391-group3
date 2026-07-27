@@ -85,7 +85,6 @@ public class EditUserController extends HttpServlet {
         try {
 
             if (isEdit) {
-
                 int targetId = Integer.parseInt(idStr);
                 // Security check: Only Admin (Role 1) can edit other users and each user can edit their profile
                 if (currentUser.getRoleId() != 1 && targetId != currentUser.getUserId()) {
@@ -163,6 +162,7 @@ public class EditUserController extends HttpServlet {
                     u.setDateBirth(Date.valueOf(rawDob.trim()));
 
                 } catch (Exception e) {
+                    
                 }
             }
 
@@ -184,7 +184,8 @@ public class EditUserController extends HttpServlet {
             }
 
             // 3. Validation Logic
-            error = Validation.validateEmpty(u.getFullName(), "Full Name");
+            error = Validation.validateFullName(u.getFullName());
+            
             if (error == null) {
                 error = Validation.validateUsername(u.getUserName());
             }
@@ -196,6 +197,16 @@ public class EditUserController extends HttpServlet {
             }
             if (error == null) {
                 error = Validation.validateDateBirth(rawDob);
+            }
+
+            if (error == null) {
+                if (u.getAddress() != null) {
+                    error = Validation.validateAddress(u.getAddress());
+                }
+            }
+
+            if (error == null) {
+                error = Validation.validateGender(u.getGender());
             }
 
             if (error == null) {

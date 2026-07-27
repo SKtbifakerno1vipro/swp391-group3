@@ -391,6 +391,7 @@
                         <p>Quản lý hợp đồng và tình trạng phê duyệt</p>
                         <c:if test="${sessionScope.errorSig != null}">
                             <div style="color: red; margin-bottom: 10px;">${sessionScope.errorSig}</div>
+                            <c:remove scope="session" var="errorSig"/>
                         </c:if>
                     </div>
                     <div>
