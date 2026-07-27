@@ -78,6 +78,12 @@ public class VNPAYPayment extends HttpServlet {
             return;
         }
         if ("FAILED".equals(p.getPaymentStatus()) || "CANCELLED".equals(p.getPaymentStatus())) {
+            if (paymentService.hasPendingPaymentForOrder(p.getCustomerOrderId())) {
+                resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId + "&error=" + 
+                URLEncoder.encode("Đơn hàng này đang có khoản thanh toán khác ở trạng thái chờ xử lý (PENDING)!", StandardCharsets.UTF_8.toString()));
+                return;
+            }
+
             Payment newPayment = new Payment();
             newPayment.setCustomerContractId(p.getCustomerContractId());
             newPayment.setCustomerOrderId(p.getCustomerOrderId());

@@ -131,6 +131,10 @@ public class PaymentService {
         return paymentDAO.hasCompletedPaymentForOrder(orderId);
     }
 
+    public boolean hasPendingPaymentForOrder(int orderId) {
+        return paymentDAO.hasPendingPaymentForOrder(orderId);
+    }
+
 
     public synchronized void createPendingPaymentForOrder(CustomerOrder order) {
         int orderId = order.getCustomerOrderId();
