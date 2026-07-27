@@ -381,9 +381,6 @@
                         <p>Chào mừng bạn quay trở lại với cổng quản lý thông tin khách hàng của Po Bread.</p>
                     </div>
                     <div class="top-actions">
-                        <a class="button" href="${pageContext.request.contextPath}/tool/auto-generate?customerId=${customer.customer.customerId}" id="btn-auto-generate" style="background-color: var(--tertiary); color: white; border-color: var(--tertiary);">
-                            <span class="material-symbols-outlined">construction</span>Auto Generate Tool
-                        </a>
                         <a class="button" href="${pageContext.request.contextPath}/customer/detail?id_cus=${customer.customer.customerId}" id="btn-view-profile">
                             <span class="material-symbols-outlined">account_circle</span>Thông tin cá nhân
                         </a>
@@ -411,10 +408,6 @@
                             <a class="quick-link" href="${pageContext.request.contextPath}/payment/list" id="link-payments">
                                 Lịch sử thanh toán
                                 <span>Theo dõi hóa đơn & lịch sử thanh toán</span>
-                            </a>
-                            <a class="quick-link" href="${pageContext.request.contextPath}/tool/auto-generate?customerId=${customer.customer.customerId}" id="link-auto-generate" style="border-left-color: var(--tertiary);">
-                                <strong style="color: var(--tertiary);">Auto-Generate Tool</strong>
-                                <span>Tự động tạo báo giá & hợp đồng mẫu để test</span>
                             </a>
                             <a class="quick-link" href="${pageContext.request.contextPath}/customer/detail?id_cus=${customer.customer.customerId}" id="link-profile">
                                 Thông tin tài khoản

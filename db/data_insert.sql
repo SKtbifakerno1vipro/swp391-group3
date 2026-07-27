@@ -58,50 +58,49 @@ GO
 INSERT INTO category (category_name)
 VALUES
 (N'Bột làm bánh'),
-(N'Men nở & Chất tạo nở'),
-(N'Đường & Chất tạo ngọt'),
-(N'Bơ & Chất béo'),
-(N'Sữa & Chế phẩm từ sữa'),
-(N'Trứng & Chế phẩm từ trứng'),
-(N'Socola & Ca cao'),
-(N'Hương liệu & Phụ gia thực phẩm'),
-(N'Nhân bánh & Mứt'),
-(N'Hạt & Trái cây sấy');
+(N'Men nở và Chất tạo nở'),
+(N'Đường và Chất tạo ngọt'),
+(N'Bơ và Chất béo'),
+(N'Sữa và Chế phẩm từ sữa'),
+(N'Trứng và Chế phẩm từ trứng'),
+(N'Socola và Ca cao'),
+(N'Hương liệu và Phụ gia thực phẩm'),
+(N'Nhân bánh và Mứt'),
+(N'Hạt và Trái cây sấy');
 GO
 
 -- 6. SAN PHAM
-
 INSERT INTO product (product_name, cost_price, selling_price, description, unit, product_status, quantity_available, updated_by, category_id)
 VALUES
-(N'Bột mì Baker''s Choice số 8', 310000, 355000, N'Bột mì chuyên dùng cho bánh ngọt', N'Bao 25kg', 'ACTIVE', 120, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 1),
-(N'Bột mì Baker''s Choice số 11', 320000, 365000, N'Bột mì đa dụng', N'Bao 25kg', 'ACTIVE', 100, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 1),
-(N'Bột mì Baker''s Choice số 13', 335000, 385000, N'Bột mì chuyên làm bánh mì', N'Bao 25kg', 'ACTIVE', 90, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 1),
-(N'Bột mì Hoa Ngọc Lan', 295000, 340000, N'Bột mì cao cấp', N'Bao 25kg', 'ACTIVE', 80, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 1),
-(N'Bột mì Prima Bread Flour', 345000, 395000, N'Bột mì nhập khẩu Singapore', N'Bao 25kg', 'ACTIVE', 60, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 1),
+(N'Bột mì số 8', 310000, 355000, N'Bột mì Baker Choice chuyên làm bánh ngọt', N'Bao 25kg', 'ACTIVE', 120, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 1),
+(N'Bột mì số 11', 320000, 365000, N'Bột mì Baker Choice đa dụng', N'Bao 25kg', 'ACTIVE', 100, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 1),
+(N'Bột mì số 13', 335000, 385000, N'Bột mì Baker Choice chuyên làm bánh mì', N'Bao 25kg', 'ACTIVE', 90, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 1),
+(N'Bột mì Hoa Ngọc Lan', 295000, 340000, N'Bột mì cao cấp Hoa Ngọc Lan', N'Bao 25kg', 'ACTIVE', 80, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 1),
+(N'Bột mì Bread Flour', 345000, 395000, N'Bột mì Prima Bread Flour', N'Bao 25kg', 'ACTIVE', 60, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 1),
 
-(N'Men khô Saf-Instant Gold', 72000, 86000, N'Men nở dành cho bánh ngọt', N'Gói 500g', 'ACTIVE', 180, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 2),
-(N'Men khô Saf-Instant Red', 70000, 84000, N'Men nở dành cho bánh mì', N'Gói 500g', 'ACTIVE', 200, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 2),
-(N'Baking Powder Alsa', 42000, 52000, N'Bột nở Alsa', N'Hộp 1kg', 'ACTIVE', 100, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 2),
-(N'Baking Soda Arm & Hammer', 38000, 50000, N'Baking soda thực phẩm', N'Hộp 454g', 'ACTIVE', 90, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 2),
-(N'Bread Improver Puratos S500', 185000, 225000, N'Phụ gia cải thiện chất lượng bánh mì', N'Gói 1kg', 'ACTIVE', 70, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 2),
+(N'Men khô Instant Gold', 72000, 86000, N'Men khô Saf Instant Gold', N'Gói 500g', 'ACTIVE', 180, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 2),
+(N'Men khô Instant Red', 70000, 84000, N'Men khô Saf Instant Red', N'Gói 500g', 'ACTIVE', 200, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 2),
+(N'Bột nở', 42000, 52000, N'Baking Powder Alsa', N'Hộp 1kg', 'ACTIVE', 100, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 2),
+(N'Muối nở', 38000, 50000, N'Baking Soda Arm Hammer', N'Hộp 454g', 'ACTIVE', 90, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 2),
+(N'Phụ gia bánh mì', 185000, 225000, N'Bread Improver Puratos S500', N'Gói 1kg', 'ACTIVE', 70, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 2),
 
-(N'Đường tinh luyện Biên Hòa', 450000, 520000, N'Đường trắng tinh luyện', N'Bao 50kg', 'ACTIVE', 50, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 3),
-(N'Đường nâu Biên Hòa', 29000, 36000, N'Đường nâu dùng làm bánh', N'Kg', 'ACTIVE', 300, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 3),
-(N'Đường bột Baker''s Choice', 36000, 45000, N'Đường bột mịn', N'Kg', 'ACTIVE', 180, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 3),
-(N'Glucose Syrup Puratos', 920000, 1080000, N'Siro glucose thực phẩm', N'Thùng 25kg', 'ACTIVE', 20, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 3),
-(N'Mật ong nguyên chất', 155000, 185000, N'Mật ong dùng trong làm bánh', N'Chai 1L', 'ACTIVE', 80, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 3),
+(N'Đường tinh luyện', 450000, 520000, N'Đường tinh luyện Biên Hòa', N'Bao 50kg', 'ACTIVE', 50, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 3),
+(N'Đường nâu', 29000, 36000, N'Đường nâu Biên Hòa', N'Kg', 'ACTIVE', 300, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 3),
+(N'Đường bột', 36000, 45000, N'Đường bột Baker Choice', N'Kg', 'ACTIVE', 180, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 3),
+(N'Siro Glucose', 920000, 1080000, N'Glucose Syrup Puratos', N'Thùng 25kg', 'ACTIVE', 20, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 3),
+(N'Mật ong', 155000, 185000, N'Mật ong nguyên chất', N'Chai 1L', 'ACTIVE', 80, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 3),
 
-(N'Bơ lạt Anchor', 1180000, 1320000, N'Bơ lạt New Zealand', N'Thùng 20kg', 'ACTIVE', 35, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 4),
-(N'Bơ lạt Elle & Vire', 1260000, 1420000, N'Bơ lạt Pháp', N'Thùng 20kg', 'ACTIVE', 25, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 4),
-(N'Margarine Meizan', 530000, 620000, N'Bơ thực vật Meizan', N'Thùng 15kg', 'ACTIVE', 45, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 4),
-(N'Shortening Cái Lân', 610000, 710000, N'Shortening dùng làm bánh', N'Thùng 15kg', 'ACTIVE', 40, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 4),
-(N'Bơ President', 1280000, 1450000, N'Bơ President nhập khẩu', N'Thùng 20kg', 'ACTIVE', 18, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 4),
+(N'Bơ lạt', 1180000, 1320000, N'Bơ lạt Anchor New Zealand', N'Thùng 20kg', 'ACTIVE', 35, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 4),
+(N'Bơ Pháp', 1260000, 1420000, N'Bơ Elle Vire nhập khẩu Pháp', N'Thùng 20kg', 'ACTIVE', 25, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 4),
+(N'Bơ thực vật', 530000, 620000, N'Margarine Meizan', N'Thùng 15kg', 'ACTIVE', 45, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 4),
+(N'Shortening', 610000, 710000, N'Shortening Cái Lân', N'Thùng 15kg', 'ACTIVE', 40, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 4),
+(N'Bơ President', 1280000, 1450000, N'Bơ President nhập khẩu', N'Thùng 20kg', 'ACTIVE', 18, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 4),
 
-(N'Whipping Cream Anchor', 112000, 132000, N'Kem tươi Anchor', N'Hộp 1L', 'ACTIVE', 120, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 5),
-(N'Topping Cream Rich''s', 78000, 95000, N'Kem thực vật Rich''s', N'Hộp 1L', 'ACTIVE', 150, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 5),
-(N'Cream Cheese Philadelphia', 148000, 175000, N'Phô mai kem Philadelphia', N'Hộp 1kg', 'ACTIVE', 80, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 5),
-(N'Sữa đặc Ông Thọ', 420000, 490000, N'Sữa đặc có đường', N'Thùng 24 lon', 'ACTIVE', 40, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 5),
-(N'Sữa bột Anchor', 175000, 205000, N'Sữa bột nguyên kem', N'Gói 1kg', 'ACTIVE', 70, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 5);
+(N'Whipping Cream', 112000, 132000, N'Whipping Cream Anchor', N'Hộp 1L', 'ACTIVE', 120, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 5),
+(N'Topping Cream', 78000, 95000, N'Topping Cream Rich', N'Hộp 1L', 'ACTIVE', 150, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 5),
+(N'Cream Cheese', 148000, 175000, N'Cream Cheese Philadelphia', N'Hộp 1kg', 'ACTIVE', 80, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 5),
+(N'Sữa đặc', 420000, 490000, N'Sữa đặc Ông Thọ', N'Thùng 24 lon', 'ACTIVE', 40, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 5),
+(N'Sữa bột nguyên kem', 175000, 205000, N'Sữa bột Anchor', N'Gói 1kg', 'ACTIVE', 70, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 5);
 GO
 
 INSERT INTO product (product_name, cost_price, selling_price, description, unit, product_status, quantity_available, updated_by, category_id)
@@ -137,6 +136,38 @@ VALUES
 (N'Cranberry sấy Ocean Spray', 235000, 275000, N'Nam việt quất sấy khô', N'Gói 1kg', 'ACTIVE', 40, (SELECT user_id FROM [user] WHERE user_name = 'warehouse_01'), 10);
 GO
 
+INSERT INTO product (product_name, cost_price, selling_price, description, unit, product_status, quantity_available, updated_by, category_id)
+VALUES
+(N'Trứng gà tươi', 32000, 38000, N'Trứng gà tươi dùng làm bánh', N'Vỉ 10 quả', 'ACTIVE', 150, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 6),
+(N'Lòng đỏ trứng thanh trùng', 105000, 125000, N'Lòng đỏ trứng thanh trùng', N'Hộp 1kg', 'ACTIVE', 60, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 6),
+(N'Lòng trắng trứng thanh trùng', 98000, 118000, N'Lòng trắng trứng thanh trùng', N'Hộp 1kg', 'ACTIVE', 60, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 6),
+(N'Bột lòng trắng trứng', 420000, 495000, N'Bột lòng trắng trứng Ovodan', N'Gói 1kg', 'ACTIVE', 25, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 6),
+(N'Bột trứng nguyên chất', 465000, 545000, N'Bột trứng Sanovo', N'Gói 1kg', 'ACTIVE', 20, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 6),
+
+(N'Socola đen Couverture', 425000, 495000, N'Callebaut Couverture Dark 54.5 phần trăm', N'Gói 2.5kg', 'ACTIVE', 40, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 7),
+(N'Socola sữa Couverture', 435000, 510000, N'Callebaut Couverture Milk', N'Gói 2.5kg', 'ACTIVE', 35, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 7),
+(N'Socola đen Compound', 235000, 275000, N'Beryls Compound Dark', N'Gói 1kg', 'ACTIVE', 70, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 7),
+(N'Socola Chip', 255000, 295000, N'Chocolate Chips Beryls', N'Gói 1kg', 'ACTIVE', 65, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 7),
+(N'Bột ca cao', 205000, 245000, N'Bột ca cao Van Houten', N'Gói 1kg', 'ACTIVE', 50, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 7),
+
+(N'Tinh chất Vanilla', 395000, 455000, N'Vanilla Extract Nielsen Massey', N'Chai 118ml', 'ACTIVE', 25, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 8),
+(N'Hương bơ', 68000, 85000, N'Hương bơ Rayners', N'Chai 28ml', 'ACTIVE', 90, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 8),
+(N'Hương sữa', 68000, 85000, N'Hương sữa Rayners', N'Chai 28ml', 'ACTIVE', 90, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 8),
+(N'Lá Gelatin', 148000, 175000, N'Gelatin Gold Leaf', N'Hộp 200g', 'ACTIVE', 45, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 8),
+(N'Bột Agar', 45000, 58000, N'Bột Agar Vĩnh Thuận', N'Gói 50g', 'ACTIVE', 120, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 8),
+
+(N'Nhân đậu đỏ', 98000, 118000, N'Nhân đậu đỏ Puratos', N'Gói 1kg', 'ACTIVE', 80, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 9),
+(N'Nhân khoai môn', 108000, 128000, N'Nhân khoai môn Puratos', N'Gói 1kg', 'ACTIVE', 70, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 9),
+(N'Nhân phô mai', 145000, 170000, N'Nhân phô mai Puratos', N'Gói 1kg', 'ACTIVE', 55, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 9),
+(N'Mứt dâu', 92000, 110000, N'Mứt dâu Puratos', N'Hộp 1kg', 'ACTIVE', 65, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 9),
+(N'Nhân Custard', 158000, 188000, N'Custard Filling Puratos', N'Gói 1kg', 'ACTIVE', 40, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 9),
+
+(N'Hạnh nhân', 265000, 310000, N'Hạnh nhân nhập khẩu Mỹ', N'Gói 1kg', 'ACTIVE', 45, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 10),
+(N'Hạt óc chó', 315000, 365000, N'Hạt óc chó nhập khẩu Mỹ', N'Gói 1kg', 'ACTIVE', 35, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 10),
+(N'Hạt điều', 225000, 265000, N'Hạt điều Bình Phước', N'Gói 1kg', 'ACTIVE', 55, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 10),
+(N'Nho khô', 175000, 210000, N'Nho khô Sun Maid', N'Gói 1kg', 'ACTIVE', 60, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 10),
+(N'Nam việt quất sấy', 235000, 275000, N'Nam việt quất sấy Ocean Spray', N'Gói 1kg', 'ACTIVE', 40, (SELECT user_id FROM [user] WHERE user_name='warehouse_01'), 10);
+GO
 -- 7. PHAN QUYEN (PERMISSION)
 INSERT INTO permission (permission_name) VALUES
 (N'Dashboard'),

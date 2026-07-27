@@ -184,16 +184,16 @@ public class CustomerOrderController extends HttpServlet {
 
             List<CustomerOrderDTO> details = customerOrderService.getOrderDetails(orderId);
 
-            // Get total_price from quotation linked via contract
-            double quotationTotal = customerOrderService.getTotalPriceFromQuotationByOrderId(orderId);
-            if (quotationTotal <= 0 && details != null) {
+            // Calculate total price from order details
+            double totalPrice = 0;
+            if (details != null) {
                 for (CustomerOrderDTO item : details) {
                     if (item.getDetail() != null) {
-                        quotationTotal += item.getDetail().getTotal();
+                        totalPrice += item.getDetail().getTotal();
                     }
                 }
             }
-            request.setAttribute("quotationTotal", quotationTotal);
+            request.setAttribute("quotationTotal", totalPrice);
             request.setAttribute("order", order);
             request.setAttribute("details", details);
             request.getRequestDispatcher("/views/customer-order/detail.jsp").forward(request, response);
@@ -267,13 +267,18 @@ public class CustomerOrderController extends HttpServlet {
             if (contractIdParam != null && !contractIdParam.isBlank()) {
                 try {
                     int contractId = Integer.parseInt(contractIdParam);
-                    request.setAttribute("selectedContractId", contractId);
-                    Contract selectedContract = contractDao.getContractById(contractId);
-                    if (selectedContract != null) {
-                        request.setAttribute("selectedContract", selectedContract);
-                        QuotationDAO quotationDao = new QuotationDAO();
-                        List<QuotationDetail> quotationDetails = quotationDao.getQuotationDetailsByQuotationId(selectedContract.getQuotationId());
-                        request.setAttribute("quotationDetails", quotationDetails);
+                    CustomerOrderDTO existingOrder = customerOrderService.getOrderByContractId(contractId);
+                    if (existingOrder != null) {
+                        request.setAttribute("error", "Hợp đồng này đã được tạo đơn hàng trước đó (Mã đơn hàng: #" + existingOrder.getCustomerOrder().getCustomerOrderId() + ").");
+                    } else {
+                        request.setAttribute("selectedContractId", contractId);
+                        Contract selectedContract = contractDao.getContractById(contractId);
+                        if (selectedContract != null) {
+                            request.setAttribute("selectedContract", selectedContract);
+                            QuotationDAO quotationDao = new QuotationDAO();
+                            List<QuotationDetail> quotationDetails = quotationDao.getQuotationDetailsByQuotationId(selectedContract.getQuotationId());
+                            request.setAttribute("quotationDetails", quotationDetails);
+                        }
                     }
                 } catch (Exception e) {
                 }
@@ -303,6 +308,14 @@ public class CustomerOrderController extends HttpServlet {
         try {
             int customerId = Integer.parseInt(customerIdStr);
             int contractId = Integer.parseInt(contractIdStr);
+
+            // Check if an order already exists for this contract
+            CustomerOrderDTO existingOrder = customerOrderService.getOrderByContractId(contractId);
+            if (existingOrder != null) {
+                request.setAttribute("error", "Hợp đồng này đã được tạo đơn hàng trước đó (Mã đơn hàng: #" + existingOrder.getCustomerOrder().getCustomerOrderId() + ").");
+                CreateView(request, response);
+                return;
+            }
 
             if (qdIds == null || qdIds.length == 0) {
                 request.setAttribute("error", "Vui lòng chọn ít nhất một sản phẩm.");

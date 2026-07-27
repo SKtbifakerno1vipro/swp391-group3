@@ -249,4 +249,8 @@ public class ContractService {
         return contractDAO.updateContractContent(contractId, contractContent);
     }
     // nguyenkien - end
+
+    public Contract getContractByToken(String token) {
+        return contractDAO.getContractByToken(token);
+    }
 }
