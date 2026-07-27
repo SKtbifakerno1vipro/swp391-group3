@@ -96,6 +96,7 @@
             </c:if>
             <br>
             <button type="submit">Tạo đơn hàng</button>
+             <a href="contract-list" style="color: var(--primary); font-size: 0.9em; font-weight: 600;">Quay lại danh sách</a>
         </form>
 
             </main>
