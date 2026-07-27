@@ -121,6 +121,21 @@ public class PaymentDAO extends DBContext {
         return false;
     }
 
+    public boolean hasPendingPaymentForOrder(int orderId) {
+        String sql = "SELECT COUNT(*) FROM payment WHERE customer_order_id = ? AND UPPER(payment_status) = 'PENDING'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public Payment getPaymentByContractId(int contractId) {
         String sql = "SELECT TOP 1 * FROM payment WHERE customer_contract_id = ? ORDER BY payment_id DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
