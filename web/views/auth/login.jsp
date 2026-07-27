@@ -381,7 +381,6 @@
                                         <span class="material-symbols-outlined">lock</span>
                                         <input type="password" id="password" name="password" required
                                             placeholder="Nhập mật khẩu" autocomplete="current-password">
-                                        <span class="material-symbols-outlined" id="togglePasswordIcon" onclick="togglePassword()" style="cursor: pointer; color: var(--muted); user-select: none;">visibility_off</span>
                                     </div>
                                 </div>
 
@@ -390,31 +389,16 @@
                                 </div>
 
                                 <button class="submit-btn" type="submit">Đăng nhập</button>
-
                                 <c:if test="${not empty error}">
                                     <div class="error-message">
                                         <c:out value="${error}" />
                                     </div>
                                 </c:if>
                             </form>
-
                             <div class="copyright">2026 Po Bread. SWP391 Group 3.</div>
                         </div>
                     </section>
                 </section>
             </main>
-            <script>
-                function togglePassword() {
-                    var pwdInput = document.getElementById("password");
-                    var icon = document.getElementById("togglePasswordIcon");
-                    if (pwdInput.type === "password") {
-                        pwdInput.type = "text";
-                        icon.innerText = "visibility";
-                    } else {
-                        pwdInput.type = "password";
-                        icon.innerText = "visibility_off";
-                    }
-                }
-            </script>
         </body>
         </html>
