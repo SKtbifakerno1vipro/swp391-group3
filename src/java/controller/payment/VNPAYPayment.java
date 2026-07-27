@@ -67,6 +67,11 @@ public class VNPAYPayment extends HttpServlet {
             URLEncoder.encode("Không tìm thấy thông tin thanh toán!", StandardCharsets.UTF_8.toString()));
             return;
         }
+        if (paymentService.hasCompletedPaymentForOrder(p.getCustomerOrderId())) {
+            resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId + "&error=" + 
+            URLEncoder.encode("Đơn hàng này đã có khoản thanh toán khác hoàn tất thành công!", StandardCharsets.UTF_8.toString()));
+            return;
+        }
         if ("COMPLETED".equals(p.getPaymentStatus())) {
             resp.sendRedirect(req.getContextPath() + "/payment/detail?id=" + paymentId + "&error=" + 
             URLEncoder.encode("Khoản thanh toán này đã hoàn tất từ trước!", StandardCharsets.UTF_8.toString()));

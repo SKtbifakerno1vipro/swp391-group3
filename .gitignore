@@ -44,5 +44,6 @@ nbproject/private/
 *.iml
 out/
 .smarttomcat/
+.vscode
 
 
