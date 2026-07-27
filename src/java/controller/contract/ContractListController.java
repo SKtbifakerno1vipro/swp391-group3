@@ -55,6 +55,8 @@ public class ContractListController extends HttpServlet {
 
         if (error != null) {
             session.setAttribute("errorSig", error);
+            response.sendRedirect(request.getContextPath() + "/contract-list");
+            return;
         }
 
         // 2. validate page index
