@@ -162,6 +162,7 @@ public class EditUserController extends HttpServlet {
                     u.setDateBirth(Date.valueOf(rawDob.trim()));
 
                 } catch (Exception e) {
+                    
                 }
             }
 
@@ -183,7 +184,7 @@ public class EditUserController extends HttpServlet {
             }
 
             // 3. Validation Logic
-            error = Validation.validateEmpty(u.getFullName(), "Full Name");
+            error = Validation.validateFullName(u.getFullName());
             
             if (error == null) {
                 error = Validation.validateUsername(u.getUserName());

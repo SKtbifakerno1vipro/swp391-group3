@@ -259,6 +259,7 @@
                         <p>Quản lý tài khoản, vai trò, thông tin liên lạc và trạng thái của người dùng.</p>
                         <c:if test="${sessionScope.errorSig != null}">
                             <div style="color: red; margin-bottom: 10px;">${sessionScope.errorSig}</div>
+                            <c:remove scope="session" var="errorSig"/>
                         </c:if>
                     </div>
                     <div class="actions">
@@ -338,8 +339,8 @@
                                                                 <input type="submit" style="display: none;">
                                                             </label>
                                                         </form>
-                                                        </c:when>
-                                                        <c:otherwise>
+                                                    </c:when>
+                                                    <c:otherwise>
                                                         <a class="chip primary" href="${pageContext.request.contextPath}/edit-user?id=${u.userId}"><span class="material-symbols-outlined">visibility</span>Xem</a>
                                                     </c:otherwise>
                                                 </c:choose>
