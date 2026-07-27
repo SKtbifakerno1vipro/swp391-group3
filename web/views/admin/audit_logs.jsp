@@ -2,10 +2,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>System Audit Logs</title>
+    <title>Nhật ký hoạt động hệ thống</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&amp;family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -152,66 +152,67 @@
         </jsp:include>
         
         <main class="main legacy-page">
-            <h2>System Audit Logs</h2>
+            <h2>Nhật ký hoạt động hệ thống</h2>
             <p style="color: var(--muted); margin-bottom: 20px;">
-                Review all system data modifications. This provides an audit trail of which user performed what modifications, on what entities, and when.
+                Xem lại tất cả các thay đổi dữ liệu hệ thống. Phần này cung cấp nhật ký chi tiết về việc người dùng nào đã thực hiện những chỉnh sửa gì, trên thực thể nào và vào thời gian nào.
             </p>
             
             <form action="${pageContext.request.contextPath}/admin/audit-logs" method="GET" class="search-form-responsive">
                 <div class="search-group">
-                    <label class="search-label">Audit Log Search Filters:</label>
+                    <label class="search-label">Bộ lọc tìm kiếm nhật ký:</label>
                     <div class="inputs-grid">
                         
                         <div>
-                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;">User (Name/Username)</span>
-                            <input type="text" name="searchUser" value="<c:out value='${searchUser}'/>" placeholder="Search user..." />
+                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Người dùng (Tên/Tên đăng nhập)</span>
+                            <input type="text" name="searchUser" value="<c:out value='${searchUser}'/>" placeholder="Tìm kiếm người dùng..." />
                         </div>
                         
                         <div>
-                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Action Type</span>
+                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Loại hành động</span>
                             <select name="actionType">
                                 <option value="">-- All Actions --</option>
                                 <option value="CREATE" ${actionType == 'CREATE' ? 'selected' : ''}>CREATE</option>
                                 <option value="UPDATE" ${actionType == 'UPDATE' ? 'selected' : ''}>UPDATE</option>
                                 <option value="DELETE" ${actionType == 'DELETE' ? 'selected' : ''}>DELETE</option>
+                                <option value="LOGIN" ${actionType == 'LOGIN' ? 'selected' : ''}>LOGIN</option>
                                 <option value="LOGOUT" ${actionType == 'LOGOUT' ? 'selected' : ''}>LOGOUT</option>
                             </select>
                         </div>
                         
                         
                         <div>
-                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Start Date</span>
+                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Ngày bắt đầu</span>
                             <input type="date" name="startDate" value="${startDate}" />
                         </div>
                         
                         <div>
-                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;">End Date</span>
+                            <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Ngày kết thúc</span>
                             <input type="date" name="endDate" value="${endDate}" />
                         </div>
                     </div>
                 </div>
 
                 <div class="actions-group">
-                    <button type="submit" class="btn-search">Search Logs</button>
-                    <a href="${pageContext.request.contextPath}/admin/audit-logs" class="btn-clear">Reset Filters</a>
+                    <button type="submit" class="btn-search">Tìm kiếm</button>
+                    <a href="${pageContext.request.contextPath}/admin/audit-logs" class="btn-clear">Thiết lập lại</a>
                 </div>
             </form>
 
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 80px;">Log ID</th>
-                        <th style="width: 180px;">User</th>
-                        <th style="width: 120px;">Action Type</th>
-                        <th style="width: 150px;">Affected Object</th>
-                        <th>Description / Details</th>
-                        <th style="width: 180px;">Timestamp</th>
+                        <th style="width: 80px;">Mã log</th>
+                        <th style="width: 180px;">Người dùng</th>
+                        <th style="width: 120px;">Loại hành động</th>
+                        <th style="width: 150px;">Đối tượng bị ảnh hưởng</th>
+                        <th>Mô tả / Chi tiết</th>
+                        <th style="width: 180px;">Thời gian</th>
                     </tr>
                 </thead>
                 <tbody>
                     <c:if test="${empty auditLogs}">
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 24px;">No system audit logs found.</td>
+                            <td colspan="6" style="text-align: center; padding: 24px;">Không tìm thấy nhật ký hoạt động hệ thống nào.</td>
                         </tr>
                     </c:if>
                     <c:forEach var="log" items="${auditLogs}">
@@ -224,20 +225,38 @@
                                         <small style="color: var(--muted);">@<c:out value="${log.userName}"/></small>
                                     </c:when>
                                     <c:otherwise>
-                                        <span style="color: var(--muted);">System / Guest (ID: ${log.userId})</span>
+                                        <span style="color: var(--muted);">Hệ thống / Khách (ID: ${log.userId})</span>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
                             <td>
                                 <c:choose>
                                     <c:when test="${log.actionType == 'CREATE'}">
-                                        <span class="badge badge-create">CREATE</span>
+                                        <span class="badge badge-create">TẠO MỚI</span>
                                     </c:when>
                                     <c:when test="${log.actionType == 'UPDATE'}">
-                                        <span class="badge badge-update">UPDATE</span>
+                                        <span class="badge badge-update">CẬP NHẬT</span>
                                     </c:when>
                                     <c:when test="${log.actionType == 'DELETE'}">
-                                        <span class="badge badge-delete">DELETE</span>
+                                        <span class="badge badge-delete">XÓA</span>
+                                    </c:when>
+                                    <c:when test="${log.actionType == 'LOGIN'}">
+                                        <span class="badge badge-other">ĐĂNG NHẬP</span>
+                                    </c:when>
+                                    <c:when test="${log.actionType == 'LOGOUT'}">
+                                        <span class="badge badge-other">ĐĂNG XUẤT</span>
+                                    </c:when>
+                                    <c:when test="${log.actionType == 'RELEASE'}">
+                                        <span class="badge badge-create">PHÁT HÀNH</span>
+                                    </c:when>
+                                    <c:when test="${log.actionType == 'CANCEL'}">
+                                        <span class="badge badge-delete">HỦY BỎ</span>
+                                    </c:when>
+                                    <c:when test="${log.actionType == 'VIEW'}">
+                                        <span class="badge badge-update">XEM</span>
+                                    </c:when>
+                                    <c:when test="${log.actionType == 'CONFIRM'}">
+                                        <span class="badge badge-update">XÁC NHẬN</span>
                                     </c:when>
                                     <c:otherwise>
                                         <span class="badge badge-other">${log.actionType}</span>
