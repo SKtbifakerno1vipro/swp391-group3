@@ -1,7 +1,7 @@
-# Bakery Ingredient Contract & Sales Management System
+# Bakery Ingredient Sales System
 
 ## 1. Project Overview
-The **Bakery Ingredient Contract & Sales Management System** is a web-based application designed for direct B2B/B2C sales of bakery ingredients. The system manages the entire lifecycle from Quotation to Contract Signing and Payment.
+The **Bakery Ingredient Sales System** is a web-based application designed for direct B2B/B2C sales of bakery ingredients. The system manages the entire lifecycle from Quotation to Contract Signing and Payment.
 
 ## 2. Core Roles & Responsibilities
 *   **Sale Staff:** Manage quotations and negotiate prices.
