@@ -251,7 +251,7 @@
 
                                         <c:when test="${contract.contractStatus == 'SIGNED'}">
                                             <p style="color: var(--primary); text-align: center; font-weight: bold; margin: 10px 0;">Hợp đồng đã ký hoàn tất</p>
-                                            <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 5}">
+                                            <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
                                                 <form method="POST" action="contract-detail" style="margin-bottom: 10px;">
                                                     <input type="hidden" name="action" value="send_final_contract" />
                                                     <input type="hidden" name="contractId" value="${contract.contractId}" />

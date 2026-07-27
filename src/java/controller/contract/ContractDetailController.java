@@ -335,7 +335,7 @@ public class ContractDetailController extends HttpServlet {
             response.sendRedirect("contract-detail?id=" + contractId);
 
         } else if ("send_final_contract".equals(action)) {// send customer final contract for storage their contract
-            if (currentUser.getRoleId() != 5 && currentUser.getRoleId() != 1) {
+            if (currentUser.getRoleId() != 2 && currentUser.getRoleId() != 1) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Only Officer can send final contract.");
                 return;
             }
