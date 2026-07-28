@@ -192,9 +192,9 @@ public class ContractService {
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
-            String fromDate, String toDate, String taxCode, String phone, String email, String customerType) {
+            String fromDate, String toDate, String taxCode, String phone, String email, String customerType, int createBy) {
         return contractDAO.searchContracts(contractNumber, customerName, status, storageType, pageIndex, pageSize, userId, roleId,
-                fromDate, toDate, taxCode, phone, email, customerType);
+                fromDate, toDate, taxCode, phone, email, customerType, createBy);
     }
 
     public int getTotalContracts(String contractNumber, String customerName, String status,
@@ -252,5 +252,9 @@ public class ContractService {
 
     public Contract getContractByToken(String token) {
         return contractDAO.getContractByToken(token);
+    }
+
+    public boolean deleteContract(int contractId) {
+        return contractDAO.deleteContract(contractId);
     }
 }

@@ -261,6 +261,10 @@
                             <div style="color: red; margin-bottom: 10px;">${sessionScope.errorSig}</div>
                             <c:remove scope="session" var="errorSig"/>
                         </c:if>
+                        <c:if test="${sessionScope.successSig != null}">
+                            <div style="color: green; margin-bottom: 10px;">${sessionScope.successSig}</div>
+                            <c:remove scope="session" var="successSig"/>
+                        </c:if>
                     </div>
                     <div class="actions">
                         <c:if test="${sessionScope.user.roleId == 1}">

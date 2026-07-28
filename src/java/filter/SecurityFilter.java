@@ -36,7 +36,7 @@ public class SecurityFilter implements Filter {
             "/AcceptanceRecordController", "/product-list", "/edit-product",
             "/product-review", "/contract-list", "/contract-detail", "/export-pdf", "/File",
             "/Signature", "/invoice-list", "/invoice", "/preview",
-            "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail",
+            "/payment/list", "/payment", "/payment/return", "/payment/ipn", "/payment/detail","/contract-delete",
             "/revenue-report", "/revenue", "/import-request-create", "/import-request-list", "/import-request-detail", "/product-sales-report"
     );
 

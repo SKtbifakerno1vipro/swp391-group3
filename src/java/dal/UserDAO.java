@@ -418,7 +418,53 @@ public class UserDAO extends DBContext {
             ps.setString(1, status);
             ps.setInt(2, userId);
             ps.executeUpdate();
+            if ("INACTIVE".equals(status)) {
+                User u = getUserByIdFullParameter(userId);
+                if (u != null && u.getRoleId() == 4) {
+                    reassignBannedSaleCustomers(userId);
+                }
+            }
         } catch (Exception e) {
+        }
+    }
+
+    public void reassignBannedSaleCustomers(int bannedSaleId) {
+        String findNextSaleSql = "SELECT TOP 1 u.user_id "
+                + "FROM [user] u "
+                + "LEFT JOIN customer c ON u.user_id = c.assigned_to_user_id "
+                + "WHERE u.role_id = 4 AND u.account_status = 'ACTIVE' AND u.user_id != ? "
+                + "GROUP BY u.user_id "
+                + "ORDER BY COUNT(c.customer_id) ASC";
+        try (PreparedStatement ps = connection.prepareStatement(findNextSaleSql)) {
+            ps.setInt(1, bannedSaleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int nextSaleId = rs.getInt(1);
+                    // 1. Reassign customers
+                    String reassignSql = "UPDATE [customer] SET assigned_to_user_id = ? WHERE assigned_to_user_id = ?";
+                    try (PreparedStatement psUpdate = connection.prepareStatement(reassignSql)) {
+                        psUpdate.setInt(1, nextSaleId);
+                        psUpdate.setInt(2, bannedSaleId);
+                        psUpdate.executeUpdate();
+                    }
+                    // 2. Reassign quotations
+                    String reassignQuotationSql = "UPDATE [quotation] SET created_by = ? WHERE created_by = ?";
+                    try (PreparedStatement psQuotation = connection.prepareStatement(reassignQuotationSql)) {
+                        psQuotation.setInt(1, nextSaleId);
+                        psQuotation.setInt(2, bannedSaleId);
+                        psQuotation.executeUpdate();
+                    }
+                    // 3. Reassign contracts
+                    String reassignContractSql = "UPDATE [customer_contract] SET created_by = ? WHERE created_by = ?";
+                    try (PreparedStatement psContract = connection.prepareStatement(reassignContractSql)) {
+                        psContract.setInt(1, nextSaleId);
+                        psContract.setInt(2, bannedSaleId);
+                        psContract.executeUpdate();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("reassignBannedSaleCustomers: " + e.getMessage());
         }
     }
 
@@ -446,7 +492,13 @@ public class UserDAO extends DBContext {
             }
             stm.setInt(10, user.getUserId());
 
-            return stm.executeUpdate() > 0;
+            boolean isUpdated = stm.executeUpdate() > 0;
+            if (isUpdated && "INACTIVE".equals(user.getStatus())) {
+                if (user.getRoleId() == 4) {
+                    reassignBannedSaleCustomers(user.getUserId());
+                }
+            }
+            return isUpdated;
         } catch (Exception e) {
             System.out.println("updateUser" + e.getMessage());
         }
