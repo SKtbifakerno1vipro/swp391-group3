@@ -80,8 +80,12 @@ public class ContractListController extends HttpServlet {
             pageIndex = endPage;
         }
 
+        int createBy=-1;
+        if(currentUser.getRoleId()==5){
+            createBy= currentUser.getUserId();
+        }
         List<ContractCustomerDTO> list = contractService.searchContracts(contractNumber, customerName, status, storageType, pageIndex,
-                PAGE_SIZE, currentUser.getUserId(), currentUser.getRoleId(), fromDate, toDate, taxcode, phone, email, customerType);
+                PAGE_SIZE, currentUser.getUserId(), currentUser.getRoleId(), fromDate, toDate, taxcode, phone, email, customerType, createBy);
 
         request.setAttribute("list", list);
         request.setAttribute("endPage", endPage);

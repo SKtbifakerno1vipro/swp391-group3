@@ -23,6 +23,10 @@
                     <div style="color: red; margin-bottom: 10px;">${sessionScope.errorSig}</div>
                     <c:remove scope="session" var="errorSig"/>
                 </c:if>
+                <c:if test="${sessionScope.successSig != null}">
+                    <div style="color: green; margin-bottom: 10px;">${sessionScope.successSig}</div>
+                    <c:remove scope="session" var="successSig"/>
+                </c:if>
                 <form action="contract-list" method="GET">
                     <input type="text" name="contractNumber" value="${contractNumber}" placeholder="Mã hợp đồng">
                     <input type="text" name="customerName" value="${customerName}" placeholder="Tên khách hàng">
@@ -110,6 +114,9 @@
                                         </c:if>                    
                                     </c:if>
                                     <a href="${pageContext.request.contextPath}/contract-detail?id=${c.contractId}">Chi tiết</a> 
+                                    <c:if test="${sessionScope.user.roleId == 2 && c.contractStatus == 'DRAFT'}">
+                                        | <a href="${pageContext.request.contextPath}/contract-delete?id=${c.contractId}" onclick="return confirm('Bạn có chắc chắn muốn xóa cứng hợp đồng này không?');" style="color: red;">Xóa</a>
+                                    </c:if>
                                     <c:if test="${c.contractStatus =='SIGNED'}">
                                         <c:choose>
                                             <c:when test="${c.orderId > 0}">

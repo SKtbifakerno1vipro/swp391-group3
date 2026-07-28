@@ -58,7 +58,7 @@ public class ContractDAO extends DBContext {
 
     public List<ContractCustomerDTO> searchContracts(String contractNumber, String customerName, String status,
             String storageType, int pageIndex, int pageSize, int userId, int roleId,
-            String fromDate, String toDate, String taxCode, String phone, String email, String customerType) {
+            String fromDate, String toDate, String taxCode, String phone, String email, String customerType, int createBy) {
         List<ContractCustomerDTO> list = new ArrayList<>();
         String sql = """
                     SELECT c.customer_contract_id, c.contract_number, c.contract_status, c.storage_type,  c.created_at,
@@ -85,6 +85,9 @@ public class ContractDAO extends DBContext {
         }
         if (userId != 0 && userId > 0 && roleId == 3) {
             sql += " and cust.user_id= ? ";
+        }
+        if (userId != 0 && userId > 0 && roleId == 5) {
+            sql += " and c.created_by= ? ";
         }
         if (fromDate != null && !fromDate.trim().isEmpty()) {
             sql += " AND c.created_at >= CAST(? AS datetime) ";
@@ -123,6 +126,10 @@ public class ContractDAO extends DBContext {
             }
             if (userId != 0 && userId > 0 && roleId == 3) {
                 ps.setInt(index++, userId);
+            }
+
+            if (userId != 0 && userId > 0 && roleId == 5) {
+                ps.setInt(index++, createBy);
             }
             if (fromDate != null && !fromDate.trim().isEmpty()) {
                 ps.setDate(index++, Date.valueOf(fromDate));
@@ -259,6 +266,10 @@ public class ContractDAO extends DBContext {
         return 0;
     }
 
+    
+   
+    
+    
     public Contract getContractById(int id) {
         String sql = """
                      SELECT *, cu.company_name FROM customer_contract  co 
@@ -764,6 +775,56 @@ public class ContractDAO extends DBContext {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean deleteContract(int contractId) {
+        String checkSql = "SELECT contract_status FROM customer_contract WHERE customer_contract_id = ?";
+        try (PreparedStatement psCheck = connection.prepareStatement(checkSql)) {
+            psCheck.setInt(1, contractId);
+            try (ResultSet rs = psCheck.executeQuery()) {
+                if (rs.next()) {
+                    String status = rs.getString("contract_status");
+                    if (!"DRAFT".equals(status)) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        try {
+            String deleteRevisionItemsSql = "DELETE FROM contract_revision_item WHERE contract_id = ?";
+            try (PreparedStatement ps = connection.prepareStatement(deleteRevisionItemsSql)) {
+                ps.setInt(1, contractId);
+                ps.executeUpdate();
+            }
+
+            String deleteHistorySql = "DELETE FROM contract_edit_history WHERE contract_id = ?";
+            try (PreparedStatement ps = connection.prepareStatement(deleteHistorySql)) {
+                ps.setInt(1, contractId);
+                ps.executeUpdate();
+            }
+
+            String deleteSignaturesSql = "DELETE FROM signature WHERE customer_contract_id = ?";
+            try (PreparedStatement ps = connection.prepareStatement(deleteSignaturesSql)) {
+                ps.setInt(1, contractId);
+                ps.executeUpdate();
+            }
+
+            String deleteContractSql = "DELETE FROM customer_contract WHERE customer_contract_id = ?";
+            try (PreparedStatement ps = connection.prepareStatement(deleteContractSql)) {
+                ps.setInt(1, contractId);
+                int rows = ps.executeUpdate();
+                return rows > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

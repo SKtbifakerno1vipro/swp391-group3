@@ -58,11 +58,11 @@ public class CustomerDashboardController extends HttpServlet {
         List<Quotation> recentQuotations = quotationService.searchQuotations(
                 null, null, null, null, user.getUserId(), user.getRoleId(), 1, 5
         );
-
-        List<ContractCustomerDTO> recentContracts = contractService.searchContracts(
-                null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
-                null, null, null, null, null, null
-        );
+//
+//        List<ContractCustomerDTO> recentContracts = contractService.searchContracts(
+//                null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
+//                null, null, null, null, null, null, 
+//        );
         int totalContracts = contractService.getTotalContracts(
                 null, null, null, null, 1, 5, user.getUserId(), user.getRoleId(),
                 null, null, null, null, null, null
@@ -75,7 +75,7 @@ public class CustomerDashboardController extends HttpServlet {
         request.setAttribute("totalQuotations", totalQuotations);
         request.setAttribute("recentQuotations", recentQuotations);
         request.setAttribute("totalContracts", totalContracts);
-        request.setAttribute("recentContracts", recentContracts);
+//        request.setAttribute("recentContracts", recentContracts);
         request.setAttribute("totalPaid", totalPaid);
 
         request.getRequestDispatcher("/views/dashboard/customer-dashboard.jsp").forward(request, response);

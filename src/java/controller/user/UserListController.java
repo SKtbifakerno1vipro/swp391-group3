@@ -112,6 +112,15 @@ public class UserListController extends HttpServlet {
             String targetUsername = targetUser != null ? targetUser.getUserName() : String.valueOf(userId);
             String action = "ACTIVE".equals(newStatus) ? "Mở khóa tài khoản" : "Khóa tài khoản";
             AuditLogService.log(currentUser.getUserId(), "UPDATE", "User", action + ": " + targetUsername + " (ID: " + userId + ")");
+            if ("INACTIVE".equals(newStatus)) {
+                if (targetUser != null && targetUser.getRoleId() == 4) {
+                    session.setAttribute("successSig", "Đã khóa tài khoản và tự động chuyển giao toàn bộ Khách hàng, Báo giá, Hợp đồng của " + targetUsername + " sang cho nhân viên Sale khác!");
+                } else {
+                    session.setAttribute("successSig", "Đã khóa tài khoản của người dùng " + targetUsername + " thành công!");
+                }
+            } else if ("ACTIVE".equals(newStatus)) {
+                session.setAttribute("successSig", "Đã mở khóa tài khoản của người dùng " + targetUsername + " thành công!");
+            }
         } catch (NumberFormatException e) {
             System.out.println("Cannot ban or unban, status invalid!");
         }
